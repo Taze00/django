@@ -1,0 +1,132 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <!-- Bootstrap CSS -->
+        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    
+        <!-- Google Fonts - Press Start 2P -->
+        <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+        <!-- Für Share Tech Mono -->
+        <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    
+        <!-- Eigener CSS -->
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    </head>
+<body>
+    <div class="navbar">
+        <a href="#home-section">Home</a>
+        <a href="#aboutme-section">About me</a>
+        <a href="#skills-section">Skills</a>
+        <a href="#projects-section">Projects</a>
+        <a href="#contacts-section">Contact</a>
+    </div>
+    
+    
+    <!-- HOME SECTION-->
+    <section id="home-section">
+        <div class="center-container">
+
+            <!-- start pic-->
+            <div id="click-me-text"></div>
+            <img id="logo-image" src="{% static 'css/images/logo.png' %}" alt="Logo" onclick="moveImageToLeft()">
+
+            <!-- text-->
+            <div class="about-section" id="about-section">
+                <h2 id="about-header"></h2>
+                <p id="about-paragraph"></p>
+            </div>
+
+            <!-- animation-->
+            <div id="pixel-figure-container">
+                <div id="pixel-figure"></div>
+            </div>
+            
+            
+        </div>
+    <section id="home-section">
+
+    <!-- ABOUTME SECTION -->
+    <section id="aboutme-section">
+        <div class="profile-container">
+            <div class="profile-picture" id="profile-picture" data-images='["{% static 'css/images/me1.png' %}", "{% static 'css/images/me2.png' %}"]'>
+                <img src="{% static 'css/images/me1.png' %}" alt="Profilbild" id="profile-image">
+            </div>
+ 
+            <p>Hi, I'm Alex Volkmann, a Business Informatics student with a passion for Marketing and Web Design. I combine technical know-how with creative strategies to create impressive digital experiences.</p>
+        </div>
+    </section>
+
+
+    <!-- SKILL SECTION -->
+    <section id="skills-section">
+        <div class="skills-container-left">
+            <h2>Skills</h2>
+            <div class="skills-content">
+                <div class="skill-subsection">
+                    <h3>Software</h3>
+                    <ul>
+                        <li class="hover-item">
+                            <img src="{% static 'css/images/office.png' %}" class="skill-logo" alt="Microsoft Office Bild">
+                            <span class="skill-description">Microsoft Office</span>
+                        </li>
+                        <li class="hover-item">
+                            <img src="{% static 'css/images/vsc.png' %}" class="skill-logo" alt="Visual Studio Code Bild">
+                            <span class="skill-description">Visual Studio Code</span>
+                        </li>
+                        <li class="hover-item">
+                            <img src="{% static 'css/images/photo.png' %}" class="skill-logo" alt="Photoshop Bild">
+                            <span class="skill-description">Photoshop</span>
+                        </li>
+                        <li class="hover-item">
+                            <img src="{% static 'css/images/premiere.png' %}" class="skill-logo" alt="Premiere Pro Bild">
+                            <span class="skill-description">Premiere Pro</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="skill-subsection">
+                    <h3>Technische Fähigkeiten</h3>
+                    <ul>
+                        <li class="hover-item">
+                            <img src="{% static 'css/images/python.png' %}" class="skill-logo" alt="Python Bild">
+                            <span class="skill-description">Python</span>
+                        </li>
+                        <li class="hover-item">
+                            <img src="{% static 'css/images/chat.png' %}" class="skill-logo" alt="CHATGPT Bild">
+                            <span class="skill-description">ChatGPT</span>
+                        </li>
+                        <li class="hover-item">
+                            <img src="{% static 'css/images/css.png' %}" class="skill-logo" alt="CSS Bild">
+                            <span class="skill-description">CSS</span>
+                        </li>
+                        <li class="hover-item">
+                            <img src="{% static 'css/images/html.png' %}" class="skill-logo" alt="HTML Bild">
+                            <span class="skill-description">HTML</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="skills-container-right">
+            <img src="{% static 'css/images/skill.png' %}" class="skills-image" alt="Beschreibung des Bildes">
+        </div>
+    </section>
+
+
+    
+    
+    <!-- Bootstrap JS und jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    
+    <!-- Eigener JavaScript -->
+    <script src="{% static 'js/test.js' %}"></script>
+</body>
+</html>
