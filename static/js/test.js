@@ -35,7 +35,7 @@ const aboutHeaderText = "Welcome";
 
 // Funktion, um die "About me"-Überschrift Buchstabe für Buchstabe zu tippen
 function typeAboutHeader() {
-    const aboutHeader = document.getElementById('about-header');
+    const aboutHeader = document.getElementById('home-header');
     if (aboutHeaderIndex < aboutHeaderText.length) {
         aboutHeader.textContent += aboutHeaderText.charAt(aboutHeaderIndex++);
         setTimeout(typeAboutHeader, 150);
@@ -43,7 +43,7 @@ function typeAboutHeader() {
 }
 
 // Zeige den "About me"-Paragraphen
-const aboutParagraph = document.getElementById('about-paragraph');
+const aboutParagraph = document.getElementById('home-paragraph');
 aboutParagraph.innerHTML = 'Welcome to a pixel adventure! I am <strong>Alex Volkmann</strong>, crafting code and design into unique digital experiences. Get to know me better.';
 
 let currentImageIndex = 0; // Variable zum Verfolgen des aktuellen Bildindex
@@ -119,4 +119,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 //----------------------------------------------------------------------------------------------------------------
 
-  
+document.querySelectorAll('.aboutme-icon').forEach(icon => {
+  icon.addEventListener('click', function() {
+      // Alle Inhalte verstecken
+      document.querySelectorAll('.aboutme-content').forEach(content => {
+          content.classList.remove('active-content');
+          content.classList.add('hidden-content');
+      });
+      
+      // Hintergrundbild ändern, falls gewünscht
+
+      // Den geklickten Inhalt anzeigen
+      const targetContent = document.getElementById(this.dataset.target);
+      targetContent.classList.remove('hidden-content');
+      targetContent.classList.add('active-content');
+  });
+});

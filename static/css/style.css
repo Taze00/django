@@ -7,7 +7,8 @@ body, html {
     position: fixed;
     width: 100%;
 }
-
+/* Menu */
+/* -------------------------------------------------------------------- */
 .navbar {
     border-bottom: 1px solid white;
     display: none;
@@ -37,7 +38,9 @@ body, html {
     background-color: white;
     color: black;
 }
-
+/* -------------------------------------------------------------------- */
+/* HOME */
+/* -------------------------------------------------------------------- */
 .center-container {
     display: flex;
     flex-direction: column;
@@ -85,13 +88,13 @@ body, html {
     font-family: 'Share Tech Mono', sans-serif;
 }
 
-#about-header {
+#home-header {
     height: 50px;
     overflow: hidden;
     z-index: 2;
 }
 
-#about-paragraph {
+#home-paragraph {
     animation: slideFromTop 4s forwards;
     min-height: 200px;
     z-index: 1;
@@ -109,6 +112,9 @@ body, html {
     }
 }
 
+/* -------------------------------------------------------------------- */
+/* ABOUT ME */
+/* -------------------------------------------------------------------- */
 #aboutme-section {
     display: flex;
     flex-direction: column;
@@ -124,6 +130,69 @@ body, html {
     color: white;
 }
 
+/* ABOUTME (menu) */
+/* -------------------------------------------------------------------- */
+/* Stile für die Navigationsleiste und Buttons */
+#aboutme-section {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Ändern Sie dies, um die Items links auszurichten */
+    justify-content: flex-start; /* Ändern Sie dies, um die Items oben auszurichten */
+    min-height: 100vh;
+    background-color: black;
+    color: white; /* Hier geändert, damit der Text lesbar ist */
+    text-align: left; /* Ändern Sie dies, falls der gesamte Text linksbündig sein soll */
+    padding-top: 20px; /* Abstand von der oberen Kante des Elternelements */
+    padding-left: 20px; /* Abstand von der linken Kante des Elternelements */
+}
+
+/* ABOUTME (menu) */
+/* -------------------------------------------------------------------- */
+/* Stile für die Navigationsleiste und Buttons */
+.aboutme-icons-container {
+    margin-left: 40px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px; /* Abstand zwischen den Icons */
+    margin-bottom: 20px; /* Abstand zwischen den Icon-Leiste und dem Content */
+}
+
+/* Stile für die Icons */
+.aboutme-icon {
+    margin-right: 40px;
+    height: 50px;  /* oder eine andere feste Höhe, je nach deinem Design */
+    cursor: pointer;
+}
+
+.aboutme-icon:hover {
+    transform: scale(1.1);
+}
+
+/* Stile für den aktiven Inhalt */
+.active-content {
+    display: block;
+}
+
+/* Stile für versteckten Inhalt */
+.hidden-content {
+    display: none;
+}
+
+.aboutme-content {
+    /* Weitere Stile für den Inhalt hier hinzufügen, wenn nötig */
+}
+
+/* Optional: Stile für das Hintergrundbild des Abschnitts */
+.aboutme-background {
+    width: 100%;
+    position: relative; /* positionieren, wie es benötigt wird */
+}
+
+
+
+/* HOME (animation) */
+/* -------------------------------------------------------------------- */
 #pixel-figure-container {
     position: absolute;
     bottom: 0; /* Startposition am unteren Rand des Containers */
@@ -178,7 +247,7 @@ body, html {
     100% { background-image: url('/static/css/images/walk/1.png'); }
   }
 
-
+/* -------------------------------------------------------------------- */
 
 
 

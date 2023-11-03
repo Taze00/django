@@ -37,29 +37,57 @@
 
             <!-- text-->
             <div class="about-section" id="about-section">
-                <h2 id="about-header"></h2>
-                <p id="about-paragraph"></p>
+                <h2 id="home-header"></h2>
+                <p id="home-paragraph"></p>
             </div>
 
             <!-- animation-->
             <div id="pixel-figure-container">
                 <div id="pixel-figure"></div>
             </div>
-            
-            
         </div>
     <section id="home-section">
 
     <!-- ABOUTME SECTION -->
     <section id="aboutme-section">
-        <div class="profile-container">
-            <div class="profile-picture" id="profile-picture" data-images='["{% static 'css/images/me1.png' %}", "{% static 'css/images/me2.png' %}"]'>
-                <img src="{% static 'css/images/me1.png' %}" alt="Profilbild" id="profile-image">
-            </div>
- 
-            <p>Hi, I'm Alex Volkmann, a Business Informatics student with a passion for Marketing and Web Design. I combine technical know-how with creative strategies to create impressive digital experiences.</p>
+        <div class="aboutme-icons-container">
+            <!-- Icons für die einzelnen Bereiche -->
+            <img src="{% static 'css/images/symbol/intro.png' %}" class="aboutme-icon" data-target="intro-content" alt="Einleitung">
+            <img src="{% static 'css/images/symbol/education.png' %}" class="aboutme-icon" data-target="education-content" alt="Ausbildung">
+            <img src="{% static 'css/images/symbol/goals.png' %}" class="aboutme-icon" data-target="goals-content" alt="Goals">
+            <img src="{% static 'css/images/symbol/hobbys.png' %}" class="aboutme-icon" data-target="hobbys-content" alt="Hobby">
+            <img src="{% static 'css/images/symbol/facts.png' %}" class="aboutme-icon" data-target="facts-content" alt="Facts">
+            <!-- weitere Icons -->
+        </div>
+
+        <!-- Der Inhalt für die Einleitung -->
+        <div id="intro-content" class="aboutme-content active-content">
+            <p>Einleitender Text...</p>
+            <!-- eventuell weiterer Inhalt -->
+        </div>
+
+        <!-- Der Inhalt für die Ausbildung -->
+        <div id="education-content" class="aboutme-content hidden-content">
+            <p>Ausbildungstext...</p>
+            <!-- eventuell weiterer Inhalt -->
+        </div>
+        <!-- Der Inhalt für die Ziele -->
+        <div id="goals-content" class="aboutme-content active-content">
+            <p>Einleitender Ziele...</p>
+            <!-- eventuell weiterer Inhalt -->
+        </div>
+        <!-- Der Inhalt für die Hobbys -->
+        <div id="hobbys-content" class="aboutme-content active-content">
+            <p>Einleitender Hobbys...</p>
+            <!-- eventuell weiterer Inhalt -->
+        </div>
+        <!-- Der Inhalt für die Fakten -->
+        <div id="fact-content" class="aboutme-content active-content">
+            <p>Einleitender Fakten...</p>
+            <!-- eventuell weiterer Inhalt -->
         </div>
     </section>
+
 
 
     <!-- SKILL SECTION -->
@@ -71,19 +99,19 @@
                     <h3>Software</h3>
                     <ul>
                         <li class="hover-item">
-                            <img src="{% static 'css/images/office.png' %}" class="skill-logo" alt="Microsoft Office Bild">
+                            <img src="{% static 'css/images/skills/office.png' %}" class="skill-logo" alt="Microsoft Office Bild">
                             <span class="skill-description">Microsoft Office</span>
                         </li>
                         <li class="hover-item">
-                            <img src="{% static 'css/images/vsc.png' %}" class="skill-logo" alt="Visual Studio Code Bild">
+                            <img src="{% static 'css/images/skills/vsc.png' %}" class="skill-logo" alt="Visual Studio Code Bild">
                             <span class="skill-description">Visual Studio Code</span>
                         </li>
                         <li class="hover-item">
-                            <img src="{% static 'css/images/photo.png' %}" class="skill-logo" alt="Photoshop Bild">
+                            <img src="{% static 'css/images/skills/photo.png' %}" class="skill-logo" alt="Photoshop Bild">
                             <span class="skill-description">Photoshop</span>
                         </li>
                         <li class="hover-item">
-                            <img src="{% static 'css/images/premiere.png' %}" class="skill-logo" alt="Premiere Pro Bild">
+                            <img src="{% static 'css/images/skills/premiere.png' %}" class="skill-logo" alt="Premiere Pro Bild">
                             <span class="skill-description">Premiere Pro</span>
                         </li>
                     </ul>
@@ -93,19 +121,19 @@
                     <h3>Technische Fähigkeiten</h3>
                     <ul>
                         <li class="hover-item">
-                            <img src="{% static 'css/images/python.png' %}" class="skill-logo" alt="Python Bild">
+                            <img src="{% static 'css/images/skills/python.png' %}" class="skill-logo" alt="Python Bild">
                             <span class="skill-description">Python</span>
                         </li>
                         <li class="hover-item">
-                            <img src="{% static 'css/images/chat.png' %}" class="skill-logo" alt="CHATGPT Bild">
+                            <img src="{% static 'css/images/skills/chat.png' %}" class="skill-logo" alt="CHATGPT Bild">
                             <span class="skill-description">ChatGPT</span>
                         </li>
                         <li class="hover-item">
-                            <img src="{% static 'css/images/css.png' %}" class="skill-logo" alt="CSS Bild">
+                            <img src="{% static 'css/images/skills/css.png' %}" class="skill-logo" alt="CSS Bild">
                             <span class="skill-description">CSS</span>
                         </li>
                         <li class="hover-item">
-                            <img src="{% static 'css/images/html.png' %}" class="skill-logo" alt="HTML Bild">
+                            <img src="{% static 'css/images/skills/html.png' %}" class="skill-logo" alt="HTML Bild">
                             <span class="skill-description">HTML</span>
                         </li>
                     </ul>
@@ -114,7 +142,7 @@
         </div>
 
         <div class="skills-container-right">
-            <img src="{% static 'css/images/skill.png' %}" class="skills-image" alt="Beschreibung des Bildes">
+            <img src="{% static 'css/images/skills/skill.png' %}" class="skills-image" alt="Beschreibung des Bildes">
         </div>
     </section>
 
