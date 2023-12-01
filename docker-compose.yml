@@ -1,0 +1,50 @@
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    networks:
+      - backend
+  django-dev:
+    # container_name: web-app
+    image: django-dev
+    build: ./docker
+    command: python manage.py runserver 0.0.0.0:80
+    volumes:
+      - .:/code
+    ports:
+      - "8000:80"
+    expose:
+      - 80
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    depends_on:
+      - db
+    labels:
+      - "traefik.enable=true" 
+      - "traefik.http.routers.django-dev.entrypoints=http" 
+      - "traefik.http.routers.django-dev.rule=Host(`alex.devpool.net`)" 
+      - "traefik.http.middlewares.django-dev-https-redirect.redirectscheme.scheme=https" 
+      - "traefik.http.routers.django-dev.middlewares=django-dev-https-redirect" 
+      - "traefik.http.routers.django-dev-secure.entrypoints=https" 
+      - "traefik.http.routers.django-dev-secure.rule=Host(`alex.devpool.net`)" 
+      - "traefik.http.routers.django-dev-secure.tls=true" 
+      - "traefik.http.routers.django-dev-secure.tls.certresolver=http" 
+      - "traefik.http.routers.django-dev-secure.service=django-dev" 
+      - "traefik.http.services.django-dev.loadbalancer.server.port=80" 
+      - "traefik.docker.network=proxy" 
+    networks:
+      - backend
+      - proxy
+
+networks:
+  proxy:
+    external: true
+  backend:
+    external: false
