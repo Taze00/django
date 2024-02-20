@@ -7,147 +7,121 @@
         
         <!-- Bootstrap CSS -->
         <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    
-        <!-- Google Fonts - Press Start 2P -->
-        <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-        <!-- Für Share Tech Mono -->
-        <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+        <!-- Menu Icon -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
     
         <!-- Eigener CSS -->
-        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        <link rel="stylesheet" href="{% static 'css/general_settings.css' %}">
+        <link rel="stylesheet" href="{% static 'css/header.css' %}">
+        <link rel="stylesheet" href="{% static 'css/about_me.css' %}">
+        <link rel="stylesheet" href="{% static 'css/skills.css' %}">
+        <link rel="stylesheet" href="{% static 'css/contact.css' %}">
+
+
     </head>
 <body>
-    <div class="navbar">
-        <a href="#home-section">Home</a>
-        <a href="#aboutme-section">About me</a>
-        <a href="#skills-section">Skills</a>
-        <a href="#projects-section">Projects</a>
-        <a href="#contacts-section">Contact</a>
+
+    <nav>
+        <input type="checkbox" id="toggle_button">
+        <label for="toggle_button">
+            <span class="material-symbols-outlined">menu</span>
+        </label>
+        <ul>
+            <li><a href="#about_me_section">About me</a></li>
+            <li><a href="#skill_section">Skills</a></li>
+            <li><a href="">Project</a></li>
+            <li><a href="">Contact</a></li>
+        </ul>
+    </nav>
+
+   <header>
+    <div class="header_image">
+        <img src="/static/css/images/logo.png" alt="Logo">
     </div>
-    
-    
-    <!-- HOME SECTION-->
-    <section id="home-section">
-        <div class="center-container">
 
-            <!-- start pic-->
-            <div id="click-me-text"></div>
-            <img id="logo-image" src="{% static 'css/images/logo.png' %}" alt="Logo" onclick="moveImageToLeft()">
+    <div class="header_text">
+        <h1>Welcome</h1>
+        <p class="subheading">Welcome to a pixel adventure! I am <span style="font-weight: bolder;">Alex Volkmann</span>, crafting code and design into unique digital experiences. Get to know me better.</p>
+    </div>
 
-            <!-- text-->
-            <div class="about-section" id="about-section">
-                <h2 id="home-header"></h2>
-                <p id="home-paragraph"></p>
-            </div>
+   </header>
 
-            <!-- animation-->
-            <div id="pixel-figure-container">
-                <div id="pixel-figure"></div>
-            </div>
-        </div>
-    <section id="home-section">
+    <section id="about_me_section">
+        <img id="about_me_image" src="/static/css/images/aboutme/alex0.jpeg" alt="">
+        <div class="about_me_container">
+            <h2>About me</h2>
+            <p>
+                In a world of wonder, where dreams take flight,<br>
+                I'm Alex, here to share my light.<br>
+                With a heart full of laughter and a mind so keen,<br>
+                Let me take you on a journey, if you know what I mean.<br>
+                <br>
+                From dawn till dusk, I chase my dreams,<br>
+                With a sprinkle of magic, or so it seems.<br>
+                With every step, I dance with glee,<br>
+                Embracing life's adventures, wild and free.<br>
+                <br>
+                In the land of creativity, I hold my sway,<br>
+                Weaving stories and songs, come what may.<br>
+                With words as my paint and rhymes as my brush,<br>
+                I'll create a masterpiece, no need to rush.<br>
+                <br>
+                So here's to me, and the life I lead,<br>
+                Filled with laughter, love, and a little mischievous deed.<br>
+                I'll keep dancing through life, with a skip and a hop,<br>
+                Embracing each moment, until I reach the mountain top!<br>
+            </p>
+        
 
-    <!-- ABOUTME SECTION -->
-    <section id="aboutme-section">
-        <div class="aboutme-icons-container">
-            <!-- Icons für die einzelnen Bereiche -->
-            <img src="{% static 'css/images/symbol/intro.png' %}" class="aboutme-icon" data-target="intro-content" alt="Einleitung">
-            <img src="{% static 'css/images/symbol/education.png' %}" class="aboutme-icon" data-target="education-content" alt="Ausbildung">
-            <img src="{% static 'css/images/symbol/goals.png' %}" class="aboutme-icon" data-target="goals-content" alt="Goals">
-            <img src="{% static 'css/images/symbol/hobbys.png' %}" class="aboutme-icon" data-target="hobbys-content" alt="Hobby">
-            <img src="{% static 'css/images/symbol/facts.png' %}" class="aboutme-icon" data-target="facts-content" alt="Facts">
-            <!-- weitere Icons -->
         </div>
+        
 
-        <!-- Der Inhalt für die Einleitung -->
-        <div id="intro-content" class="aboutme-content active-content">
-            <p>Einleitender Text...</p>
-            <!-- eventuell weiterer Inhalt -->
-        </div>
-
-        <!-- Der Inhalt für die Ausbildung -->
-        <div id="education-content" class="aboutme-content hidden-content">
-            <p>Ausbildungstext...</p>
-            <!-- eventuell weiterer Inhalt -->
-        </div>
-        <!-- Der Inhalt für die Ziele -->
-        <div id="goals-content" class="aboutme-content active-content">
-            <p>Einleitender Ziele...</p>
-            <!-- eventuell weiterer Inhalt -->
-        </div>
-        <!-- Der Inhalt für die Hobbys -->
-        <div id="hobbys-content" class="aboutme-content active-content">
-            <p>Einleitender Hobbys...</p>
-            <!-- eventuell weiterer Inhalt -->
-        </div>
-        <!-- Der Inhalt für die Fakten -->
-        <div id="fact-content" class="aboutme-content active-content">
-            <p>Einleitender Fakten...</p>
-            <!-- eventuell weiterer Inhalt -->
-        </div>
     </section>
 
-
-
-    <!-- SKILL SECTION -->
-    <section id="skills-section">
-        <div class="skills-container-left">
-            <h2>Skills</h2>
-            <div class="skills-content">
-                <div class="skill-subsection">
-                    <h3>Software</h3>
-                    <ul>
-                        <li class="hover-item">
-                            <img src="{% static 'css/images/skills/office.png' %}" class="skill-logo" alt="Microsoft Office Bild">
-                            <span class="skill-description">Microsoft Office</span>
-                        </li>
-                        <li class="hover-item">
-                            <img src="{% static 'css/images/skills/vsc.png' %}" class="skill-logo" alt="Visual Studio Code Bild">
-                            <span class="skill-description">Visual Studio Code</span>
-                        </li>
-                        <li class="hover-item">
-                            <img src="{% static 'css/images/skills/photo.png' %}" class="skill-logo" alt="Photoshop Bild">
-                            <span class="skill-description">Photoshop</span>
-                        </li>
-                        <li class="hover-item">
-                            <img src="{% static 'css/images/skills/premiere.png' %}" class="skill-logo" alt="Premiere Pro Bild">
-                            <span class="skill-description">Premiere Pro</span>
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="skill-subsection">
-                    <h3>Technische Fähigkeiten</h3>
-                    <ul>
-                        <li class="hover-item">
-                            <img src="{% static 'css/images/skills/python.png' %}" class="skill-logo" alt="Python Bild">
-                            <span class="skill-description">Python</span>
-                        </li>
-                        <li class="hover-item">
-                            <img src="{% static 'css/images/skills/chat.png' %}" class="skill-logo" alt="CHATGPT Bild">
-                            <span class="skill-description">ChatGPT</span>
-                        </li>
-                        <li class="hover-item">
-                            <img src="{% static 'css/images/skills/css.png' %}" class="skill-logo" alt="CSS Bild">
-                            <span class="skill-description">CSS</span>
-                        </li>
-                        <li class="hover-item">
-                            <img src="{% static 'css/images/skills/html.png' %}" class="skill-logo" alt="HTML Bild">
-                            <span class="skill-description">HTML</span>
-                        </li>
-                    </ul>
-                </div>
+   <section id="skill_section">
+    <h2>Skills</h2>
+    <div class="flex_container">
+        <div class="card">
+            <h3>Program</h3>
+            <div class="program">
+                <img src="/static/css/images/skills/photo.png" alt="Photoshop" class="skill-image">
+                <p class="description">Photoshop</p>
+            </div>
+            <div class="program">
+                <img src="/static/css/images/skills/premiere.png" alt="Premiere Pro" class="skill-image">
+                <p class="description">Premiere Pro</p>
+            </div>
+            <div class="program">
+                <img src="/static/css/images/skills/vsc.png" alt="Visual Studio Code" class="skill-image">
+                <p class="description">Visual Studio Code</p>
             </div>
         </div>
-
-        <div class="skills-container-right">
-            <img src="{% static 'css/images/skills/skill.png' %}" class="skills-image" alt="Beschreibung des Bildes">
+        <div class="card">
+            <h3>Programming language</h3>
+            <div class="program">
+                <img src="/static/css/images/skills/python.png" alt="Python" class="skill-image">
+                <p>Pyhton</p>
+            </div>
+            <div class="program">
+                <img src="/static/css/images/skills/html.png" alt="HTML" class="skill-image">
+                <p>HTML</p>
+            </div>
+            <div class="program">
+                <img src="/static/css/images/skills/css.png" alt="CSS" class="skill-image">
+                <p>CSS</p>
+            </div>
         </div>
-    </section>
-
-
-    
+        <div class="card">
+            <h3>Certificates</h3>
+                <img src="/static/css/images/skills/havard.png" alt="CSS" class="certi">
+                <p>Havard Python</p>
+        </div>
+    </div>
+   </section>
+   
+   <footer></footer>
     
     <!-- Bootstrap JS und jQuery -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -155,6 +129,8 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     
     <!-- Eigener JavaScript -->
-    <script src="{% static 'js/test.js' %}"></script>
+    <script src="{% static 'js/about_me.js' %}"></script>
+
+
 </body>
 </html>

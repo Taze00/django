@@ -29,11 +29,11 @@ services:
     labels:
       - "traefik.enable=true" 
       - "traefik.http.routers.django-dev.entrypoints=http" 
-      - "traefik.http.routers.django-dev.rule=Host(`alex.devpool.net`)" 
+      - "traefik.http.routers.django-dev.rule=Host(`alex.volkmann.com`)" 
       - "traefik.http.middlewares.django-dev-https-redirect.redirectscheme.scheme=https" 
       - "traefik.http.routers.django-dev.middlewares=django-dev-https-redirect" 
       - "traefik.http.routers.django-dev-secure.entrypoints=https" 
-      - "traefik.http.routers.django-dev-secure.rule=Host(`alex.devpool.net`)" 
+      - "traefik.http.routers.django-dev-secure.rule=Host(`alex.volkmann.com`)" 
       - "traefik.http.routers.django-dev-secure.tls=true" 
       - "traefik.http.routers.django-dev-secure.tls.certresolver=http" 
       - "traefik.http.routers.django-dev-secure.service=django-dev" 

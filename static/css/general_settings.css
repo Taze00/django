@@ -1,0 +1,40 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    min-height: 100vh;
+    font-family: 'Poppins-Black', sans-serif;
+    font-size: 20px;
+}
+
+h1{
+    font-size: 50px;
+    line-height: 115%;
+    font-weight: bold;
+}
+
+h2{
+    font-weight: bold;
+    font-size: 45px;
+}
+
+h3{
+    font-size: 38px;
+    font-weight: bold;
+}
+
+.subheading{
+    margin-top: 25px;
+    font-family: 'Poppins-Black', sans-serif;
+}
+
+@media(max-width: 800px){
+    h1{
+        text-align: center;
+    }
+    .subheading{
+        text-align: center;
+    }
+}
