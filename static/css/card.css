@@ -1,0 +1,73 @@
+#card_section {
+    background-image: url("/static/css/images/backgound.png");
+    background-repeat: repeat;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+:root {
+    --card-height: 300px;
+    --card-width: calc(var(--card-height) / 1.5);
+}
+
+.card {
+    width: 330px; /* Beispielwert */
+    height: 200px; /* Beispielwert */
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    perspective: 2500px;
+    cursor: pointer;
+    background: transparent;
+}
+
+.cover {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    object-position: center; /* Zentriert das Bild horizontal und vertikal */
+}
+
+.wrapper {
+    transition: all 0.5s;
+    position: relative;
+    transform-style: preserve-3d; /* Bewahren der 3D-Transformationen */
+}
+
+.wrapper:hover {
+    transform: rotateX(20deg); /* Rotieren des Wrappers beim Hovern */
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.5s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translateZ(50px); /* Verschiebt das Overlay nach vorne */
+}
+
+.wrapper:hover .overlay {
+    opacity: 1;
+    transform: translateZ(50px) rotateX(-20deg); /* Kehrt die Neigung des Wrappers um */
+}
+
+
+.character {
+    width: 100%;
+    opacity: 1;
+}
+
+.wrapper:hover .character {
+    transform: rotateX(-20deg); /* Inverse Rotation, um die Neigung des Wrappers aufzuheben */
+}

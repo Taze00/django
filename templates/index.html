@@ -18,109 +18,229 @@
         <link rel="stylesheet" href="{% static 'css/about_me.css' %}">
         <link rel="stylesheet" href="{% static 'css/skills.css' %}">
         <link rel="stylesheet" href="{% static 'css/contact.css' %}">
+        <link rel="stylesheet" href="{% static 'css/toprate.css' %}">
+        <link rel="stylesheet" href="{% static 'css/card.css' %}">
+        <link rel="stylesheet" href="{% static 'css/gallery.css' %}">
 
 
     </head>
 <body>
 
-    <nav>
-        <input type="checkbox" id="toggle_button">
-        <label for="toggle_button">
-            <span class="material-symbols-outlined">menu</span>
-        </label>
-        <ul>
-            <li><a href="#about_me_section">About me</a></li>
-            <li><a href="#skill_section">Skills</a></li>
-            <li><a href="">Project</a></li>
-            <li><a href="">Contact</a></li>
-        </ul>
-    </nav>
+    <header>
+        <div class="header_text">
+            
+            <div class="welcome_bttn">
+                <p> &#x1F44B;&nbsp; Welcome to Alex Volkmann &nbsp;</p>
+            </div>
+            <h1>I’m a programmer</h1>
+            <p class="subheading">Welcome to my website! I'm <span style="font-weight: bolder;">Alex Volkmann</span>, ready to share my passion for technology and design with you.</p>
 
-   <header>
-    <div class="header_image">
-        <img src="/static/css/images/logo.png" alt="Logo">
-    </div>
+            <a id="change-picture-btn" class="contact-me-btn2">Change picture</a>
+            <a href="#contact" class="contact-me-btn">Contact Me</a>
+    
+        </div>
 
-    <div class="header_text">
-        <h1>Welcome</h1>
-        <p class="subheading">Welcome to a pixel adventure! I am <span style="font-weight: bolder;">Alex Volkmann</span>, crafting code and design into unique digital experiences. Get to know me better.</p>
-    </div>
+        <div class="header_image">
+            <img id="profile-picture" src="/static/css/images/aboutme/alex1.png" alt="Profilbild">
+        </div>
 
+        <div class="social-media-links">
+            <a href="https://www.instagram.com/a_.volkmann" class="social-link instagram" target="_blank" aria-label="Instagram"></a>
+            <a href="https://www.tiktok.com/@killua_alex" class="social-link tiktok" target="_blank" aria-label="TikTok"></a>
+            <!-- <a href="https://www.linkedin.com/in/alex-volkmann-54677a239/" class="social-link linkedin" target="_blank" aria-label="LinkedIn"></a> -->
+            <a href="https://soundcloud.com/alex_sasuke/sets/goat/s-G1ZTUqCaTPO?si=aa95f905957a4fc7b2ea766d80019bd3&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing" class="social-link soundcloud" target="_blank" aria-label="SoundCloud"></a>
+        </div>
+         
    </header>
 
     <section id="about_me_section">
-        <img id="about_me_image" src="/static/css/images/aboutme/alex0.jpeg" alt="">
-        <div class="about_me_container">
-            <h2>About me</h2>
-            <p>
-                In a world of wonder, where dreams take flight,<br>
-                I'm Alex, here to share my light.<br>
-                With a heart full of laughter and a mind so keen,<br>
-                Let me take you on a journey, if you know what I mean.<br>
-                <br>
-                From dawn till dusk, I chase my dreams,<br>
-                With a sprinkle of magic, or so it seems.<br>
-                With every step, I dance with glee,<br>
-                Embracing life's adventures, wild and free.<br>
-                <br>
-                In the land of creativity, I hold my sway,<br>
-                Weaving stories and songs, come what may.<br>
-                With words as my paint and rhymes as my brush,<br>
-                I'll create a masterpiece, no need to rush.<br>
-                <br>
-                So here's to me, and the life I lead,<br>
-                Filled with laughter, love, and a little mischievous deed.<br>
-                I'll keep dancing through life, with a skip and a hop,<br>
-                Embracing each moment, until I reach the mountain top!<br>
-            </p>
-        
 
+        <div class="about_me_playlist">
+            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DX6J5NfMJS675?utm_source=generator&theme=0" width="600" height="950" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
         </div>
+
+        <div class="about_me_container">
+            <h2>ABOUT ME <span>PLAYLIST</span></h2>
+
+            <div class="about_me_text"> 
+                <h3>Track 1: "Roots and Routes"</h3>
+                Born in Berlin, but now calling Werder home – a slight twist in the journey, yet my love for the capital remains untouched.
+                <br><br>
+
+                <h3>Track 2: "Digital Vibes"</h3>
+                My days are spent diving into the world of marketing and web design, thanks to my studies in Business Informatics. It's not just about the tech for me; it's about creating connections that count.
+                <br><br>
+
+                <h3>Track 3: "Berlin Beat Hopper"</h3>
+                When I'm in Berlin, I love to explore the club scene. Club hopping is my thing; a different club every weekend. Tresor gets a shoutout, not because it's the only place I go, but because when I do, it's always a blast. Yet, it's the city's diversity that truly captivates me.
+                <br><br>
+
+                <h3>Track 4: "Life on the Pitch"</h3>
+                Twenty years on the field, and still no desire to hang up my boots. Soccer is more than a game; it's one of those constants that keep me grounded.
+                <br><br>
+
+                <h3>Track 5: "Echoes of Me"</h3>
+                Talking big about myself isn't my style. I much prefer to let the things I do and my passions speak for themselves. Through this playlist, you, the listener, can catch the vibe of my world.
+                <br><br>
+
+                <h3>Track 6: "Window to My World"</h3>
+                This website is like a set of tracks, each offering a glimpse into what drives me – from Berlin's endless club landscape to a peaceful day on the soccer field. Not overloaded, just an honest insight.
+                <br><br>
+            </div>
+
+            <div class="aboutme_icons">
+            <div class="aboutme_icon_text">More playlists:</div>
+                <div class="social-media-links-aboutme">
+                    <a href="https://soundcloud.com/alex_sasuke/sets/goat/s-G1ZTUqCaTPO?si=aa95f905957a4fc7b2ea766d80019bd3&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing" class="social-link-aboutme soundcloud" target="_blank" aria-label="SoundCloud"></a>
+                    <a href="https://open.spotify.com/playlist/37i9dQZF1DX6J5NfMJS675?si=da66baa5f37645d2" class="social-link-aboutme spotify" target="_blank" aria-label="Spotify"></a>
+                </div>
+            </div>
+        </div>
+
+
         
 
     </section>
 
-   <section id="skill_section">
-    <h2>Skills</h2>
-    <div class="flex_container">
-        <div class="card">
-            <h3>Program</h3>
-            <div class="program">
-                <img src="/static/css/images/skills/photo.png" alt="Photoshop" class="skill-image">
-                <p class="description">Photoshop</p>
+    <div class="parallax" style="background-image: url(/static/css/images/background_dj.png);">
+    </div>
+
+    <!-- <section id="skills">
+
+        <h2>My skills</h2>
+        <div class="skills-grid">
+            <div class="skill">
+                <img src="/static/css/images/skills/chat.png" alt="ChatGPT">
+                <p>ChatGPT</p>
             </div>
-            <div class="program">
-                <img src="/static/css/images/skills/premiere.png" alt="Premiere Pro" class="skill-image">
-                <p class="description">Premiere Pro</p>
+            <div class="skill">
+                <img src="/static/css/images/skills/python.png" alt="Python">
+                <p>Python</p>
             </div>
-            <div class="program">
-                <img src="/static/css/images/skills/vsc.png" alt="Visual Studio Code" class="skill-image">
-                <p class="description">Visual Studio Code</p>
-            </div>
-        </div>
-        <div class="card">
-            <h3>Programming language</h3>
-            <div class="program">
-                <img src="/static/css/images/skills/python.png" alt="Python" class="skill-image">
-                <p>Pyhton</p>
-            </div>
-            <div class="program">
-                <img src="/static/css/images/skills/html.png" alt="HTML" class="skill-image">
-                <p>HTML</p>
-            </div>
-            <div class="program">
-                <img src="/static/css/images/skills/css.png" alt="CSS" class="skill-image">
+            <div class="skill">
+                <img src="/static/css/images/skills/css.png" alt="CSS">
                 <p>CSS</p>
             </div>
+            <div class="skill">
+                <img src="/static/css/images/skills/html.png" alt="HTML">
+                <p>HTML</p>
+            </div>
+            <div class="skill">
+                <img src="/static/css/images/skills/office.png" alt="Office">
+                <p>Office</p>
+            </div>
+            <div class="skill">
+                <img src="/static/css/images/skills/vsc.png" alt="Visual Studio Code">
+                <p>VS Code</p>
+            </div>
+            <div class="skill">
+                <img src="/static/css/images/skills/photo.png" alt="Photoshop">
+                <p>Photoshop</p>
+            </div>
+            <div class="skill">
+                <img src="/static/css/images/skills/premiere.png" alt="Premiere Pro">
+                <p>Premiere Pro</p>
+            </div>
         </div>
-        <div class="card">
-            <h3>Certificates</h3>
-                <img src="/static/css/images/skills/havard.png" alt="CSS" class="certi">
-                <p>Havard Python</p>
+    </section>-->
+    
+    <section id="gallery">
+
+        <div class="container_gallery">
+
+            <div class="heading">
+                <h3>Photo <span>Gallery</span></h3>
+            </div>
+            
+            <div class="box">
+                <div class="dream">
+                    <img src="/static/css/images/gallery/alex0.png">
+                    <img src="/static/css/images/gallery/alex3.jpeg">
+                    <img src="/static/css/images/gallery/alex2.png">
+                    <img src="/static/css/images/gallery/alex1.png">
+                    <img src="/static/css/images/gallery/alex9.jpeg">
+                </div>
+
+                <div class="dream">
+                    <img src="/static/css/images/gallery/alex5.jpeg">
+                    <img src="/static/css/images/gallery/alex7.jpeg">
+                    <img src="/static/css/images/gallery/alex6.jpeg">
+                    <img src="/static/css/images/gallery/alex8.jpeg">
+
+                </div>
+
+                <div class="dream">
+                    <img src="/static/css/images/gallery/alex10.jpeg">
+                    <img src="/static/css/images/gallery/alex11.jpeg">
+                    <img src="/static/css/images/gallery/alex4.jpeg">
+                    <img src="/static/css/images/gallery/alex12.jpeg">
+                    <!--<video controls>
+                        <source src="/static/css/images/gallery/alexv.mp4" type="video/mp4">
+                        Ihr Browser unterstützt dieses Videoformat nicht.
+                    </video>-->
+                    
+
+                </div>
+
+            </div>
+
         </div>
-    </div>
-   </section>
+    </section>
+
+    <section id="toprate_section">
+        <div class="rating_container">
+            <div class="heading">
+                <h2>Club Ranking</h2>
+            </div>
+            <div class="clubrating">
+                <ul class="club-list">
+                    <li><span>1.</span><div>Tresor</div></li>
+                    <li><span>2.</span><div>Lokschuppen</div></li>
+                    <li><span>3.</span><div>M-BIA</div></li>
+                    <li><span>4.</span><div>Renate</div></li>
+                    <li><span>5.</span><div>Ritter Butzke</div></li>
+                    <li><span>6.</span><div>Waschhaus</div></li>
+                    <li><span>7.</span><div>Watergate</div></li>
+                    <li><span>8.</span><div>Bergwerk</div></li>
+                    <!-- Weitere Einträge hier -->
+                </ul>
+            </div>
+        </div>
+    </section>
+
+
+
+
+    
+
+    
+                
    
+   <section id="contact">
+    <div class="form">
+        <h2>Want to get in touch</h2>
+        <form>
+            
+                <div class="form-row">
+                    <div class="input-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" name="name" placeholder="Enter your name">
+                    </div>
+                    <div class="input-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="Enter your email address">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="message" placeholder="Enter your message"></textarea>
+                </div>
+                <button type="submit" class="submit-btn">Submit</button>
+            
+        </form>
+    </div>
+</section>
+
    <footer></footer>
     
     <!-- Bootstrap JS und jQuery -->
@@ -129,7 +249,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     
     <!-- Eigener JavaScript -->
-    <script src="{% static 'js/about_me.js' %}"></script>
+    <script src="{% static 'js/header_pic.js' %}"></script>
 
 
 </body>

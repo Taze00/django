@@ -1,18 +1,84 @@
+/* roboto-condensed-regular - latin */
+@font-face {
+    font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+    font-family: 'Roboto Condensed';
+    font-style: normal;
+    font-weight: 400;
+    src: url("/static/css/fonts/roboto-condensed-v27-latin-regular.woff2") format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+
+  }
+  /* roboto-condensed-900 - latin */
+  @font-face {
+    font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+    font-family: 'Roboto Condensed';
+    font-style: normal;
+    font-weight: 900;
+    src: url("/static/css/fonts/roboto-condensed-v27-latin-900.woff2") format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+  }
+/* montserrat-regular - latin */
+@font-face {
+    font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 400;
+    src: url("/static/css/fonts/montserrat-v26-latin-regular.woff2") format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+  }
+@font-face {
+    font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+    font-family: 'Bebas Neue';
+    font-style: normal;
+    font-weight: 400;
+    src: url("/static/css/fonts/bebas-neue-v14-latin-regular.woff2") format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+}
+/* oswald-200 - latin */
+@font-face {
+    font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+    font-family: 'Oswald';
+    font-style: normal;
+    font-weight: 200;
+    src: url("/static/css/fonts/oswald-v53-latin-200.woff2") format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+  }
+  /* oswald-regular - latin */
+  @font-face {
+    font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+    font-family: 'Oswald';
+    font-style: normal;
+    font-weight: 400;
+    src: url("/static/css/fonts/oswald-v53-latin-regular.woff2") format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+  }
+  /* oswald-700 - latin */
+  @font-face {
+    font-display: swap; /* Check https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/font-display for other options. */
+    font-family: 'Oswald';
+    font-style: normal;
+    font-weight: 700;
+    src: url("/static/css/fonts/oswald-v53-latin-700.woff2") format('woff2'); /* Chrome 36+, Opera 23+, Firefox 39+, Safari 12+, iOS 10+ */
+  }
+
+
 *{
     margin: 0;
     padding: 0;
 }
 
+html, body {
+  overflow-x: hidden;
+}
+
 body{
+    max-width: 100%;
     min-height: 100vh;
-    font-family: 'Poppins-Black', sans-serif;
+    font-family: 'Roboto', sans-serif;
     font-size: 20px;
 }
+
+
 
 h1{
     font-size: 50px;
     line-height: 115%;
     font-weight: bold;
+    font-family: 'Oswald', sans-serif;
 }
 
 h2{
@@ -25,16 +91,29 @@ h3{
     font-weight: bold;
 }
 
+.parallax {
+    height: 500px; 
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
 .subheading{
     margin-top: 25px;
-    font-family: 'Poppins-Black', sans-serif;
 }
 
 @media(max-width: 800px){
     h1{
         text-align: center;
     }
+
     .subheading{
         text-align: center;
+    }
+
+    .parallax {
+      background-attachment: scroll;
+      height: 250px; 
     }
 }

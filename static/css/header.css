@@ -1,127 +1,234 @@
 header{
-    padding: 50px 25px;
+    padding: 50px 0px;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 100px;
-    flex-wrap: wrap;
-    min-height: 100vh;
-}
 
-.header_text{
-    width: 850px;
+    gap: 50px;
+    flex-wrap: wrap-reverse;
+    min-height: 100vh;
+
+    background-image: url("/static/css/images/berlin.png");
+    background-size: cover;
+    background-position: bottom;
+    background-repeat: no-repeat;
 }
 
 .header_image{
-    height: 600px;
-    width: 600px;
-    max-height: 80vw;
-    max-width: 80vw;
-
+    height: 400px;
+    width: 400px;
     overflow: hidden;
+    border-radius: 50%;
+    border: 7px solid white;
+
     display: flex;
     justify-content: center;
     align-items: center;
+
+    max-height: 80vw;
+    max-width: 80vw;
+
 }
 
 .header_image img{
     width: 100%;
 }
 
-nav{
-    position: fixed;
-    top: 0; /* Menü am oberen Bildschirmrand positionieren */
-    left: 0;
-    width: 100%;
-    z-index: 1000;
+header h1{
+    font-size: 80px;
+    margin-top: 20px;
+}
 
-    background-color: black;
-    min-height: 60px;
+.welcome_bttn{
+    background-color: rgba(255, 255, 255, 0.3);
+    border: 1px solid white;
+    border-radius: 20px;
+    width: 250px;
+    height: 35px;
     display: flex;
-    justify-content: center; /* Horizontale Ausrichtung zentrieren */
-    min-height: 60px;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+}
+
+.welcome_bttn p{
+    font-size: 15px;
+    margin-bottom: 0px;
     font-weight: bold;
-    border-bottom: solid 1px white;
     
 }
 
-nav ul{
-    list-style: none;
-    display: flex;
-    justify-content: center; /* Zentriert die Listenelemente horizontal */
-    align-items: center; /* Zentriert die Listenelemente vertikal */
-    gap: 150px;
-    margin-bottom: 0px;
+.header_text{
+    width: 700px;
+    color: white;
+    background-color: transparent;
 }
 
-nav a{
+.subheading{
+    font-size: 22px;
+}
+
+.contact-me-btn {
+    display: inline-block;
+    padding: 10px 40px;
+    margin: 0px;
+    font-size: 19px;
     color: white;
+    border: 2px solid white;
+    border-radius: 25px; /* Abgerundete Ecken */
     text-decoration: none;
+    background-color: transparent;
+    transition: background-color 0.3s, color 0.3s;
+    margin-top: 30px;
+  }
+  
+  .contact-me-btn:hover {
+    background-color: white; /* Hintergrundfarbe beim Hovern */
+    color: black; /* Textfarbe beim Hovern */
+    text-decoration: none;
+  }
+
+  .contact-me-btn2 {
+    display: inline-block;
+    padding: 10px 40px;
+    margin: 0px;
+    font-size: 19px;
+    color: black;
+    border: 2px solid white;
+    border-radius: 25px; /* Abgerundete Ecken */
+    text-decoration: none;
+    background-color: white;
+    
+    transition: background-color 0.3s, color 0.3s;
+    margin-top: 30px;
+  }
+  
+  .contact-me-btn2:hover {
+    background-color: transparent;
+    color: white; /* Textfarbe beim Hovern */
+    text-decoration: none;
+  }
+
+  .social-media-links {
+    position: fixed;
+    top: 360px;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 30px 10px 10px;
+    gap: 10px;
+}
+
+.social-link {
+    width: 35px;
+    height: 35px;
+    overflow: hidden;
+    border-radius: 50%;
+    border: 2px solid white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+
+    background-size: 100%; /* Passt die Größe des Hintergrundbildes an */
+    
+    background-position: center; /* Zentriert das Bild */
+    background-repeat: no-repeat; /* Verhindert das Wiederholen des Bildes */
+
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.social-link.instagram {
+    background-image: url("/static/css/images/icons/instagram.png");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.social-link.tiktok {
+    background-image: url("/static/css/images/icons/tiktok.png");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.social-link.linkedin {
+    background-image: url("/static/css/images/icons/linkedin.png");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.social-link.soundcloud {
+    background-image: url("/static/css/images/icons/soundcloud.png");
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+
+.social-link:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 8px white;
+}
+
+
+@media(max-width: 1400px){
+    .social-link{
+        display: none;
+    }
+
+    header{    
+        flex-wrap: wrap;
+        align-content: center;
+    }
 
 }
 
-nav a:hover {
-    color: white;
-    text-decoration: none; 
- 
+
+@media(max-width: 1166px){
+    header{    
+        flex-direction: column-reverse;
+    }
+
+    .header_text{
+        text-align: center;
+    }
+
+    .subheading{
+        text-align: center;
+    }
+
+    .welcome_bttn{
+        margin-left: 230px;
+    }
 }
 
 
-
-
-
-
-#toggle_button{
-    display: none;
-}
-
-label[for="toggle_button"]{
-    display: none;
-}
-
-label[for="toggle_button"] span{
-    font-size: 40px;
-}
 
 @media(max-width: 800px){
 
     header{
         gap: 50px;
         min-height: 50vh;
-        padding: 140px 0;
+        flex-direction: column-reverse;
     }
 
-    nav {
-        top: 0;
-        left: 0;
-        padding: 20px;
-        background-color: black;
+    header h1{
+        font-size: 40px;
     }
 
-    nav a{
-        color: white;
-        text-decoration: none;
+    .subheading{
+        font-size: 19px;
     }
 
-    nav ul{
-        display: none;
-        flex-direction: column;
-        gap: 25px;
-    }
+    .header_text{
+        width: 350px;
 
-    nav a:hover {
-        color: white;
     }
-
-    #toggle_button:checked ~ ul{
-        display: flex;
-    }
-
-    label[for="toggle_button"]{
-        display: block;
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        color: white;
+    .welcome_bttn {
+        margin-left: 50px;
     }
 }
+
+
+
+
