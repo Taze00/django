@@ -16,37 +16,28 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+//-----------------------------
+document.addEventListener('DOMContentLoaded', () => {
+    const players = document.querySelectorAll('.player');
+    let currentIndex = 0;
 
+    function showPlayer(index) {
+        players.forEach((player, i) => {
+            player.classList.toggle('active', i === index);
+        });
+    }
 
-//Slideshow
-$(document).ready(function() {
-  var slideIndex = 0;
-  var slides = $(".mySlides");
-  var delay = 3000;
+    document.getElementById('prev').addEventListener('click', () => {
+        currentIndex = (currentIndex === 0) ? players.length - 1 : currentIndex - 1;
+        showPlayer(currentIndex);
+    });
 
-  // Alle Slides verstecken außer dem ersten
-  slides.not(':eq(0)').removeClass('active');
-  slides.eq(0).addClass('active');
+    document.getElementById('next').addEventListener('click', () => {
+        currentIndex = (currentIndex === players.length - 1) ? 0 : currentIndex + 1;
+        showPlayer(currentIndex);
+    });
 
-  function showNextSlide() {
-    // Aktuelle Klasse entfernen
-    slides.eq(slideIndex).removeClass('active');
-
-    // Index erhöhen und Loop durchführen
-    slideIndex = (slideIndex + 1) % slides.length;
-
-    // Nächste Slide anzeigen
-    slides.eq(slideIndex).addClass('active');
-  }
-
-  // Interval für das Wechseln der Slides
-  setInterval(showNextSlide, delay);
+    // Initially show the first player
+    showPlayer(currentIndex);
 });
-
-
-
-
-
-
-
 

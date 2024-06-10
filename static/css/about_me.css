@@ -1,149 +1,103 @@
-#about_me_section{
-    padding: 75px 0;
+#about_me_section {
+    min-height: 950px;
+    padding: 75px 75px;
     display: flex;
-    background-color: black;
+    overflow: hidden;
+    background-image: url(/static/css/images/backgound.png);
+    background-repeat: repeat;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: space-between;
+    justify-content: center;
+}
+
+.carousel {
+    display: flex;
+    overflow: hidden;
+    width: 100%;
+}
+
+.player {
+    display: none;
+    flex: 0 0 100%;
+    border-radius: 25px;
+    flex-direction: row; /* Changed to row to align items horizontally */
+    align-items: flex-start;
+}
+
+.player.active {
+    display: flex;
+    justify-content: center;
+    gap: 70px;
+}
+
+.player .imgbox {
+    position: relative;
+    width: 350px;
+    flex-shrink: 0; /* Prevent shrinking */
+    display: flex;
+    flex-direction: column; /* Stack image and audio vertically */
+    margin-top: 100px;
+}
+
+.player .imgbox img {
+    width: 100%;
+    height: 350px; /* Fixed height for the image */
+    object-fit: cover;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+}
+
+.player .audio-container {
+    width: 100%; /* Full width under the image */
+    padding: 10px; /* Add some padding */
+    box-sizing: border-box; /* Ensure padding is included in the width */
+    background-color: #f1f3f4;
+    border-bottom-left-radius: 20px;
+    border-bottom-right-radius: 20px;
+}
+
+.player audio {
+    width: 100%;
+    outline: none;
+}
+
+.lyrics {
+    flex: 2; /* Increased flex-grow value to take more space */
+    font-size: 1.5rem; /* Increased font size */
+    color: white; /* Changed text color to white */
+    padding: 20px; /* Added padding for some space around the lyrics */
+    margin-left: 20px;
+    text-align: center; /* Centered the text */
+    display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 150px;
-    flex-wrap: wrap-reverse;
-    background-image: url("/static/css/images/backgound.png");
-    background-repeat: repeat;
+    max-width: 750px;
 }
 
-.about_me_container{
-    padding: 30px;
-    min-height: 850px;
-    width: 900px;
-    color: white;
-    max-width: 90%;
+.lyrics h2 {
+    margin: 0 0 30px 0; /* Adjust margins as needed */
+    font-size: 2rem; /* Adjust font size as needed */
+    color: white; /* Ensure the heading text color is white */
+    padding: 0;
 }
 
-.about_me_text{
-    font-style: italic;
-    font-size: 20px;
+.carousel-controls {
+    display: flex;
+    justify-content: center;
+    gap: 200px;
+    align-items: flex-end;
 }
 
-
-#about_me_section h2{
-    font-size: 40px;
-    margin-bottom: 75px;
-    padding: 0px;
-}
-
-#about_me_section h3{
-    font-size: 27px;
-    font-weight: bold;
-    font-style: normal;
-}
-
-#change-picture-btn {
-    user-select: none;
+.carousel-controls button {
+    background: none;
+    border: none;
     cursor: pointer;
-  }
-  
-.aboutme_icon_text{
-    display: none;
+    padding: 0; /* Remove any default padding */
 }
 
-.social-link-aboutme.spotify {
-    display: none;
-    background-image: url("/static/css/images/icons/spotify.png");
-    background-repeat: no-repeat;
-    background-position: center;
+.carousel-controls button img {
+    width: 40px;
+    height: 40px;
 }
-
-.social-link-aboutme.soundcloud {
-    display: none;
-    background-image: url("/static/css/images/icons/soundcloud.png");
-    background-repeat: no-repeat;
-    background-position: center;
-}
-
-
-.social-link-aboutme:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 8px white;
-}
-
-
-@media(max-width: 1317px){
-    .about_me_playlist{
-        display: none;
-    }
-
-    .social-media-links-aboutme {
-        display: flex;
-        align-items: center;
-        gap: 50px;
-        justify-content: center;
-    }
-    
-    .social-link-aboutme {
-        width: 35px;
-        height: 35px;
-        overflow: hidden;
-        border-radius: 50%;
-        border: 2px solid white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 10px;
-        background-size: 100%; /* Passt die Größe des Hintergrundbildes an */
-        background-position: center; /* Zentriert das Bild */
-        background-repeat: no-repeat; /* Verhindert das Wiederholen des Bildes */
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-    .social-link-aboutme.soundcloud{
-        display: flex;
-    }
-
-    .social-link-aboutme.spotify{
-        display: flex;
-    }
-
-    .aboutme_icon_text{
-        display: flex;
-        justify-content: center;
-        margin: 20px 0px 30px 0px;
-        font-size: 25px;
-        color: white;
-        text-decoration: none;
-    }
-    
-}
-@media(max-width: 800px){
-    #about_me_section{
-        padding: 70px 0;
-        flex-direction: column;
-        gap: 50px;
-    }
-
-    #about_me_section h2{
-        text-align: center;
-        font-size: 7vw;
-        margin-bottom: 40px;
-    }
-
-    .about_me_container {
-        padding: 0px;
-    }
-
-    .about_me_container p{
-        text-align: center;
-        font-size: 4vw;
-    }
-
-    .about_me_container h2 span{
-        color: rgb(200,20,045);
-    }
-
-    .about_me_text {
-        text-align: center;
-        font-size: 17px;
-        margin: 0 40px;
-    }
-
-
-
-}
-
