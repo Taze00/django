@@ -1,3 +1,4 @@
+
 header{
     padding: 50px 0px;
     display: flex;
@@ -8,7 +9,7 @@ header{
     flex-wrap: wrap-reverse;
     min-height: 100vh;
 
-    background-image: url("/static/css/images/berlin.png");
+    background-image: url("/static/css/images/berlin.jpeg");
     background-size: cover;
     background-position: bottom;
     background-repeat: no-repeat;
@@ -119,6 +120,7 @@ header h1{
     align-items: center;
     padding: 10px 30px 10px 10px;
     gap: 10px;
+    z-index: 2;
 }
 
 .social-link {
@@ -228,7 +230,3 @@ header h1{
         margin-left: 50px;
     }
 }
-
-
-
-

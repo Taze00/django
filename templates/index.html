@@ -4,7 +4,16 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        
+
+
+        <!-- Lightbox CSS -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet">
+    
+        <!-- Lightbox JS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+
+        <link rel="preload" href="{% static 'css/images/berlin.jpeg' %}" as="image">
+
         <!-- Bootstrap CSS -->
         <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
@@ -41,7 +50,7 @@
         </div>
 
         <div class="header_image">
-            <img id="profile-picture" src="/static/css/images/aboutme/alex1.png" alt="Profilbild">
+            <img id="profile-picture" src="/static/css/images/aboutme/alex0.png" alt="Profilbild">
         </div>
 
         <div class="social-media-links">
@@ -54,145 +63,40 @@
    </header>
 
     <section id="about_me_section">
-        <div class="carousel">
 
-            <div class="player">
-                <div class="imgbox">
-                    <img src="/static/css/images/tracks/BornInBerlin.png" alt="BornInBerlin">
-                    <div class="audio-container">
-                        <audio src="/static/css/music/track1.mp3" type="audio/mp3" controls></audio>
-                    </div>
-                </div>
-                <div class="lyrics">
-                    <h2>Born in Berlin</h2>
-                    <p> Born in Moabit where the river flows free
-                        At four years old Werder welcomed me
-                        From Berlin's heart to the fields so wide
-                        Both places I love they’re side by side<br>
-                        
-                        From Moabit's hustle to Werder's calm
-                        Both are my home both hold a charm
-                        Memories of youth in each street and park
-                        Berlin and Werder both leave a mark<br>
-                        
-                        Born in Berlin where dreams take flight
-                        From Moabit’s streets to Werder’s light
-                        City of my birth where my heart will stay
-                        Berlin and Werder every night and day<br>
-                        
-                        In Berlin's alleys dreams begin and grow
-                        Werder’s whisper life’s gentle flow
-                        Urban pulse rustic embrace
-                        Two worlds collide sweetly in pace<br>
-                        
-                        Every corner and every lane
-                        Moments of joy moments of pain
-                        From busy city to quiet town
-                        In this love I’ll never drown<br>
-                        
-                        Born in Berlin where dreams take flight
-                        From Moabit’s streets to Werder’s light
-                        City of my birth where my heart will stay
-                        Berlin and Werder every night and day<br>
-                </div>
-            </div>
-            
-            <div class="player">
-                <div class="imgbox">
-                    <img src="/static/css/images/tracks/DigitalDreams.png" alt="DigitalDreams">
-                    <div class="audio-container">
-                        <audio src="/static/css/music/track2.mp3" type="audio/mp3" controls></audio>
-                    </div>
-                </div>
-                <div class="lyrics">
-                    <h2>Digital Dreams</h2>
-                    <p> Studied business tech in my veins
-                        Exploring digital breaking chains
-                        Websites marketing my grind
-                        In tech there's always things to find<br>
-                        
-                        Digital journey dreams take flight
-                        Coding creating all day and night
-                        From Berlin's heart to Werder's view
-                        Tech is the path that I pursue<br>
-                        
-                        Building websites brands that shine
-                        In the tech realm I'm just fine
-                        Marketing strategies new heights
-                        Digital world I find my light<br>
-                        
-                        Digital journey dreams take flight
-                        Coding creating all day and night
-                        From Berlin's heart to Werder's view
-                        Tech is the path that I pursue<br>
-                        
-                        Loving tech from dawn till night
-                        Business informatics feels so right
-                        Breaking boundaries reaching new
-                        Digital dreams coming true<br>
-                        
-                        Digital journey dreams take flight
-                        Coding creating all day and night
-                        From Berlin's heart to Werder's view
-                        Tech is the path that I pursue<br>
-                    </p>
-                </div>
-            </div>
-            
-            <div class="player">
-                <div class="imgbox">
-                    <img src="/static/css/images/tracks/BeatExplorer.png" alt="BeatExplorer">
-                    <div class="audio-container">
-                        <audio src="/static/css/music/track3.mp3" type="audio/mp3" controls></audio>
-                    </div>
-                </div>
-                <div class="lyrics">
-                    <h2>Beat Explorer</h2>
-                    <p>Heading to Berlin where the night comes alive
-                        Techno beats pounding that's where I thrive
-                        Dancing till sunrise under the open sky
-                        In the heart of the city I feel so high<br>
-                        
-                        From club to club with friends by my side
-                        Lost in the music we let the night guide
-                        Techno's heartbeat pulsing through my soul
-                        In Berlin's nightlife I feel whole<br>
-                        
-                        Berlin nights where dreams take flight
-                        Techno rhythms till the morning light
-                        Dancing till dawn with the rising sun
-                        Berlin’s my playground where I have my fun<br>
-                        
-                        Neon lights flicker shadows dance
-                        In this city of rhythm we take a chance
-                        Heartbeat syncing with the bass line
-                        In Berlin's glow I feel divine<br>
-                        
-                        Berlin nights where dreams take flight
-                        Techno rhythms till the morning light
-                        Dancing till dawn with the rising sun
-                        Berlin’s my playground where I have my fun<br>
-                        
-                        Loving the nightlife the techno beat
-                        In Berlin’s embrace life is sweet
-                        From dusk till dawn I lose control
-                        Berlin’s my haven it feeds my soul
-                    </p>
-                </div>
-            </div>
-        </div>
-    
-        <div class="carousel-controls">
-            <button id="prev">
-                <img src="/static/css/images/icons/backwards.png" alt="Previous">
-            </button>
-            <button id="next">
-                <img src="/static/css/images/icons/forwards.png" alt="Next">
-            </button>
+        <div class="about_me_playlist">
+            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DX6J5NfMJS675?utm_source=generator&theme=0" width="600" height="950" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
         </div>
 
+        <div class="about_me_container">
+            <h2>ABOUT ME <span>PLAYLIST</span></h2>
 
-        <!-- 
+            <div class="about_me_text"> 
+                <h3>Track 1: "Roots and Routes"</h3>
+                Born in Berlin, but now calling Werder home – a slight twist in the journey, yet my love for the capital remains untouched.
+                <br><br>
+
+                <h3>Track 2: "Digital Vibes"</h3>
+                My days are spent diving into the world of marketing and web design, thanks to my studies in Business Informatics. It's not just about the tech for me; it's about creating connections that count.
+                <br><br>
+
+                <h3>Track 3: "Berlin Beat Hopper"</h3>
+                When I'm in Berlin, I love to explore the club scene. Club hopping is my thing; a different club every weekend. Tresor gets a shoutout, not because it's the only place I go, but because when I do, it's always a blast. Yet, it's the city's diversity that truly captivates me.
+                <br><br>
+
+                <h3>Track 4: "Life on the Pitch"</h3>
+                Twenty years on the field, and still no desire to hang up my boots. Soccer is more than a game; it's one of those constants that keep me grounded.
+                <br><br>
+
+                <h3>Track 5: "Echoes of Me"</h3>
+                Talking big about myself isn't my style. I much prefer to let the things I do and my passions speak for themselves. Through this playlist, you, the listener, can catch the vibe of my world.
+                <br><br>
+
+                <h3>Track 6: "Window to My World"</h3>
+                This website is like a set of tracks, each offering a glimpse into what drives me – from Berlin's endless club landscape to a peaceful day on the soccer field. Not overloaded, just an honest insight.
+                <br><br>
+            </div>
+
             <div class="aboutme_icons">
             <div class="aboutme_icon_text">More playlists:</div>
                 <div class="social-media-links-aboutme">
@@ -200,19 +104,15 @@
                     <a href="https://open.spotify.com/playlist/37i9dQZF1DX6J5NfMJS675?si=da66baa5f37645d2" class="social-link-aboutme spotify" target="_blank" aria-label="Spotify"></a>
                 </div>
             </div>
-        </div>-->
+        </div>
+
+
+        
 
     </section>
 
-    <div class="parallax">
-        <video autoplay muted loop id="background_video">
-            <source src="/static/css/backgorund/try1.mp4"type="video/mp4">
-            Your browser does not support HTML5 video.
-        </video>
+    <div class="parallax" style="background-image: url(/static/css/images/background_dj.png);">
     </div>
-
-
-    
 
     <!-- <section id="skills">
 
@@ -254,47 +154,92 @@
     </section>-->
     
     <section id="gallery">
-
         <div class="container_gallery">
-
             <div class="heading">
                 <h3>Photo <span>Gallery</span></h3>
             </div>
             
             <div class="box">
                 <div class="dream">
-                    <img src="/static/css/images/gallery/alex0.png">
-                    <img src="/static/css/images/gallery/alex3.jpeg">
-                    <img src="/static/css/images/gallery/alex2.png">
-                    <img src="/static/css/images/gallery/alex1.png">
-                    <img src="/static/css/images/gallery/alex9.jpeg">
+                    <a href="/static/css/images/gallery/alex0.png" data-lightbox="gallery">
+                        <img src="/static/css/images/gallery/alex0.png" alt="Bild 1">
+                    </a>
+                    <video loop muted autoplay>
+                        <source src="/static/css/images/gallery/alex18.mp4" type="video/mp4">
+                        Ihr Browser unterstützt dieses Videoformat nicht.
+                    </video>
+                    <a href="/static/css/images/gallery/alex6.jpeg" data-lightbox="gallery">
+                        <img src="/static/css/images/gallery/alex6.jpeg" alt="Bild 2">
+                    </a>
+                    <a href="/static/css/images/gallery/alex3.jpeg" data-lightbox="gallery">
+                        <img src="/static/css/images/gallery/alex3.jpeg" alt="Bild 3">
+                    </a>
+                    <a href="/static/css/images/gallery/alex2.png" data-lightbox="gallery">
+                        <img src="/static/css/images/gallery/alex2.png" alt="Bild 4">
+                    </a>
+                    <a href="/static/css/images/gallery/alex11.jpeg" data-lightbox="gallery">
+                        <img src="/static/css/images/gallery/alex11.jpeg" alt="Bild 5">
+                    </a>
+                    <a href="/static/css/images/gallery/alex9.jpeg" data-lightbox="gallery">
+                        <img src="/static/css/images/gallery/alex9.jpeg" alt="Bild 6">
+                    </a>
                 </div>
-
+    
                 <div class="dream">
-                    <img src="/static/css/images/gallery/alex5.jpeg">
-                    <img src="/static/css/images/gallery/alex7.jpeg">
-                    <img src="/static/css/images/gallery/alex6.jpeg">
-                    <img src="/static/css/images/gallery/alex8.jpeg">
-
+                    <a href="/static/css/images/gallery/alex5.jpeg" data-lightbox="gallery">
+                        <img src="/static/css/images/gallery/alex5.jpeg" alt="Bild 7">
+                    </a>
+                    <a href="/static/css/images/gallery/alex13.jpeg" data-lightbox="gallery">
+                        <img src="/static/css/images/gallery/alex13.jpeg" alt="Bild 8">
+                    </a>
+                    <video loop muted autoplay>
+                        <source src="/static/css/images/gallery/alex19.mp4" type="video/mp4">
+                        Ihr Browser unterstützt dieses Videoformat nicht.
+                    </video>
+                    <a href="/static/css/images/gallery/alex7.jpeg" data-lightbox="gallery">
+                        <img src="/static/css/images/gallery/alex7.jpeg" alt="Bild 9">
+                    </a>
+                    <a href="/static/css/images/gallery/alex17.jpeg" data-lightbox="gallery">
+                        <img src="/static/css/images/gallery/alex17.jpeg" alt="Bild 10">
+                    </a>
+                    <a href="/static/css/images/gallery/alex8.jpeg" data-lightbox="gallery">
+                        <img src="/static/css/images/gallery/alex8.jpeg" alt="Bild 11">
+                    </a>
                 </div>
-
+    
                 <div class="dream">
-                    <img src="/static/css/images/gallery/alex10.jpeg">
-                    <img src="/static/css/images/gallery/alex11.jpeg">
-                    <img src="/static/css/images/gallery/alex4.jpeg">
-                    <img src="/static/css/images/gallery/alex12.jpeg">
-                    <!--<video controls>
+                    <a href="/static/css/images/gallery/alex10.jpeg" data-lightbox="gallery">
+                        <img src="/static/css/images/gallery/alex10.jpeg" alt="Bild 12">
+                    </a>
+                    <a href="/static/css/images/gallery/alex15.jpeg" data-lightbox="gallery">
+                        <img src="/static/css/images/gallery/alex15.jpeg" alt="Bild 13">
+                    </a>
+                    <a href="/static/css/images/gallery/alex4.jpeg" data-lightbox="gallery">
+                        <img src="/static/css/images/gallery/alex4.jpeg" alt="Bild 14">
+                    </a>
+                    <a href="/static/css/images/gallery/alex16.jpeg" data-lightbox="gallery">
+                        <img src="/static/css/images/gallery/alex16.jpeg" alt="Bild 15">
+                    </a>
+                    <a href="/static/css/images/gallery/alex12.jpeg" data-lightbox="gallery">
+                        <img src="/static/css/images/gallery/alex12.jpeg" alt="Bild 16">
+                    </a>
+                    <video loop muted autoplay>
                         <source src="/static/css/images/gallery/alexv.mp4" type="video/mp4">
                         Ihr Browser unterstützt dieses Videoformat nicht.
-                    </video>-->
-                    
-
+                    </video>
                 </div>
-
             </div>
-
         </div>
     </section>
+    
+
+
+    <div class="parallax">
+        <video autoplay muted loop id="background_video">
+            <source src="/static/css/images/try1.mp4"type="video/mp4">
+            Your browser does not support HTML5 video.
+        </video>
+    </div>
 
     <section id="toprate_section">
         <div class="rating_container">
@@ -303,28 +248,24 @@
             </div>
             <div class="clubrating">
                 <ul class="club-list">
-                    <li><span>1.</span><div>Tresor</div></li>
-                    <li><span>2.</span><div>Lokschuppen</div></li>
-                    <li><span>3.</span><div>M-BIA</div></li>
-                    <li><span>4.</span><div>Renate</div></li>
+                    <li><span>1.</span><div>Lokschuppen</div></li>
+                    <li><span>2.</span><div>Club Ost</div></li>
+                    <li><span>3.</span><div>Tresor</div></li>
+                    <li><span>4.</span><div>M-BIA</div></li>
                     <li><span>5.</span><div>Ritter Butzke</div></li>
-                    <li><span>6.</span><div>Waschhaus</div></li>
-                    <li><span>7.</span><div>Watergate</div></li>
-                    <li><span>8.</span><div>Bergwerk</div></li>
+                    <li><span>6.</span><div>Renate</div></li>
+                    <li><span>7.</span><div>Humboldhain</div></li>
+                    <li><span>8.</span><div>Else</div></li>
+                    <li><span>9.</span><div>Waschhaus</div></li>
+                    <li><span>10.</span><div>Watergate</div></li>
+                    <li><span>11.</span><div>Soda</div></li>
+                    <li><span>12.</span><div>Bergwerk</div></li>
                     <!-- Weitere Einträge hier -->
                 </ul>
             </div>
         </div>
     </section>
 
-
-
-
-    
-
-    
-                
-   
    <section id="contact">
     <div class="form">
         <h2>Want to get in touch</h2>
@@ -359,6 +300,11 @@
     
     <!-- Eigener JavaScript -->
     <script src="{% static 'js/header_pic.js' %}"></script>
+
+
+    <!-- Lightbox JS (nach jQuery einbinden, wenn du jQuery verwendest) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+
 
 
 </body>

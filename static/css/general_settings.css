@@ -59,11 +59,11 @@
 *{
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
 html, body {
   overflow-x: hidden;
+  overflow-y: auto;
 }
 
 body{
@@ -72,6 +72,8 @@ body{
     font-family: 'Roboto', sans-serif;
     font-size: 20px;
 }
+
+
 
 h1{
     font-size: 50px;
@@ -91,10 +93,15 @@ h3{
 }
 
 .parallax {
-  position: relative;
-  height: 500px; 
-  overflow: hidden;
-}
+    height: 500px; 
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    position: relative;
+    overflow: hidden;
+    z-index: 1; 
+  }
 
 .parallax video {
   position: absolute;
@@ -105,7 +112,7 @@ h3{
   object-fit: cover;
   z-index: -1;
 }
-
+  
 .subheading{
     margin-top: 25px;
 }
@@ -120,7 +127,6 @@ h3{
     }
 
     .parallax {
-      background-attachment: scroll;
-      height: 250px; 
+      display: none;
     }
 }
