@@ -5,15 +5,6 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
-        <!-- Lightbox CSS -->
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet">
-    
-        <!-- Lightbox JS -->
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
-
-        <link rel="preload" href="{% static 'css/images/berlin.jpeg' %}" as="image">
-
         <!-- Bootstrap CSS -->
         <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
@@ -28,7 +19,6 @@
         <link rel="stylesheet" href="{% static 'css/skills.css' %}">
         <link rel="stylesheet" href="{% static 'css/contact.css' %}">
         <link rel="stylesheet" href="{% static 'css/toprate.css' %}">
-        <link rel="stylesheet" href="{% static 'css/card.css' %}">
         <link rel="stylesheet" href="{% static 'css/gallery.css' %}">
 
 
@@ -36,122 +26,82 @@
 <body>
 
     <header>
-        <div class="header_text">
-            
-            <div class="welcome_bttn">
-                <p> &#x1F44B;&nbsp; Welcome to Alex Volkmann &nbsp;</p>
+        <div class="header-text">
+            <div class="left-side">
+                <p><strong>Alex</strong></p>
             </div>
-            <h1>I’m a programmer</h1>
-            <p class="subheading">Welcome to my website! I'm <span style="font-weight: bolder;">Alex Volkmann</span>, ready to share my passion for technology and design with you.</p>
+            <div class="right-side">
+                                <p id="animated-text"></p>
+                <p><strong>MOABEAT</strong></p>
+                <p>BORN 15032000</p>
 
-            <a id="change-picture-btn" class="contact-me-btn2">Change picture</a>
-            <a href="#contact" class="contact-me-btn">Contact Me</a>
-    
+                
+            </div>
         </div>
 
-        <div class="header_image">
-            <img id="profile-picture" src="/static/css/images/aboutme/alex0.png" alt="Profilbild">
-        </div>
+        <div class="pics">
+            <div class="border-animation">
+                <div class="card">
+                    <div class="polaroid">
+                        <img class="polaroid" src="/static/css/images/header/polaroid1grey.jpg" alt="">
+                    </div>
+                </div>
+                <div class="card-2">
+                    <div class="polaroid">
+                        <img class="polaroid" src="/static/css/images/header/polaroid2grey.jpg" alt="">
+                    </div>
+                </div>
+                <div class="card-3 card">
+                    <div class="polaroid">
+                        <img class="polaroid" src="/static/css/images/header/polaroid3grey.jpg" alt="">
+                    </div>
+                </div>                
+                <img class="berlin-img" src="/static/css/images/header/berlin-crop.jpg" alt="">
+            </div>
 
+        </div>
+        
         <div class="social-media-links">
             <a href="https://www.instagram.com/a_.volkmann" class="social-link instagram" target="_blank" aria-label="Instagram"></a>
             <a href="https://www.tiktok.com/@killua_alex" class="social-link tiktok" target="_blank" aria-label="TikTok"></a>
-            <!-- <a href="https://www.linkedin.com/in/alex-volkmann-54677a239/" class="social-link linkedin" target="_blank" aria-label="LinkedIn"></a> -->
             <a href="https://soundcloud.com/alex_sasuke/sets/goat/s-G1ZTUqCaTPO?si=aa95f905957a4fc7b2ea766d80019bd3&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing" class="social-link soundcloud" target="_blank" aria-label="SoundCloud"></a>
         </div>
-         
-   </header>
+    </header>
 
-    <section id="about_me_section">
+   <section id="about_me_section">
 
-        <div class="about_me_playlist">
-            <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DX6J5NfMJS675?utm_source=generator&theme=0" width="600" height="950" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        <div class="visualizer-container">
+            <div id="visualizer"></div>
         </div>
 
-        <div class="about_me_container">
-            <h2>ABOUT ME <span>PLAYLIST</span></h2>
-
-            <div class="about_me_text"> 
-                <h3>Track 1: "Roots and Routes"</h3>
-                Born in Berlin, but now calling Werder home – a slight twist in the journey, yet my love for the capital remains untouched.
-                <br><br>
-
-                <h3>Track 2: "Digital Vibes"</h3>
-                My days are spent diving into the world of marketing and web design, thanks to my studies in Business Informatics. It's not just about the tech for me; it's about creating connections that count.
-                <br><br>
-
-                <h3>Track 3: "Berlin Beat Hopper"</h3>
-                When I'm in Berlin, I love to explore the club scene. Club hopping is my thing; a different club every weekend. Tresor gets a shoutout, not because it's the only place I go, but because when I do, it's always a blast. Yet, it's the city's diversity that truly captivates me.
-                <br><br>
-
-                <h3>Track 4: "Life on the Pitch"</h3>
-                Twenty years on the field, and still no desire to hang up my boots. Soccer is more than a game; it's one of those constants that keep me grounded.
-                <br><br>
-
-                <h3>Track 5: "Echoes of Me"</h3>
-                Talking big about myself isn't my style. I much prefer to let the things I do and my passions speak for themselves. Through this playlist, you, the listener, can catch the vibe of my world.
-                <br><br>
-
-                <h3>Track 6: "Window to My World"</h3>
-                This website is like a set of tracks, each offering a glimpse into what drives me – from Berlin's endless club landscape to a peaceful day on the soccer field. Not overloaded, just an honest insight.
-                <br><br>
-            </div>
-
-            <div class="aboutme_icons">
-            <div class="aboutme_icon_text">More playlists:</div>
-                <div class="social-media-links-aboutme">
-                    <a href="https://soundcloud.com/alex_sasuke/sets/goat/s-G1ZTUqCaTPO?si=aa95f905957a4fc7b2ea766d80019bd3&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing" class="social-link-aboutme soundcloud" target="_blank" aria-label="SoundCloud"></a>
-                    <a href="https://open.spotify.com/playlist/37i9dQZF1DX6J5NfMJS675?si=da66baa5f37645d2" class="social-link-aboutme spotify" target="_blank" aria-label="Spotify"></a>
-                </div>
-            </div>
+        <div class="toggle-container">
+            <label class="toggle-switch">
+                <input type="checkbox" id="toggle-audio">
+                <span class="slider"></span>
+            </label>
+            <span class="toggle-text"><strong>Party Mode</strong></span>
         </div>
 
 
-        
-
+            
+        <div class="textblock">
+            <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat...</p>
+        </div>
     </section>
+
+
+
+
+
+
+
+
+
+
 
     <div class="parallax" style="background-image: url(/static/css/images/background_dj.png);">
     </div>
 
-    <!-- <section id="skills">
-
-        <h2>My skills</h2>
-        <div class="skills-grid">
-            <div class="skill">
-                <img src="/static/css/images/skills/chat.png" alt="ChatGPT">
-                <p>ChatGPT</p>
-            </div>
-            <div class="skill">
-                <img src="/static/css/images/skills/python.png" alt="Python">
-                <p>Python</p>
-            </div>
-            <div class="skill">
-                <img src="/static/css/images/skills/css.png" alt="CSS">
-                <p>CSS</p>
-            </div>
-            <div class="skill">
-                <img src="/static/css/images/skills/html.png" alt="HTML">
-                <p>HTML</p>
-            </div>
-            <div class="skill">
-                <img src="/static/css/images/skills/office.png" alt="Office">
-                <p>Office</p>
-            </div>
-            <div class="skill">
-                <img src="/static/css/images/skills/vsc.png" alt="Visual Studio Code">
-                <p>VS Code</p>
-            </div>
-            <div class="skill">
-                <img src="/static/css/images/skills/photo.png" alt="Photoshop">
-                <p>Photoshop</p>
-            </div>
-            <div class="skill">
-                <img src="/static/css/images/skills/premiere.png" alt="Premiere Pro">
-                <p>Premiere Pro</p>
-            </div>
-        </div>
-    </section>-->
     
     <section id="gallery">
         <div class="container_gallery">
@@ -161,79 +111,57 @@
             
             <div class="box">
                 <div class="dream">
-                    <a href="/static/css/images/gallery/alex0.png" data-lightbox="gallery">
-                        <img src="/static/css/images/gallery/alex0.png" alt="Bild 1">
-                    </a>
+                    <img src="/static/css/images/gallery/alex0.png" alt="Bild 1">
                     <video loop muted autoplay>
-                        <source src="/static/css/images/gallery/alex18.mp4" type="video/mp4">
+                        <source src="/static/css/images/gallery/alex20.mp4" type="video/mp4">
                         Ihr Browser unterstützt dieses Videoformat nicht.
                     </video>
-                    <a href="/static/css/images/gallery/alex6.jpeg" data-lightbox="gallery">
-                        <img src="/static/css/images/gallery/alex6.jpeg" alt="Bild 2">
-                    </a>
-                    <a href="/static/css/images/gallery/alex3.jpeg" data-lightbox="gallery">
-                        <img src="/static/css/images/gallery/alex3.jpeg" alt="Bild 3">
-                    </a>
-                    <a href="/static/css/images/gallery/alex2.png" data-lightbox="gallery">
-                        <img src="/static/css/images/gallery/alex2.png" alt="Bild 4">
-                    </a>
-                    <a href="/static/css/images/gallery/alex11.jpeg" data-lightbox="gallery">
-                        <img src="/static/css/images/gallery/alex11.jpeg" alt="Bild 5">
-                    </a>
-                    <a href="/static/css/images/gallery/alex9.jpeg" data-lightbox="gallery">
-                        <img src="/static/css/images/gallery/alex9.jpeg" alt="Bild 6">
-                    </a>
+                    <img src="/static/css/images/gallery/alex6.jpeg" alt="Bild 2">
+                    <img src="/static/css/images/gallery/alex3.jpeg" alt="Bild 3">
+                    <img src="/static/css/images/gallery/alex2.png" alt="Bild 4">
+                    <img src="/static/css/images/gallery/alex11.jpeg" alt="Bild 5">
+                    <img src="/static/css/images/gallery/alex12.jpeg" alt="Bild 16">
+                    <img src="/static/css/images/gallery/alex17.jpeg" alt="Bild 10">
+                    <img src="/static/css/images/gallery/alex26.jpeg" alt="Bild 10">
                 </div>
     
                 <div class="dream">
-                    <a href="/static/css/images/gallery/alex5.jpeg" data-lightbox="gallery">
-                        <img src="/static/css/images/gallery/alex5.jpeg" alt="Bild 7">
-                    </a>
-                    <a href="/static/css/images/gallery/alex13.jpeg" data-lightbox="gallery">
-                        <img src="/static/css/images/gallery/alex13.jpeg" alt="Bild 8">
-                    </a>
+                    <img src="/static/css/images/gallery/alex22.jpeg" alt="Bild 2">
+                    <img src="/static/css/images/gallery/alex5.jpeg" alt="Bild 7">
+                    <img src="/static/css/images/gallery/alex24.jpeg" alt="Bild 2">
+                    <video loop muted autoplay>
+                        <source src="/static/css/images/gallery/alex25.mp4" type="video/mp4">
+                        Ihr Browser unterstützt dieses Videoformat nicht.
+                    </video>
+                    <img src="/static/css/images/gallery/alex13.jpeg" alt="Bild 8">
                     <video loop muted autoplay>
                         <source src="/static/css/images/gallery/alex19.mp4" type="video/mp4">
                         Ihr Browser unterstützt dieses Videoformat nicht.
                     </video>
-                    <a href="/static/css/images/gallery/alex7.jpeg" data-lightbox="gallery">
-                        <img src="/static/css/images/gallery/alex7.jpeg" alt="Bild 9">
-                    </a>
-                    <a href="/static/css/images/gallery/alex17.jpeg" data-lightbox="gallery">
-                        <img src="/static/css/images/gallery/alex17.jpeg" alt="Bild 10">
-                    </a>
-                    <a href="/static/css/images/gallery/alex8.jpeg" data-lightbox="gallery">
-                        <img src="/static/css/images/gallery/alex8.jpeg" alt="Bild 11">
-                    </a>
+                    <img src="/static/css/images/gallery/alex7.jpeg" alt="Bild 9">
+                    
+                    
                 </div>
     
                 <div class="dream">
-                    <a href="/static/css/images/gallery/alex10.jpeg" data-lightbox="gallery">
-                        <img src="/static/css/images/gallery/alex10.jpeg" alt="Bild 12">
-                    </a>
-                    <a href="/static/css/images/gallery/alex15.jpeg" data-lightbox="gallery">
-                        <img src="/static/css/images/gallery/alex15.jpeg" alt="Bild 13">
-                    </a>
-                    <a href="/static/css/images/gallery/alex4.jpeg" data-lightbox="gallery">
-                        <img src="/static/css/images/gallery/alex4.jpeg" alt="Bild 14">
-                    </a>
-                    <a href="/static/css/images/gallery/alex16.jpeg" data-lightbox="gallery">
-                        <img src="/static/css/images/gallery/alex16.jpeg" alt="Bild 15">
-                    </a>
-                    <a href="/static/css/images/gallery/alex12.jpeg" data-lightbox="gallery">
-                        <img src="/static/css/images/gallery/alex12.jpeg" alt="Bild 16">
-                    </a>
+                    <img src="/static/css/images/gallery/alex10.jpeg" alt="Bild 12">
+                    <img src="/static/css/images/gallery/alex15.jpeg" alt="Bild 13">
+                    <img src="/static/css/images/gallery/alex4.jpeg" alt="Bild 14">
+                    <img src="/static/css/images/gallery/alex21.jpeg" alt="Bild 2">
+                    <img src="/static/css/images/gallery/alex16.jpeg" alt="Bild 15">
+                    <img src="/static/css/images/gallery/alex9.jpeg" alt="Bild 6">
                     <video loop muted autoplay>
                         <source src="/static/css/images/gallery/alexv.mp4" type="video/mp4">
                         Ihr Browser unterstützt dieses Videoformat nicht.
                     </video>
+                    <img src="/static/css/images/gallery/alex8.jpeg" alt="Bild 11">
                 </div>
             </div>
         </div>
     </section>
     
 
-
+    
     <div class="parallax">
         <video autoplay muted loop id="background_video">
             <source src="/static/css/images/try1.mp4"type="video/mp4">
@@ -241,7 +169,7 @@
         </video>
     </div>
 
-    <section id="toprate_section">
+    <!-- <section id="toprate_section">
         <div class="rating_container">
             <div class="heading">
                 <h2>Club Ranking</h2>
@@ -260,11 +188,11 @@
                     <li><span>10.</span><div>Watergate</div></li>
                     <li><span>11.</span><div>Soda</div></li>
                     <li><span>12.</span><div>Bergwerk</div></li>
-                    <!-- Weitere Einträge hier -->
+                    Weitere Einträge hier
                 </ul>
             </div>
         </div>
-    </section>
+    </section> -->
 
    <section id="contact">
     <div class="form">
@@ -302,8 +230,10 @@
     <script src="{% static 'js/header_pic.js' %}"></script>
 
 
-    <!-- Lightbox JS (nach jQuery einbinden, wenn du jQuery verwendest) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+
+
 
 
 

@@ -46,11 +46,10 @@
 
 .container_gallery .box .dream img, .container_gallery .box .dream video {
     width: 100%;
-    padding-bottom: 15px;
-    border-radius: 5px;
-    background-color: black;
+    margin-bottom: 10px; /* Abstand zwischen Bildern/Videos vergrößert */
+    border-radius: 0px; /* Kanten nicht abrunden */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover effect */
 }
-
 
 
 @media only screen and (max-width: 768px) {
@@ -83,6 +82,8 @@
     }
 
     .container_gallery .box .dream img, .container_gallery .box .dream video {
-        border-radius: 0px;
+        border-radius: 0px;     
+        margin-bottom: 0px;
     }
+
 }
