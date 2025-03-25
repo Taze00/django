@@ -1,220 +1,347 @@
-header {
-    user-select: none;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 88vh;
-}
-
-p{
-    margin-bottom: 0px;
-}
-
-.header-text{
-    height:auto;
-    width: 70%;
-    display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 5%;
-}
-
-.left-side{
-    margin-left: 15%;
-    font-size: 100px;
-    font-weight: bolder;
-}
-
-.left-side p{
-    width: 40%;
-    top: 30px;
-    position: relative;
-}
-
-/* Animation für das Flackern */
-/* Keyframes für unregelmäßiges Flackern */
-@keyframes flicker {
-    0% { color: rgba(255, 255, 255, 0.6); }       /* Weiß bleibt lange sichtbar */
-    50% { color: white; }
-    55% { color: rgba(255, 255, 255, 0.6); }
-    70% { color: rgba(255, 255, 255, 0.6); }      /* Weiß bleibt weiterhin sichtbar */
-    71% { color: white; } /* Kurzer Flackermoment */
-    81% { color: rgba(255, 255, 255, 0.6); }      
-    83% { color: white; } /* Noch ein kurzer Flacker */
-    93% { color: rgba(255, 255, 255, 0.6); }      
-    100% { color: rgba(255, 255, 255, 0.6); }     /* Zurück zu Weiß für lange Pause */
-}
-
-
-/* Flacker-Effekt für "Alex" */
-.left-side p strong {
-    animation: flicker 2s infinite; /* Dauer der Animation und Wiederholung */
-    font-size: inherit; /* Fontgröße beibehalten */
-    font-weight: inherit; /* Gewichtung wie im Text */
-}
-
-
-.right-side{
-    width: 40%;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-}
-.right-side img{
-    width: 100%;
-    height: auto;
-}
-
-.pics {
-    position: relative;
-    width: 70%;
-    height: auto;
-}
-
-.alex-img {
-    position: absolute;
-    top: -33%;
-    left: 24%;
-    transform: translateX(-50%);
-    z-index: 2;
-    width: 30%;
-    height: auto;
-}
-
-.border-animation {
-    position: relative;
-    display: inline-block;
-    width: auto;
-    height: auto;
-    padding: 2px; /* Weißer Rand, der hervorsteht */
-    background: white; /* Hintergrundfarbe für den Rand */
-    border-radius: 5px; /* Optional: Abgerundete Ecken */
-    animation: border-pulse 2s infinite; /* Animation hinzufügen */
-}
-
-.berlin-img {
-    width: 100%;
-    height: auto;
-    z-index: 1;
-    display: block;
-    border-radius: 3px; /* Optional: Abgerundete Ecken innerhalb des Rands */
-}
-
-/* Animation für pulsierenden Effekt */
-@keyframes border-pulse {
-    0% {
-        box-shadow: 0 0 5px rgba(255, 255, 255, 0.6);
+    header {
+        user-select: none;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 0 0 3%;
     }
-    50% {
-        box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
-    }
-    100% {
-        box-shadow: 0 0 5px rgba(255, 255, 255, 0.6);
-    }
-}
 
-.polaroid{
-    position: relative;
-    padding: 5px 5px 25px 5px;
+    p{
+        margin-bottom: 0px;
+    }
+
+    .header-text{
+        height:auto;
+        width: 70%;
+        display: flex;
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 5%;
+    }
+
+    .left-side{
+        margin-left: 15%;
+        font-size: 100px;
+        font-weight: bolder;
+    }
+
+    .left-side p{
+        width: 40%;
+        top: 30px;
+        position: relative;
+    }
+
+    /* Animation für das Flackern */
+    /* Keyframes für unregelmäßiges Flackern */
+    @keyframes flicker {
+        0% { color: rgba(255, 255, 255, 0.6); }       /* Weiß bleibt lange sichtbar */
+        50% { color: white; }
+        55% { color: rgba(255, 255, 255, 0.6); }
+        70% { color: rgba(255, 255, 255, 0.6); }      /* Weiß bleibt weiterhin sichtbar */
+        71% { color: white; } /* Kurzer Flackermoment */
+        81% { color: rgba(255, 255, 255, 0.6); }      
+        83% { color: white; } /* Noch ein kurzer Flacker */
+        93% { color: rgba(255, 255, 255, 0.6); }      
+        100% { color: rgba(255, 255, 255, 0.6); }     /* Zurück zu Weiß für lange Pause */
+    }
+
+
+    /* Flacker-Effekt für "Alex" */
+    .left-side p strong {
+        animation: flicker 2s infinite; /* Dauer der Animation und Wiederholung */
+        font-size: inherit; /* Fontgröße beibehalten */
+        font-weight: inherit; /* Gewichtung wie im Text */
+    }
+
+
+    .right-side{
+        width: 40%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .pics {
+        position: relative;
+        width: 70%;
+        height: auto;
+    }
+
+    .alex-img {
+        position: absolute;
+        top: -33%;
+        left: 24%;
+        transform: translateX(-50%);
+        z-index: 2;
+        width: 30%;
+        height: auto;
+    }
+
+    .border-animation {
+        position: relative;
+        display: inline-block;
+        width: auto;
+        height: auto;
+        padding: 2px; /* Weißer Rand, der hervorsteht */
+        background: white; /* Hintergrundfarbe für den Rand */
+        border-radius: 5px; /* Optional: Abgerundete Ecken */
+        animation: border-pulse 2s infinite; /* Animation hinzufügen */
+    }
+
+    .berlin-img {
+        width: 100%;
+        height: auto;
+        z-index: 1;
+        display: block;
+        border-radius: 3px; /* Optional: Abgerundete Ecken innerhalb des Rands */
+    }
+
+    /* Animation für pulsierenden Effekt */
+    @keyframes border-pulse {
+        0% {
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+        }
+        50% {
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+        }
+        100% {
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+        }
+    }
+
+    .polaroid{
+        position: relative;
+        padding: 5px 5px 25px 5px;
+    }
+
+    .polaroid img {
+        width: 100%;
+        height: auto;
+        padding: 0px;
+        transition: opacity 0.3s ease; /* Nur die Transparenz soll sich ändern */
+        transform: none; /* Sicherstellen, dass kein Transform-Effekt aktiv ist */
+    }
+
+
+    .card{
+        width: 20%;
+        transform: rotate(22deg);
+        border-radius: 0;
+        position: absolute;
+    }
+
+    .card-2{
+        background-color: white;
+        width: 20%;
+        transform: rotate(-22deg);
+        border-radius: 0;
+        top: 50%;
+        position: absolute;
+    }
+
+    .card-3{
+        background-color: white;
+        width: 20%;
+        transform: rotate(9deg);
+        border-radius: 0;
+        top: 57%;
+        left: 83%;
+        position: absolute;
+    }
+
+    .subheading {
+        margin-top: 30px;
+        width: 70%; /* Breite etwas vergrößert für ein sauberes Layout */
+        font-size: 35px;
+        text-align: center; /* Zentrierter Text */
+        margin-left: auto; /* Sorgt dafür, dass das Element zentriert bleibt */
+        margin-right: auto;
+        line-height: 1.5; /* Optional: Zeilenhöhe für bessere Lesbarkeit */
+        color: white; /* Textfarbe beibehalten */
+    }
     
-}
 
-.polaroid img {
-    width: 100%;
-    height: auto;
-    padding: 0px;
-    transition: opacity 0.3s ease; /* Nur die Transparenz soll sich ändern */
-    transform: none; /* Sicherstellen, dass kein Transform-Effekt aktiv ist */
-}
+    .welcome_bttn{
+        display: none;
+        background-color: rgba(255, 255, 255, 0.3);
+        border: 1px solid white;
+        border-radius: 20px;
+        align-items: center;
+        text-align: center;
+        justify-content: center;
+        margin-bottom: 10px;
+        
+    }
 
+    .welcome_bttn p{
+        font-size: 20px;
+        font-weight: bold;
+        color: white;
+        padding: 0 20px;
+        
+    }
 
-.card{
-    width: 20%;
-    transform: rotate(22deg);
-    border-radius: 0;
-    position: absolute;
-}
+    .contact-me-btn {
+        display: none;
+        padding: 10px 40px;
+        margin: 0px;
+        font-size: 19px;
+        border: 2px solid white;
+        border-radius: 25px; /* Abgerundete Ecken */
+        text-decoration: none;
+        background-color: white; /* Hintergrundfarbe beim Hovern */
+        color: black;
+        transition: background-color 0.3s, color 0.3s;
+        margin-top: 30px;
+    }
+    
 
-.card-2{
-    background-color: white;
-    width: 20%;
-    transform: rotate(-22deg);
-    border-radius: 0;
-    top: 50%;
-    position: absolute;
-}
+    .circle-container {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 400px;
+        height: 400px;
+        border-radius: 50%; /* Macht das Bild rund */
+        overflow: hidden; /* Schneidet überschüssige Inhalte ab */
+        animation: border-pulse 2s infinite;
+        margin-bottom: 40px;
+        
+    }
 
-.card-3{
-    background-color: white;
-    width: 20%;
-    transform: rotate(9deg);
-    border-radius: 0;
-    top: 57%;
-    left: 83%;
-    position: absolute;
-}
+    .circle-image {
+        width: 100%; /* Füllt den Kreis komplett aus */
+        height: 100%;
+        object-fit: cover; /* Skaliert das Bild, ohne das Seitenverhältnis zu verlieren */
+        
+    }
 
-.social-media-links {
-    position: fixed;
-    right: 15px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px;
-    gap: 10px;
-    z-index: 3;
-}
-
-.social-link {
-    width: 35px;
-    height: 35px;
-    border-radius: 50%;
-    border: 2px solid white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.social-link.instagram {
-    background-image: url("/static/css/images/icons/instagram.png");
-}
-
-.social-link.tiktok {
-    background-image: url("/static/css/images/icons/tiktok.png");
-}
-
-.social-link.soundcloud {
-    background-image: url("/static/css/images/icons/soundcloud.png");
-}
-
-.social-link:hover {
-    transform: scale(1.1);
-    box-shadow: 0 0 8px white;
-}
-
-#animated-text {
-    font-size: 20px;
-    font-weight: bold;
-    color: white; /* Passe die Farbe an */
-}
-
-@media(max-width: 1400px) {
-    .social-link {
+    .header_text{
         display: none;
     }
-}
 
-@media(max-width: 800px) {
-    header {
-        gap: 50px;
-        min-height: 50vh;
-        flex-direction: column-reverse;
+    .social-media-links {
+        position: fixed;
+        right: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 50px 10px 10px 10px;
+        gap: 10px;
+        z-index: 3;
     }
-}
+
+    .social-link {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        border: 2px solid white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .social-link.instagram {
+        background-image: url("/static/css/images/icons/instagram.png");
+    }
+
+    .social-link.tiktok {
+        background-image: url("/static/css/images/icons/tiktok.png");
+    }
+
+    .social-link.soundcloud {
+        background-image: url("/static/css/images/icons/soundcloud.png");
+    }
+
+    .social-link:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 8px white;
+    }
+
+    #animated-text {
+        font-size: 20px;
+        font-weight: bold;
+        color: white; /* Passe die Farbe an */
+    }
+
+    @media(max-width: 1000px) {
+        .border-animation {
+            display: none;
+        }
+
+        header{
+            background-image: url("/static/css/images/header/berlin.png");
+            background-size: cover;
+            justify-content: flex-start;
+        }
+
+        .header-text{
+            display: none;
+        }
+
+        .card, .card-2,.card-3{
+            display: none;
+            
+        }
+
+        .berlin-img{
+            display: none;
+        }
+        .circle-container {
+            margin-top: 150px;
+            display: block; /* Sichtbar machen */
+        }
+
+        .welcome_bttn{
+            display: block;
+        }
+        .header_text{
+            display: block;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .contact-me-btn{
+            display: inline-block;
+        }
+
+        .social-media-links{
+            display: none;
+        }
+    }
+
+    @media(max-width: 550px) {
+        .subheading {
+            font-size: 28px;
+        }
+
+    }
+
+    @media(max-width: 400px) {
+        .circle-container {
+            width: 200px;
+            height: 200px;
+            margin-top: 40px;
+        }
+
+        .subheading {
+            font-size: 25px;
+            width: 80%;
+            margin: 40px 0 10px 0;
+        }
+
+        .welcome_bttn p{
+            padding: 0 10px;
+        }
+    
+
+    }

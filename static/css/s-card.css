@@ -1,0 +1,144 @@
+.section-cart{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    transition: all 0.35s linear;
+
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    min-height: 75vh;
+}
+
+.about-me {
+    text-align: center;
+    margin: 2rem auto;
+    padding: 1rem;
+    color: white;
+    border-radius: 1rem;
+    max-width: 50%;
+}
+
+.about-me h2 {
+    font-size: 4rem;
+    padding: 30px;
+}
+
+.about-me p {
+    font-size: 1.8rem;
+    line-height: 1.75rem;
+}
+
+
+.s-cart{
+    --color: red;
+    --border-size: 1rem;
+    --bg-color: #252525;
+    position: relative;
+    background-color: var(--bg-color);
+    width: 350px;
+    margin: 2rem;
+    border-radius: var(--border-size);
+    color: white;
+    display: grid;
+    place-content: center;
+    padding: 3rem 2rem;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: 350px;
+}
+
+.s-cart::before, .s-cart::after{
+    content: "";
+    position: absolute;
+}
+
+.s-cart::before{
+    width: 200%;
+    height: 200%;
+    background-image: conic-gradient(var(--color) 0deg, transparent 60deg, transparent 180deg, var(--color) 180deg, transparent 240deg);
+    inset: -50%;
+    z-index: -2;
+    animation: border 8s linear infinite;
+}
+
+@keyframes border{
+    to{
+        transform: rotateZ(-360deg)
+    }
+}
+
+.s-cart::after{
+    --inset: 0.25rem;
+    background-color: #111;
+    inset: var(--inset);
+    border-radius: calc(var(--border-size) - var(--inset)); 
+    z-index: -1;
+    transition: all 0.35s linear; 
+}
+
+.s-cart:hover::before{
+    animation-play-state: paused;
+}
+
+.s-cart:hover::after{
+    background-color: var(--bg-color);
+}
+
+.s-cart i{
+    font-size: 4rem;
+    margin-inline: auto;
+    color: transparent;
+    -webkit-text-stroke: thin var(--color);
+}
+
+.s-cart:hover i{
+    color: var(--color);
+    -webkit-text-stroke-width: 0;
+}
+
+.s-cart .title{
+    text-align: center;
+    font-size: 1.5rem;
+    line-height: 1.875rem;
+    margin: 0 1.5rem 1.5rem 1.5rem;
+    color: var(--color);
+}
+
+.s-cart .detail{
+    line-height: 1.5rem;
+    text-align: center;
+    opacity: 0.75;
+}
+
+@media(max-width: 783px) {
+    .about-me {
+        max-width: 90%;
+        padding: 0px;
+        margin: 150px auto;
+    }
+    .about-me h2 {
+        font-size: 3rem;
+        padding: 30px;
+    }
+    
+    .about-me p {
+        font-size: 1.3rem;
+        line-height: 1.75rem;
+    }
+}
+
+
+
+@media(max-width: 400px) {
+    .s-cart{
+        padding: 1.5rem 0.5rem;
+    }
+    
+    .s-cart .title {
+        margin-block: 1.5rem 0.5rem;
+    }
+}

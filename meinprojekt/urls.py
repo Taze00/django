@@ -22,5 +22,6 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
+    path("schubi/", views.freundin_page, name="schubi_page"),
 
 ]

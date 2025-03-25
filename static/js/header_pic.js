@@ -1,182 +1,153 @@
-// -------------------------------------------------------------------------------------------------
+// ------------------------------
+// Typing Animation Script
+// ------------------------------
 const words = ["WEBDESIGN", "DEVELOPER", "STUDENT"];
 let wordIndex = 0;
 let charIndex = 0;
 let isDeleting = false;
 
-const speed = 150; // Geschwindigkeit des Schreibens
-const pause = 2000; // Pause, bevor ein neues Wort erscheint
+// Geschwindigkeits- und Pauseneinstellungen
+const typingSpeed = 150; // Geschwindigkeit des Schreibens (ms)
+const deletingSpeed = 75; // Geschwindigkeit des Löschens (ms)
+const pauseAfterWord = 2000; // Pause nach Fertigstellen eines Wortes (ms)
 
+// Ziel-Element für die Animation
 const animatedText = document.getElementById("animated-text");
 
+// Hauptfunktion für die Schreibanimation
 function typeEffect() {
     const currentWord = words[wordIndex];
+
+    // Sichtbarer Text: Hinzufügen oder Löschen von Zeichen
     const visibleText = isDeleting 
         ? currentWord.substring(0, charIndex--) 
         : currentWord.substring(0, charIndex++);
 
     animatedText.textContent = visibleText;
 
-    // Geschwindigkeit anpassen beim Löschen
-    const typingSpeed = isDeleting ? speed / 2 : speed;
+    // Geschwindigkeit je nach Status (Schreiben oder Löschen)
+    const speed = isDeleting ? deletingSpeed : typingSpeed;
 
     if (!isDeleting && charIndex === currentWord.length) {
-        // Vollständig geschrieben, Pause starten
-        setTimeout(() => (isDeleting = true), pause);
+        // Wort ist komplett geschrieben, kurze Pause
+        setTimeout(() => (isDeleting = true), pauseAfterWord);
     } else if (isDeleting && charIndex === 0) {
-        // Vollständig gelöscht, zum nächsten Wort wechseln
+        // Wort ist vollständig gelöscht, nächstes Wort
         isDeleting = false;
-        wordIndex = (wordIndex + 1) % words.length;
+        wordIndex = (wordIndex + 1) % words.length; // Zyklischer Wechsel der Wörter
     }
 
-    setTimeout(typeEffect, typingSpeed);
+    // Nächsten Frame der Animation starten
+    setTimeout(typeEffect, speed);
 }
 
-// Animation starten
-typeEffect();
+// Animation initial starten
+if (animatedText) {
+    typeEffect();
+} else {
+    console.error("Element mit ID 'animated-text' nicht gefunden.");
+}
 
-// -------------------------------------------------------------------------------------------------
+// ------------------------------
+// Rock-Paper-Scissors Script
+// ------------------------------
+let gameInProgress = false; // Blockiert neue Spiele während einer Runde
 
-document.addEventListener('DOMContentLoaded', () => {
-    // WebGL Visualizer
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ alpha: true });
-    renderer.setPixelRatio(window.devicePixelRatio);
+function playGame(userChoice) {
+    if (gameInProgress) return; // Verhindert mehrfaches Starten
+    gameInProgress = true;
 
-    // Dynamische Größe des Containers verwenden
-    const visualizerContainer = document.querySelector('.visualizer-container');
-    if (visualizerContainer) {
-        renderer.setSize(visualizerContainer.offsetWidth, visualizerContainer.offsetHeight);
-        document.getElementById('visualizer').appendChild(renderer.domElement);
+    const choices = ['rock', 'paper', 'scissors'];
+    const difficulty = document.getElementById("difficulty").value;
+    const timerElement = document.getElementById("rps-timer");
+    const userResult = document.getElementById("user-choice-emoji");
+    const computerResult = document.getElementById("computer-choice-emoji");
+    const resultIcon = document.getElementById("result-icon");
+    const opponentName = document.getElementById("opponent-name");
+    const userTitle = document.querySelector("#user-result h3"); // Verweis auf "You"
+    let computerChoice;
+    let winnerName = "";
+
+    // Alles initial leeren
+    userResult.innerText = "";
+    computerResult.innerText = "";
+    resultIcon.innerText = "";
+    opponentName.innerText = "";
+    userTitle.classList.add("hidden"); // Versteckt "You" beim Start
+    timerElement.style.color = "#FFFFFF"; // Timer bleibt weiß
+
+    // Schwierigkeit auswerten
+    if (difficulty === "leonard") {
+        winnerName = "Leonard";
+        // Leonard verliert oder spielt unentschieden
+        if (userChoice === 'rock') computerChoice = 'scissors'; // Rock schlägt Scissors
+        else if (userChoice === 'paper') computerChoice = 'rock'; // Paper schlägt Rock
+        else computerChoice = 'paper'; // Scissors schlägt Paper
+        if (Math.random() < 0.5) computerChoice = userChoice; // 50% Chance auf Unentschieden
+    } else if (difficulty === "alex") {
+        winnerName = "Alex";
+        // Alex gewinnt oder spielt unentschieden
+        if (userChoice === 'rock') computerChoice = 'paper'; // Paper schlägt Rock
+        else if (userChoice === 'paper') computerChoice = 'scissors'; // Scissors schlägt Paper
+        else computerChoice = 'rock'; // Rock schlägt Scissors
+        if (Math.random() < 0.5) computerChoice = userChoice; // 50% Chance auf Unentschieden
     } else {
-        console.error('Visualizer container not found!');
-        return;
+        winnerName = "Schubi";
+        computerChoice = choices[Math.floor(Math.random() * 3)]; // Zufällige Wahl
     }
 
-    // Geometrie und Shader-Material für den Glow-Effekt
-    const geometry = new THREE.SphereGeometry(3, 64, 64);
+    // Timer-Countdown
+    let countdown = 3;
+    timerElement.innerText = `Ready... ${countdown}`;
+    const timer = setInterval(() => {
+        countdown--;
+        if (countdown > 0) {
+            timerElement.innerText = `Ready... ${countdown}`;
+        } else {
+            clearInterval(timer);
 
-    // Punkte-Material mit Glow
-    const material = new THREE.ShaderMaterial({
-        uniforms: {
-            glowColor: { value: new THREE.Color(0xffffff) },
-            viewVector: { value: camera.position },
-        },
-        vertexShader: `
-            varying vec3 vNormal;
-            varying vec3 vPositionNormal;
-            void main() {
-                vNormal = normalize(normalMatrix * normal);
-                vPositionNormal = normalize((modelViewMatrix * vec4(position, 1.0)).xyz);
-                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }
-        `,
-        fragmentShader: `
-            uniform vec3 glowColor;
-            varying vec3 vNormal;
-            varying vec3 vPositionNormal;
-            void main() {
-                float intensity = pow(0.9 - dot(vNormal, vPositionNormal), 3.0);
-                gl_FragColor = vec4(glowColor, 1.0) * intensity;
-            }
-        `,
-        transparent: true,
-        blending: THREE.AdditiveBlending,
-    });
+            // Emojis anzeigen
+            const emojiMap = { rock: "✊", paper: "✋", scissors: "✌" };
+            userResult.innerText = emojiMap[userChoice];
+            computerResult.innerText = emojiMap[computerChoice];
+            opponentName.innerText = winnerName;
 
-    const points = new THREE.Points(geometry, material);
-    scene.add(points);
+            // "You" sichtbar machen
+            userTitle.classList.remove("hidden");
 
-    camera.position.z = 10;
-    const initialPositions = geometry.attributes.position.array.slice();
-
-    // Audio Setup
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const analyser = audioContext.createAnalyser();
-    analyser.fftSize = 256;
-    const frequencyData = new Uint8Array(analyser.frequencyBinCount);
-
-    const audio = new Audio('/static/js/test.mp3');
-    audio.crossOrigin = 'anonymous';
-    audio.loop = true;
-
-    const source = audioContext.createMediaElementSource(audio);
-    source.connect(analyser);
-    analyser.connect(audioContext.destination);
-
-    // Toggle Audio Button
-    const toggleAudio = document.getElementById('toggle-audio');
-    if (toggleAudio) {
-        toggleAudio.addEventListener('change', (event) => {
-            if (event.target.checked) {
-                // Start or resume audio
-                audioContext.resume().then(() => {
-                    audio.play();
-                }).catch(err => {
-                    console.error('Error resuming audio context:', err);
-                });
+            // Ergebnislogik
+            let resultText = "";
+            let resultClass = "";
+            if (userChoice === computerChoice) {
+                resultText = `It is a draw against ${winnerName}!`;
+                resultClass = "result-draw";
+                resultIcon.innerText = "⚖️";
+            } else if (
+                (userChoice === 'rock' && computerChoice === 'scissors') ||
+                (userChoice === 'paper' && computerChoice === 'rock') ||
+                (userChoice === 'scissors' && computerChoice === 'paper')
+            ) {
+                resultText = `You have won against ${winnerName}!`;
+                resultClass = "result-win";
+                resultIcon.innerText = "✅";
             } else {
-                // Pause audio
-                audio.pause();
+                resultText = `${winnerName} has won against you!`;
+                resultClass = "result-lose";
+                resultIcon.innerText = "❌";
             }
-        });
-    } else {
-        console.error('Audio toggle element not found!');
-    }
 
-    // Animation Loop
-    function animate() {
-        requestAnimationFrame(animate);
+            // Ergebnis anzeigen
+            timerElement.innerText = resultText;
+            timerElement.className = ""; // Klassen zurücksetzen
+            timerElement.classList.add(resultClass);
+            timerElement.style.color = "#FFFFFF"; // Sicherstellen, dass die Timer-Farbe weiß bleibt
 
-        analyser.getByteFrequencyData(frequencyData);
-
-        const positions = geometry.attributes.position.array;
-        for (let i = 0; i < positions.length; i += 3) {
-            const x = initialPositions[i];
-            const y = initialPositions[i + 1];
-            const z = initialPositions[i + 2];
-
-            const frequency = frequencyData[i % frequencyData.length] / 255;
-            const strength = frequency * 3;
-
-            positions[i] = x + (x / 3) * strength * 0.5;
-            positions[i + 1] = y + (y / 3) * strength * 0.5;
-            positions[i + 2] = z + (z / 3) * strength * 0.5;
-
-            positions[i] += (x - positions[i]) * 0.01;
-            positions[i + 1] += (y - positions[i + 1]) * 0.01;
-            positions[i + 2] += (z - positions[i + 2]) * 0.01;
+            // Nach 2 Sekunden entsperren
+            setTimeout(() => {
+                gameInProgress = false;
+            }, 2000);
         }
+    }, 1000);
+}
 
-        geometry.attributes.position.needsUpdate = true;
 
-        points.rotation.x += 0.005;
-        points.rotation.y += 0.005;
-
-        renderer.render(scene, camera);
-    }
-
-    animate();
-});
-
-// -------------------------------------------------------------------------------------------------
-
-document.addEventListener('DOMContentLoaded', () => {
-    const toggleInput = document.getElementById('toggle-audio');
-    const toggleText = document.querySelector('.toggle-text');
-
-    if (toggleInput && toggleText) {
-        toggleInput.addEventListener('change', () => {
-            if (toggleInput.checked) {
-                // Wenn aktiviert
-                toggleText.classList.add('glow');
-            } else {
-                // Wenn deaktiviert
-                toggleText.classList.remove('glow');
-            }
-        });
-    } else {
-        console.error('Toggle input or text not found!');
-    }
-});

@@ -3,7 +3,6 @@
     padding: 20px;
     background-color: black;
     min-height: 100vh;
-    background-image: url("/static/css/images/backgound.png");
 }
 
 h2{
@@ -106,3 +105,6 @@ label {
         margin-top: 10px;
     }
 }
+
+
+

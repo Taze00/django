@@ -8,100 +8,162 @@
         <!-- Bootstrap CSS -->
         <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
-        <!-- Menu Icon -->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+        <link rel="icon" href="{% static 'css/images/favicon.ico' %}" type="image/x-icon">
 
-    
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+        
+
+
         <!-- Eigener CSS -->
         <link rel="stylesheet" href="{% static 'css/general_settings.css' %}">
         <link rel="stylesheet" href="{% static 'css/header.css' %}">
-        <link rel="stylesheet" href="{% static 'css/about_me.css' %}">
+        <link rel="stylesheet" href="{% static 'css/rps.css' %}">
         <link rel="stylesheet" href="{% static 'css/skills.css' %}">
         <link rel="stylesheet" href="{% static 'css/contact.css' %}">
         <link rel="stylesheet" href="{% static 'css/toprate.css' %}">
         <link rel="stylesheet" href="{% static 'css/gallery.css' %}">
+        <link rel="stylesheet" href="{% static 'css/s-card.css' %}">
+        
 
 
     </head>
 <body>
 
     <header>
-        <div class="header-text">
-            <div class="left-side">
-                <p><strong>Alex</strong></p>
-            </div>
-            <div class="right-side">
-                                <p id="animated-text"></p>
-                <p><strong>MOABEAT</strong></p>
-                <p>BORN 15032000</p>
+            <div class="header-text">
+                <div class="left-side">
+                    <p><strong>Alex</strong></p>
+                </div>
+                <div class="right-side">
+                                    <p id="animated-text"></p>
+                    <p><strong>MOABEAT</strong></p>
+                    <p>BORN 15032000</p>
 
+                    
+                </div>
+            </div>
+            <!-- Mobile -->
+
+
+            <div class="header_text">
                 
-            </div>
-        </div>
+                <div class="circle-container">
+                    <img class="circle-image" src="/static/css/images/gallery/alex0.png" alt="Alex">
+                </div>
 
-        <div class="pics">
-            <div class="border-animation">
-                <div class="card">
-                    <div class="polaroid">
-                        <img class="polaroid" src="/static/css/images/header/polaroid1grey.jpg" alt="">
-                    </div>
+                <div class="welcome_bttn">
+                    <p> &#x1F44B;&nbsp; Welcome to Alex Volkmann &nbsp;</p>
                 </div>
-                <div class="card-2">
-                    <div class="polaroid">
-                        <img class="polaroid" src="/static/css/images/header/polaroid2grey.jpg" alt="">
-                    </div>
-                </div>
-                <div class="card-3 card">
-                    <div class="polaroid">
-                        <img class="polaroid" src="/static/css/images/header/polaroid3grey.jpg" alt="">
-                    </div>
-                </div>                
-                <img class="berlin-img" src="/static/css/images/header/berlin-crop.jpg" alt="">
+                <p class="subheading">Welcome to my website! <br> I'm <span style="font-weight: bolder;">Alex Volkmann</span>, ready to share my passion for technology and design with you.</p>
+                <a href="#contact" class="contact-me-btn">Contact Me</a>
             </div>
 
-        </div>
-        
-        <div class="social-media-links">
-            <a href="https://www.instagram.com/a_.volkmann" class="social-link instagram" target="_blank" aria-label="Instagram"></a>
-            <a href="https://www.tiktok.com/@killua_alex" class="social-link tiktok" target="_blank" aria-label="TikTok"></a>
-            <a href="https://soundcloud.com/alex_sasuke/sets/goat/s-G1ZTUqCaTPO?si=aa95f905957a4fc7b2ea766d80019bd3&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing" class="social-link soundcloud" target="_blank" aria-label="SoundCloud"></a>
-        </div>
+
+
+            <div class="pics">
+                <div class="border-animation">
+                    <div class="card">
+                        <div class="polaroid">
+                            <img class="polaroid" src="/static/css/images/header/polaroid1grey.jpg" alt="">
+                        </div>
+                    </div>
+                    <div class="card-2">
+                        <div class="polaroid">
+                            <img class="polaroid" src="/static/css/images/header/polaroid2grey.jpg" alt="">
+                        </div>
+                    </div>
+                    <div class="card-3">
+                        <div class="polaroid">
+                            <img class="polaroid" src="/static/css/images/header/polaroid3grey.jpg" alt="">
+                        </div>
+                    </div>                
+                    <img class="berlin-img" src="/static/css/images/header/berlin-crop.jpg" alt="">
+                </div>
+
+            </div>
+            
+            <div class="social-media-links">
+                <a href="https://www.instagram.com/a_.volkmann" class="social-link instagram" target="_blank" aria-label="Instagram"></a>
+                <a href="https://www.tiktok.com/@killua_alex" class="social-link tiktok" target="_blank" aria-label="TikTok"></a>
+                <a href="https://soundcloud.com/alex_sasuke/sets/goat/s-G1ZTUqCaTPO?si=aa95f905957a4fc7b2ea766d80019bd3&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing" class="social-link soundcloud" target="_blank" aria-label="SoundCloud"></a>
+            </div>
     </header>
 
-   <section id="about_me_section">
 
-        <div class="visualizer-container">
-            <div id="visualizer"></div>
-        </div>
-
-        <div class="toggle-container">
-            <label class="toggle-switch">
-                <input type="checkbox" id="toggle-audio">
-                <span class="slider"></span>
-            </label>
-            <span class="toggle-text"><strong>Party Mode</strong></span>
-        </div>
-
-
-            
-        <div class="textblock">
-            <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat...</p>
-        </div>
-    </section>
-
-
-
-
-
-
-
-
-
-
-
-    <div class="parallax" style="background-image: url(/static/css/images/background_dj.png);">
+    <div class="about-me">
+        <h2>About Me</h2>
+        <p>
+            I'm Alex Volkmann, a 24-year-old pasta enthusiast, tech geek, and creative mind from Berlin. 
+            Whether it's crafting engaging digital experiences, diving into techno nights, or exploring the vibrant culture of the city, 
+            I’m always chasing unique stories and moments. Welcome to my world!
+        </p>
     </div>
 
+    <section class="section-cart">
+
+        <div class="s-cart" style="--color: #8aff9a">
+            <div class="title">Fun Fact</div>
+            <div class="detail">
+                One morning after coming home from a party, I decided to make pasta. To check if the water was boiling, I used my finger... let’s just say it wasn’t my brightest moment.
+            </div>
+        </div>
+    
+        <div class="s-cart" style="--color: #0abfba">
+            <div class="title">Favorite Quote</div>
+            <div class="detail">
+                Why are you still thinking about it instead of just doing it?
+            </div>
+        </div> 
+    
+        <div class="s-cart" style="--color: #faff9a">
+            <div class="title">Things I Love</div>
+            <div class="detail">
+                I’m passionate about the strategy in chess, the energy of football, and the creative challenges of marketing. Music, especially Berlin’s techno beats, is my ultimate fuel.
+            </div>
+        </div>
+    
+    </section>
+
+<!--
+    <section class="rps-section">
+        <h2>Play Rock-Paper-Scissors 🤘📝✂️</h2>
+ 
+
+        <div class="rps-game">
+            <button class="rps-button" onclick="playGame('rock')">✊ Rock</button>
+            <button class="rps-button" onclick="playGame('paper')">✋ Paper</button>
+            <button class="rps-button" onclick="playGame('scissors')">✌ Scissors</button>
+        </div>
+
+
+        <div class="difficulty-selector">
+            <label for="difficulty">Choose Difficulty:</label>
+            <select id="difficulty">
+                <option value="schubi" selected>Schubi</option>
+                <option value="leonard">Leonard</option>
+                <option value="alex">Alex</option>
+            </select>
+        </div>
+    
+
+        <div id="rps-timer" class="rps-timer"></div>
+
+        <div id="rps-result" class="rps-result">
+            <div class="rps-side" id="user-result">
+                <h3 class="hidden" id="user-title">You</h3>
+                <p id="user-choice-emoji" class="emoji-display"></p>
+            </div>
+            
+            <div class="rps-middle" id="result-icon"></div>
+            <div class="rps-side" id="computer-result">
+                <h3 id="opponent-name"></h3>
+                <p id="computer-choice-emoji" class="emoji-display"></p>
+            </div>
+        </div>
+    </section>
+     --> 
+    <div class="parallax" style="background-image: url(/static/css/images/background_dj.png);"></div>
     
     <section id="gallery">
         <div class="container_gallery">
@@ -112,10 +174,6 @@
             <div class="box">
                 <div class="dream">
                     <img src="/static/css/images/gallery/alex0.png" alt="Bild 1">
-                    <video loop muted autoplay>
-                        <source src="/static/css/images/gallery/alex20.mp4" type="video/mp4">
-                        Ihr Browser unterstützt dieses Videoformat nicht.
-                    </video>
                     <img src="/static/css/images/gallery/alex6.jpeg" alt="Bild 2">
                     <img src="/static/css/images/gallery/alex3.jpeg" alt="Bild 3">
                     <img src="/static/css/images/gallery/alex2.png" alt="Bild 4">
@@ -129,16 +187,9 @@
                     <img src="/static/css/images/gallery/alex22.jpeg" alt="Bild 2">
                     <img src="/static/css/images/gallery/alex5.jpeg" alt="Bild 7">
                     <img src="/static/css/images/gallery/alex24.jpeg" alt="Bild 2">
-                    <video loop muted autoplay>
-                        <source src="/static/css/images/gallery/alex25.mp4" type="video/mp4">
-                        Ihr Browser unterstützt dieses Videoformat nicht.
-                    </video>
                     <img src="/static/css/images/gallery/alex13.jpeg" alt="Bild 8">
-                    <video loop muted autoplay>
-                        <source src="/static/css/images/gallery/alex19.mp4" type="video/mp4">
-                        Ihr Browser unterstützt dieses Videoformat nicht.
-                    </video>
                     <img src="/static/css/images/gallery/alex7.jpeg" alt="Bild 9">
+                    <img src="/static/css/images/gallery/alex9.jpeg" alt="Bild 6">
                     
                     
                 </div>
@@ -149,11 +200,6 @@
                     <img src="/static/css/images/gallery/alex4.jpeg" alt="Bild 14">
                     <img src="/static/css/images/gallery/alex21.jpeg" alt="Bild 2">
                     <img src="/static/css/images/gallery/alex16.jpeg" alt="Bild 15">
-                    <img src="/static/css/images/gallery/alex9.jpeg" alt="Bild 6">
-                    <video loop muted autoplay>
-                        <source src="/static/css/images/gallery/alexv.mp4" type="video/mp4">
-                        Ihr Browser unterstützt dieses Videoformat nicht.
-                    </video>
                     <img src="/static/css/images/gallery/alex8.jpeg" alt="Bild 11">
                 </div>
             </div>
@@ -169,30 +215,114 @@
         </video>
     </div>
 
-    <!-- <section id="toprate_section">
-        <div class="rating_container">
-            <div class="heading">
-                <h2>Club Ranking</h2>
-            </div>
-            <div class="clubrating">
-                <ul class="club-list">
-                    <li><span>1.</span><div>Lokschuppen</div></li>
-                    <li><span>2.</span><div>Club Ost</div></li>
-                    <li><span>3.</span><div>Tresor</div></li>
-                    <li><span>4.</span><div>M-BIA</div></li>
-                    <li><span>5.</span><div>Ritter Butzke</div></li>
-                    <li><span>6.</span><div>Renate</div></li>
-                    <li><span>7.</span><div>Humboldhain</div></li>
-                    <li><span>8.</span><div>Else</div></li>
-                    <li><span>9.</span><div>Waschhaus</div></li>
-                    <li><span>10.</span><div>Watergate</div></li>
-                    <li><span>11.</span><div>Soda</div></li>
-                    <li><span>12.</span><div>Bergwerk</div></li>
-                    Weitere Einträge hier
-                </ul>
-            </div>
+    <section id="club-ranking">
+        <div class="container ranking-container">
+            <h2 class="ranking-heading">🏆 My Club Ranking 🏆</h2>
+            <p class="ranking-description">
+                My personal list of the best (and worst) clubs I've experienced.
+            </p>
+            <ul class="club-ranking-list">
+                <li>
+                    <span class="club-position">1.</span>
+                    <span class="club-name">Lokschuppen</span>
+                    <a href="https://www.google.com/maps?q=Lokschuppen+Club" target="_blank" class="club-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </a>
+                    <span class="club-score">9/10</span>
+                </li>
+                <li>
+                    <span class="club-position">2.</span>
+                    <span class="club-name">Club Ost</span>
+                    <a href="https://www.google.com/maps?q=Club+Ost+Berlin" target="_blank" class="club-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </a>
+                    <span class="club-score">9/10</span>
+                </li>
+                <li>
+                    <span class="club-position">3.</span>
+                    <span class="club-name">Tresor</span>
+                    <a href="https://www.google.com/maps?q=Tresor+Berlin" target="_blank" class="club-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </a>
+                    <span class="club-score">8/10</span>
+                </li>
+                <li>
+                    <span class="club-position">4.</span>
+                    <span class="club-name">Ritter Butzke</span>
+                    <a href="https://www.google.com/maps?q=Ritter+Butzke+Berlin" target="_blank" class="club-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </a>
+                    <span class="club-score">8/10</span>
+                </li>
+                <li>
+                    <span class="club-position">5.</span>
+                    <span class="club-name">Renate</span>
+                    <a href="https://www.google.com/maps?q=Salon+Zur+Wilden+Renate" target="_blank" class="club-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </a>
+                    <span class="club-score">7.5/10</span>
+                </li>
+                <li>
+                    <span class="club-position">6.</span>
+                    <span class="club-name">MBIA</span>
+                    <a href="https://www.google.com/maps?q=MBIA+Berlin" target="_blank" class="club-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </a>
+                    <span class="club-score">7.5/10</span>
+                </li>
+                <li>
+                    <span class="club-position">7.</span>
+                    <span class="club-name">Humboldthain</span>
+                    <a href="https://www.google.com/maps?q=Humboldthain+Club" target="_blank" class="club-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </a>
+                    <span class="club-score">7/10</span>
+                </li>
+                <li>
+                    <span class="club-position">8.</span>
+                    <span class="club-name">Watergate</span>
+                    <a href="https://www.google.com/maps?q=Watergate+Berlin" target="_blank" class="club-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </a>
+                    <span class="club-score">6/10</span>
+                </li>
+                <li>
+                    <span class="club-position">9.</span>
+                    <span class="club-name">Else</span>
+                    <a href="https://www.google.com/maps?q=Else+Berlin" target="_blank" class="club-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </a>
+                    <span class="club-score">6/10</span>
+                </li>
+                <li>
+                    <span class="club-position">10.</span>
+                    <span class="club-name">Waschhaus</span>
+                    <a href="https://www.google.com/maps?q=Waschhaus+Potsdam" target="_blank" class="club-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </a>
+                    <span class="club-score">6/10</span>
+                </li>
+                <li>
+                    <span class="club-position">11.</span>
+                    <span class="club-name">Soda</span>
+                    <a href="https://www.google.com/maps?q=Soda+Club+Berlin" target="_blank" class="club-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </a>
+                    <span class="club-score">4/10</span>
+                </li>
+                <li>
+                    <span class="club-position">12.</span>
+                    <span class="club-name">Berkwerk</span>
+                    <a href="https://www.google.com/maps?q=Club+Berkwerk" target="_blank" class="club-location">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </a>
+                    <span class="club-score">1/10</span>
+                </li>
+            </ul>
         </div>
-    </section> -->
+    </section>
+    
+    
 
    <section id="contact">
     <div class="form">
@@ -232,10 +362,6 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
-
-
-
-
 
 </body>
 </html>
