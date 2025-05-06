@@ -1,0 +1,583 @@
+/* Hauptstile für die Geburtstagsseite von Schubi */
+body {
+    background-color: #ffedf2;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+}
+
+/* Header-Bereich */
+.birthday-header {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: linear-gradient(135deg, #ff7eb9, #ff65a3);
+    color: white;
+    border-radius: 0 0 50% 50% / 20px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.birthday-title {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+    40% {transform: translateY(-20px);}
+    60% {transform: translateY(-10px);}
+}
+
+/* Bereich für Wünsche */
+.wishes-section {
+    background-color: white;
+    padding: 3rem;
+    text-align: center;
+    border-radius: 15px;
+    margin: 2rem auto;
+    max-width: 800px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.heart-icon {
+    color: #ff65a3;
+    font-size: 2rem;
+    margin: 1rem;
+}
+
+/* Footer-Bereich */
+.birthday-footer {
+    text-align: center;
+    padding: 2rem;
+    background-color: #333;
+    color: white;
+    margin-top: 3rem;
+}
+
+.back-to-home {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 1.5rem;
+    background-color: #ff65a3;
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    transition: background-color 0.3s;
+}
+
+.back-to-home:hover {
+    background-color: #e0598b;
+    color: white;
+    text-decoration: none;
+}
+
+/* Konfetti Animation */
+.confetti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    background-color: #ff65a3;
+    animation: confetti-fall 5s linear infinite;
+    z-index: 1000;
+}
+
+@keyframes confetti-fall {
+    0% {
+        transform: translateY(-100px) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Timeline-Bereich */
+.timeline-section {
+    padding: 2rem 0;
+    margin: 3rem auto;
+    max-width: 1000px;
+}
+
+.timeline {
+    position: relative;
+    padding: 2rem 0;
+}
+
+/* Vertikale Linie in der Mitte */
+.timeline::before {
+    content: '';
+    position: absolute;
+    width: 4px;
+    background: linear-gradient(to bottom, #ff65a3, #ff9cc8);
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 4px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 4rem;
+    width: 100%;
+}
+
+/* Punkte auf der Timeline */
+.timeline-dot {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: #ff65a3;
+    border-radius: 50%;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    box-shadow: 0 0 0 4px #ffcee4;
+    z-index: 1;
+}
+
+/* Datum auf der Timeline */
+.timeline-date {
+    position: absolute;
+    width: 120px;
+    padding: 8px;
+    background-color: #ff65a3;
+    color: white;
+    border-radius: 20px;
+    text-align: center;
+    font-weight: bold;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    z-index: 2;
+}
+
+/* Inhalt der Timeline-Einträge */
+.timeline-content {
+    position: relative;
+    background-color: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    width: calc(50% - 50px);
+    margin-top: 30px;
+    transition: transform 0.3s ease;
+}
+
+.timeline-content:hover {
+    transform: translateY(-5px);
+}
+
+/* Abwechselnde Anordnung der Timeline-Einträge */
+.timeline-item:nth-child(odd) .timeline-content {
+    margin-left: auto;
+    margin-right: 50px;
+}
+
+.timeline-item:nth-child(even) .timeline-content {
+    margin-left: 50px;
+}
+
+/* Media für Timeline (Bilder, Videos) */
+.timeline-media {
+    margin-top: 1.5rem;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.timeline-image, .timeline-video {
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Galerie innerhalb der Timeline */
+.timeline-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.gallery-img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    transition: transform 0.3s;
+}
+
+.gallery-img:hover {
+    transform: scale(1.05);
+}
+
+/* Spezielle Styles für den heutigen Tag */
+.special-item .timeline-dot {
+    background-color: #fb3584;
+    box-shadow: 0 0 0 4px #ffcee4, 0 0 15px #ff65a3;
+    animation: pulse 2s infinite;
+}
+
+.special-item .timeline-date {
+    background-color: #fb3584;
+    font-weight: bold;
+    box-shadow: 0 2px 10px rgba(251, 53, 132, 0.3);
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(251, 53, 132, 0.7), 0 0 0 4px #ffcee4;
+    }
+    70% {
+        box-shadow: 0 0 0 15px rgba(251, 53, 132, 0), 0 0 0 4px #ffcee4;
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(251, 53, 132, 0), 0 0 0 4px #ffcee4;
+    }
+}
+
+/* Herz-Animation für den heutigen Tag */
+.heart-animation {
+    font-size: 5rem;
+    text-align: center;
+    animation: heartbeat 1.5s infinite;
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+/* Zukunfts-Element */
+.future-item .timeline-dot {
+    background-color: #9e9e9e;
+    box-shadow: 0 0 0 4px #e0e0e0;
+}
+
+.future-item .timeline-date {
+    background-color: #9e9e9e;
+}
+
+.future-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background-color: #f8f8f8;
+    border-radius: 10px;
+    color: #9e9e9e;
+}
+
+.future-placeholder i {
+    margin-bottom: 1rem;
+    color: #ff65a3;
+}
+
+/* Responsive Design für kleinere Bildschirme */
+@media (max-width: 768px) {
+    .birthday-title {
+        font-size: 2rem;
+    }
+    
+    .timeline::before {
+        left: 30px;
+    }
+    
+    .timeline-dot {
+        left: 30px;
+    }
+    
+    .timeline-date {
+        left: 30px;
+        width: auto;
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+    
+    .timeline-content {
+        width: calc(100% - 80px);
+        margin-left: 80px !important;
+        margin-right: 0 !important;
+    }
+    
+    .timeline-gallery {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Quiz-Bereich Styles */
+.quiz-section {
+    padding: 3rem 0;
+    margin: 3rem auto;
+    max-width: 800px;
+}
+
+.quiz-container {
+    background-color: white;
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    margin-top: 2rem;
+}
+
+.quiz-progress {
+    height: 8px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 20%; /* Startwert, wird durch JS aktualisiert */
+    background: linear-gradient(to right, #ff65a3, #ff9cc8);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+.quiz-question h3 {
+    margin-bottom: 1.5rem;
+    text-align: center;
+    color: #333;
+}
+
+.quiz-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.quiz-option {
+    background-color: #f9f9f9;
+    border: 2px solid #f0f0f0;
+    border-radius: 10px;
+    padding: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.quiz-option:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    border-color: #ffc2e0;
+}
+
+.option-label {
+    width: 30px;
+    height: 30px;
+    background-color: #ff65a3;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.option-text {
+    flex-grow: 1;
+}
+
+/* Styling für richtige/falsche Antworten */
+.quiz-option.correct {
+    background-color: #d4ffda;
+    border-color: #00c853;
+}
+
+.quiz-option.incorrect {
+    background-color: #ffe5e5;
+    border-color: #ff1744;
+}
+
+.quiz-option.disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* Ergebnis-Bereich */
+.quiz-result {
+    text-align: center;
+}
+
+.result-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.result-score {
+    margin-bottom: 1.5rem;
+}
+
+.score-number {
+    font-size: 4rem;
+    font-weight: bold;
+    color: #ff65a3;
+    display: block;
+}
+
+.score-text {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+.result-message {
+    margin-bottom: 2rem;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+.heart-container {
+    margin: 1.5rem 0;
+}
+
+.heart-icon {
+    font-size: 5rem;
+    animation: heartbeat 1.5s infinite;
+}
+
+.restart-quiz {
+    background-color: #ff65a3;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 0.8rem 2rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.restart-quiz:hover {
+    background-color: #e0598b;
+}
+
+/* Responsive Design für kleinere Bildschirme */
+@media (max-width: 768px) {
+    .quiz-options {
+        grid-template-columns: 1fr;
+    }
+    
+    .quiz-container {
+        padding: 1.5rem;
+    }
+    
+    .score-number {
+        font-size: 3rem;
+    }
+}
+
+
+.video-section {
+    padding: 2rem 0;
+    margin: 2rem auto;
+    max-width: 700px; /* Reduziert von 900px für Desktop */
+}
+
+.video-container {
+    background-color: white;
+    border-radius: 15px;
+    padding: 15px; /* Reduziert von 20px */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
+    position: relative;
+}
+
+#birthday-video {
+    width: 100%;
+    max-height: 400px; /* Maximal-Höhe für Desktop hinzugefügt */
+    border-radius: 10px;
+    display: block;
+}
+
+.video-controls {
+    margin-top: 12px; /* Reduziert von 15px */
+    display: flex;
+    justify-content: center;
+}
+
+.download-video-btn {
+    background-color: #ff65a3;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 0.6rem 1.8rem; /* Reduziert von 0.8rem 2rem */
+    font-size: 0.9rem; /* Reduziert von 1rem */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.download-video-btn:hover {
+    background-color: #e0598b;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.download-video-btn i {
+    font-size: 1.1rem; /* Reduziert von 1.2rem */
+}
+
+.video-caption {
+    color: #666;
+    font-style: italic;
+    margin-top: 10px; /* Reduziert von 15px */
+    font-size: 0.9rem; /* Kleinere Schriftgröße */
+}
+
+/* Desktop-spezifische Anpassungen */
+@media (min-width: 992px) {
+    .video-section {
+        margin: 2rem auto;
+    }
+    
+    .video-container {
+        max-width: 670px;
+        margin: 0 auto;
+    }
+    
+    h2 {
+        font-size: 2.2rem; /* Kleinere Überschrift für Desktop */
+    }
+}
+
+/* Tablet-Anpassungen */
+@media (min-width: 768px) and (max-width: 991px) {
+    .video-section {
+        max-width: 650px;
+    }
+    
+    #birthday-video {
+        max-height: 350px;
+    }
+}
+
+/* Mobile Anpassungen beibehalten */
+@media (max-width: 767px) {
+    .video-section {
+        padding: 1.5rem 1rem;
+    }
+    
+    .video-container {
+        padding: 12px;
+    }
+    
+    .download-video-btn {
+        padding: 0.5rem 1.2rem;
+        font-size: 0.85rem;
+    }
+    
+    h2 {
+        font-size: 1.8rem;
+    }
+}
