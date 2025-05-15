@@ -1,586 +1,175 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
 
-        <!-- Bootstrap CSS -->
-        <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-
-        <link rel="icon" href="{% static 'css/images/favicon.ico' %}" type="image/x-icon">
-
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-        
-
-
-        <!-- Eigener CSS -->
-        <link rel="stylesheet" href="{% static 'css/general_settings.css' %}">
-        <link rel="stylesheet" href="{% static 'css/header.css' %}">
-        <link rel="stylesheet" href="{% static 'css/rps.css' %}">
-        <link rel="stylesheet" href="{% static 'css/skills.css' %}">
-        <link rel="stylesheet" href="{% static 'css/contact.css' %}">
-        <link rel="stylesheet" href="{% static 'css/toprate.css' %}">
-        <link rel="stylesheet" href="{% static 'css/gallery.css' %}">
-        <link rel="stylesheet" href="{% static 'css/aboutme.css' %}">
-        
+    <title>Alex Volkmann | Berlin Club Culture</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="{% static 'css/images/favicon.ico' %}" type="image/x-icon">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Eigener CSS -->
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20250514-2">
 
 
-    </head>
+</head>
+
 <body>
-
-<!-- Stylisher Header mit Glitch-Effekten -->
-<header>
-    <!-- Hintergrund mit Bild -->
-    <div class="header-background">
-        <div class="header-overlay"></div>
-    </div>
-    
-    <!-- Sprachauswahl oben rechts -->
-    <div class="language-selector">
-        <a href="#" class="lang-active">DE</a>
-        <a href="#">EN</a>
-    </div>
-    
-    <!-- Hauptinhalt des Headers -->
-    <div class="header-content">
-        <div class="glitch-container">
-            <h1 class="glitch" data-text="Alex Volkmann">Alex Volkmann</h1>
+    <!-- Header -->
+    <header id="header">
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">Alex Volkmann</a>
+                <ul class="nav-links">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#about">Über Mich</a></li>
+                    <li><a href="#clubs">Club Ranking</a></li>
+                    <li><a href="#gallery">Galerie</a></li>
+                    <li><a href="#contact">Kontakt</a></li>
+                </ul>
+                <div class="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </nav>
         </div>
-        
-        <p class="header-subtitle neon-text">Berlin-based creative mind & tech enthusiast</p>
-        
-        <!-- Animierter Text -->
-        <div class="animated-text-container">
-            <span id="animated-text" class="neon-text-bright"></span>
-        </div>
-    </div>
-    
-    <!-- Social Media Links -->
-    <div class="social-media-links">
-        <a href="https://www.instagram.com/a_.volkmann" class="social-link instagram" target="_blank" aria-label="Instagram">
-            <div class="social-hover-effect"></div>
-        </a>
-        <a href="https://www.tiktok.com/@killua_alex" class="social-link tiktok" target="_blank" aria-label="TikTok">
-            <div class="social-hover-effect"></div>
-        </a>
-        <a href="https://soundcloud.com/alex_sasuke/sets/goat/s-G1ZTUqCaTPO?si=aa95f905957a4fc7b2ea766d80019bd3&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing" class="social-link soundcloud" target="_blank" aria-label="SoundCloud">
-            <div class="social-hover-effect"></div>
-        </a>
-    </div>
-    
-    <!-- Scroll-Down Indikator -->
-    <div class="scroll-indicator neon-arrow"></div>
-</header>
-    
+    </header>
 
-
-<!-- Korrigierte About Me Sektion ohne doppelte Überschrift -->
-<section id="about-me">
-    <div class="about-container">
-        <!-- Hintergrund-Effekt -->
-        <div class="bg-grid"></div>
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-bg" id="three-bg"></div> <!-- Three.js Canvas wird hier eingebunden -->
+        <div class="hero-overlay"></div>
         
-        <div class="about-content">
-            <div class="about-text">
-                <!-- Überschrift mit Neon-Effekt -->
-                <h2 class="about-title">About Me</h2>
-                
-                <p class="about-description">
-                    I'm Alex Volkmann, a 24-year-old pasta enthusiast, tech geek, and creative mind from Berlin. 
-                    Whether it's crafting engaging digital experiences, diving into techno nights, or exploring the vibrant culture of the city, 
-                    I'm always chasing unique stories and moments. Welcome to my world!
-                </p>
-                
-                <div class="about-skills">
-                    <span class="skill-tag" data-text="Web Design">Web Design</span>
-                    <span class="skill-tag" data-text="Development">Development</span>
-                    <span class="skill-tag" data-text="UI/UX">UI/UX</span>
-                    <span class="skill-tag" data-text="Creative">Creative</span>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="hero-content fade-in">
+                        <h1>Mein <span class="text-gradient">Berlin</span>-Vibe<br> ganz ohne Filter</h1>
+                        <p class="hero-subtitle">Student | Webdesign | Marketing</p>
+                        <div class="hero-cta">
+                            <a href="#clubs" class="btn">Club Ranking</a>
+                            <a href="#gallery" class="btn btn-outline">Galerie ansehen</a>
+                        </div>
+                    </div>
                 </div>
             </div>
-            
-            <div class="about-image">
-                <div class="image-container">
-                    <!-- Bild mit Rahmen und Schatten-Effekt -->
-                    <img src="/static/css/images/gallery/alex0.png" alt="Alex Volkmann">
-                    <div class="image-overlay"></div>
-                    <div class="corner-accent top-left"></div>
-                    <div class="corner-accent top-right"></div>
-                    <div class="corner-accent bottom-left"></div>
-                    <div class="corner-accent bottom-right"></div>
+        </div>
+        
+        <div class="scroll-indicator">
+            <div class="scroll-arrow"></div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="about-pattern"></div>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-6 order-lg-1 order-2">
+                    <div class="about-text fade-in">
+                        <h2>Über <span class="text-gradient">Mich</span></h2>
+                        <p>Ich heiße Alex Volkmann, bin 25 Jahre alt und lebe in Werder. Zurzeit studiere ich Wirtschaftsinformatik und arbeite nebenbei an verschiedenen Projekten im Bereich Webdesign und Online-Marketing.</p>
+                        <p>Am Wochenende bin ich oft unterwegs – meistens mit Freunden und gerne auch mal beim Club-Hopping durch Berlin. Ich liebe die Atmosphäre, die Energie und das Gefühl, wenn aus einer Nacht eine Erinnerung wird. Diese Eindrücke fließen oft in meine kreativen Projekte ein – sei es in Designs, Texte oder Ideen, die mir spontan in den Kopf schießen.</p>
+                        <p>Diese Seite ist mein digitaler Spielplatz: ein Mix aus Portfolio, persönlichem Tagebuch und ein bisschen Chaos.</p>     
+                        <div class="button-group">
+                            <a href="#contact" class="btn">Kontakt</a>
+                            <a href="https://soundcloud.com/alex_sasuke/sets/goat" target="_blank" rel="noopener noreferrer" class="btn btn-outline"><i class="fab fa-soundcloud"></i> Meine Playlist</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 order-lg-2 order-1 mb-lg-0 mb-5">
+                    <div class="about-image fade-in">
+                        <img src="{% static 'css/images/about-me/alex0.png' %}" alt="Über mich">
+                    </div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <!-- Club Ranking Section (jetzt an erster Stelle) -->
+    <section id="clubs" class="club-ranking">
+    <div class="club-pattern"></div>
+    <div class="container club-container">
+        <div class="section-header fade-in">
+            <h2>Berlin Club <span class="text-gradient">Ranking</span></h2>
+            <p>Meine persönliche Bewertung der besten Clubs in Berlin, basierend auf Atmosphäre, Sound und Lineup</p>
+        </div>
+        
+        <div class="row" id="ranking-grid">
+            <!-- Club cards will be added via JavaScript -->
         </div>
     </div>
 </section>
 
-
-
-<!--
-    <section class="rps-section">
-        <h2>Play Rock-Paper-Scissors 🤘📝✂️</h2>
- 
-
-        <div class="rps-game">
-            <button class="rps-button" onclick="playGame('rock')">✊ Rock</button>
-            <button class="rps-button" onclick="playGame('paper')">✋ Paper</button>
-            <button class="rps-button" onclick="playGame('scissors')">✌ Scissors</button>
+<!-- Gallery Section (ohne Filter) -->
+<section id="gallery" class="gallery">
+    <div class="gallery-pattern"></div>
+    <div class="container gallery-container">
+        <div class="section-header fade-in">
+            <h2>Galerie</h2>
+            <p>Eine kleine Sammlung an Erinnerungen und Momente and die ich gerne zurück denke</p>
         </div>
-
-
-        <div class="difficulty-selector">
-            <label for="difficulty">Choose Difficulty:</label>
-            <select id="difficulty">
-                <option value="schubi" selected>Schubi</option>
-                <option value="leonard">Leonard</option>
-                <option value="alex">Alex</option>
-            </select>
+        
+        <!-- Die Filterbuttons wurden hier entfernt -->
+        
+        <div class="row" id="gallery-grid">
+            <!-- Gallery items will be added via JavaScript -->
         </div>
-    
-
-        <div id="rps-timer" class="rps-timer"></div>
-
-        <div id="rps-result" class="rps-result">
-            <div class="rps-side" id="user-result">
-                <h3 class="hidden" id="user-title">You</h3>
-                <p id="user-choice-emoji" class="emoji-display"></p>
-            </div>
-            
-            <div class="rps-middle" id="result-icon"></div>
-            <div class="rps-side" id="computer-result">
-                <h3 id="opponent-name"></h3>
-                <p id="computer-choice-emoji" class="emoji-display"></p>
-            </div>
-        </div>
-    </section>
-     --> 
-    <div class="parallax" style="background-image: url(/static/css/images/background_dj.png);"></div>
-    
-
-    <section id="gallery">
-        <div class="gallery-container">
-            <div class="gallery-header">
-                <h2 class="gallery-title">Photo Gallery</h2>
-                <p class="gallery-description">A glimpse into my world through photography</p>
-            </div>
-            
-            <div class="gallery-filter">
-                <button class="filter-btn active" data-filter="all">All</button>
-                <button class="filter-btn" data-filter="portrait">Portraits</button>
-                <button class="filter-btn" data-filter="travel">Travel</button>
-                <button class="filter-btn" data-filter="events">Events</button>
-            </div>
-            
-            <div class="gallery-grid">
-                <!-- Erste Spalte (ursprünglich) -->
-                <div class="gallery-item portrait" data-category="portrait">
-                    <div class="gallery-image">
-                        <img src="/static/css/images/gallery/alex0.png" alt="Portrait">
-                        <div class="hover-overlay">
-                            <div class="image-info">
-                                <h3>Self Portrait</h3>
-                                <p>Berlin, 2023</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="gallery-item portrait" data-category="portrait">
-                    <div class="gallery-image">
-                        <img src="/static/css/images/gallery/alex6.jpeg" alt="Portrait">
-                        <div class="hover-overlay">
-                            <div class="image-info">
-                                <h3>Urban Style</h3>
-                                <p>City Vibes</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="gallery-item portrait" data-category="portrait">
-                    <div class="gallery-image">
-                        <img src="/static/css/images/gallery/alex3.jpeg" alt="Portrait">
-                        <div class="hover-overlay">
-                            <div class="image-info">
-                                <h3>Casual Look</h3>
-                                <p>Everyday Style</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="gallery-item portrait" data-category="portrait">
-                    <div class="gallery-image">
-                        <img src="/static/css/images/gallery/alex2.png" alt="Portrait">
-                        <div class="hover-overlay">
-                            <div class="image-info">
-                                <h3>Studio Shot</h3>
-                                <p>Fashion Moment</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="gallery-item events" data-category="events">
-                    <div class="gallery-image">
-                        <img src="/static/css/images/gallery/alex11.jpeg" alt="Event">
-                        <div class="hover-overlay">
-                            <div class="image-info">
-                                <h3>Night Out</h3>
-                                <p>Club Scene</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="gallery-item events" data-category="events">
-                    <div class="gallery-image">
-                        <img src="/static/css/images/gallery/alex12.jpeg" alt="Event">
-                        <div class="hover-overlay">
-                            <div class="image-info">
-                                <h3>Party Time</h3>
-                                <p>Weekend Vibes</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="gallery-item travel" data-category="travel">
-                    <div class="gallery-image">
-                        <img src="/static/css/images/gallery/alex17.jpeg" alt="Travel">
-                        <div class="hover-overlay">
-                            <div class="image-info">
-                                <h3>City Exploration</h3>
-                                <p>Urban Adventure</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="gallery-item travel" data-category="travel">
-                    <div class="gallery-image">
-                        <img src="/static/css/images/gallery/alex26.jpeg" alt="Travel">
-                        <div class="hover-overlay">
-                            <div class="image-info">
-                                <h3>Architecture</h3>
-                                <p>Design Appreciation</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Zweite Spalte (ursprünglich) -->
-                <div class="gallery-item events" data-category="events">
-                    <div class="gallery-image">
-                        <img src="/static/css/images/gallery/alex22.jpeg" alt="Event">
-                        <div class="hover-overlay">
-                            <div class="image-info">
-                                <h3>Festival</h3>
-                                <p>Music & Friends</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="gallery-item portrait" data-category="portrait">
-                    <div class="gallery-image">
-                        <img src="/static/css/images/gallery/alex5.jpeg" alt="Portrait">
-                        <div class="hover-overlay">
-                            <div class="image-info">
-                                <h3>Lifestyle</h3>
-                                <p>Modern Look</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="gallery-item travel" data-category="travel">
-                    <div class="gallery-image">
-                        <img src="/static/css/images/gallery/alex24.jpeg" alt="Travel">
-                        <div class="hover-overlay">
-                            <div class="image-info">
-                                <h3>Journey</h3>
-                                <p>Exploring Places</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="gallery-item events" data-category="events">
-                    <div class="gallery-image">
-                        <img src="/static/css/images/gallery/alex13.jpeg" alt="Event">
-                        <div class="hover-overlay">
-                            <div class="image-info">
-                                <h3>Social Gathering</h3>
-                                <p>Good Times</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="gallery-item events" data-category="events">
-                    <div class="gallery-image">
-                        <img src="/static/css/images/gallery/alex7.jpeg" alt="Event">
-                        <div class="hover-overlay">
-                            <div class="image-info">
-                                <h3>Event</h3>
-                                <p>Special Occasion</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="gallery-item events" data-category="events">
-                    <div class="gallery-image">
-                        <img src="/static/css/images/gallery/alex9.jpeg" alt="Event">
-                        <div class="hover-overlay">
-                            <div class="image-info">
-                                <h3>Night Life</h3>
-                                <p>Berlin Scene</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Dritte Spalte (ursprünglich) -->
-                <div class="gallery-item events" data-category="events">
-                    <div class="gallery-image">
-                        <img src="/static/css/images/gallery/alex10.jpeg" alt="Event">
-                        <div class="hover-overlay">
-                            <div class="image-info">
-                                <h3>Club Night</h3>
-                                <p>Techno Culture</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="gallery-item portrait" data-category="portrait">
-                    <div class="gallery-image">
-                        <img src="/static/css/images/gallery/alex15.jpeg" alt="Portrait">
-                        <div class="hover-overlay">
-                            <div class="image-info">
-                                <h3>Mood</h3>
-                                <p>Artistic Shot</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="gallery-item portrait" data-category="portrait">
-                    <div class="gallery-image">
-                        <img src="/static/css/images/gallery/alex4.jpeg" alt="Portrait">
-                        <div class="hover-overlay">
-                            <div class="image-info">
-                                <h3>Streetwear</h3>
-                                <p>Urban Fashion</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="gallery-item travel" data-category="travel">
-                    <div class="gallery-image">
-                        <img src="/static/css/images/gallery/alex21.jpeg" alt="Travel">
-                        <div class="hover-overlay">
-                            <div class="image-info">
-                                <h3>Exploration</h3>
-                                <p>Scenic Views</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="gallery-item portrait" data-category="portrait">
-                    <div class="gallery-image">
-                        <img src="/static/css/images/gallery/alex16.jpeg" alt="Portrait">
-                        <div class="hover-overlay">
-                            <div class="image-info">
-                                <h3>Lifestyle</h3>
-                                <p>Daily Moments</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="gallery-item travel" data-category="travel">
-                    <div class="gallery-image">
-                        <img src="/static/css/images/gallery/alex8.jpeg" alt="Travel">
-                        <div class="hover-overlay">
-                            <div class="image-info">
-                                <h3>City Life</h3>
-                                <p>Urban Exploration</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="gallery-navigation">
-                <button class="load-more">Load More</button>
-            </div>
-        </div>
-    </section>
-    
-
-    
-    <div class="parallax">
-        <video autoplay muted loop id="background_video">
-            <source src="/static/css/images/try1.mp4"type="video/mp4">
-            Your browser does not support HTML5 video.
-        </video>
-    </div>
-
-    <section id="club-ranking">
-        <div class="container ranking-container">
-            <h2 class="ranking-heading">🏆 My Club Ranking 🏆</h2>
-            <p class="ranking-description">
-                My personal list of the best (and worst) clubs I've experienced.
-            </p>
-            <ul class="club-ranking-list">
-                <li>
-                    <span class="club-position">1.</span>
-                    <span class="club-name">Lokschuppen</span>
-                    <a href="https://www.google.com/maps?q=Lokschuppen+Club" target="_blank" class="club-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </a>
-                    <span class="club-score">9/10</span>
-                </li>
-                <li>
-                    <span class="club-position">2.</span>
-                    <span class="club-name">Club Ost</span>
-                    <a href="https://www.google.com/maps?q=Club+Ost+Berlin" target="_blank" class="club-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </a>
-                    <span class="club-score">9/10</span>
-                </li>
-                <li>
-                    <span class="club-position">3.</span>
-                    <span class="club-name">Tresor</span>
-                    <a href="https://www.google.com/maps?q=Tresor+Berlin" target="_blank" class="club-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </a>
-                    <span class="club-score">8/10</span>
-                </li>
-                <li>
-                    <span class="club-position">4.</span>
-                    <span class="club-name">Ritter Butzke</span>
-                    <a href="https://www.google.com/maps?q=Ritter+Butzke+Berlin" target="_blank" class="club-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </a>
-                    <span class="club-score">8/10</span>
-                </li>
-                <li>
-                    <span class="club-position">5.</span>
-                    <span class="club-name">Renate</span>
-                    <a href="https://www.google.com/maps?q=Salon+Zur+Wilden+Renate" target="_blank" class="club-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </a>
-                    <span class="club-score">7.5/10</span>
-                </li>
-                <li>
-                    <span class="club-position">6.</span>
-                    <span class="club-name">MBIA</span>
-                    <a href="https://www.google.com/maps?q=MBIA+Berlin" target="_blank" class="club-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </a>
-                    <span class="club-score">7.5/10</span>
-                </li>
-                <li>
-                    <span class="club-position">7.</span>
-                    <span class="club-name">Humboldthain</span>
-                    <a href="https://www.google.com/maps?q=Humboldthain+Club" target="_blank" class="club-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </a>
-                    <span class="club-score">7/10</span>
-                </li>
-                <li>
-                    <span class="club-position">8.</span>
-                    <span class="club-name">Watergate</span>
-                    <a href="https://www.google.com/maps?q=Watergate+Berlin" target="_blank" class="club-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </a>
-                    <span class="club-score">6/10</span>
-                </li>
-                <li>
-                    <span class="club-position">9.</span>
-                    <span class="club-name">Else</span>
-                    <a href="https://www.google.com/maps?q=Else+Berlin" target="_blank" class="club-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </a>
-                    <span class="club-score">6/10</span>
-                </li>
-                <li>
-                    <span class="club-position">10.</span>
-                    <span class="club-name">Waschhaus</span>
-                    <a href="https://www.google.com/maps?q=Waschhaus+Potsdam" target="_blank" class="club-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </a>
-                    <span class="club-score">6/10</span>
-                </li>
-                <li>
-                    <span class="club-position">11.</span>
-                    <span class="club-name">Soda</span>
-                    <a href="https://www.google.com/maps?q=Soda+Club+Berlin" target="_blank" class="club-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </a>
-                    <span class="club-score">4/10</span>
-                </li>
-                <li>
-                    <span class="club-position">12.</span>
-                    <span class="club-name">Berkwerk</span>
-                    <a href="https://www.google.com/maps?q=Club+Berkwerk" target="_blank" class="club-location">
-                        <i class="fas fa-map-marker-alt"></i>
-                    </a>
-                    <span class="club-score">1/10</span>
-                </li>
-            </ul>
-        </div>
-    </section>
-    
-    
-
-   <section id="contact">
-    <div class="form">
-        <h2>Want to get in touch</h2>
-        <form>
-            
-                <div class="form-row">
-                    <div class="input-group">
-                        <label for="name">Name</label>
-                        <input type="text" id="name" name="name" placeholder="Enter your name">
-                    </div>
-                    <div class="input-group">
-                        <label for="email">Email</label>
-                        <input type="email" id="email" name="email" placeholder="Enter your email address">
-                    </div>
-                </div>
-                <div class="input-group">
-                    <label for="message">Message</label>
-                    <textarea id="message" name="message" placeholder="Enter your message"></textarea>
-                </div>
-                <button type="submit" class="submit-btn">Submit</button>
-            
-        </form>
     </div>
 </section>
+    
+    <!-- Modal -->
+    <div class="modal" id="galleryModal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <img src="" alt="" class="modal-img">
+            <div class="modal-caption"></div>
+        </div>
+    </div>
 
-   <footer></footer>
+    <!-- Footer -->
+    <footer id="contact">
+        <div class="container">
+            <div class="footer-content fade-in">
+                <h2>Kontakt</h2>
+                <p>Lass uns in Verbindung bleiben oder tausche dich mit mir über die Berliner Clubszene aus.</p>
+                <!-- Aktualisierte Social Links im Footer mit tatsächlichen URLs -->
+                <div class="social-links">
+                    <a href="https://www.instagram.com/a_.volkmann/" target="_blank" rel="noopener noreferrer" class="social-link"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.tiktok.com/@killua_alex" target="_blank" rel="noopener noreferrer" class="social-link"><i class="fab fa-tiktok"></i></a>
+                    <a href="https://soundcloud.com/alex_sasuke" target="_blank" rel="noopener noreferrer" class="social-link"><i class="fab fa-soundcloud"></i></a>
+                    <a href="https://www.linkedin.com/in/alex-volkmann-54677a239/" target="_blank" rel="noopener noreferrer" class="social-link"><i class="fab fa-linkedin"></i></a>
+                </div>
+
+                <p class="copyright">&copy; {% now "Y" %} Alex Volkmann | Alle Rechte vorbehalten.</p>
+            </div>
+        </div>
+    </footer>
     
     <!-- Bootstrap JS und jQuery -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    
+    <!-- Three.js für Hintergrundeffekte -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
     
     <!-- Eigener JavaScript -->
-    <script src="{% static 'js/header_pic.js' %}"></script>
-    <script src="/static/js/gallery.js"></script>
-
-
-
-    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
-
+    <script src="{% static 'js/main.js' %}?v=20250514-2"></script>
 </body>
 </html>
