@@ -2041,3 +2041,494 @@ document.addEventListener('DOMContentLoaded', () => {
     window.galleryModal = new GallerySwipeModal();
   }
 });
+
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+// ===== IMPROVED GALLERY JAVASCRIPT =====
+
+// Gallery Data - Deine bestehenden Daten
+const improvedGalleryItems = [
+    {
+        id: 1,
+        image: '/static/css/images/gallery/alex1.jpeg',
+        title: 'Geburtstagsfeier',
+        type: 'image'
+    },
+    {
+        id: 2,
+        image: '/static/css/images/gallery/alex2.png',
+        title: 'Weiße Socken zu den Schuhen',
+        type: 'image'
+    },
+    {
+        id: 3,
+        source: '/static/css/images/gallery/alex10.mp4',
+        title: 'Klassischer Handschlag',
+        type: 'video'
+    },
+    {
+        id: 4,
+        image: '/static/css/images/gallery/alex3.jpeg',
+        title: 'Potsdam Oktoberfest',
+        type: 'image'
+    },
+    {
+        id: 5,
+        image: '/static/css/images/gallery/alex4.jpeg',
+        title: 'Baumblüte',
+        type: 'image'
+    },
+    {
+        id: 6,
+        image: '/static/css/images/gallery/alex5.jpeg',
+        title: 'Abend mit Freunden',
+        type: 'image'
+    },
+    {
+        id: 7,
+        image: '/static/css/images/gallery/alex6.jpeg',
+        title: 'Ready machen für Berlin',
+        type: 'image'
+    },
+    {
+        id: 8,
+        source: '/static/css/images/gallery/alex11.mp4',
+        title: 'World Club Dome abkühlen',
+        type: 'video'
+    },
+    {
+        id: 9,
+        image: '/static/css/images/gallery/alex7.jpeg',
+        title: 'SMS Festival',
+        type: 'image'
+    },
+    {
+        id: 10,
+        image: '/static/css/images/gallery/alex8.jpeg',
+        title: 'Malle',
+        type: 'image'
+    },
+    {
+        id: 11,
+        source: '/static/css/images/gallery/alex12.mp4',
+        title: 'Aftern nach Geburtstag',
+        type: 'video'
+    },
+    {
+        id: 12,
+        image: '/static/css/images/gallery/alex9.jpeg',
+        title: 'World Club Dome',
+        type: 'image'
+    }
+];
+
+class ImprovedGallery {
+    constructor() {
+        this.currentIndex = 0;
+        this.items = improvedGalleryItems;
+        this.modal = document.getElementById('improved-modal');
+        this.modalMedia = document.getElementById('improved-modal-media');
+        this.modalClose = document.getElementById('improved-modal-close');
+        this.modalPrev = document.getElementById('improved-modal-prev');
+        this.modalNext = document.getElementById('improved-modal-next');
+        this.modalCounter = document.getElementById('improved-modal-counter');
+        this.galleryGrid = document.getElementById('gallery-grid');
+        
+        // Touch-Variablen
+        this.touchStartX = 0;
+        this.touchStartY = 0;
+        this.touchEndX = 0;
+        this.touchEndY = 0;
+        this.isSwiping = false;
+        this.swipeThreshold = 50;
+        
+        // Check if elements exist
+        if (!this.modal || !this.galleryGrid) {
+            console.error('Required gallery elements not found');
+            return;
+        }
+        
+        this.init();
+    }
+
+    init() {
+        this.createGallery();
+        this.bindEvents();
+    }
+
+    createGallery() {
+        // Clear existing content
+        this.galleryGrid.innerHTML = '';
+        
+        this.items.forEach((item, index) => {
+            const galleryItem = document.createElement('div');
+            galleryItem.className = 'gallery-item fade-in';
+            galleryItem.addEventListener('click', () => this.openModal(index));
+
+            if (item.type === 'video') {
+                // Video Thumbnail erstellen
+                const videoContainer = document.createElement('div');
+                videoContainer.className = 'video-thumbnail-container';
+                
+                const video = document.createElement('video');
+                video.src = item.source;
+                video.muted = true;
+                video.preload = 'metadata';
+                video.addEventListener('loadedmetadata', () => {
+                    // Set video to first frame
+                    video.currentTime = 0.1;
+                });
+                
+                const playButton = document.createElement('button');
+                playButton.className = 'video-play-button';
+                playButton.innerHTML = '<i class="fas fa-play"></i>';
+                playButton.setAttribute('aria-label', 'Video abspielen');
+                
+                const indicator = document.createElement('div');
+                indicator.className = 'video-indicator';
+                indicator.innerHTML = '<i class="fas fa-video"></i> Video';
+                
+                videoContainer.appendChild(video);
+                videoContainer.appendChild(playButton);
+                videoContainer.appendChild(indicator);
+                galleryItem.appendChild(videoContainer);
+            } else {
+                // Bild erstellen
+                const img = document.createElement('img');
+                img.src = item.image;
+                img.alt = item.title;
+                img.loading = 'lazy';
+                
+                // Error handling für Bilder
+                img.addEventListener('error', () => {
+                    console.error(`Failed to load image: ${item.image}`);
+                    img.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" fill="%23333"/><text x="150" y="150" font-family="Arial" font-size="14" fill="%23fff" text-anchor="middle">Bild nicht verfügbar</text></svg>';
+                });
+                
+                galleryItem.appendChild(img);
+            }
+
+            // Overlay hinzufügen
+            const overlay = document.createElement('div');
+            overlay.className = 'gallery-overlay';
+            const title = document.createElement('h3');
+            title.className = 'gallery-title';
+            title.textContent = item.title;
+            overlay.appendChild(title);
+            galleryItem.appendChild(overlay);
+
+            this.galleryGrid.appendChild(galleryItem);
+        });
+
+        // Trigger fade-in animation
+        setTimeout(() => {
+            document.querySelectorAll('.gallery-item').forEach(item => {
+                item.classList.add('active');
+            });
+        }, 100);
+    }
+
+    bindEvents() {
+        // Modal schließen
+        if (this.modalClose) {
+            this.modalClose.addEventListener('click', () => this.closeModal());
+        }
+        
+        this.modal.addEventListener('click', (e) => {
+            if (e.target === this.modal) this.closeModal();
+        });
+
+        // Navigation
+        if (this.modalPrev) {
+            this.modalPrev.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.previousItem();
+            });
+        }
+        
+        if (this.modalNext) {
+            this.modalNext.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.nextItem();
+            });
+        }
+
+        // Tastatur-Navigation
+        document.addEventListener('keydown', (e) => {
+            if (!this.modal.classList.contains('active')) return;
+            
+            switch (e.key) {
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    this.previousItem();
+                    break;
+                case 'ArrowRight':
+                    e.preventDefault();
+                    this.nextItem();
+                    break;
+                case 'Escape':
+                    e.preventDefault();
+                    this.closeModal();
+                    break;
+            }
+        });
+
+        // Touch-Events für Swipe
+        this.modal.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: true });
+        this.modal.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
+        this.modal.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: true });
+    }
+
+    openModal(index) {
+        this.currentIndex = index;
+        
+        // Prevent pull-to-refresh and browser navigation
+        this.preventOverscroll();
+        
+        this.showMedia();
+        this.modal.classList.add('active');
+        document.body.classList.add('improved-modal-open');
+        
+        // Swipe-Hinweis auf Mobile anzeigen
+        if (window.innerWidth <= 768) {
+            this.showSwipeHint();
+        }
+    }
+
+    closeModal() {
+        this.modal.classList.remove('active');
+        document.body.classList.remove('improved-modal-open');
+        
+        // Re-enable overscroll
+        this.restoreOverscroll();
+        
+        // Alle Videos stoppen
+        const videos = this.modal.querySelectorAll('video');
+        videos.forEach(video => {
+            video.pause();
+            video.currentTime = 0;
+        });
+        
+        // Swipe hint entfernen falls vorhanden
+        const swipeHint = this.modal.querySelector('.swipe-hint');
+        if (swipeHint) {
+            swipeHint.remove();
+        }
+    }
+
+    showMedia() {
+        const item = this.items[this.currentIndex];
+        if (!item) return;
+        
+        this.updateCounter();
+
+        // Altes Video entfernen
+        const existingVideo = this.modal.querySelector('video:not(#improved-modal-media)');
+        if (existingVideo) {
+            existingVideo.remove();
+        }
+
+        if (item.type === 'video') {
+            // Bild verstecken
+            this.modalMedia.style.display = 'none';
+            
+            // Video erstellen
+            const video = document.createElement('video');
+            video.className = 'improved-modal-media';
+            video.controls = true;
+            video.autoplay = false;
+            video.muted = false;
+            video.loop = true;
+            video.src = item.source;
+            video.volume = 0.2;
+            video.setAttribute('playsinline', '');
+            video.setAttribute('webkit-playsinline', '');
+            
+            // Video verhindern das Modal zu schließen
+            video.addEventListener('click', (e) => e.stopPropagation());
+            
+            // Error handling für Videos
+            video.addEventListener('error', () => {
+                console.error(`Failed to load video: ${item.source}`);
+                // Fallback: zeige einen Fehler-Platzhalter
+                video.style.display = 'none';
+                this.modalMedia.style.display = 'block';
+                this.modalMedia.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="%23333"/><text x="200" y="150" font-family="Arial" font-size="16" fill="%23fff" text-anchor="middle">Video nicht verfügbar</text></svg>';
+                this.modalMedia.alt = 'Video nicht verfügbar';
+            });
+            
+            // Video zur Modal hinzufügen
+            this.modal.querySelector('.improved-modal-content').insertBefore(video, this.modalCounter);
+        } else {
+            // Video verstecken, Bild anzeigen
+            this.modalMedia.style.display = 'block';
+            this.modalMedia.src = item.image;
+            this.modalMedia.alt = item.title;
+        }
+    }
+
+    updateCounter() {
+        if (this.modalCounter) {
+            this.modalCounter.textContent = `${this.currentIndex + 1} / ${this.items.length}`;
+        }
+    }
+
+    previousItem() {
+        this.currentIndex = this.currentIndex > 0 ? this.currentIndex - 1 : this.items.length - 1;
+        this.showMedia();
+    }
+
+    nextItem() {
+        this.currentIndex = this.currentIndex < this.items.length - 1 ? this.currentIndex + 1 : 0;
+        this.showMedia();
+    }
+
+    showSwipeHint() {
+        // Überprüfen ob bereits ein Hinweis existiert
+        if (this.modal.querySelector('.swipe-hint')) return;
+        
+        const hint = document.createElement('div');
+        hint.className = 'swipe-hint';
+        hint.textContent = '← Wischen zum Navigieren →';
+        this.modal.querySelector('.improved-modal-content').appendChild(hint);
+        
+        // Hinweis nach 3 Sekunden entfernen
+        setTimeout(() => {
+            if (hint.parentNode) {
+                hint.remove();
+            }
+        }, 3000);
+    }
+
+    // Touch-Events für Swipe-Funktionalität
+    handleTouchStart(e) {
+        // Verhindere Standard-Browser-Verhalten
+        if (e.target.closest('.improved-modal-content')) {
+            this.touchStartX = e.touches[0].clientX;
+            this.touchStartY = e.touches[0].clientY;
+            this.isSwiping = false;
+        }
+    }
+
+    handleTouchMove(e) {
+        if (!this.touchStartX || !this.touchStartY) return;
+
+        this.touchEndX = e.touches[0].clientX;
+        this.touchEndY = e.touches[0].clientY;
+
+        const diffX = this.touchStartX - this.touchEndX;
+        const diffY = this.touchStartY - this.touchEndY;
+
+        // Nur horizontale Swipes verarbeiten und Browser-Navigation verhindern
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
+            e.preventDefault(); // Scrollen und Browser-Navigation verhindern
+            e.stopPropagation(); // Event-Bubbling stoppen
+            this.isSwiping = true;
+            this.modal.classList.add('swiping');
+        }
+    }
+
+    handleTouchEnd(e) {
+        if (!this.isSwiping) {
+            // Reset touch coordinates
+            this.touchStartX = 0;
+            this.touchStartY = 0;
+            return;
+        }
+
+        const diffX = this.touchStartX - this.touchEndX;
+        
+        this.modal.classList.remove('swiping');
+
+        if (Math.abs(diffX) > this.swipeThreshold) {
+            if (diffX > 0) {
+                this.nextItem(); // Nach links wischen = nächstes Bild
+            } else {
+                this.previousItem(); // Nach rechts wischen = vorheriges Bild
+            }
+        }
+
+        // Reset
+        this.touchStartX = 0;
+        this.touchStartY = 0;
+        this.touchEndX = 0;
+        this.touchEndY = 0;
+        this.isSwiping = false;
+    }
+
+    // Prevent overscroll behavior
+    preventOverscroll() {
+        // Store current body position to restore later
+        this.bodyScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        // Prevent pull-to-refresh and overscroll
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${this.bodyScrollTop}px`;
+        document.body.style.width = '100%';
+        
+        // Prevent touchmove on document level when modal is open
+        this.preventTouchMove = (e) => {
+            // Allow touch events only within modal content
+            if (!e.target.closest('.improved-modal-content')) {
+                e.preventDefault();
+            }
+        };
+        
+        document.addEventListener('touchmove', this.preventTouchMove, { passive: false });
+    }
+
+    // Restore overscroll behavior
+    restoreOverscroll() {
+        // Remove event listener
+        if (this.preventTouchMove) {
+            document.removeEventListener('touchmove', this.preventTouchMove);
+        }
+        
+        // Restore body position
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        
+        // Restore scroll position
+        if (this.bodyScrollTop !== undefined) {
+            window.scrollTo(0, this.bodyScrollTop);
+        }
+    }
+}
+
+// Globale Variable für die Galerie-Instanz
+let improvedGalleryInstance = null;
+
+// Funktion zum Initialisieren der verbesserten Galerie
+function initImprovedGallery() {
+    // Alte Galerie-Funktionalität deaktivieren falls vorhanden
+    const oldModal = document.getElementById('galleryModal');
+    if (oldModal) {
+        oldModal.style.display = 'none';
+    }
+    
+    // Neue Galerie initialisieren
+    if (!improvedGalleryInstance) {
+        improvedGalleryInstance = new ImprovedGallery();
+    }
+}
+
+// Event-Listener für DOM-Bereitschaft
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initImprovedGallery);
+} else {
+    // DOM ist bereits geladen
+    initImprovedGallery();
+}
+
+// Bestehende createGallery-Funktion überschreiben falls vorhanden
+if (typeof window.createGallery === 'function') {
+    const originalCreateGallery = window.createGallery;
+    window.createGallery = function() {
+        // Nach kurzer Verzögerung neue Galerie initialisieren
+        setTimeout(() => {
+            initImprovedGallery();
+        }, 100);
+    };
+}

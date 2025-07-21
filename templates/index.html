@@ -451,31 +451,35 @@ function toggleDetails(element) {
 }
 </script>
 
-<!-- Gallery Section (ohne Filter) -->
+<!-- Gallery Section -->
 <section id="gallery" class="gallery">
     <div class="gallery-pattern"></div>
     <div class="container gallery-container">
         <div class="section-header fade-in">
             <h2>Galerie</h2>
-            <p>Eine kleine Sammlung an Erinnerungen und Momente and die ich gerne zurück denke</p>
+            <p>Eine kleine Sammlung an Erinnerungen und Momente, an die ich gerne zurück denke</p>
         </div>
         
-        <!-- Die Filterbuttons wurden hier entfernt -->
-        
-        <div class="row" id="gallery-grid">
-            <!-- Gallery items will be added via JavaScript -->
+        <div class="gallery-grid" id="gallery-grid">
+            <!-- Gallery items will be inserted here by JavaScript -->
         </div>
     </div>
 </section>
-    
-    <!-- Modal -->
-    <div class="modal" id="galleryModal">
-        <div class="modal-content">
-            <span class="modal-close">&times;</span>
-            <img src="" alt="" class="modal-img">
-            <div class="modal-caption"></div>
-        </div>
+
+<!-- Improved Modal -->
+<div class="improved-modal" id="improved-modal">
+    <div class="improved-modal-content">
+        <button class="improved-modal-close" id="improved-modal-close">&times;</button>
+        <img class="improved-modal-media" id="improved-modal-media" alt="">
+        <button class="improved-modal-navigation improved-modal-prev" id="improved-modal-prev">
+            <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="improved-modal-navigation improved-modal-next" id="improved-modal-next">
+            <i class="fas fa-chevron-right"></i>
+        </button>
+        <div class="improved-modal-counter" id="improved-modal-counter">1 / 12</div>
     </div>
+</div>
 
     <!-- Footer -->
     <footer id="contact">
