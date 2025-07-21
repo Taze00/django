@@ -176,6 +176,12 @@ const galleryItems = [
         category: 'clubs'
     },
     {
+        id: 13,
+        source: '/static/css/images/gallery/alex11.jpeg',
+        title: 'Nach dem Lokschuppen',
+        category: 'clubs'
+    },
+    {
         id: 9,
         image: '/static/css/images/gallery/alex9.jpeg',
         title: 'World Club Dome',
@@ -760,260 +766,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// Finale Version der Galerie-Navigation mit Video-Thumbnails
-// Ersetzen Sie den vorherigen Code mit diesem Code in Ihrer main.js
 
-// Verbesserte, stabilere Galerie-Navigation
-// Ersetzen Sie den vorherigen Code in Ihrer main.js
-
-// Stabilisierte Galerie-Navigation mit fixer Größe und zuverlässigen Pfeilen
-function enhanceGalleryModal() {
-  // Modal und zugehörige Elemente
-  const modal = document.querySelector('.modal');
-  const modalImg = document.querySelector('.modal-img');
-  const modalCaption = document.querySelector('.modal-caption');
-  const modalContent = document.querySelector('.modal-content');
-  const modalClose = document.querySelector('.modal-close');
-  
-  if (!modal || !modalImg || !modalContent) {
-    console.error('Modal-Elemente nicht gefunden');
-    return;
-  }
-  
-  // Bildunterschrift ausblenden
-  if (modalCaption) {
-    modalCaption.style.display = 'none';
-  }
-  
-  // Variablen für die Navigation
-  let currentIndex = 0;
-  
-  // Prüfen, ob Mobilgerät
-  const isMobile = window.innerWidth <= 768;
-  
-  // Bestehende Navigation entfernen, falls vorhanden
-  function clearExistingNavigation() {
-    const existingNav = document.querySelector('.modal-nav');
-    if (existingNav) existingNav.remove();
-    
-    // Auch alle anderen dynamischen Elemente entfernen
-    const existingVideoContainer = document.querySelector('.modal-video-container');
-    if (existingVideoContainer) existingVideoContainer.remove();
-    
-    const existingVideo = document.querySelector('.modal-video');
-    if (existingVideo) existingVideo.remove();
-  }
-  
-  // Modales Fenster und Layout neugestalten für konsistente Größe
-  function setupModalLayout() {
-    // Konsistentes Styling für das Modal
-    modal.style.padding = isMobile ? '1rem' : '2rem';
-    modal.style.overscrollBehavior = 'contain';
-    modal.style.touchAction = 'pan-y pinch-zoom';
-    
-    // Konsistente Größe für modalContent
-    modalContent.style.position = 'relative';
-    modalContent.style.maxWidth = '90%';
-    modalContent.style.height = isMobile ? '75vh' : '85vh';
-    modalContent.style.display = 'flex';
-    modalContent.style.flexDirection = 'column';
-    modalContent.style.justifyContent = 'center'; // Vertikale Zentrierung
-    modalContent.style.alignItems = 'center';
-    modalContent.style.background = 'transparent';
-    modalContent.style.border = 'none';
-    modalContent.style.overflowY = 'hidden';
-    
-    // Fix für Größe und Position des Schließen-Buttons
-    if (modalClose) {
-      modalClose.style.position = 'absolute';
-      modalClose.style.top = isMobile ? '-60px' : '-50px';
-      modalClose.style.right = isMobile ? '0' : '0';
-      modalClose.style.fontSize = isMobile ? '3rem' : '2.5rem';
-      modalClose.style.color = 'white';
-      modalClose.style.cursor = 'pointer';
-      modalClose.style.zIndex = '2001';
-    }
-    
-    // Standard-Styling für das Hauptbild
-    modalImg.style.maxWidth = '100%';
-    modalImg.style.maxHeight = isMobile ? '65vh' : '75vh';
-    modalImg.style.width = 'auto';
-    modalImg.style.height = 'auto';
-    modalImg.style.objectFit = 'contain';
-    modalImg.style.display = 'block';
-    modalImg.style.borderRadius = '8px';
-    modalImg.style.boxShadow = '0 15px 40px rgba(0, 0, 0, 0.6)';
-  }
-  
-  // Navigations-Elemente erstellen
-  // Verbesserte Galerie-Navigation ohne Pfeile auf Mobilgeräten
-// Nur einen kleinen Teil des Codes aktualisieren - suchen Sie diese Funktion in Ihrem bestehenden Code
-
-// Navigations-Elemente erstellen - mit mobiler Anpassung
-function createNavigationControls() {
-  // Bestehende Navigation entfernen falls vorhanden
-  clearExistingNavigation();
-  
-  // Container für Navigationselemente
-  const navContainer = document.createElement('div');
-  navContainer.className = 'modal-nav';
-  navContainer.style.position = 'absolute';
-  
-  if (isMobile) {
-    // Für mobile Geräte - nur Zähler anzeigen, keine Pfeile
-    navContainer.style.bottom = '-50px';
-    navContainer.style.left = '0';
-    navContainer.style.width = '100%';
-    navContainer.style.height = '40px';
-    navContainer.style.display = 'flex';
-    navContainer.style.justifyContent = 'center'; // Zähler zentrieren
-    navContainer.style.alignItems = 'center';
-    navContainer.style.zIndex = '2001';
-    
-    // Zähler für die Bilder (x von y)
-    const counter = document.createElement('div');
-    counter.className = 'modal-counter';
-    counter.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
-    counter.style.color = 'white';
-    counter.style.padding = '5px 15px';
-    counter.style.borderRadius = '20px';
-    counter.style.fontSize = '12px';
-    counter.style.fontWeight = '500';
-    
-    // Nur den Zähler zum Container hinzufügen für Mobile
-    navContainer.appendChild(counter);
-    
-    // Container zum Modal hinzufügen
-    modalContent.appendChild(navContainer);
-    
-    // Swipe-Hinweis hinzufügen (optional)
-    const swipeHint = document.createElement('div');
-    swipeHint.className = 'swipe-hint';
-    swipeHint.textContent = 'Zum Wechseln wischen';
-    swipeHint.style.position = 'absolute';
-    swipeHint.style.bottom = '-30px';
-    swipeHint.style.width = '100%';
-    swipeHint.style.textAlign = 'center';
-    swipeHint.style.color = 'rgba(255, 255, 255, 0.6)';
-    swipeHint.style.fontSize = '10px';
-    swipeHint.style.fontWeight = '400';
-    swipeHint.style.opacity = '1';
-    swipeHint.style.transition = 'opacity 1s';
-    
-    // Swipe-Hinweis nach ein paar Sekunden ausblenden
-    modalContent.appendChild(swipeHint);
-    setTimeout(() => {
-      swipeHint.style.opacity = '0';
-    }, 2500);
-    
-    // Zähler aktualisieren
-    updateCounter(counter);
-    
-    return {counter};
-  } else {
-    // Desktop-Version mit Pfeilen bleibt unverändert
-    navContainer.style.bottom = '20px';
-    navContainer.style.left = '0';
-    navContainer.style.width = '100%';
-    navContainer.style.height = '50px';
-    navContainer.style.display = 'flex';
-    navContainer.style.justifyContent = 'space-between';
-    navContainer.style.alignItems = 'center';
-    navContainer.style.zIndex = '2001';
-    navContainer.style.pointerEvents = 'none';
-    
-    // Vorheriges Bild Button
-    const prevButton = document.createElement('div');
-    prevButton.className = 'modal-nav-prev';
-    prevButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
-    prevButton.style.width = '50px';
-    prevButton.style.height = '50px';
-    prevButton.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-    prevButton.style.color = 'white';
-    prevButton.style.display = 'flex';
-    prevButton.style.justifyContent = 'center';
-    prevButton.style.alignItems = 'center';
-    prevButton.style.borderRadius = '50%';
-    prevButton.style.cursor = 'pointer';
-    prevButton.style.marginLeft = '20px';
-    prevButton.style.pointerEvents = 'auto';
-    prevButton.style.transition = 'none';
-    prevButton.style.fontSize = '20px';
-    prevButton.style.outline = 'none';
-    prevButton.style.webkitTapHighlightColor = 'transparent';
-    prevButton.style.userSelect = 'none';
-    prevButton.style.border = 'none';
-    
-    // Nächstes Bild Button
-    const nextButton = document.createElement('div');
-    nextButton.className = 'modal-nav-next';
-    nextButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
-    nextButton.style.width = '50px';
-    nextButton.style.height = '50px';
-    nextButton.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-    nextButton.style.color = 'white';
-    nextButton.style.display = 'flex';
-    nextButton.style.justifyContent = 'center';
-    nextButton.style.alignItems = 'center';
-    nextButton.style.borderRadius = '50%';
-    nextButton.style.cursor = 'pointer';
-    nextButton.style.marginRight = '20px';
-    nextButton.style.pointerEvents = 'auto';
-    nextButton.style.transition = 'none';
-    nextButton.style.fontSize = '20px';
-    nextButton.style.outline = 'none';
-    nextButton.style.webkitTapHighlightColor = 'transparent';
-    nextButton.style.userSelect = 'none';
-    nextButton.style.border = 'none';
-    
-    // Zähler für die Bilder (x von y)
-    const counter = document.createElement('div');
-    counter.className = 'modal-counter';
-    counter.style.backgroundColor = 'rgba(0, 0, 0, 0.6)';
-    counter.style.color = 'white';
-    counter.style.padding = '5px 15px';
-    counter.style.borderRadius = '20px';
-    counter.style.fontSize = '14px';
-    counter.style.fontWeight = '500';
-    counter.style.pointerEvents = 'none';
-    
-    // Navigation-Elemente zum Container hinzufügen
-    navContainer.appendChild(prevButton);
-    navContainer.appendChild(counter);
-    navContainer.appendChild(nextButton);
-    
-    // Container zum Modal hinzufügen
-    modalContent.appendChild(navContainer);
-    
-    // Definitiv funktionierende Event-Listener für die Navigation
-    const handlePrevClick = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      showPreviousMedia();
-    };
-    
-    const handleNextClick = (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      showNextMedia();
-    };
-    
-    // Event-Listener hinzufügen - wichtig: direkte Funktionen verwenden, keine anonymen
-    prevButton.addEventListener('click', handlePrevClick);
-    nextButton.addEventListener('click', handleNextClick);
-    
-    // Alle Touch-Events verhindern Standard-Verhalten
-    prevButton.addEventListener('touchstart', (e) => e.preventDefault(), {passive: false});
-    nextButton.addEventListener('touchstart', (e) => e.preventDefault(), {passive: false});
-    prevButton.addEventListener('mousedown', (e) => e.preventDefault());
-    nextButton.addEventListener('mousedown', (e) => e.preventDefault());
-    
-    // Zähler aktualisieren
-    updateCounter(counter);
-    
-    return {prevButton, nextButton, counter};
-  }
-}
   
   // Zähler aktualisieren
   function updateCounter(counterElement) {
@@ -1399,7 +1152,7 @@ function createNavigationControls() {
       showMedia(currentIndex);
     }
   });
-}
+
 
 // Galerie-Modal-Enhancement nach dem Laden der Seite initialisieren
 document.addEventListener('DOMContentLoaded', function() {
@@ -1408,4 +1161,883 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Verzögerung, um sicherzustellen, dass alle DOM-Elemente geladen sind
   setTimeout(enhanceGalleryModal, 500);
+});
+
+// GallerySwipeModal - Eine vollständig neu geschriebene Galerie-Popup-Implementierung
+// mit optimierter Performance und Touch-Unterstützung
+
+class GallerySwipeModal {
+  constructor() {
+    // DOM-Elemente
+    this.modal = document.querySelector('.modal');
+    this.modalContent = document.querySelector('.modal-content');
+    this.modalImg = document.querySelector('.modal-img');
+    this.modalCaption = document.querySelector('.modal-caption');
+    this.modalClose = document.querySelector('.modal-close');
+    
+    // Zustandsvariablen
+    this.currentIndex = 0;
+    this.items = window.galleryItems || [];
+    this.isAnimating = false;
+    this.isMobile = window.innerWidth <= 768;
+    this.touchStartX = 0;
+    this.touchStartY = 0;
+    this.touchEndX = 0;
+    this.touchEndY = 0;
+    this.swipeThreshold = this.isMobile ? 50 : 100;
+    this.isVideoPlaying = false;
+    this.videoInstance = null;
+    this.navElements = null;
+    
+    // Element-Container
+    this.mediaContainer = null;
+    
+    // Initialisierung
+    this.init();
+  }
+  
+  // Initialisierung der Galerie
+  init() {
+    if (!this.modal) {
+      console.error('Modal-Element nicht gefunden');
+      return;
+    }
+    
+    // Event-Listener für Schließen-Button
+    if (this.modalClose) {
+      this.modalClose.addEventListener('click', this.close.bind(this));
+    }
+    
+    // Klick außerhalb des Inhalts schließt das Modal
+    this.modal.addEventListener('click', (e) => {
+      if (e.target === this.modal) {
+        this.close();
+      }
+    });
+    
+    // Touch-Events für Swipe-Funktionalität
+    this.modal.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: true });
+    this.modal.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
+    this.modal.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: true });
+    
+    // Tastaturnavigation
+    document.addEventListener('keydown', this.handleKeyboard.bind(this));
+    
+    // Fenstergrößenänderung
+    window.addEventListener('resize', this.handleResize.bind(this));
+    
+    // Benutzerinterface vorbereiten
+    this.setupUI();
+    
+    // Galerie-Elemente modifizieren, um auf diese Klasse zu verweisen
+    this.modifyGalleryItems();
+  }
+  
+  // UI-Einrichtung mit verbesserten Styling-Methoden
+  setupUI() {
+    // Styling-Elemente
+    this.addStyles(`
+      body.modal-open {
+        overflow: hidden !important;
+        position: fixed !important;
+        width: 100% !important;
+        height: 100% !important;
+      }
+      
+      .gallery-modal {
+        --transition-speed: 300ms;
+        --swipe-color: rgba(255, 255, 255, 0.1);
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.95);
+        z-index: 2000;
+        overflow: hidden;
+        touch-action: none;
+      }
+      
+      .gallery-modal.open {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      
+      .modal-content {
+        position: relative;
+        width: 90%;
+        height: 85vh;
+        max-width: 1400px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+      }
+      
+      .media-container {
+        position: relative;
+        width: 100%;
+        height: 75vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: transform var(--transition-speed) ease-out;
+      }
+      
+      .media-item {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transform: translateX(100%);
+        transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease;
+      }
+      
+      .media-item.previous {
+        transform: translateX(-100%);
+        opacity: 0;
+      }
+      
+      .media-item.current {
+        transform: translateX(0);
+        opacity: 1;
+        z-index: 10;
+      }
+      
+      .media-item.next {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      
+      .media-content {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        border-radius: 8px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+      }
+      
+      .video-container {
+        position: relative;
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      
+      .video-thumbnail {
+        position: relative;
+        cursor: pointer;
+      }
+      
+      .video-play-button {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 70px;
+        height: 70px;
+        background-color: rgba(0, 0, 0, 0.7);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-size: 30px;
+        transition: background-color 0.2s;
+      }
+      
+      .video-play-button:hover {
+        background-color: rgba(0, 0, 0, 0.8);
+      }
+      
+      .navigation-controls {
+        position: absolute;
+        bottom: 20px;
+        left: 0;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 20;
+        padding: 0 20px;
+      }
+      
+      .nav-button {
+        width: 50px;
+        height: 50px;
+        background-color: rgba(0, 0, 0, 0.7);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        border: none;
+        outline: none;
+      }
+      
+      .nav-button:hover {
+        background-color: rgba(0, 0, 0, 0.9);
+      }
+      
+      .counter-indicator {
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+      }
+      
+      .swipe-indicator {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--swipe-color);
+        opacity: 0;
+        transition: opacity 150ms ease;
+        pointer-events: none;
+      }
+      
+      .swipe-indicator.left {
+        background: linear-gradient(to right, var(--swipe-color), transparent);
+      }
+      
+      .swipe-indicator.right {
+        background: linear-gradient(to left, var(--swipe-color), transparent);
+      }
+      
+      .swipe-hint {
+        position: absolute;
+        bottom: 60px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        color: rgba(255, 255, 255, 0.6);
+        font-size: 12px;
+        opacity: 1;
+        transition: opacity 1.5s;
+      }
+      
+      .close-button {
+        position: absolute;
+        top: -50px;
+        right: 0;
+        color: white;
+        font-size: 2.5rem;
+        cursor: pointer;
+        z-index: 30;
+      }
+      
+      @media (max-width: 768px) {
+        .modal-content {
+          height: 80vh;
+        }
+        
+        .media-container {
+          height: 70vh;
+        }
+        
+        .nav-button {
+          width: 40px;
+          height: 40px;
+          font-size: 16px;
+        }
+        
+        .video-play-button {
+          width: 50px;
+          height: 50px;
+          font-size: 24px;
+        }
+        
+        .close-button {
+          top: -40px;
+          font-size: 2rem;
+        }
+        
+        .counter-indicator {
+          font-size: 12px;
+          padding: 4px 12px;
+        }
+      }
+    `);
+    
+    // Klasse zum Modal hinzufügen für verbesserte Selektoren
+    if (this.modal) {
+      this.modal.classList.add('gallery-modal');
+    }
+  }
+  
+  // Hinzufügen von CSS-Styles
+  addStyles(css) {
+    const styleElement = document.createElement('style');
+    styleElement.textContent = css;
+    document.head.appendChild(styleElement);
+  }
+  
+  // Modifizieren der Galerie-Elemente
+  modifyGalleryItems() {
+    // Alle Galerie-Elemente finden
+    const galleryItems = document.querySelectorAll('.gallery-item');
+    
+    // Für jedes Element den Event-Listener neu setzen
+    galleryItems.forEach((item, index) => {
+      // Clone erstellen, um alte Event-Listener zu entfernen
+      const newItem = item.cloneNode(true);
+      item.parentNode.replaceChild(newItem, item);
+      
+      // Neuen Event-Listener hinzufügen
+      newItem.addEventListener('click', () => {
+        this.open(index);
+      });
+    });
+  }
+  
+  // Erstellen des Medien-Containers
+  createMediaContainer() {
+    if (this.mediaContainer) {
+      // Container zurücksetzen
+      this.mediaContainer.innerHTML = '';
+    } else {
+      // Neuen Container erstellen
+      this.mediaContainer = document.createElement('div');
+      this.mediaContainer.className = 'media-container';
+      this.modalContent.appendChild(this.mediaContainer);
+    }
+    
+    // Swipe-Indikator hinzufügen
+    const swipeIndicator = document.createElement('div');
+    swipeIndicator.className = 'swipe-indicator';
+    this.mediaContainer.appendChild(swipeIndicator);
+    this.swipeIndicator = swipeIndicator;
+    
+    return this.mediaContainer;
+  }
+  
+  // Erstellen der Navigations-Elemente
+  createNavigationControls() {
+    // Bestehende Navigation entfernen
+    const existingNav = document.querySelector('.navigation-controls');
+    if (existingNav) {
+      existingNav.remove();
+    }
+    
+    // Container für Navigation
+    const navContainer = document.createElement('div');
+    navContainer.className = 'navigation-controls';
+    
+    // Vorheriges Bild Button
+    const prevButton = document.createElement('button');
+    prevButton.className = 'nav-button prev-button';
+    prevButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
+    prevButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.showPrevious();
+    });
+    
+    // Zähler für die Position
+    const counter = document.createElement('div');
+    counter.className = 'counter-indicator';
+    
+    // Nächstes Bild Button
+    const nextButton = document.createElement('button');
+    nextButton.className = 'nav-button next-button';
+    nextButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
+    nextButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.showNext();
+    });
+    
+    // Bei mobilen Geräten Swipe-Hinweis anzeigen
+    if (this.isMobile) {
+      const swipeHint = document.createElement('div');
+      swipeHint.className = 'swipe-hint';
+      swipeHint.textContent = 'Wischen zum Navigieren';
+      this.modalContent.appendChild(swipeHint);
+      
+      // Nach einigen Sekunden ausblenden
+      setTimeout(() => {
+        swipeHint.style.opacity = '0';
+      }, 2000);
+    }
+    
+    // Elemente zum Container hinzufügen
+    navContainer.appendChild(prevButton);
+    navContainer.appendChild(counter);
+    navContainer.appendChild(nextButton);
+    
+    // Container zum Modal hinzufügen
+    this.modalContent.appendChild(navContainer);
+    
+    this.navElements = {
+      prevButton,
+      nextButton,
+      counter
+    };
+    
+    return this.navElements;
+  }
+  
+  // Schließen-Button neu erstellen
+  createCloseButton() {
+    // Bestehenden Button entfernen
+    if (this.modalClose) {
+      this.modalClose.remove();
+    }
+    
+    // Neuen Button erstellen
+    const closeButton = document.createElement('div');
+    closeButton.className = 'close-button';
+    closeButton.innerHTML = '&times;';
+    closeButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.close();
+    });
+    
+    // Button zum Modal hinzufügen
+    this.modalContent.appendChild(closeButton);
+    this.modalClose = closeButton;
+    
+    return closeButton;
+  }
+  
+  // Zähler aktualisieren
+  updateCounter() {
+    if (!this.navElements || !this.navElements.counter) return;
+    
+    const totalItems = this.items.length;
+    if (totalItems > 0) {
+      this.navElements.counter.textContent = `${this.currentIndex + 1} / ${totalItems}`;
+    }
+  }
+  
+  // Modal öffnen mit bestimmtem Index
+  open(index) {
+    if (this.isAnimating) return;
+    
+    // Aktuellen Index setzen
+    this.currentIndex = this.validateIndex(index);
+    
+    // Modal anzeigen
+    this.modal.classList.add('open');
+    
+    // Body-Klasse für Scrolling-Verhinderung
+    document.body.classList.add('modal-open');
+    
+    // UI-Elemente erstellen
+    this.createMediaContainer();
+    this.createNavigationControls();
+    this.createCloseButton();
+    
+    // Medien laden
+    this.loadMedia(this.currentIndex);
+    
+    // Zähler aktualisieren
+    this.updateCounter();
+  }
+  
+  // Modal schließen
+  close() {
+    // Videos stoppen
+    this.stopAllVideos();
+    
+    // Modal schließen
+    this.modal.classList.remove('open');
+    
+    // Body-Klasse entfernen
+    document.body.classList.remove('modal-open');
+    
+    // Zurücksetzen
+    this.isAnimating = false;
+  }
+  
+  // Alle Videos stoppen
+  stopAllVideos() {
+    const videos = this.modal.querySelectorAll('video');
+    videos.forEach(video => {
+      video.pause();
+      video.currentTime = 0;
+    });
+    this.isVideoPlaying = false;
+    this.videoInstance = null;
+  }
+  
+  // Index validieren
+  validateIndex(index) {
+    if (index < 0) return this.items.length - 1;
+    if (index >= this.items.length) return 0;
+    return index;
+  }
+  
+  // Vorheriges Medium anzeigen
+  showPrevious() {
+    if (this.isAnimating) return;
+    this.navigate(-1);
+  }
+  
+  // Nächstes Medium anzeigen
+  showNext() {
+    if (this.isAnimating) return;
+    this.navigate(1);
+  }
+  
+  // Navigation in eine Richtung
+  navigate(direction) {
+    if (this.isAnimating) return;
+    this.isAnimating = true;
+    
+    // Videos stoppen
+    this.stopAllVideos();
+    
+    // Neuen Index berechnen
+    const newIndex = this.validateIndex(this.currentIndex + direction);
+    
+    // Animation der Richtung
+    const currentItem = this.mediaContainer.querySelector('.media-item.current');
+    if (currentItem) {
+      if (direction > 0) {
+        currentItem.classList.remove('current');
+        currentItem.classList.add('previous');
+      } else {
+        currentItem.classList.remove('current');
+        currentItem.classList.add('next');
+      }
+    }
+    
+    // Neues Medium laden
+    this.loadMedia(newIndex);
+    
+    // Nach Animation zurücksetzen
+    setTimeout(() => {
+      this.isAnimating = false;
+      
+      // Alte Items entfernen, die nicht mehr sichtbar sind
+      const oldItems = this.mediaContainer.querySelectorAll('.media-item:not(.current)');
+      oldItems.forEach(item => item.remove());
+      
+    }, 300); // Übereinstimmend mit CSS-Transition
+    
+    // Index aktualisieren
+    this.currentIndex = newIndex;
+    
+    // Zähler aktualisieren
+    this.updateCounter();
+  }
+  
+  // Medium laden
+  loadMedia(index) {
+    if (!this.items[index]) return;
+    
+    const item = this.items[index];
+    const mediaType = item.type || 'image';
+    const mediaSource = item.source || item.image;
+    
+    // Medien-Item erstellen
+    const mediaItem = document.createElement('div');
+    mediaItem.className = 'media-item current';
+    
+    if (mediaType === 'video') {
+      // Video-Container erstellen
+      const videoContainer = document.createElement('div');
+      videoContainer.className = 'video-container';
+      
+      // Thumbnail erstellen
+      const thumbnail = document.createElement('div');
+      thumbnail.className = 'video-thumbnail';
+      
+      // Thumbnail-Bild
+      const thumbnailImg = document.createElement('img');
+      thumbnailImg.className = 'media-content';
+      thumbnailImg.src = this.getVideoThumbnailPlaceholder();
+      
+      // Play-Button
+      const playButton = document.createElement('div');
+      playButton.className = 'video-play-button';
+      playButton.innerHTML = '<i class="fas fa-play"></i>';
+      
+      // Zusammenfügen
+      thumbnail.appendChild(thumbnailImg);
+      thumbnail.appendChild(playButton);
+      videoContainer.appendChild(thumbnail);
+      
+      // Klick-Handler zum Abspielen des Videos
+      thumbnail.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.playVideo(mediaSource, videoContainer);
+      });
+      
+      // Video-Thumbnail generieren
+      this.generateVideoThumbnail(mediaSource, (thumbnailUrl) => {
+        if (thumbnailUrl) {
+          thumbnailImg.src = thumbnailUrl;
+        }
+      });
+      
+      mediaItem.appendChild(videoContainer);
+    } else {
+      // Bild erstellen
+      const img = document.createElement('img');
+      img.className = 'media-content';
+      img.src = mediaSource;
+      img.alt = item.title || '';
+      
+      // Verhindern, dass Klick auf das Bild das Modal schließt
+      img.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+      
+      mediaItem.appendChild(img);
+    }
+    
+    // Zum Container hinzufügen
+    this.mediaContainer.appendChild(mediaItem);
+  }
+  
+  // Video abspielen
+  playVideo(source, container) {
+    // Thumbnail entfernen
+    const thumbnail = container.querySelector('.video-thumbnail');
+    if (thumbnail) {
+      thumbnail.remove();
+    }
+    
+    // Video erstellen
+    const video = document.createElement('video');
+    video.className = 'media-content';
+    video.controls = true;
+    video.autoplay = true;
+    video.muted = false;
+    video.loop = true;
+    video.src = source;
+    video.volume = 0.15;
+    
+    // Attribute für mobiles Abspielen
+    video.setAttribute('playsinline', '');
+    video.setAttribute('webkit-playsinline', '');
+    
+    // Verhindern, dass Klick auf das Video das Modal schließt
+    video.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+    
+    // Video zum Container hinzufügen
+    container.appendChild(video);
+    
+    // Video-Status setzen
+    this.isVideoPlaying = true;
+    this.videoInstance = video;
+    
+    // Video abspielen
+    video.play().catch(err => {
+      console.error('Video konnte nicht abgespielt werden:', err);
+    });
+  }
+  
+  // Placeholder für Video-Thumbnail
+  getVideoThumbnailPlaceholder() {
+    return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="%23333"/><text x="150" y="100" font-family="Arial" font-size="14" fill="%23fff" text-anchor="middle">Video wird geladen...</text></svg>';
+  }
+  
+  // Video-Thumbnail generieren
+  generateVideoThumbnail(videoSrc, callback) {
+    const tempVideo = document.createElement('video');
+    
+    // Thumbnail erzeugen, sobald das Video geladen ist
+    tempVideo.addEventListener('loadeddata', () => {
+      // Zum optimalen Frame springen (z.B. 0.5 Sekunden)
+      tempVideo.currentTime = 0.5;
+    });
+    
+    // Wenn zum Frame gesprungen wurde, Canvas erstellen
+    tempVideo.addEventListener('seeked', () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = tempVideo.videoWidth;
+      canvas.height = tempVideo.videoHeight;
+      
+      // Frame zeichnen
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(tempVideo, 0, 0, canvas.width, canvas.height);
+      
+      // URL des Thumbnails zurückgeben
+      const thumbnailUrl = canvas.toDataURL('image/jpeg');
+      callback(thumbnailUrl);
+      
+      // Aufräumen
+      tempVideo.remove();
+    });
+    
+    // Fehlerbehandlung
+    tempVideo.addEventListener('error', () => {
+      console.error('Fehler beim Laden des Videos:', videoSrc);
+      callback('');
+    });
+    
+    // Video laden
+    tempVideo.crossOrigin = 'anonymous';
+    tempVideo.src = videoSrc;
+    tempVideo.load();
+    tempVideo.style.display = 'none';
+    document.body.appendChild(tempVideo);
+  }
+  
+  // Touch-Start-Ereignis
+  handleTouchStart(event) {
+    // Touch-Startposition speichern
+    this.touchStartX = event.touches[0].clientX;
+    this.touchStartY = event.touches[0].clientY;
+    this.touchMoved = false;
+  }
+  
+  // Touch-Move-Ereignis mit visueller Rückmeldung
+  handleTouchMove(event) {
+    if (!this.touchStartX) return;
+    
+    // Wenn ein Video abgespielt wird, keine Swipe-Gesten
+    if (this.isVideoPlaying) return;
+    
+    // Aktuelle Position
+    const touchX = event.touches[0].clientX;
+    const touchY = event.touches[0].clientY;
+    
+    // Differenz berechnen
+    const diffX = touchX - this.touchStartX;
+    const diffY = Math.abs(touchY - this.touchStartY);
+    
+    // Nur horizontale Bewegungen verarbeiten, wenn die vertikale Bewegung nicht zu groß ist
+    if (Math.abs(diffX) > 10 && diffY < 50) {
+      // Verhindern des Scrollens
+      event.preventDefault();
+      
+      // Visuelle Rückmeldung
+      if (this.swipeIndicator) {
+        // Transparenz basierend auf der Swipe-Distanz
+        const opacity = Math.min(Math.abs(diffX) / 200, 0.5);
+        this.swipeIndicator.style.opacity = opacity;
+        
+        // Links/Rechts-Indikator
+        if (diffX > 0) {
+          this.swipeIndicator.classList.add('right');
+          this.swipeIndicator.classList.remove('left');
+        } else {
+          this.swipeIndicator.classList.add('left');
+          this.swipeIndicator.classList.remove('right');
+        }
+      }
+      
+      this.touchMoved = true;
+    }
+  }
+  
+  // Touch-End-Ereignis
+  handleTouchEnd(event) {
+    if (!this.touchStartX || !this.touchMoved) return;
+    
+    // Wenn ein Video abgespielt wird, keine Swipe-Gesten
+    if (this.isVideoPlaying) return;
+    
+    // Endposition
+    const touchEndX = event.changedTouches[0].clientX;
+    const touchEndY = event.changedTouches[0].clientY;
+    
+    // Differenz berechnen
+    const diffX = touchEndX - this.touchStartX;
+    const diffY = Math.abs(touchEndY - this.touchStartY);
+    
+    // Visuellen Indikator zurücksetzen
+    if (this.swipeIndicator) {
+      this.swipeIndicator.style.opacity = 0;
+      this.swipeIndicator.classList.remove('left', 'right');
+    }
+    
+    // Nur horizontale Bewegungen, wenn die vertikale Bewegung nicht zu groß ist
+    if (Math.abs(diffX) > this.swipeThreshold && diffY < 50) {
+      if (diffX > 0) {
+        // Nach rechts - vorheriges Bild
+        this.showPrevious();
+      } else {
+        // Nach links - nächstes Bild
+        this.showNext();
+      }
+    }
+    
+    // Zurücksetzen
+    this.touchStartX = 0;
+    this.touchStartY = 0;
+    this.touchMoved = false;
+  }
+  
+  // Keyboard-Navigation
+  handleKeyboard(event) {
+    // Nur reagieren, wenn das Modal geöffnet ist
+    if (!this.modal.classList.contains('open')) return;
+    
+    switch (event.key) {
+      case 'ArrowLeft':
+        this.showPrevious();
+        break;
+      case 'ArrowRight':
+        this.showNext();
+        break;
+      case 'Escape':
+        this.close();
+        break;
+    }
+  }
+  
+  // Fenstergrößenänderung
+  handleResize() {
+    // Mobilen Status aktualisieren
+    this.isMobile = window.innerWidth <= 768;
+    
+    // Swipe-Schwellenwert anpassen
+    this.swipeThreshold = this.isMobile ? 50 : 100;
+  }
+}
+
+// Initialisierung nach dem Laden der Seite
+document.addEventListener('DOMContentLoaded', () => {
+  // Bestehende Funktion sichern
+  const originalCreateGallery = window.createGallery;
+  
+  // Neue Galerie-Funktion
+  window.createGallery = function() {
+    // Originale Funktion aufrufen
+    if (typeof originalCreateGallery === 'function') {
+      originalCreateGallery();
+    }
+    
+    // Nach kurzer Verzögerung neue Galerie initialisieren
+    setTimeout(() => {
+      // Neue Galerie-Instanz erstellen
+      window.galleryModal = new GallerySwipeModal();
+    }, 500);
+  };
+  
+  // Falls die Seite bereits geladen ist
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    // Galerie direkt initialisieren
+    window.galleryModal = new GallerySwipeModal();
+  }
 });

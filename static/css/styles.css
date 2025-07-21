@@ -196,7 +196,7 @@ header {
     top: 0;
     left: 0;
     width: 100%;
-    padding: 1.5rem 0;
+    padding: 1.5rem 0 0 0;
     z-index: 1000;
     transition: var(--transition);
     background-color: rgba(16, 16, 16, 0.2);
@@ -204,7 +204,7 @@ header {
 }
 
 header.scrolled {
-    padding: 1rem 0;
+    padding: 1rem 0 0 0;
     background-color: rgba(8, 8, 8, 0.9);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
@@ -1476,4 +1476,479 @@ body.modal-open {
   .modal-content {
     margin-bottom: 40px !important;
   }
+}
+
+/* Top Lists Section */
+.top-lists {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a0f1f 100%);
+    position: relative;
+    padding: 7rem 0;
+    overflow: visible; /* Wichtig für die Anime-Figuren */
+}
+
+.lists-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 20% 50%, rgba(123, 0, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 50%, rgba(0, 240, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(255, 46, 99, 0.05) 0%, transparent 50%);
+    z-index: 0;
+}
+
+.lists-container {
+    position: relative;
+    z-index: 1;
+}
+
+.lists-wrapper {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+    margin-top: 4rem;
+}
+
+.list-category {
+    background: rgba(20, 20, 20, 0.6);
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 2.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.list-category::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--accent), var(--secondary));
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.list-category:hover::before {
+    transform: translateX(0);
+}
+
+.list-category:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    border-color: rgba(0, 240, 255, 0.3);
+}
+
+.category-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.category-header i {
+    font-size: 2.5rem;
+    background: linear-gradient(45deg, var(--primary), var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.category-header h3 {
+    font-size: 2rem;
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.top-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.list-item {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    min-height: 80px; /* Feste Mindesthöhe für alle Boxen */
+}
+
+.item-main {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.5rem;
+    align-items: center;
+    padding: 1.5rem;
+    min-height: 80px; /* Gleiche Höhe für alle Hauptelemente */
+}
+
+.item-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.item-content h4 {
+    font-size: 1.3rem;
+    margin: 0;
+    font-weight: 600;
+    color: #fff;
+    width: 100%;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+}
+
+.list-item::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.1), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.6s ease;
+}
+
+.list-item:hover::after {
+    transform: translateX(100%);
+}
+
+.list-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateY(-2px);
+}
+
+/* Aktiver Zustand mit offenen Details */
+.list-item:has(.item-details.show) {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.list-item[data-rank="1"] {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+    border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.list-item[data-rank="2"] {
+    background: linear-gradient(135deg, rgba(192, 192, 192, 0.08), rgba(192, 192, 192, 0.04));
+    border: 1px solid rgba(192, 192, 192, 0.2);
+}
+
+.list-item[data-rank="3"] {
+    background: linear-gradient(135deg, rgba(205, 127, 50, 0.08), rgba(205, 127, 50, 0.04));
+    border: 1px solid rgba(205, 127, 50, 0.2);
+}
+
+.rank-number {
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    font-weight: 800;
+    border-radius: 50%;
+    position: relative;
+}
+
+.list-item[data-rank="1"] .rank-number {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #000;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+}
+
+.list-item[data-rank="2"] .rank-number {
+    background: linear-gradient(135deg, #C0C0C0, #808080);
+    color: #000;
+    box-shadow: 0 0 15px rgba(192, 192, 192, 0.5);
+}
+
+.list-item[data-rank="3"] .rank-number {
+    background: linear-gradient(135deg, #CD7F32, #8B4513);
+    color: #fff;
+    box-shadow: 0 0 15px rgba(205, 127, 50, 0.5);
+}
+
+.list-item[data-rank="4"] .rank-number,
+.list-item[data-rank="5"] .rank-number {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+}
+
+.stars {
+    font-size: 1.2rem;
+    color: var(--primary);
+    letter-spacing: 2px;
+}
+
+/* Details Dropdown */
+.item-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 0 1.5rem;
+    opacity: 0;
+}
+
+.item-details.show {
+    max-height: 300px;
+    padding: 0 1.5rem 1.5rem 1.5rem;
+    opacity: 1;
+    transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease 0.2s;
+}
+
+.item-details p {
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.details-info {
+    display: flex;
+    gap: 2rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.details-info span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.details-info i {
+    color: var(--primary);
+}
+
+/* Animationen */
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.list-category {
+    animation: slideInFromLeft 0.8s ease-out;
+}
+
+.list-category:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.list-category:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+/* Anime Figuren am Rand */
+
+/* Levi - Linke Seite */
+.anime-figure-left {
+    position: absolute;
+    left: 2px;
+    bottom: 0; /* Am unteren Rand fixiert */
+    width: 400px;
+    height: auto;
+    z-index: 1;
+    opacity: 0.7;
+    pointer-events: none;
+    animation: slideInLeft 1s ease-out;
+}
+
+/* Killua - Rechte Seite */
+.anime-figure-right {
+    position: absolute;
+    right: -160px;
+    bottom: 0; /* Am unteren Rand fixiert */
+    width: 400px;
+    height: auto;
+    z-index: 1;
+    opacity: 0.8;
+    pointer-events: none;
+    animation: slideInRight 1s ease-out;
+}
+
+/* Hover-Effekt für die Figuren */
+.anime-figure-left:hover,
+.anime-figure-right:hover {
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+/* Animation für Anime Figuren */
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 0.8;
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 0.8;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1600px) {
+    .anime-figure-left,
+    .anime-figure-right {
+        width: 250px;
+    }
+    
+    .anime-figure-left {
+        left: -100px;
+    }
+    
+    .anime-figure-right {
+        right: -100px;
+    }
+}
+
+@media (max-width: 1400px) {
+    .lists-wrapper {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 2rem;
+    }
+    
+    .anime-figure-left,
+    .anime-figure-right {
+        width: 200px;
+    }
+    
+    .anime-figure-left {
+        left: -80px;
+    }
+    
+    .anime-figure-right {
+        right: -80px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .lists-wrapper {
+        grid-template-columns: 1fr;
+        max-width: 700px;
+        margin: 4rem auto 0;
+    }
+    
+    /* Anime Figuren auf Tablets und Mobil ausblenden */
+    .anime-figure-left,
+    .anime-figure-right {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .top-lists {
+        padding: 5rem 0;
+    }
+    
+    .lists-wrapper {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .list-category {
+        padding: 2rem;
+    }
+    
+    .category-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+    }
+    
+    .category-header i {
+        font-size: 2rem;
+    }
+    
+    .category-header h3 {
+        font-size: 1.6rem;
+    }
+    
+    .list-item {
+        min-height: 70px;
+    }
+    
+    .item-main {
+        grid-template-columns: auto 1fr;
+        gap: 1rem;
+        padding: 1rem;
+        min-height: 70px;
+    }
+    
+    .rank-number {
+        width: 40px;
+        height: 40px;
+        font-size: 1.4rem;
+    }
+    
+    .item-content h4 {
+        font-size: 1.1rem;
+    }
+    
+    .stars {
+        font-size: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .lists-wrapper {
+        margin-top: 3rem;
+    }
+    
+    .list-category {
+        padding: 1.5rem;
+        border-radius: 12px;
+    }
+    
+    .list-item {
+        min-height: 60px;
+    }
+    
+    .item-main {
+        padding: 0.8rem;
+        min-height: 60px;
+    }
+    
+    .rank-number {
+        width: 35px;
+        height: 35px;
+        font-size: 1.2rem;
+    }
+    
+    .item-content h4 {
+        font-size: 1rem;
+    }
 }

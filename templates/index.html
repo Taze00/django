@@ -40,6 +40,7 @@
                     <li><a href="#home">Home</a></li>
                     <li><a href="#about">Über Mich</a></li>
                     <li><a href="#clubs">Club Ranking</a></li>
+                    <li><a href="#top-lists">Filme</a></li>
                     <li><a href="#gallery">Galerie</a></li>
                     <li><a href="#contact">Kontakt</a></li>
                 </ul>
@@ -101,6 +102,8 @@
         </div>
     </section>
 
+
+    
     <!-- Club Ranking Section (jetzt an erster Stelle) -->
     <section id="clubs" class="club-ranking">
     <div class="club-pattern"></div>
@@ -115,6 +118,338 @@
         </div>
     </div>
 </section>
+
+<!-- Top Lists Section - Füge dies nach der Club Ranking Section ein -->
+<section id="top-lists" class="top-lists">
+    <img src="{% static 'css/images/movie/levi.png' %}" alt="Levi" class="anime-figure-left">
+    <img src="{% static 'css/images/movie/killua.png' %}" alt="Killua" class="anime-figure-right">
+    <div class="lists-pattern"></div>
+    <div class="container lists-container">
+        <div class="section-header fade-in">
+            <h2>Meine <span class="text-gradient">Top Listen</span></h2>
+            <p>Die besten Animes, Filme und Serien die ich dir empfehlen kann</p>
+        </div>
+        
+        <div class="lists-wrapper">
+            <!-- Anime Top 5 -->
+            <div class="list-category fade-in">
+                <div class="category-header">
+                    <i class="fas fa-torii-gate"></i>
+                    <h3>Top 5 Anime</h3>
+                </div>
+                <div class="top-list">
+                    <div class="list-item" data-rank="1" onclick="toggleDetails(this)">
+                        <div class="item-main">
+                            <div class="rank-number">1</div>
+                            <div class="item-content">
+                                <h4>Attack on Titan</h4>
+                                <div class="rating">
+                                    <span class="stars">★★★★★</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-details">
+                            <p>Die Menschheit lebt hinter riesigen Mauern, um sich vor menschenfressenden Titanen zu schützen. Was als einfache Survival-Story beginnt, entwickelt sich zu einer komplexen Erzählung über Krieg, Rassismus und den Kreislauf der Gewalt. Jede Staffel übertrifft die vorherige.</p>
+                            <div class="details-info">
+                                <span><i class="fas fa-play-circle"></i> Crunchyroll</span>
+                                <span><i class="fas fa-tv"></i> 87 Episoden</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-item" data-rank="2" onclick="toggleDetails(this)">
+                        <div class="item-main">
+                            <div class="rank-number">2</div>
+                            <div class="item-content">
+                                <h4>Hunter x Hunter</h4>
+                                <div class="rating">
+                                    <span class="stars">★★★★★</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-details">
+                            <p>Gon Freecss begibt sich auf die Suche nach seinem Vater und wird dabei zum Hunter. Die Serie brilliert durch komplexe Charaktere, ein ausgeklügeltes Nen-System und Kämpfe, die mehr auf Strategie als auf rohe Kraft setzen. Der Chimera Ant Arc gilt als einer der besten Anime-Arcs aller Zeiten.</p>
+                            <div class="details-info">
+                                <span><i class="fas fa-play-circle"></i> Prime</span>
+                                <span><i class="fas fa-tv"></i> 148 Episoden</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-item" data-rank="3" onclick="toggleDetails(this)">
+                        <div class="item-main">
+                            <div class="rank-number">3</div>
+                            <div class="item-content">
+                                <h4>Death Note</h4>
+                                <div class="rating">
+                                    <span class="stars">★★★★☆</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-details">
+                            <p>Light Yagami findet ein Notizbuch, mit dem er jeden töten kann, dessen Namen er hineinschreibt. Der daraus entstehende Kampf zwischen Light und dem Detektiv L ist ein brillantes Katz-und-Maus-Spiel voller Wendungen und moralischer Fragen über Gerechtigkeit.</p>
+                            <div class="details-info">
+                                <span><i class="fas fa-play-circle"></i> Netflix</span>
+                                <span><i class="fas fa-tv"></i> 37 Episoden </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-item" data-rank="4" onclick="toggleDetails(this)">
+                        <div class="item-main">
+                            <div class="rank-number">4</div>
+                            <div class="item-content">
+                                <h4>7 Deadly Sins</h4>
+                                <div class="rating">
+                                    <span class="stars">★★★☆☆</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-details">
+                            <p>Die Seven Deadly Sins sind gefallene Helden, die ein zerschlagenes Königreich retten wollen. Die Dynamik der Charaktere und die überraschenden Wendungen sorgen für ein mitreißendes Abenteuer, das süchtig macht.</p>
+                            <div class="details-info">
+                                <span><i class="fas fa-play-circle"></i> Netflix</span>
+                                <span><i class="fas fa-tv"></i> 100 Episoden</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-item" data-rank="5" onclick="toggleDetails(this)">
+                        <div class="item-main">
+                            <div class="rank-number">5</div>
+                            <div class="item-content">
+                                <h4>Demon Slayer</h4>
+                                <div class="rating">
+                                    <span class="stars">★★★☆☆</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-details">
+                            <p>Tanjiro Kamado wird zum Dämonenjäger, um seine in einen Dämon verwandelte Schwester zu retten. Ufotable's Animation setzt neue Maßstäbe, besonders in Kampfszenen. Die emotionale Geschichte und liebenswerten Charaktere machen es zu einem modernen Klassiker.</p>
+                            <div class="details-info">
+                                <span><i class="fas fa-play-circle"></i> Netflix</span>
+                                <span><i class="fas fa-tv"></i> 44 Episoden</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filme Top 5 -->
+            <div class="list-category fade-in">
+                <div class="category-header">
+                    <i class="fas fa-film"></i>
+                    <h3>Top 5 Filme</h3>
+                </div>
+                <div class="top-list">
+                    <div class="list-item" data-rank="1" onclick="toggleDetails(this)">
+                        <div class="item-main">
+                            <div class="rank-number">1</div>
+                            <div class="item-content">
+                                <h4>The Sixth Sense</h4>
+                                <div class="rating">
+                                    <span class="stars">★★★★★</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-details">
+                            <p>Dr. Crowe ist ein angesehener Kinderpsychologe, der einem verstörten Jungen helfen soll. The Sixth Sense ist ein atmosphärisch dichter Psychothriller über Verlust, Schuld und das Unbewusste. Noch nie hat mich ein Plottwist am Ende so heftig getroffen. Mit großem Abstand mein Lieblingsfilm!</p>
+                            <div class="details-info">
+                                <span><i class="fas fa-play-circle"></i> Prime</span>
+                                <span><i class="fas fa-calendar"></i> 1999</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-item" data-rank="2" onclick="toggleDetails(this)">
+                        <div class="item-main">
+                            <div class="rank-number">2</div>
+                            <div class="item-content">
+                                <h4>The Green Mile</h4>
+                                <div class="rating">
+                                    <span class="stars">★★★★★</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-details">
+                            <p>Paul Edgecomb arbeitet als Aufseher im Todestrakt, doch ein neuer Häftling stellt alles infrage, was er je für wahr hielt. The Green Mile ist ein zutiefst bewegendes Drama über Mitgefühl, Gerechtigkeit und das Übernatürliche. </p>
+                            <div class="details-info">
+                                <span><i class="fas fa-play-circle"></i> Prime</span>
+                                <span><i class="fas fa-calendar"></i> 1999</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-item" data-rank="3" onclick="toggleDetails(this)">
+                        <div class="item-main">
+                            <div class="rank-number">3</div>
+                            <div class="item-content">
+                                <h4>Shutter Island</h4>
+                                <div class="rating">
+                                    <span class="stars">★★★★★</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-details">
+                            <p>Teddy Daniels ist US-Marshal und ermittelt auf einer abgelegenen Inselklinik, doch nichts ist, wie es scheint. Shutter Island ist ein packender Psychothriller über Trauma, Wahrnehmung und Wahnsinn. Das verstörende Ende entfaltet eine Wucht, die einen noch lange danach nicht loslässt.</p>
+                            <div class="details-info">
+                                <span><i class="fas fa-play-circle"></i> Netflix</span>
+                                <span><i class="fas fa-calendar"></i> 2010</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-item" data-rank="4" onclick="toggleDetails(this)">
+                        <div class="item-main">
+                            <div class="rank-number">4</div>
+                            <div class="item-content">
+                                <h4>Interstellar</h4>
+                                <div class="rating">
+                                    <span class="stars">★★★★☆</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-details">
+                            <p>Cooper ist Pilot und Vater, seine Mission: das Überleben der Menschheit jenseits der Sterne. Interstellar ist ein visuell überwältigendes Sci-Fi-Epos über Zeit, Raum und die Kraft der Liebe. Hans Zimmers Score und die emotionale Tiefe machen das Finale zu einem der eindrucksvollsten der Filmgeschichte.</p>
+                            <div class="details-info">
+                                <span><i class="fas fa-play-circle"></i> Netflix</span>
+                                <span><i class="fas fa-calendar"></i> 2014</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-item" data-rank="5" onclick="toggleDetails(this)">
+                        <div class="item-main">
+                            <div class="rank-number">5</div>
+                            <div class="item-content">
+                                <h4>Joker</h4>
+                                <div class="rating">
+                                    <span class="stars">★★★★☆</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-details">
+                            <p>Arthur Fleck ist ein Außenseiter in einer kalten, zerrissenen Gesellschaft. Joker ist ein düsteres Charakterporträt über Wahnsinn, Isolation und Identität. Mit einer verstörenden Intensität und Joaquin Phoenix in Höchstform hinterlässt dieser Film ein Gefühl, das lange nachwirkt</p>
+                            <div class="details-info">
+                                <span><i class="fas fa-play-circle"></i> Prime</span>
+                                <span><i class="fas fa-calendar"></i> 2019</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Serien Top 5 -->
+            <div class="list-category fade-in">
+                <div class="category-header">
+                    <i class="fas fa-tv"></i>
+                    <h3>Top 5 Serien</h3>
+                </div>
+                <div class="top-list">
+                    <div class="list-item" data-rank="1" onclick="toggleDetails(this)">
+                        <div class="item-main">
+                            <div class="rank-number">1</div>
+                            <div class="item-content">
+                                <h4>Prison Break</h4>
+                                <div class="rating">
+                                    <span class="stars">★★★★★</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-details">
+                            <p>Ein Ingenieur entwickelt einen ausgeklügelten Plan, um seinen Bruder aus dem Gefängnis zu befreien. Clevere Wendungen und psychologische Spannung in einem der besten Gefängnis-Thriller aller Zeiten.</p>
+                            <div class="details-info">
+                                <span><i class="fas fa-play-circle"></i> Prime</span>
+                                <span><i class="fas fa-tv"></i> 90 Episoden</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-item" data-rank="2" onclick="toggleDetails(this)">
+                        <div class="item-main">
+                            <div class="rank-number">2</div>
+                            <div class="item-content">
+                                <h4>Haus des Geldes</h4>
+                                <div class="rating">
+                                    <span class="stars">★★★★☆</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-details">
+                            <p>Ein geheimnisvoller Mastermind plant den spektakulärsten Bankraub Spaniens. Heist-Thriller mit emotionaler Tiefe und gesellschaftskritischen Untertönen, der weltweit zum Phänomen wurde.</p>
+                            <div class="details-info">
+                                <span><i class="fas fa-play-circle"></i> Netflix</span>
+                                <span><i class="fas fa-tv"></i> 48 Episoden</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-item" data-rank="3" onclick="toggleDetails(this)">
+                        <div class="item-main">
+                            <div class="rank-number">3</div>
+                            <div class="item-content">
+                                <h4>From</h4>
+                                <div class="rating">
+                                    <span class="stars">★★★☆☆</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-details">
+                            <p>Eine Familie strandet in einer mysteriösen Stadt, aus der niemand entkommen kann. Mystery-Horror mit psychologischen Elementen, der Spannung bis zur letzten Minute garantiert.</p>
+                            <div class="details-info">
+                                <span><i class="fas fa-play-circle"></i> Prime</span>
+                                <span><i class="fas fa-tv"></i> 40 Episoden</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-item" data-rank="4" onclick="toggleDetails(this)">
+                        <div class="item-main">
+                            <div class="rank-number">4</div>
+                            <div class="item-content">
+                                <h4>The Watcher</h4>
+                                <div class="rating">
+                                    <span class="stars">★★★☆☆</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-details">
+                            <p>Eine Familie zieht in ihr Traumhaus und wird von anonymen, bedrohlichen Briefen terrorisiert. Psychothriller über Paranoia und die dunklen Geheimnisse der Nachbarschaft.</p>
+                            <div class="details-info">
+                                <span><i class="fas fa-play-circle"></i> Netflix</span>
+                                <span><i class="fas fa-tv"></i> 7 Episoden</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="list-item" data-rank="5" onclick="toggleDetails(this)">
+                        <div class="item-main">
+                            <div class="rank-number">5</div>
+                            <div class="item-content">
+                                <h4>Discounter</h4>
+                                <div class="rating">
+                                    <span class="stars">★★★☆☆</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="item-details">
+                            <p>Das chaotische Leben in einem deutschen Discounter zwischen Sonderangeboten und sozialen Abgründen. Schwarze Komödie, die den Einzelhandel-Wahnsinn mit viel Humor entlarvt.</p>
+                            <div class="details-info">
+                                <span><i class="fas fa-play-circle"></i> Prime</span>
+                                <span><i class="fas fa-tv"></i> 40 Episoden</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+function toggleDetails(element) {
+    const details = element.querySelector('.item-details');
+    const allDetails = document.querySelectorAll('.item-details');
+    
+    // Schließe alle anderen Details
+    allDetails.forEach(detail => {
+        if (detail !== details && detail.classList.contains('show')) {
+            detail.classList.remove('show');
+        }
+    });
+    
+    // Toggle das aktuelle Detail
+    details.classList.toggle('show');
+}
+</script>
 
 <!-- Gallery Section (ohne Filter) -->
 <section id="gallery" class="gallery">
