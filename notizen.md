@@ -22,6 +22,9 @@ docker compose run web-app python3 manage.py migrate
 ### start bash shell inside container
 docker compose run web-app bash
 
+### Restart Docker
+docker compose restart django-dev
+docker compose restart db
 
 
 ## bookmarks

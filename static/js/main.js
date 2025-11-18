@@ -1,115 +1,30 @@
-// Initialize Three.js Background
-function initThreeBackground() {
-    if (!threeBgContainer) return;
-    
-    // Create scene, camera, and renderer
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ 
-        alpha: true, 
-        antialias: true 
-    });
-    
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    threeBgContainer.appendChild(renderer.domElement);
-    
-    // Camera position
-    camera.position.z = 30;
-    
-    // Create particles - reduced by 33%
-    const particlesGeometry = new THREE.BufferGeometry();
-    const particlesCount = 1000; // Reduced from 1500 (33% less)
-    
-    const posArray = new Float32Array(particlesCount * 3);
-    
-    // Generate random positions
-    for (let i = 0; i < particlesCount * 3; i += 3) {
-        posArray[i] = (Math.random() - 0.5) * 100;     // x
-        posArray[i+1] = (Math.random() - 0.5) * 100;   // y
-        posArray[i+2] = (Math.random() - 0.5) * 100;   // z
+// ===== MAIN CONFIGURATION =====
+const CONFIG = {
+    SITE_VERSION: '20250514-2',
+    PARTICLES_COUNT: 800,
+    ANIMATION_SPEED: {
+        ROTATION_X: 0.0003,
+        ROTATION_Y: 0.0005
     }
-    
-    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-    
-    // Create a canvas for circular particle texture
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const size = 64;
-    canvas.width = size;
-    canvas.height = size;
-    
-    // Draw a white circle
-    ctx.beginPath();
-    ctx.arc(size/2, size/2, size/2, 0, Math.PI * 2);
-    ctx.fillStyle = 'white';
-    ctx.fill();
-    
-    // Create texture from canvas
-    const texture = new THREE.Texture(canvas);
-    texture.needsUpdate = true;
-    
-    // Simple material with fixed gray color and circular texture
-    const particlesMaterial = new THREE.PointsMaterial({
-        color: 0xcccccc,           // Fixed gray color
-        size: 0.2,                 // Particle size
-        map: texture,              // Circular texture
-        transparent: true,
-        opacity: 0.5,
-        alphaTest: 0.1,            // Helps with rendering transparency
-        sizeAttenuation: true,     // Particles get smaller with distance
-        depthWrite: false          // Prevents depth fighting issues
-    });
-    
-    // Create the particle system
-    const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-    scene.add(particlesMesh);
-    
-    // Animation
-    const animate = () => {
-        requestAnimationFrame(animate);
-        
-        particlesMesh.rotation.x += 0.0003;
-        particlesMesh.rotation.y += 0.0005;
-        
-        renderer.render(scene, camera);
-    };
-    
-    // Handle window resize
-    window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-    
-    animate();
-}
-const header = document.getElementById('header');
-const menuToggle = document.querySelector('.menu-toggle');
-const navLinks = document.querySelector('.nav-links');
-const galleryGrid = document.getElementById('gallery-grid');
-const filterBtns = document.querySelectorAll('.filter-btn');
-const rankingGrid = document.getElementById('ranking-grid');
-const modal = document.querySelector('.modal');
-const modalImg = document.querySelector('.modal-img');
-const modalCaption = document.querySelector('.modal-caption');
-const modalClose = document.querySelector('.modal-close');
-const fadeElements = document.querySelectorAll('.fade-in');
-const threeBgContainer = document.getElementById('three-bg');
+};
 
-// Logo Enhancement - Split name into spans with different styling
-document.addEventListener('DOMContentLoaded', function() {
-    const logoElement = document.querySelector('.logo');
-    if (logoElement && logoElement.innerHTML === 'Alex Volkmann') {
-        logoElement.innerHTML = '<span class="first-name">Alex</span> <span class="last-name">Volkmann</span>';
-    }
-});
+// ===== DOM ELEMENTS =====
+const elements = {
+    header: document.getElementById('header'),
+    menuToggle: document.querySelector('.menu-toggle'),
+    navLinks: document.querySelector('.nav-links'),
+    galleryGrid: document.getElementById('gallery-grid'),
+    rankingGrid: document.getElementById('ranking-grid'),
+    fadeElements: document.querySelectorAll('.fade-in'),
+    threeBgContainer: document.getElementById('three-bg')
+};
 
-// Gallery data
+// ===== DATA STRUCTURES =====
 const galleryItems = [
     {
         id: 1,
         image: '/static/css/images/gallery/alex1.jpeg',
-        title: 'Geburstagfeier',
+        title: 'Geburtstagsfeier',
         category: 'clubs'
     },
     {
@@ -119,77 +34,76 @@ const galleryItems = [
         category: 'clubs'
     },
     {
-        id: 10,
-        type: 'video', // Typ: Video
+        id: 3,
+        type: 'video',
         source: '/static/css/images/gallery/alex10.mp4',
-        title: 'Klassicher Handschlag',
+        title: 'Klassischer Handschlag',
         category: 'clubs'
     },
     {
-        id: 3,
+        id: 4,
         image: '/static/css/images/gallery/alex3.jpeg',
         title: 'Potsdam Oktoberfest',
         category: 'clubs'
     },
     {
-        id: 4,
+        id: 5,
         image: '/static/css/images/gallery/alex4.jpeg',
         title: 'Baumblüte',
         category: 'people'
     },
     {
-        id: 5,
+        id: 6,
         image: '/static/css/images/gallery/alex5.jpeg',
         title: 'Abend mit Freunden',
         category: 'architecture'
     },
     {
-        id: 6,
+        id: 7,
         image: '/static/css/images/gallery/alex6.jpeg',
         title: 'Ready machen für Berlin',
         category: 'clubs'
     },
     {
-        id: 11,
-        type: 'video', // Typ: Video
+        id: 8,
+        type: 'video',
         source: '/static/css/images/gallery/alex11.mp4',
         title: 'World Club Dome abkühlen',
         category: 'clubs'
     },
     {
-        id: 7,
+        id: 9,
         image: '/static/css/images/gallery/alex7.jpeg',
         title: 'SMS Festival',
         category: 'people'
     },
     {
-        id: 8,
+        id: 10,
         image: '/static/css/images/gallery/alex8.jpeg',
         title: 'Malle',
         category: 'architecture'
     },
     {
-        id: 12,
-        type: 'video', // Typ: Video
+        id: 11,
+        type: 'video',
         source: '/static/css/images/gallery/alex12.mp4',
-        title: 'Aftern nach Geburstag',
+        title: 'Aftern nach Geburtstag',
         category: 'clubs'
+    },
+    {
+        id: 12,
+        image: '/static/css/images/gallery/alex9.jpeg',
+        title: 'World Club Dome',
+        category: 'architecture'
     },
     {
         id: 13,
-        source: '/static/css/images/gallery/alex11.jpeg',
-        title: 'Nach dem Lokschuppen',
-        category: 'clubs'
-    },
-    {
-        id: 9,
-        image: '/static/css/images/gallery/alex9.jpeg',
-        title: 'World Club Dome',
+        image: '/static/css/images/gallery/alex13.jpeg',
+        title: 'Berlin Bar',
         category: 'architecture'
     }
 ];
 
-// Club ranking data
 const clubData = [
     {
         id: 1,
@@ -231,7 +145,7 @@ const clubData = [
         id: 4,
         name: 'Ritter Butzke',
         image: '/static/css/images/clubs/butzke.png',
-        description: 'Geiler Club mit einer einzigartige Atmosphäre.',
+        description: 'Geiler Club mit einer einzigartigen Atmosphäre.',
         ratings: {
             atmosphere: 98,
             sound: 83,
@@ -265,87 +179,139 @@ const clubData = [
     }
 ];
 
-// Club Cards Funktion, die in deinem Code fehlt
-function createClubCards() {
-    if (!rankingGrid) return;
-    
-    rankingGrid.innerHTML = '';
-    
-    clubData.forEach(club => {
-        const colDiv = document.createElement('div');
-        colDiv.className = 'col-lg-4 col-md-6 col-sm-12';
-        
-        const clubCard = document.createElement('div');
-        clubCard.className = 'club-card fade-in';
-        
-        clubCard.innerHTML = `
-            <div class="club-image">
-                <img src="${club.image}" alt="${club.name}" loading="lazy">
-                <div class="club-badge">${club.badge}</div>
-            </div>
-            <div class="club-content">
-                <h3 class="club-name">${club.name}</h3>
-                <p class="club-desc">${club.description}</p>
-                
-                <div class="rating-container">
-                    <div class="rating-header">
-                        <span class="rating-title">Atmosphäre</span>
-                        <span class="rating-value">${club.ratings.atmosphere}%</span>
-                    </div>
-                    <div class="rating-bar">
-                        <div class="rating-fill atmosphere-fill" data-width="${club.ratings.atmosphere}%"></div>
-                    </div>
-                </div>
-                
-                <div class="rating-container">
-                    <div class="rating-header">
-                        <span class="rating-title">Sound</span>
-                        <span class="rating-value">${club.ratings.sound}%</span>
-                    </div>
-                    <div class="rating-bar">
-                        <div class="rating-fill sound-fill" data-width="${club.ratings.sound}%"></div>
-                    </div>
-                </div>
-                
-                <div class="rating-container">
-                    <div class="rating-header">
-                        <span class="rating-title">Lineup</span>
-                        <span class="rating-value">${club.ratings.lineup}%</span>
-                    </div>
-                    <div class="rating-bar">
-                        <div class="rating-fill lineup-fill" data-width="${club.ratings.lineup}%"></div>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        colDiv.appendChild(clubCard);
-        rankingGrid.appendChild(colDiv);
-    });
-    
-    // Aktiviere Fade-In für Club-Karten
-    setTimeout(() => {
-        document.querySelectorAll('.club-card').forEach(card => {
-            card.classList.add('active');
-        });
-    }, 300);
-}
+const topListsData = {
+    anime: [
+        {
+            rank: 1,
+            title: 'Attack on Titan',
+            rating: '★★★★★',
+            description: 'Die Menschheit lebt hinter riesigen Mauern, um sich vor menschenfressenden Titanen zu schützen. Was als einfache Survival-Story beginnt, entwickelt sich zu einer komplexen Erzählung über Krieg, Rassismus und den Kreislauf der Gewalt. Jede Staffel übertrifft die vorherige.',
+            platform: 'Crunchyroll',
+            episodes: '87 Episoden'
+        },
+        {
+            rank: 2,
+            title: 'Hunter x Hunter',
+            rating: '★★★★★',
+            description: 'Gon Freecss begibt sich auf die Suche nach seinem Vater und wird dabei zum Hunter. Die Serie brilliert durch komplexe Charaktere, ein ausgeklügeltes Nen-System und Kämpfe, die mehr auf Strategie als auf rohe Kraft setzen. Der Chimera Ant Arc gilt als einer der besten Anime-Arcs aller Zeiten.',
+            platform: 'Prime',
+            episodes: '148 Episoden'
+        },
+        {
+            rank: 3,
+            title: 'Death Note',
+            rating: '★★★★☆',
+            description: 'Light Yagami findet ein Notizbuch, mit dem er jeden töten kann, dessen Namen er hineinschreibt. Der daraus entstehende Kampf zwischen Light und dem Detektiv L ist ein brillantes Katz-und-Maus-Spiel voller Wendungen und moralischer Fragen über Gerechtigkeit.',
+            platform: 'Netflix',
+            episodes: '37 Episoden'
+        },
+        {
+            rank: 4,
+            title: '7 Deadly Sins',
+            rating: '★★★☆☆',
+            description: 'Die Seven Deadly Sins sind gefallene Helden, die ein zerschlagenes Königreich retten wollen. Die Dynamik der Charaktere und die überraschenden Wendungen sorgen für ein mitreißendes Abenteuer, das süchtig macht.',
+            platform: 'Netflix',
+            episodes: '100 Episoden'
+        },
+        {
+            rank: 5,
+            title: 'Demon Slayer',
+            rating: '★★★☆☆',
+            description: 'Tanjiro Kamado wird zum Dämonenjäger, um seine in einen Dämon verwandelte Schwester zu retten. Ufotable\'s Animation setzt neue Maßstäbe, besonders in Kampfszenen. Die emotionale Geschichte und liebenswerten Charaktere machen es zu einem modernen Klassiker.',
+            platform: 'Netflix',
+            episodes: '44 Episoden'
+        }
+    ],
+    movies: [
+        {
+            rank: 1,
+            title: 'The Sixth Sense',
+            rating: '★★★★★',
+            description: 'Dr. Crowe ist ein angesehener Kinderpsychologe, der einem verstörten Jungen helfen soll. The Sixth Sense ist ein atmosphärisch dichter Psychothriller über Verlust, Schuld und das Unbewusste. Noch nie hat mich ein Plottwist am Ende so heftig getroffen. Mit großem Abstand mein Lieblingsfilm!',
+            platform: 'Prime',
+            year: '1999'
+        },
+        {
+            rank: 2,
+            title: 'The Green Mile',
+            rating: '★★★★★',
+            description: 'Paul Edgecomb arbeitet als Aufseher im Todestrakt, doch ein neuer Häftling stellt alles infrage, was er je für wahr hielt. The Green Mile ist ein zutiefst bewegendes Drama über Mitgefühl, Gerechtigkeit und das Übernatürliche.',
+            platform: 'Prime',
+            year: '1999'
+        },
+        {
+            rank: 3,
+            title: 'Shutter Island',
+            rating: '★★★★★',
+            description: 'Teddy Daniels ist US-Marshal und ermittelt auf einer abgelegenen Inselklinik, doch nichts ist, wie es scheint. Shutter Island ist ein packender Psychothriller über Trauma, Wahrnehmung und Wahnsinn. Das verstörende Ende entfaltet eine Wucht, die einen noch lange danach nicht loslässt.',
+            platform: 'Netflix',
+            year: '2010'
+        },
+        {
+            rank: 4,
+            title: 'Interstellar',
+            rating: '★★★★☆',
+            description: 'Cooper ist Pilot und Vater, seine Mission: das Überleben der Menschheit jenseits der Sterne. Interstellar ist ein visuell überwältigendes Sci-Fi-Epos über Zeit, Raum und die Kraft der Liebe. Hans Zimmers Score und die emotionale Tiefe machen das Finale zu einem der eindrucksvollsten der Filmgeschichte.',
+            platform: 'Netflix',
+            year: '2014'
+        },
+        {
+            rank: 5,
+            title: 'Joker',
+            rating: '★★★★☆',
+            description: 'Arthur Fleck ist ein Außenseiter in einer kalten, zerrissenen Gesellschaft. Joker ist ein düsteres Charakterporträt über Wahnsinn, Isolation und Identität. Mit einer verstörenden Intensität und Joaquin Phoenix in Höchstform hinterlässt dieser Film ein Gefühl, das lange nachwirkt.',
+            platform: 'Prime',
+            year: '2019'
+        }
+    ],
+    series: [
+        {
+            rank: 1,
+            title: 'Prison Break',
+            rating: '★★★★★',
+            description: 'Ein Ingenieur entwickelt einen ausgeklügelten Plan, um seinen Bruder aus dem Gefängnis zu befreien. Clevere Wendungen und psychologische Spannung in einem der besten Gefängnis-Thriller aller Zeiten.',
+            platform: 'Prime',
+            episodes: '90 Episoden'
+        },
+        {
+            rank: 2,
+            title: 'Haus des Geldes',
+            rating: '★★★★☆',
+            description: 'Ein geheimnisvoller Mastermind plant den spektakulärsten Bankraub Spaniens. Heist-Thriller mit emotionaler Tiefe und gesellschaftskritischen Untertönen, der weltweit zum Phänomen wurde.',
+            platform: 'Netflix',
+            episodes: '48 Episoden'
+        },
+        {
+            rank: 3,
+            title: 'From',
+            rating: '★★★☆☆',
+            description: 'Eine Familie strandet in einer mysteriösen Stadt, aus der niemand entkommen kann. Mystery-Horror mit psychologischen Elementen, der Spannung bis zur letzten Minute garantiert.',
+            platform: 'Prime',
+            episodes: '40 Episoden'
+        },
+        {
+            rank: 4,
+            title: 'The Watcher',
+            rating: '★★★☆☆',
+            description: 'Eine Familie zieht in ihr Traumhaus und wird von anonymen, bedrohlichen Briefen terrorisiert. Psychothriller über Paranoia und die dunklen Geheimnisse der Nachbarschaft.',
+            platform: 'Netflix',
+            episodes: '7 Episoden'
+        },
+        {
+            rank: 5,
+            title: 'Discounter',
+            rating: '★★★☆☆',
+            description: 'Das chaotische Leben in einem deutschen Discounter zwischen Sonderangeboten und sozialen Abgründen. Schwarze Komödie, die den Einzelhandel-Wahnsinn mit viel Humor entlarvt.',
+            platform: 'Prime',
+            episodes: '40 Episoden'
+        }
+    ]
+};
 
-
-// NEUE FUNKTION ZUM ERSETZEN - direkt an die Stelle kopieren, wo initThreeBackground definiert ist
+// ===== THREE.JS BACKGROUND =====
 function initThreeBackground() {
-    // Sicherstellen, dass der Container existiert
-    const threeBgContainer = document.getElementById('three-bg');
-    if (!threeBgContainer) return;
+    if (!elements.threeBgContainer) return;
     
-    // Zuerst alle vorhandenen Renderer/Canvas entfernen
-    while (threeBgContainer.firstChild) {
-        threeBgContainer.removeChild(threeBgContainer.firstChild);
-    }
-    
-    console.log("Initialisiere neue graue, runde Partikel");
-    
-    // Szene, Kamera und Renderer erstellen
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ 
@@ -354,66 +320,59 @@ function initThreeBackground() {
     });
     
     renderer.setSize(window.innerWidth, window.innerHeight);
-    threeBgContainer.appendChild(renderer.domElement);
+    elements.threeBgContainer.appendChild(renderer.domElement);
     
-    // Kameraposition
     camera.position.z = 30;
     
-    // Partikel erstellen - weiter reduziert
-    const particlesCount = 800; // Weiter reduziert von 1000 auf 800
+    // Create particles
     const particlesGeometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(particlesCount * 3);
+    const posArray = new Float32Array(CONFIG.PARTICLES_COUNT * 3);
     
-    // Zufällige Positionen
-    for (let i = 0; i < particlesCount * 3; i += 3) {
-        positions[i] = (Math.random() - 0.5) * 100;     // x
-        positions[i+1] = (Math.random() - 0.5) * 100;   // y
-        positions[i+2] = (Math.random() - 0.5) * 100;   // z
+    for (let i = 0; i < CONFIG.PARTICLES_COUNT * 3; i += 3) {
+        posArray[i] = (Math.random() - 0.5) * 100;
+        posArray[i + 1] = (Math.random() - 0.5) * 100;
+        posArray[i + 2] = (Math.random() - 0.5) * 100;
     }
     
-    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
     
-    // Canvas für runde Partikel erstellen
     const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    canvas.width = 128;
-    canvas.height = 128;
+    const ctx = canvas.getContext('2d');
+    const size = 64;
+    canvas.width = size;
+    canvas.height = size;
     
-    // Weißen Kreis zeichnen
-    context.beginPath();
-    context.arc(64, 64, 64, 0, Math.PI * 2, false);
-    context.fillStyle = 'white';
-    context.fill();
+    ctx.beginPath();
+    ctx.arc(size/2, size/2, size/2, 0, Math.PI * 2);
+    ctx.fillStyle = 'white';
+    ctx.fill();
     
-    const circleTexture = new THREE.Texture(canvas);
-    circleTexture.needsUpdate = true;
+    const texture = new THREE.Texture(canvas);
+    texture.needsUpdate = true;
     
-    // Material mit FIXIERTER GRAUER FARBE
     const particlesMaterial = new THREE.PointsMaterial({
         color: 0xcccccc,
-        size: 0.2,         // Größe von 0.3 auf 0.2 reduziert
-        map: circleTexture,
+        size: 0.2,
+        map: texture,
         transparent: true,
-        opacity: 0.6,
-        depthWrite: false,
-        sizeAttenuation: true
+        opacity: 0.5,
+        alphaTest: 0.1,
+        sizeAttenuation: true,
+        depthWrite: false
     });
     
-    // Partikelsystem erstellen
-    const particleSystem = new THREE.Points(particlesGeometry, particlesMaterial);
-    scene.add(particleSystem);
+    const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
+    scene.add(particlesMesh);
     
-    // Animation
-    function animate() {
+    const animate = () => {
         requestAnimationFrame(animate);
         
-        particleSystem.rotation.x += 0.0003;
-        particleSystem.rotation.y += 0.0005;
+        particlesMesh.rotation.x += CONFIG.ANIMATION_SPEED.ROTATION_X;
+        particlesMesh.rotation.y += CONFIG.ANIMATION_SPEED.ROTATION_Y;
         
         renderer.render(scene, camera);
-    }
+    };
     
-    // Fenstergrößenänderung behandeln
     window.addEventListener('resize', () => {
         camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
@@ -421,103 +380,70 @@ function initThreeBackground() {
     });
     
     animate();
-    return true; // Erfolgreiche Initialisierung
 }
-// Verbesserte Partikel-Animation mit mehr Partikeln
-function createParticles() {
-    if (!particlesContainer) return;
-    
-    // Lösche vorhandene Partikel
-    particlesContainer.innerHTML = '';
-    
-    // Erstelle 40 Partikel statt der ursprünglichen 25
-    const particleCount = 40;
-    
-    for (let i = 0; i < particleCount; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        
-        // Zufällige Größe zwischen 2 und 10 Pixel
-        const size = Math.random() * 8 + 2;
-        particle.style.width = `${size}px`;
-        particle.style.height = `${size}px`;
-        
-        // Zufällige Position
-        const posX = Math.random() * 100;
-        const posY = Math.random() * 100;
-        particle.style.left = `${posX}%`;
-        particle.style.top = `${posY}%`;
-        
-        // Zufällige Opazität zwischen 0.1 und 0.4
-        const opacity = Math.random() * 0.3 + 0.1;
-        particle.style.opacity = opacity;
-        
-        // Zufällige Animation-Dauer zwischen 15 und 40 Sekunden
-        const duration = Math.random() * 25 + 15;
-        particle.style.animationDuration = `${duration}s`;
-        
-        // Zufällige Animation-Verzögerung, damit alle Partikel sofort beginnen sich zu bewegen
-        // aber nicht synchron sind
-        const delay = Math.random() * -40; // Negative Verzögerung sorgt dafür, dass die Animation sofort startet
-        particle.style.animationDelay = `${delay}s`;
-        
-        // Füge das Partikel zum Container hinzu
-        particlesContainer.appendChild(particle);
+
+// ===== LOGO ENHANCEMENT =====
+function enhanceLogo() {
+    const logoElement = document.querySelector('.logo');
+    if (logoElement && logoElement.innerHTML === 'Alex Volkmann') {
+        logoElement.innerHTML = '<span class="first-name">Alex</span> <span class="last-name">Volkmann</span>';
     }
 }
 
-// Mobile Menu Toggle
-if (menuToggle) {
-    menuToggle.addEventListener('click', () => {
-        navLinks.classList.toggle('active');
-        
-        if (navLinks.classList.contains('active')) {
-            menuToggle.innerHTML = '<i class="fas fa-times"></i>';
-        } else {
-            menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+// ===== MOBILE MENU =====
+function initMobileMenu() {
+    if (elements.menuToggle && elements.navLinks) {
+        elements.menuToggle.addEventListener('click', () => {
+            elements.navLinks.classList.toggle('active');
+            
+            const icon = elements.menuToggle.querySelector('i');
+            if (elements.navLinks.classList.contains('active')) {
+                icon.className = 'fas fa-times';
+            } else {
+                icon.className = 'fas fa-bars';
+            }
+        });
+    }
+}
+
+// ===== SCROLL EVENTS =====
+function initScrollEvents() {
+    window.addEventListener('scroll', () => {
+        // Header style on scroll
+        if (elements.header) {
+            if (window.scrollY > 100) {
+                elements.header.classList.add('scrolled');
+            } else {
+                elements.header.classList.remove('scrolled');
+            }
         }
+        
+        // Fade in elements
+        elements.fadeElements.forEach(el => {
+            const elementTop = el.getBoundingClientRect().top;
+            const windowHeight = window.innerHeight;
+            
+            if (elementTop < windowHeight - 50) {
+                el.classList.add('active');
+            }
+        });
     });
 }
 
-// Scroll Events
-window.addEventListener('scroll', () => {
-    // Header style on scroll
-    if (window.scrollY > 100) {
-        header.classList.add('scrolled');
-    } else {
-        header.classList.remove('scrolled');
-    }
-    
-    // Fade in elements
-    fadeElements.forEach(el => {
-        const elementTop = el.getBoundingClientRect().top;
-        const windowHeight = window.innerHeight;
-        
-        if (elementTop < windowHeight - 50) {
-            el.classList.add('active');
-        }
-    });
-});
-
+// ===== GALLERY FUNCTIONS =====
 function createGallery() {
-    if (!galleryGrid) return;
+    if (!elements.galleryGrid) return;
     
-    galleryGrid.innerHTML = '';
+    elements.galleryGrid.innerHTML = '';
     
-    galleryItems.forEach(item => {
-        const colDiv = document.createElement('div');
-        colDiv.className = 'col-lg-4 col-md-6 col-sm-12';
-        
+    galleryItems.forEach((item, index) => {
         const galleryItem = document.createElement('div');
-        galleryItem.className = `gallery-item fade-in`;
+        galleryItem.className = 'gallery-item fade-in';
         
-        // Überprüfe, ob item.type existiert, falls nicht, wird es als 'image' behandelt
         const itemType = item.type || 'image';
-        const itemSource = item.source || item.image; // Unterstützung für beide Formate
+        const itemSource = item.source || item.image;
         
-        // Unterschiedlicher Inhalt je nach Typ (Bild oder Video)
         if (itemType === 'video') {
-            // Erstelle Video-Element mit JavaScript für mehr Kontrolle
             const video = document.createElement('video');
             video.autoplay = true;
             video.muted = true;
@@ -525,10 +451,8 @@ function createGallery() {
             video.playsInline = true;
             video.src = itemSource;
             
-            // Video-Element zur Galerie-Item hinzufügen
             galleryItem.appendChild(video);
             
-            // Overlay mit Titel hinzufügen
             const overlay = document.createElement('div');
             overlay.className = 'gallery-overlay';
             overlay.innerHTML = `<h3 class="gallery-title">${item.title}</h3>`;
@@ -542,51 +466,7 @@ function createGallery() {
             `;
         }
         
-        galleryItem.addEventListener('click', () => {
-            if (itemType === 'video') {
-                // Video im Modal anzeigen
-                modalImg.style.display = 'none'; // Bild ausblenden
-                
-                // Falls ein vorheriges Video existiert, entfernen
-                const existingVideo = document.querySelector('.modal-video');
-                if (existingVideo) existingVideo.remove();
-                
-                // Neues Video erstellen
-                const video = document.createElement('video');
-                video.controls = true;
-                video.autoplay = true;
-                video.muted = false;
-                video.loop = true;
-                video.src = itemSource;
-                video.className = 'modal-video';
-                
-                // Lautstärke auf 15% setzen (0.15 von 1.0)
-                video.volume = 0.15;
-                
-                // Einfügen vor der Bildunterschrift
-                const modalContent = document.querySelector('.modal-content');
-                modalContent.insertBefore(video, modalCaption);
-                
-                modalCaption.textContent = item.title;
-                modal.style.display = 'flex';
-            } else {
-                // Bild im Modal anzeigen
-                const existingVideo = document.querySelector('.modal-video');
-                if (existingVideo) existingVideo.remove();
-                
-                // Sicherstellen, dass das Bild nicht verzerrt wird
-                modalImg.style.display = 'block';
-                modalImg.style.width = 'auto';
-                modalImg.style.height = 'auto';
-                modalImg.src = itemSource;
-                
-                modalCaption.textContent = item.title;
-                modal.style.display = 'flex';
-            }
-        });
-        
-        colDiv.appendChild(galleryItem);
-        galleryGrid.appendChild(colDiv);
+        elements.galleryGrid.appendChild(galleryItem);
     });
     
     setTimeout(() => {
@@ -596,8 +476,211 @@ function createGallery() {
     }, 300);
 }
 
+// ===== CLUB CARDS FUNCTIONS =====
+function createClubCards() {
+    if (!elements.rankingGrid) return;
+    
+    elements.rankingGrid.innerHTML = '';
+    
+    // Prüfe ob Mobile
+    const isMobile = window.innerWidth <= 768;
+    
+    clubData.forEach(club => {
+        const colDiv = document.createElement('div');
+        colDiv.className = 'col-lg-4 col-md-6 col-sm-12';
+        
+        const clubCard = document.createElement('div');
+        clubCard.className = 'club-card fade-in';
+        
+        if (isMobile) {
+            // Mobile Struktur
+            const avgRating = Math.round((club.ratings.atmosphere + club.ratings.sound + club.ratings.lineup) / 3);
+            
+            clubCard.innerHTML = `
+                <div class="club-card-header">
+                    <div class="club-thumbnail">
+                        <img src="${club.image}" alt="${club.name}">
+                    </div>
+                    <div class="club-list-info">
+                        <h3>${club.name}</h3>
+                        <div class="club-quick-rating">
+                            <span class="stars">${getStarsFromRating(avgRating)}</span>
+                            <span>${avgRating}%</span>
+                        </div>
+                    </div>
+                    <div class="club-expand-icon">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+                <div class="club-details-mobile">
+                    <div class="club-details-image">
+                        <img src="${club.image}" alt="${club.name}">
+                        ${club.badge ? `<div class="club-badge-mobile">${club.badge}</div>` : ''}
+                    </div>
+                    <p class="club-desc-mobile">${club.description}</p>
+                    <div class="club-ratings-mobile">
+                        <div class="rating-item-mobile">
+                            <div class="rating-header-mobile">
+                                <span class="rating-title-mobile">Atmosphäre</span>
+                                <span class="rating-value-mobile">${club.ratings.atmosphere}%</span>
+                            </div>
+                            <div class="rating-bar-mobile">
+                                <div class="rating-fill-mobile atmosphere" style="width: 0%" data-width="${club.ratings.atmosphere}%"></div>
+                            </div>
+                        </div>
+                        <div class="rating-item-mobile">
+                            <div class="rating-header-mobile">
+                                <span class="rating-title-mobile">Sound</span>
+                                <span class="rating-value-mobile">${club.ratings.sound}%</span>
+                            </div>
+                            <div class="rating-bar-mobile">
+                                <div class="rating-fill-mobile sound" style="width: 0%" data-width="${club.ratings.sound}%"></div>
+                            </div>
+                        </div>
+                        <div class="rating-item-mobile">
+                            <div class="rating-header-mobile">
+                                <span class="rating-title-mobile">Lineup</span>
+                                <span class="rating-value-mobile">${club.ratings.lineup}%</span>
+                            </div>
+                            <div class="rating-bar-mobile">
+                                <div class="rating-fill-mobile lineup" style="width: 0%" data-width="${club.ratings.lineup}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Event Listener für Mobile hinzufügen
+            setTimeout(() => {
+                const header = clubCard.querySelector('.club-card-header');
+                if (header) {
+                    header.addEventListener('click', () => {
+                        toggleMobileClubDetails(clubCard);
+                    });
+                }
+            }, 100);
+        } else {
+            // Desktop Struktur
+            clubCard.innerHTML = `
+                <div class="club-image">
+                    <img src="${club.image}" alt="${club.name}" loading="lazy">
+                    <div class="club-badge">${club.badge}</div>
+                </div>
+                <div class="club-content">
+                    <h3 class="club-name">${club.name}</h3>
+                    <p class="club-desc">${club.description}</p>
+                    
+                    <div class="rating-container">
+                        <div class="rating-header">
+                            <span class="rating-title">Atmosphäre</span>
+                            <span class="rating-value">${club.ratings.atmosphere}%</span>
+                        </div>
+                        <div class="rating-bar">
+                            <div class="rating-fill atmosphere-fill" data-width="${club.ratings.atmosphere}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-container">
+                        <div class="rating-header">
+                            <span class="rating-title">Sound</span>
+                            <span class="rating-value">${club.ratings.sound}%</span>
+                        </div>
+                        <div class="rating-bar">
+                            <div class="rating-fill sound-fill" data-width="${club.ratings.sound}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="rating-container">
+                        <div class="rating-header">
+                            <span class="rating-title">Lineup</span>
+                            <span class="rating-value">${club.ratings.lineup}%</span>
+                        </div>
+                        <div class="rating-bar">
+                            <div class="rating-fill lineup-fill" data-width="${club.ratings.lineup}%"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        colDiv.appendChild(clubCard);
+        elements.rankingGrid.appendChild(colDiv);
+    });
+    
+    setTimeout(() => {
+        document.querySelectorAll('.club-card').forEach(card => {
+            card.classList.add('active');
+        });
+    }, 300);
+}
 
-// Animate Rating Bars when visible
+// ===== TOP LISTS FUNCTIONS =====
+function createTopLists() {
+    const categories = ['anime', 'movies', 'series'];
+    const categoryTitles = ['Top 5 Anime', 'Top 5 Filme', 'Top 5 Serien'];
+    const categoryIcons = ['fas fa-torii-gate', 'fas fa-film', 'fas fa-tv'];
+    
+    categories.forEach((category, categoryIndex) => {
+        const listCategory = document.querySelector(`.list-category:nth-child(${categoryIndex + 1})`);
+        if (!listCategory) return;
+        
+        const topList = listCategory.querySelector('.top-list');
+        if (!topList) return;
+        
+        topList.innerHTML = '';
+        
+        topListsData[category].forEach(item => {
+            const listItem = document.createElement('div');
+            listItem.className = 'list-item';
+            listItem.setAttribute('data-rank', item.rank);
+            listItem.onclick = () => toggleDetails(listItem);
+            
+            const detailsInfo = category === 'movies' 
+                ? `<span><i class="fas fa-play-circle"></i> ${item.platform}</span>
+                   <span><i class="fas fa-calendar"></i> ${item.year}</span>`
+                : `<span><i class="fas fa-play-circle"></i> ${item.platform}</span>
+                   <span><i class="fas fa-tv"></i> ${item.episodes}</span>`;
+            
+            listItem.innerHTML = `
+                <div class="item-main">
+                    <div class="rank-number">${item.rank}</div>
+                    <div class="item-content">
+                        <h4>${item.title}</h4>
+                        <div class="rating">
+                            <span class="stars">${item.rating}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="item-details">
+                    <p>${item.description}</p>
+                    <div class="details-info">
+                        ${detailsInfo}
+                    </div>
+                </div>
+            `;
+            
+            topList.appendChild(listItem);
+        });
+    });
+}
+
+// ===== TOP LISTS TOGGLE FUNCTION =====
+function toggleDetails(element) {
+    const details = element.querySelector('.item-details');
+    const allDetails = document.querySelectorAll('.item-details');
+    
+    // Close all other details
+    allDetails.forEach(detail => {
+        if (detail !== details && detail.classList.contains('show')) {
+            detail.classList.remove('show');
+        }
+    });
+    
+    // Toggle current detail
+    details.classList.toggle('show');
+}
+
+// ===== RATING BARS ANIMATION =====
 function animateRatingBars() {
     if (!document.querySelector('.club-card')) return;
     
@@ -623,1614 +706,104 @@ function animateRatingBars() {
     });
 }
 
-
-// Modal Functions
-if (modalClose) {
-    modalClose.addEventListener('click', () => {
-        modal.style.display = 'none';
-    });
-
-    window.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            modal.style.display = 'none';
-        }
+// ===== SMOOTH SCROLLING =====
+function initSmoothScrolling() {
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop,
+                    behavior: 'smooth'
+                });
+                
+                // Close mobile menu if open
+                if (elements.navLinks && elements.navLinks.classList.contains('active')) {
+                    elements.navLinks.classList.remove('active');
+                    const icon = elements.menuToggle.querySelector('i');
+                    icon.className = 'fas fa-bars';
+                }
+            }
+        });
     });
 }
 
-// Smooth scrolling
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        const targetId = this.getAttribute('href');
-        if (targetId === '#') return;
-        
-        const targetElement = document.querySelector(targetId);
-        if (targetElement) {
-            window.scrollTo({
-                top: targetElement.offsetTop,
-                behavior: 'smooth'
-            });
-            
-            // Close mobile menu if open
-            if (navLinks.classList.contains('active')) {
-                navLinks.classList.remove('active');
-                menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+// ===== VERSION MANAGEMENT =====
+function initVersionManagement() {
+    const lastVersion = localStorage.getItem('site_version');
+    if (lastVersion !== CONFIG.SITE_VERSION) {
+        localStorage.setItem('site_version', CONFIG.SITE_VERSION);
+        if (lastVersion) {
+            console.log('Neue Version verfügbar. Lade Seite neu...');
+            window.location.reload(true);
+        }
+    }
+    
+    updateMediaSources();
+}
+
+function updateMediaSources() {
+    // Update all images
+    document.querySelectorAll('img').forEach(img => {
+        if (img.src && !img.src.includes('?v=') && !img.src.includes('data:image')) {
+            try {
+                const imgUrl = new URL(img.src);
+                imgUrl.searchParams.set('v', CONFIG.SITE_VERSION);
+                img.src = imgUrl.toString();
+            } catch (e) {
+                img.src = img.src + (img.src.includes('?') ? '&' : '?') + 'v=' + CONFIG.SITE_VERSION;
             }
         }
     });
-});
-
-// Initialize
-window.addEventListener('load', () => {
-    // Initialisiere Three.js Hintergrund
-    initThreeBackground();
     
-    // Aktiviere initiale Fade-Elemente
-    fadeElements.forEach(el => {
-        const elementTop = el.getBoundingClientRect().top;
-        const windowHeight = window.innerHeight;
-        
-        if (elementTop < windowHeight) {
-            el.classList.add('active');
-        }
-    });
-    
-    // Erstelle Galerie und Club-Karten
-    createGallery();
-    createClubCards();
-    animateRatingBars();
-});
-
-
-// Diesen Code in Ihre main.js-Datei einfügen (am Anfang oder Ende der Datei)
-document.addEventListener('DOMContentLoaded', function() {
-  // Aktuelle Version - ändern Sie diesen Wert, wenn Sie Updates erzwingen möchten
-  const SITE_VERSION = '20250514-2';
-  
-  // Funktion zum Hinzufügen von Versionsnummern zu allen Medien
-  function updateMediaSources() {
-    // Alle Bilder auf der Seite
-    document.querySelectorAll('img').forEach(img => {
-      // Überprüfen, ob bereits ein Versionsparameter vorhanden ist
-      if (img.src && !img.src.includes('?v=') && !img.src.includes('data:image')) {
-        // URL-Objekt erstellen, um Parameter hinzuzufügen oder zu aktualisieren
-        try {
-          const imgUrl = new URL(img.src);
-          imgUrl.searchParams.set('v', SITE_VERSION);
-          img.src = imgUrl.toString();
-        } catch (e) {
-          // Falls eine ungültige URL vorliegt, direkten String-Ansatz verwenden
-          img.src = img.src + (img.src.includes('?') ? '&' : '?') + 'v=' + SITE_VERSION;
-        }
-      }
-    });
-    
-    // Alle Videos auf der Seite
+    // Update all videos
     document.querySelectorAll('video').forEach(video => {
-      if (video.src && !video.src.includes('?v=')) {
-        try {
-          const videoUrl = new URL(video.src);
-          videoUrl.searchParams.set('v', SITE_VERSION);
-          video.src = videoUrl.toString();
-        } catch (e) {
-          // Falls eine ungültige URL vorliegt, direkten String-Ansatz verwenden
-          video.src = video.src + (video.src.includes('?') ? '&' : '?') + 'v=' + SITE_VERSION;
+        if (video.src && !video.src.includes('?v=')) {
+            try {
+                const videoUrl = new URL(video.src);
+                videoUrl.searchParams.set('v', CONFIG.SITE_VERSION);
+                video.src = videoUrl.toString();
+            } catch (e) {
+                video.src = video.src + (video.src.includes('?') ? '&' : '?') + 'v=' + CONFIG.SITE_VERSION;
+            }
         }
-      }
     });
-    
-    // Hintergrundbild-URLs in CSS aktualisieren (falls vorhanden)
-    document.querySelectorAll('[style*="background-image"]').forEach(el => {
-      const style = el.getAttribute('style');
-      if (style && style.includes('url(') && !style.includes('?v=')) {
-        const newStyle = style.replace(/url\(['"]?([^'"]+?)['"]?\)/g, 
-          (match, url) => `url(${url}${url.includes('?') ? '&' : '?'}v=${SITE_VERSION})`);
-        el.setAttribute('style', newStyle);
-      }
-    });
-  }
-  
-  // Prüfen, ob ein Force-Reload nötig ist
-  const lastVersion = localStorage.getItem('site_version');
-  if (lastVersion !== SITE_VERSION) {
-    // Neue Version in localStorage speichern
-    localStorage.setItem('site_version', SITE_VERSION);
-    
-    // Seite neu laden, wenn zuvor schon eine Version gespeichert war
-    if (lastVersion) {
-      console.log('Neue Version verfügbar. Lade Seite neu...');
-      // Hard reload erzwingen (kein Cache)
-      window.location.reload(true);
-    }
-  }
-  
-  // Media-Quellen aktualisieren, selbst wenn kein Reload erforderlich war
-  updateMediaSources();
-  
-  // Anpassung der Galerie- und Club-Karten-Funktionen, um Medien zu aktualisieren
-  if (typeof createGallery === 'function') {
-    const originalCreateGallery = createGallery;
-    window.createGallery = function() {
-      originalCreateGallery();
-      updateMediaSources();
-    };
-  }
-  
-  if (typeof createClubCards === 'function') {
-    const originalCreateClubCards = createClubCards;
-    window.createClubCards = function() {
-      originalCreateClubCards();
-      updateMediaSources();
-    };
-  }
-});
-
-
-  
-  // Zähler aktualisieren
-  function updateCounter(counterElement) {
-    if (!counterElement) return;
-    
-    const totalItems = window.galleryItems ? window.galleryItems.length : 0;
-    if (totalItems > 0) {
-      counterElement.textContent = `${currentIndex + 1} / ${totalItems}`;
-    }
-  }
-  
-  // Video-Thumbnails aus dem ersten Frame des Videos erzeugen
-  function createVideoThumbnail(videoSrc, callback) {
-    const tempVideo = document.createElement('video');
-    
-    tempVideo.addEventListener('loadeddata', function() {
-      // Wenn das Video geladen ist, gehen wir zum ersten Frame
-      tempVideo.currentTime = 0.5; // 0.5 Sekunden, um einen besseren Thumbnail zu bekommen
-    });
-    
-    tempVideo.addEventListener('seeked', function() {
-      // Wenn wir zum Frame gesprungen sind, erstellen wir ein Canvas
-      const canvas = document.createElement('canvas');
-      canvas.width = tempVideo.videoWidth;
-      canvas.height = tempVideo.videoHeight;
-      
-      // Frame auf Canvas zeichnen
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(tempVideo, 0, 0, canvas.width, canvas.height);
-      
-      // Thumbnail als Daten-URL zurückgeben
-      const thumbnailUrl = canvas.toDataURL('image/jpeg');
-      callback(thumbnailUrl);
-      
-      // Video entfernen
-      tempVideo.remove();
-    });
-    
-    // Für den Fall, dass Fehler auftreten
-    tempVideo.addEventListener('error', function() {
-      console.error('Fehler beim Laden des Videos:', videoSrc);
-      callback(''); // Leere URL zurückgeben, was zu einem Fehler-Image führen sollte
-    });
-    
-    // Video-Quelle setzen und laden
-    tempVideo.src = videoSrc;
-    tempVideo.load();
-    tempVideo.style.display = 'none';
-    document.body.appendChild(tempVideo);
-  }
-  
-  // Medien anzeigen basierend auf Index - Hauptfunktion
-  function showMedia(index) {
-    // Sicherstellen, dass galleryItems verfügbar ist
-    if (!window.galleryItems || !window.galleryItems.length) return;
-    
-    // Sicherstellen, dass der Index gültig ist
-    if (index < 0) index = window.galleryItems.length - 1;
-    if (index >= window.galleryItems.length) index = 0;
-    
-    // Aktuellen Index aktualisieren
-    currentIndex = index;
-    
-    // Zunächst alle bestehenden Medien entfernen
-    clearExistingNavigation();
-    
-    // Aktuelles Item aus der Galerie
-    const item = window.galleryItems[index];
-    
-    // Navigationselemente erstellen
-    const navElements = createNavigationControls();
-    
-    // Prüfen, ob es sich um ein Video oder Bild handelt
-    const itemType = item.type || 'image';
-    const itemSource = item.source || item.image;
-    
-    if (itemType === 'video') {
-      // Bild ausblenden
-      modalImg.style.display = 'none';
-      
-      // Video-Container erstellen mit fester Größe
-      const videoContainer = document.createElement('div');
-      videoContainer.className = 'modal-video-container';
-      videoContainer.style.position = 'relative';
-      videoContainer.style.width = '100%'; 
-      videoContainer.style.maxWidth = isMobile ? '90%' : '90%';
-      videoContainer.style.height = isMobile ? '65vh' : '75vh';
-      videoContainer.style.display = 'flex';
-      videoContainer.style.justifyContent = 'center'; // Horizontale Zentrierung
-      videoContainer.style.alignItems = 'center'; // Vertikale Zentrierung
-      
-      // Thumbnail erstellen und anzeigen
-      const thumbnail = document.createElement('div');
-      thumbnail.className = 'video-thumbnail';
-      thumbnail.style.position = 'relative';
-      thumbnail.style.width = '100%';
-      thumbnail.style.height = '100%';
-      thumbnail.style.display = 'flex';
-      thumbnail.style.justifyContent = 'center';
-      thumbnail.style.alignItems = 'center';
-      thumbnail.style.backgroundColor = '#000';
-      thumbnail.style.borderRadius = '8px';
-      thumbnail.style.overflow = 'hidden';
-      thumbnail.style.cursor = 'pointer';
-      
-      // Thumbnail-Bild
-      const thumbnailImg = document.createElement('img');
-      thumbnailImg.style.maxWidth = '100%';
-      thumbnailImg.style.maxHeight = '100%';
-      thumbnailImg.style.width = 'auto';
-      thumbnailImg.style.height = 'auto';
-      thumbnailImg.style.objectFit = 'contain';
-      thumbnailImg.style.display = 'block';
-      
-      // Vorübergehendes Platzhalterbild, bis das eigentliche Thumbnail geladen ist
-      thumbnailImg.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="%23333"/></svg>';
-      
-      // Play-Button über dem Thumbnail
-      const playButton = document.createElement('div');
-      playButton.className = 'video-play-button';
-      playButton.innerHTML = '<i class="fas fa-play"></i>';
-      playButton.style.position = 'absolute';
-      playButton.style.top = '50%';
-      playButton.style.left = '50%';
-      playButton.style.transform = 'translate(-50%, -50%)';
-      playButton.style.width = isMobile ? '50px' : '70px';
-      playButton.style.height = isMobile ? '50px' : '70px';
-      playButton.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-      playButton.style.borderRadius = '50%';
-      playButton.style.display = 'flex';
-      playButton.style.justifyContent = 'center';
-      playButton.style.alignItems = 'center';
-      playButton.style.color = 'white';
-      playButton.style.fontSize = isMobile ? '20px' : '30px';
-      playButton.style.cursor = 'pointer';
-      playButton.style.zIndex = '1';
-      
-      // Thumbnail zum Container hinzufügen
-      thumbnail.appendChild(thumbnailImg);
-      thumbnail.appendChild(playButton);
-      videoContainer.appendChild(thumbnail);
-      
-      // Thumbnail generieren
-      createVideoThumbnail(itemSource, (thumbnailUrl) => {
-        if (thumbnailUrl) {
-          thumbnailImg.src = thumbnailUrl;
-        }
-      });
-      
-      // Klick-Handler für das Abspielen des Videos
-      const handleThumbnailClick = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // Thumbnail entfernen
-        thumbnail.remove();
-        
-        // Video erstellen
-        const video = document.createElement('video');
-        video.controls = true;
-        video.autoplay = false;
-        video.muted = false;
-        video.loop = true;
-        video.src = itemSource;
-        video.className = 'modal-video';
-        video.volume = 0.15;
-        
-        // Vollbildmodus verhindern
-        video.setAttribute('playsinline', 'playsinline');
-        video.setAttribute('webkit-playsinline', 'webkit-playsinline');
-        
-        // Video-Styling
-        video.style.maxWidth = '100%';
-        video.style.maxHeight = '100%';
-        video.style.width = 'auto';
-        video.style.height = 'auto';
-        video.style.objectFit = 'contain';
-        video.style.display = 'block';
-        video.style.borderRadius = '8px';
-        video.style.boxShadow = '0 15px 40px rgba(0, 0, 0, 0.6)';
-        
-        // Video zum Container hinzufügen
-        videoContainer.appendChild(video);
-        
-        // Video abspielen
-        video.play().catch(err => console.error('Fehler beim Abspielen des Videos:', err));
-        
-        // Verhindere, dass das Modal beim Klick auf das Video geschlossen wird
-        video.addEventListener('click', e => e.stopPropagation());
-      };
-      
-      // Event-Listener für Klick auf Thumbnail
-      thumbnail.addEventListener('click', handleThumbnailClick);
-      
-      // Video-Container zum Modal hinzufügen
-      modalContent.insertBefore(videoContainer, navElements ? navElements.prevButton.parentNode : null);
-    } else {
-      // Bei Bildern: Alle Video-Elemente entfernen
-      const existingVideoContainer = document.querySelector('.modal-video-container');
-      if (existingVideoContainer) existingVideoContainer.remove();
-      
-      const existingVideo = document.querySelector('.modal-video');
-      if (existingVideo) existingVideo.remove();
-      
-      // Bild anzeigen
-      modalImg.style.display = 'block';
-      modalImg.src = itemSource;
-    }
-    
-    // Zähler aktualisieren
-    if (navElements && navElements.counter) {
-      updateCounter(navElements.counter);
-    }
-  }
-  
-  // Navigation zu vorherigem Medium
-  function showPreviousMedia() {
-    showMedia(currentIndex - 1);
-  }
-  
-  // Navigation zu nächstem Medium
-  function showNextMedia() {
-    showMedia(currentIndex + 1);
-  }
-  
-  // Verarbeitet die Tastatureingabe für die Navigation
-  function handleKeyNavigation(event) {
-    if (!modal.style.display || modal.style.display === 'none') return;
-    
-    if (event.key === 'ArrowLeft') {
-      showPreviousMedia();
-    } else if (event.key === 'ArrowRight') {
-      showNextMedia();
-    } else if (event.key === 'Escape') {
-      modal.style.display = 'none';
-    }
-  }
-  
-  // Touch-Events für Swipe-Funktionalität
-  let touchStartX = 0;
-  let touchStartY = 0;
-  
-  function handleTouchStart(event) {
-    touchStartX = event.changedTouches[0].screenX;
-    touchStartY = event.changedTouches[0].screenY;
-  }
-  
-  function handleTouchEnd(event) {
-    const touchEndX = event.changedTouches[0].screenX;
-    const touchEndY = event.changedTouches[0].screenY;
-    
-    // Berechne die horizontale und vertikale Distanz
-    const deltaX = touchEndX - touchStartX;
-    const deltaY = Math.abs(touchEndY - touchStartY);
-    
-    // Nur horizontale Swipes mit genügend Distanz berücksichtigen
-    // und wenn die vertikale Bewegung nicht zu groß ist
-    if (Math.abs(deltaX) > window.innerWidth * 0.15 && deltaY < 50) {
-      if (deltaX > 0) {
-        // Nach rechts - vorheriges Bild
-        showPreviousMedia();
-      } else {
-        // Nach links - nächstes Bild
-        showNextMedia();
-      }
-    }
-  }
-  
-  // Setzt das Modal in einen einheitlichen Startzustand
-  function resetModal() {
-    // Modal-Layout optimieren
-    setupModalLayout();
-    
-    // Klick auf das Modal außerhalb des Inhalts schließt es
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        modal.style.display = 'none';
-      }
-    });
-    
-    // Verhindern der Standardaktion beim Klicken auf das Bild
-    modalImg.addEventListener('click', (e) => {
-      e.stopPropagation();
-    });
-    
-    // Touch-Events für Swipe-Funktionalität
-    modal.addEventListener('touchstart', handleTouchStart, {passive: true});
-    modal.addEventListener('touchend', handleTouchEnd, {passive: true});
-    
-    // Tastaturnavigation hinzufügen
-    document.addEventListener('keydown', handleKeyNavigation);
-  }
-  
-  // Initialisiert das Modal mit dem Bild/Video
-  function initModalWithMedia(index) {
-    // Sicherstellen, dass das Modal zurückgesetzt wird
-    resetModal();
-    
-    // Zeige das entsprechende Medium
-    showMedia(index);
-    
-    // Modal anzeigen
-    modal.style.display = 'flex';
-    
-    // Auf Mobilgeräten das Hintergrund-Scrollen verhindern
-    if (isMobile) {
-      document.body.classList.add('modal-open');
-    }
-  }
-  
-  // Modifizieren der Galerie-Items, um das neue Modal zu verwenden
-  function modifyGalleryItems() {
-    const galleryItems = document.querySelectorAll('.gallery-item');
-    
-    galleryItems.forEach((item, index) => {
-      // Bestehenden Event-Listener entfernen und neu erstellen
-      const newItem = item.cloneNode(true);
-      item.parentNode.replaceChild(newItem, item);
-      
-      // Neuen Klick-Event-Listener hinzufügen
-      newItem.addEventListener('click', () => {
-        initModalWithMedia(index);
-      });
-    });
-  }
-  
-  // Wenn Modal geschlossen wird, Scrollen wieder aktivieren
-  if (modalClose) {
-    modalClose.addEventListener('click', () => {
-      modal.style.display = 'none';
-      document.body.classList.remove('modal-open');
-    });
-  }
-  
-  // CSS hinzufügen für Modal-Open-Klasse und Verbesserungen
-  const style = document.createElement('style');
-  style.textContent = `
-    body.modal-open {
-      overflow: hidden;
-      position: fixed;
-      width: 100%;
-      height: 100%;
-    }
-    
-    .modal-nav-prev:focus, 
-    .modal-nav-next:focus,
-    .modal-nav-prev:hover, 
-    .modal-nav-next:hover,
-    .modal-nav-prev:active, 
-    .modal-nav-next:active {
-      outline: none !important;
-      box-shadow: none !important;
-      border: none !important;
-      background-color: rgba(0, 0, 0, 0.7) !important;
-    }
-  `;
-  document.head.appendChild(style);
-  
-  // Ursprüngliche createGallery-Funktion überschreiben
-  if (typeof window.createGallery === 'function') {
-    const originalCreateGallery = window.createGallery;
-    window.createGallery = function() {
-      originalCreateGallery();
-      setTimeout(modifyGalleryItems, 100);
-    };
-  }
-  
-  // Bei vorhandener Galerie sofort anwenden
-  if (document.querySelectorAll('.gallery-item').length > 0) {
-    setTimeout(modifyGalleryItems, 300);
-  }
-  
-  // Größenanpassung des Fensters behandeln
-  window.addEventListener('resize', () => {
-    // Aktualisiere die isMobile-Erkennung
-    const wasMobile = isMobile;
-    const newIsMobile = window.innerWidth <= 768;
-    
-    // Nur wenn sich der Mobilstatus ändert oder Modal geöffnet ist
-    if (wasMobile !== newIsMobile && modal.style.display === 'flex') {
-      // Layout neu einrichten und aktuellen Index neu laden
-      setupModalLayout();
-      showMedia(currentIndex);
-    }
-  });
-
-
-// Galerie-Modal-Enhancement nach dem Laden der Seite initialisieren
-document.addEventListener('DOMContentLoaded', function() {
-  // Stellen Sie sicher, dass die galleryItems-Variable global verfügbar ist
-  window.galleryItems = galleryItems;
-  
-  // Verzögerung, um sicherzustellen, dass alle DOM-Elemente geladen sind
-  setTimeout(enhanceGalleryModal, 500);
-});
-
-// GallerySwipeModal - Eine vollständig neu geschriebene Galerie-Popup-Implementierung
-// mit optimierter Performance und Touch-Unterstützung
-
-class GallerySwipeModal {
-  constructor() {
-    // DOM-Elemente
-    this.modal = document.querySelector('.modal');
-    this.modalContent = document.querySelector('.modal-content');
-    this.modalImg = document.querySelector('.modal-img');
-    this.modalCaption = document.querySelector('.modal-caption');
-    this.modalClose = document.querySelector('.modal-close');
-    
-    // Zustandsvariablen
-    this.currentIndex = 0;
-    this.items = window.galleryItems || [];
-    this.isAnimating = false;
-    this.isMobile = window.innerWidth <= 768;
-    this.touchStartX = 0;
-    this.touchStartY = 0;
-    this.touchEndX = 0;
-    this.touchEndY = 0;
-    this.swipeThreshold = this.isMobile ? 50 : 100;
-    this.isVideoPlaying = false;
-    this.videoInstance = null;
-    this.navElements = null;
-    
-    // Element-Container
-    this.mediaContainer = null;
-    
-    // Initialisierung
-    this.init();
-  }
-  
-  // Initialisierung der Galerie
-  init() {
-    if (!this.modal) {
-      console.error('Modal-Element nicht gefunden');
-      return;
-    }
-    
-    // Event-Listener für Schließen-Button
-    if (this.modalClose) {
-      this.modalClose.addEventListener('click', this.close.bind(this));
-    }
-    
-    // Klick außerhalb des Inhalts schließt das Modal
-    this.modal.addEventListener('click', (e) => {
-      if (e.target === this.modal) {
-        this.close();
-      }
-    });
-    
-    // Touch-Events für Swipe-Funktionalität
-    this.modal.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: true });
-    this.modal.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
-    this.modal.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: true });
-    
-    // Tastaturnavigation
-    document.addEventListener('keydown', this.handleKeyboard.bind(this));
-    
-    // Fenstergrößenänderung
-    window.addEventListener('resize', this.handleResize.bind(this));
-    
-    // Benutzerinterface vorbereiten
-    this.setupUI();
-    
-    // Galerie-Elemente modifizieren, um auf diese Klasse zu verweisen
-    this.modifyGalleryItems();
-  }
-  
-  // UI-Einrichtung mit verbesserten Styling-Methoden
-  setupUI() {
-    // Styling-Elemente
-    this.addStyles(`
-      body.modal-open {
-        overflow: hidden !important;
-        position: fixed !important;
-        width: 100% !important;
-        height: 100% !important;
-      }
-      
-      .gallery-modal {
-        --transition-speed: 300ms;
-        --swipe-color: rgba(255, 255, 255, 0.1);
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.95);
-        z-index: 2000;
-        overflow: hidden;
-        touch-action: none;
-      }
-      
-      .gallery-modal.open {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      
-      .modal-content {
-        position: relative;
-        width: 90%;
-        height: 85vh;
-        max-width: 1400px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden;
-      }
-      
-      .media-container {
-        position: relative;
-        width: 100%;
-        height: 75vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        transition: transform var(--transition-speed) ease-out;
-      }
-      
-      .media-item {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        opacity: 0;
-        transform: translateX(100%);
-        transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease;
-      }
-      
-      .media-item.previous {
-        transform: translateX(-100%);
-        opacity: 0;
-      }
-      
-      .media-item.current {
-        transform: translateX(0);
-        opacity: 1;
-        z-index: 10;
-      }
-      
-      .media-item.next {
-        transform: translateX(100%);
-        opacity: 0;
-      }
-      
-      .media-content {
-        max-width: 100%;
-        max-height: 100%;
-        width: auto;
-        height: auto;
-        object-fit: contain;
-        border-radius: 8px;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
-      }
-      
-      .video-container {
-        position: relative;
-        max-width: 100%;
-        max-height: 100%;
-        width: auto;
-        height: auto;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-      
-      .video-thumbnail {
-        position: relative;
-        cursor: pointer;
-      }
-      
-      .video-play-button {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 70px;
-        height: 70px;
-        background-color: rgba(0, 0, 0, 0.7);
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: white;
-        font-size: 30px;
-        transition: background-color 0.2s;
-      }
-      
-      .video-play-button:hover {
-        background-color: rgba(0, 0, 0, 0.8);
-      }
-      
-      .navigation-controls {
-        position: absolute;
-        bottom: 20px;
-        left: 0;
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        z-index: 20;
-        padding: 0 20px;
-      }
-      
-      .nav-button {
-        width: 50px;
-        height: 50px;
-        background-color: rgba(0, 0, 0, 0.7);
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: white;
-        font-size: 20px;
-        cursor: pointer;
-        transition: background-color 0.2s;
-        border: none;
-        outline: none;
-      }
-      
-      .nav-button:hover {
-        background-color: rgba(0, 0, 0, 0.9);
-      }
-      
-      .counter-indicator {
-        background-color: rgba(0, 0, 0, 0.7);
-        color: white;
-        padding: 5px 15px;
-        border-radius: 20px;
-        font-size: 14px;
-        font-weight: 500;
-      }
-      
-      .swipe-indicator {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: var(--swipe-color);
-        opacity: 0;
-        transition: opacity 150ms ease;
-        pointer-events: none;
-      }
-      
-      .swipe-indicator.left {
-        background: linear-gradient(to right, var(--swipe-color), transparent);
-      }
-      
-      .swipe-indicator.right {
-        background: linear-gradient(to left, var(--swipe-color), transparent);
-      }
-      
-      .swipe-hint {
-        position: absolute;
-        bottom: 60px;
-        left: 0;
-        width: 100%;
-        text-align: center;
-        color: rgba(255, 255, 255, 0.6);
-        font-size: 12px;
-        opacity: 1;
-        transition: opacity 1.5s;
-      }
-      
-      .close-button {
-        position: absolute;
-        top: -50px;
-        right: 0;
-        color: white;
-        font-size: 2.5rem;
-        cursor: pointer;
-        z-index: 30;
-      }
-      
-      @media (max-width: 768px) {
-        .modal-content {
-          height: 80vh;
-        }
-        
-        .media-container {
-          height: 70vh;
-        }
-        
-        .nav-button {
-          width: 40px;
-          height: 40px;
-          font-size: 16px;
-        }
-        
-        .video-play-button {
-          width: 50px;
-          height: 50px;
-          font-size: 24px;
-        }
-        
-        .close-button {
-          top: -40px;
-          font-size: 2rem;
-        }
-        
-        .counter-indicator {
-          font-size: 12px;
-          padding: 4px 12px;
-        }
-      }
-    `);
-    
-    // Klasse zum Modal hinzufügen für verbesserte Selektoren
-    if (this.modal) {
-      this.modal.classList.add('gallery-modal');
-    }
-  }
-  
-  // Hinzufügen von CSS-Styles
-  addStyles(css) {
-    const styleElement = document.createElement('style');
-    styleElement.textContent = css;
-    document.head.appendChild(styleElement);
-  }
-  
-  // Modifizieren der Galerie-Elemente
-  modifyGalleryItems() {
-    // Alle Galerie-Elemente finden
-    const galleryItems = document.querySelectorAll('.gallery-item');
-    
-    // Für jedes Element den Event-Listener neu setzen
-    galleryItems.forEach((item, index) => {
-      // Clone erstellen, um alte Event-Listener zu entfernen
-      const newItem = item.cloneNode(true);
-      item.parentNode.replaceChild(newItem, item);
-      
-      // Neuen Event-Listener hinzufügen
-      newItem.addEventListener('click', () => {
-        this.open(index);
-      });
-    });
-  }
-  
-  // Erstellen des Medien-Containers
-  createMediaContainer() {
-    if (this.mediaContainer) {
-      // Container zurücksetzen
-      this.mediaContainer.innerHTML = '';
-    } else {
-      // Neuen Container erstellen
-      this.mediaContainer = document.createElement('div');
-      this.mediaContainer.className = 'media-container';
-      this.modalContent.appendChild(this.mediaContainer);
-    }
-    
-    // Swipe-Indikator hinzufügen
-    const swipeIndicator = document.createElement('div');
-    swipeIndicator.className = 'swipe-indicator';
-    this.mediaContainer.appendChild(swipeIndicator);
-    this.swipeIndicator = swipeIndicator;
-    
-    return this.mediaContainer;
-  }
-  
-  // Erstellen der Navigations-Elemente
-  createNavigationControls() {
-    // Bestehende Navigation entfernen
-    const existingNav = document.querySelector('.navigation-controls');
-    if (existingNav) {
-      existingNav.remove();
-    }
-    
-    // Container für Navigation
-    const navContainer = document.createElement('div');
-    navContainer.className = 'navigation-controls';
-    
-    // Vorheriges Bild Button
-    const prevButton = document.createElement('button');
-    prevButton.className = 'nav-button prev-button';
-    prevButton.innerHTML = '<i class="fas fa-chevron-left"></i>';
-    prevButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      this.showPrevious();
-    });
-    
-    // Zähler für die Position
-    const counter = document.createElement('div');
-    counter.className = 'counter-indicator';
-    
-    // Nächstes Bild Button
-    const nextButton = document.createElement('button');
-    nextButton.className = 'nav-button next-button';
-    nextButton.innerHTML = '<i class="fas fa-chevron-right"></i>';
-    nextButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      this.showNext();
-    });
-    
-    // Bei mobilen Geräten Swipe-Hinweis anzeigen
-    if (this.isMobile) {
-      const swipeHint = document.createElement('div');
-      swipeHint.className = 'swipe-hint';
-      swipeHint.textContent = 'Wischen zum Navigieren';
-      this.modalContent.appendChild(swipeHint);
-      
-      // Nach einigen Sekunden ausblenden
-      setTimeout(() => {
-        swipeHint.style.opacity = '0';
-      }, 2000);
-    }
-    
-    // Elemente zum Container hinzufügen
-    navContainer.appendChild(prevButton);
-    navContainer.appendChild(counter);
-    navContainer.appendChild(nextButton);
-    
-    // Container zum Modal hinzufügen
-    this.modalContent.appendChild(navContainer);
-    
-    this.navElements = {
-      prevButton,
-      nextButton,
-      counter
-    };
-    
-    return this.navElements;
-  }
-  
-  // Schließen-Button neu erstellen
-  createCloseButton() {
-    // Bestehenden Button entfernen
-    if (this.modalClose) {
-      this.modalClose.remove();
-    }
-    
-    // Neuen Button erstellen
-    const closeButton = document.createElement('div');
-    closeButton.className = 'close-button';
-    closeButton.innerHTML = '&times;';
-    closeButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      this.close();
-    });
-    
-    // Button zum Modal hinzufügen
-    this.modalContent.appendChild(closeButton);
-    this.modalClose = closeButton;
-    
-    return closeButton;
-  }
-  
-  // Zähler aktualisieren
-  updateCounter() {
-    if (!this.navElements || !this.navElements.counter) return;
-    
-    const totalItems = this.items.length;
-    if (totalItems > 0) {
-      this.navElements.counter.textContent = `${this.currentIndex + 1} / ${totalItems}`;
-    }
-  }
-  
-  // Modal öffnen mit bestimmtem Index
-  open(index) {
-    if (this.isAnimating) return;
-    
-    // Aktuellen Index setzen
-    this.currentIndex = this.validateIndex(index);
-    
-    // Modal anzeigen
-    this.modal.classList.add('open');
-    
-    // Body-Klasse für Scrolling-Verhinderung
-    document.body.classList.add('modal-open');
-    
-    // UI-Elemente erstellen
-    this.createMediaContainer();
-    this.createNavigationControls();
-    this.createCloseButton();
-    
-    // Medien laden
-    this.loadMedia(this.currentIndex);
-    
-    // Zähler aktualisieren
-    this.updateCounter();
-  }
-  
-  // Modal schließen
-  close() {
-    // Videos stoppen
-    this.stopAllVideos();
-    
-    // Modal schließen
-    this.modal.classList.remove('open');
-    
-    // Body-Klasse entfernen
-    document.body.classList.remove('modal-open');
-    
-    // Zurücksetzen
-    this.isAnimating = false;
-  }
-  
-  // Alle Videos stoppen
-  stopAllVideos() {
-    const videos = this.modal.querySelectorAll('video');
-    videos.forEach(video => {
-      video.pause();
-      video.currentTime = 0;
-    });
-    this.isVideoPlaying = false;
-    this.videoInstance = null;
-  }
-  
-  // Index validieren
-  validateIndex(index) {
-    if (index < 0) return this.items.length - 1;
-    if (index >= this.items.length) return 0;
-    return index;
-  }
-  
-  // Vorheriges Medium anzeigen
-  showPrevious() {
-    if (this.isAnimating) return;
-    this.navigate(-1);
-  }
-  
-  // Nächstes Medium anzeigen
-  showNext() {
-    if (this.isAnimating) return;
-    this.navigate(1);
-  }
-  
-  // Navigation in eine Richtung
-  navigate(direction) {
-    if (this.isAnimating) return;
-    this.isAnimating = true;
-    
-    // Videos stoppen
-    this.stopAllVideos();
-    
-    // Neuen Index berechnen
-    const newIndex = this.validateIndex(this.currentIndex + direction);
-    
-    // Animation der Richtung
-    const currentItem = this.mediaContainer.querySelector('.media-item.current');
-    if (currentItem) {
-      if (direction > 0) {
-        currentItem.classList.remove('current');
-        currentItem.classList.add('previous');
-      } else {
-        currentItem.classList.remove('current');
-        currentItem.classList.add('next');
-      }
-    }
-    
-    // Neues Medium laden
-    this.loadMedia(newIndex);
-    
-    // Nach Animation zurücksetzen
-    setTimeout(() => {
-      this.isAnimating = false;
-      
-      // Alte Items entfernen, die nicht mehr sichtbar sind
-      const oldItems = this.mediaContainer.querySelectorAll('.media-item:not(.current)');
-      oldItems.forEach(item => item.remove());
-      
-    }, 300); // Übereinstimmend mit CSS-Transition
-    
-    // Index aktualisieren
-    this.currentIndex = newIndex;
-    
-    // Zähler aktualisieren
-    this.updateCounter();
-  }
-  
-  // Medium laden
-  loadMedia(index) {
-    if (!this.items[index]) return;
-    
-    const item = this.items[index];
-    const mediaType = item.type || 'image';
-    const mediaSource = item.source || item.image;
-    
-    // Medien-Item erstellen
-    const mediaItem = document.createElement('div');
-    mediaItem.className = 'media-item current';
-    
-    if (mediaType === 'video') {
-      // Video-Container erstellen
-      const videoContainer = document.createElement('div');
-      videoContainer.className = 'video-container';
-      
-      // Thumbnail erstellen
-      const thumbnail = document.createElement('div');
-      thumbnail.className = 'video-thumbnail';
-      
-      // Thumbnail-Bild
-      const thumbnailImg = document.createElement('img');
-      thumbnailImg.className = 'media-content';
-      thumbnailImg.src = this.getVideoThumbnailPlaceholder();
-      
-      // Play-Button
-      const playButton = document.createElement('div');
-      playButton.className = 'video-play-button';
-      playButton.innerHTML = '<i class="fas fa-play"></i>';
-      
-      // Zusammenfügen
-      thumbnail.appendChild(thumbnailImg);
-      thumbnail.appendChild(playButton);
-      videoContainer.appendChild(thumbnail);
-      
-      // Klick-Handler zum Abspielen des Videos
-      thumbnail.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.playVideo(mediaSource, videoContainer);
-      });
-      
-      // Video-Thumbnail generieren
-      this.generateVideoThumbnail(mediaSource, (thumbnailUrl) => {
-        if (thumbnailUrl) {
-          thumbnailImg.src = thumbnailUrl;
-        }
-      });
-      
-      mediaItem.appendChild(videoContainer);
-    } else {
-      // Bild erstellen
-      const img = document.createElement('img');
-      img.className = 'media-content';
-      img.src = mediaSource;
-      img.alt = item.title || '';
-      
-      // Verhindern, dass Klick auf das Bild das Modal schließt
-      img.addEventListener('click', (e) => {
-        e.stopPropagation();
-      });
-      
-      mediaItem.appendChild(img);
-    }
-    
-    // Zum Container hinzufügen
-    this.mediaContainer.appendChild(mediaItem);
-  }
-  
-  // Video abspielen
-  playVideo(source, container) {
-    // Thumbnail entfernen
-    const thumbnail = container.querySelector('.video-thumbnail');
-    if (thumbnail) {
-      thumbnail.remove();
-    }
-    
-    // Video erstellen
-    const video = document.createElement('video');
-    video.className = 'media-content';
-    video.controls = true;
-    video.autoplay = true;
-    video.muted = false;
-    video.loop = true;
-    video.src = source;
-    video.volume = 0.15;
-    
-    // Attribute für mobiles Abspielen
-    video.setAttribute('playsinline', '');
-    video.setAttribute('webkit-playsinline', '');
-    
-    // Verhindern, dass Klick auf das Video das Modal schließt
-    video.addEventListener('click', (e) => {
-      e.stopPropagation();
-    });
-    
-    // Video zum Container hinzufügen
-    container.appendChild(video);
-    
-    // Video-Status setzen
-    this.isVideoPlaying = true;
-    this.videoInstance = video;
-    
-    // Video abspielen
-    video.play().catch(err => {
-      console.error('Video konnte nicht abgespielt werden:', err);
-    });
-  }
-  
-  // Placeholder für Video-Thumbnail
-  getVideoThumbnailPlaceholder() {
-    return 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" viewBox="0 0 300 200"><rect width="300" height="200" fill="%23333"/><text x="150" y="100" font-family="Arial" font-size="14" fill="%23fff" text-anchor="middle">Video wird geladen...</text></svg>';
-  }
-  
-  // Video-Thumbnail generieren
-  generateVideoThumbnail(videoSrc, callback) {
-    const tempVideo = document.createElement('video');
-    
-    // Thumbnail erzeugen, sobald das Video geladen ist
-    tempVideo.addEventListener('loadeddata', () => {
-      // Zum optimalen Frame springen (z.B. 0.5 Sekunden)
-      tempVideo.currentTime = 0.5;
-    });
-    
-    // Wenn zum Frame gesprungen wurde, Canvas erstellen
-    tempVideo.addEventListener('seeked', () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = tempVideo.videoWidth;
-      canvas.height = tempVideo.videoHeight;
-      
-      // Frame zeichnen
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(tempVideo, 0, 0, canvas.width, canvas.height);
-      
-      // URL des Thumbnails zurückgeben
-      const thumbnailUrl = canvas.toDataURL('image/jpeg');
-      callback(thumbnailUrl);
-      
-      // Aufräumen
-      tempVideo.remove();
-    });
-    
-    // Fehlerbehandlung
-    tempVideo.addEventListener('error', () => {
-      console.error('Fehler beim Laden des Videos:', videoSrc);
-      callback('');
-    });
-    
-    // Video laden
-    tempVideo.crossOrigin = 'anonymous';
-    tempVideo.src = videoSrc;
-    tempVideo.load();
-    tempVideo.style.display = 'none';
-    document.body.appendChild(tempVideo);
-  }
-  
-  // Touch-Start-Ereignis
-  handleTouchStart(event) {
-    // Touch-Startposition speichern
-    this.touchStartX = event.touches[0].clientX;
-    this.touchStartY = event.touches[0].clientY;
-    this.touchMoved = false;
-  }
-  
-  // Touch-Move-Ereignis mit visueller Rückmeldung
-  handleTouchMove(event) {
-    if (!this.touchStartX) return;
-    
-    // Wenn ein Video abgespielt wird, keine Swipe-Gesten
-    if (this.isVideoPlaying) return;
-    
-    // Aktuelle Position
-    const touchX = event.touches[0].clientX;
-    const touchY = event.touches[0].clientY;
-    
-    // Differenz berechnen
-    const diffX = touchX - this.touchStartX;
-    const diffY = Math.abs(touchY - this.touchStartY);
-    
-    // Nur horizontale Bewegungen verarbeiten, wenn die vertikale Bewegung nicht zu groß ist
-    if (Math.abs(diffX) > 10 && diffY < 50) {
-      // Verhindern des Scrollens
-      event.preventDefault();
-      
-      // Visuelle Rückmeldung
-      if (this.swipeIndicator) {
-        // Transparenz basierend auf der Swipe-Distanz
-        const opacity = Math.min(Math.abs(diffX) / 200, 0.5);
-        this.swipeIndicator.style.opacity = opacity;
-        
-        // Links/Rechts-Indikator
-        if (diffX > 0) {
-          this.swipeIndicator.classList.add('right');
-          this.swipeIndicator.classList.remove('left');
-        } else {
-          this.swipeIndicator.classList.add('left');
-          this.swipeIndicator.classList.remove('right');
-        }
-      }
-      
-      this.touchMoved = true;
-    }
-  }
-  
-  // Touch-End-Ereignis
-  handleTouchEnd(event) {
-    if (!this.touchStartX || !this.touchMoved) return;
-    
-    // Wenn ein Video abgespielt wird, keine Swipe-Gesten
-    if (this.isVideoPlaying) return;
-    
-    // Endposition
-    const touchEndX = event.changedTouches[0].clientX;
-    const touchEndY = event.changedTouches[0].clientY;
-    
-    // Differenz berechnen
-    const diffX = touchEndX - this.touchStartX;
-    const diffY = Math.abs(touchEndY - this.touchStartY);
-    
-    // Visuellen Indikator zurücksetzen
-    if (this.swipeIndicator) {
-      this.swipeIndicator.style.opacity = 0;
-      this.swipeIndicator.classList.remove('left', 'right');
-    }
-    
-    // Nur horizontale Bewegungen, wenn die vertikale Bewegung nicht zu groß ist
-    if (Math.abs(diffX) > this.swipeThreshold && diffY < 50) {
-      if (diffX > 0) {
-        // Nach rechts - vorheriges Bild
-        this.showPrevious();
-      } else {
-        // Nach links - nächstes Bild
-        this.showNext();
-      }
-    }
-    
-    // Zurücksetzen
-    this.touchStartX = 0;
-    this.touchStartY = 0;
-    this.touchMoved = false;
-  }
-  
-  // Keyboard-Navigation
-  handleKeyboard(event) {
-    // Nur reagieren, wenn das Modal geöffnet ist
-    if (!this.modal.classList.contains('open')) return;
-    
-    switch (event.key) {
-      case 'ArrowLeft':
-        this.showPrevious();
-        break;
-      case 'ArrowRight':
-        this.showNext();
-        break;
-      case 'Escape':
-        this.close();
-        break;
-    }
-  }
-  
-  // Fenstergrößenänderung
-  handleResize() {
-    // Mobilen Status aktualisieren
-    this.isMobile = window.innerWidth <= 768;
-    
-    // Swipe-Schwellenwert anpassen
-    this.swipeThreshold = this.isMobile ? 50 : 100;
-  }
 }
 
-// Initialisierung nach dem Laden der Seite
-document.addEventListener('DOMContentLoaded', () => {
-  // Bestehende Funktion sichern
-  const originalCreateGallery = window.createGallery;
-  
-  // Neue Galerie-Funktion
-  window.createGallery = function() {
-    // Originale Funktion aufrufen
-    if (typeof originalCreateGallery === 'function') {
-      originalCreateGallery();
-    }
-    
-    // Nach kurzer Verzögerung neue Galerie initialisieren
-    setTimeout(() => {
-      // Neue Galerie-Instanz erstellen
-      window.galleryModal = new GallerySwipeModal();
-    }, 500);
-  };
-  
-  // Falls die Seite bereits geladen ist
-  if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    // Galerie direkt initialisieren
-    window.galleryModal = new GallerySwipeModal();
-  }
-});
-
-//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-// ===== IMPROVED GALLERY JAVASCRIPT =====
-
-// Gallery Data - Deine bestehenden Daten
-const improvedGalleryItems = [
-    {
-        id: 1,
-        image: '/static/css/images/gallery/alex1.jpeg',
-        title: 'Geburtstagsfeier',
-        type: 'image'
-    },
-    {
-        id: 2,
-        image: '/static/css/images/gallery/alex2.png',
-        title: 'Weiße Socken zu den Schuhen',
-        type: 'image'
-    },
-    {
-        id: 3,
-        source: '/static/css/images/gallery/alex10.mp4',
-        title: 'Klassischer Handschlag',
-        type: 'video'
-    },
-    {
-        id: 4,
-        image: '/static/css/images/gallery/alex3.jpeg',
-        title: 'Potsdam Oktoberfest',
-        type: 'image'
-    },
-    {
-        id: 5,
-        image: '/static/css/images/gallery/alex4.jpeg',
-        title: 'Baumblüte',
-        type: 'image'
-    },
-    {
-        id: 6,
-        image: '/static/css/images/gallery/alex5.jpeg',
-        title: 'Abend mit Freunden',
-        type: 'image'
-    },
-    {
-        id: 7,
-        image: '/static/css/images/gallery/alex6.jpeg',
-        title: 'Ready machen für Berlin',
-        type: 'image'
-    },
-    {
-        id: 8,
-        source: '/static/css/images/gallery/alex11.mp4',
-        title: 'World Club Dome abkühlen',
-        type: 'video'
-    },
-    {
-        id: 9,
-        image: '/static/css/images/gallery/alex7.jpeg',
-        title: 'SMS Festival',
-        type: 'image'
-    },
-    {
-        id: 10,
-        image: '/static/css/images/gallery/alex8.jpeg',
-        title: 'Malle',
-        type: 'image'
-    },
-    {
-        id: 11,
-        source: '/static/css/images/gallery/alex12.mp4',
-        title: 'Aftern nach Geburtstag',
-        type: 'video'
-    },
-    {
-        id: 12,
-        image: '/static/css/images/gallery/alex9.jpeg',
-        title: 'World Club Dome',
-        type: 'image'
-    }
-];
-
+// ===== IMPROVED GALLERY CLASS =====
 class ImprovedGallery {
     constructor() {
         this.currentIndex = 0;
-        this.items = improvedGalleryItems;
+        this.items = galleryItems;
         this.modal = document.getElementById('improved-modal');
         this.modalMedia = document.getElementById('improved-modal-media');
         this.modalClose = document.getElementById('improved-modal-close');
         this.modalPrev = document.getElementById('improved-modal-prev');
         this.modalNext = document.getElementById('improved-modal-next');
         this.modalCounter = document.getElementById('improved-modal-counter');
-        this.galleryGrid = document.getElementById('gallery-grid');
         
-        // Touch-Variablen
+        // Touch variables
         this.touchStartX = 0;
         this.touchStartY = 0;
-        this.touchEndX = 0;
-        this.touchEndY = 0;
         this.isSwiping = false;
         this.swipeThreshold = 50;
         
-        // Check if elements exist
-        if (!this.modal || !this.galleryGrid) {
-            console.error('Required gallery elements not found');
-            return;
+        if (this.modal && elements.galleryGrid) {
+            this.init();
         }
-        
-        this.init();
     }
 
     init() {
-        this.createGallery();
         this.bindEvents();
-    }
-
-    createGallery() {
-        // Clear existing content
-        this.galleryGrid.innerHTML = '';
-        
-        this.items.forEach((item, index) => {
-            const galleryItem = document.createElement('div');
-            galleryItem.className = 'gallery-item fade-in';
-            galleryItem.addEventListener('click', () => this.openModal(index));
-
-            if (item.type === 'video') {
-                // Video Thumbnail erstellen
-                const videoContainer = document.createElement('div');
-                videoContainer.className = 'video-thumbnail-container';
-                
-                const video = document.createElement('video');
-                video.src = item.source;
-                video.muted = true;
-                video.preload = 'metadata';
-                video.addEventListener('loadedmetadata', () => {
-                    // Set video to first frame
-                    video.currentTime = 0.1;
-                });
-                
-                const playButton = document.createElement('button');
-                playButton.className = 'video-play-button';
-                playButton.innerHTML = '<i class="fas fa-play"></i>';
-                playButton.setAttribute('aria-label', 'Video abspielen');
-                
-                const indicator = document.createElement('div');
-                indicator.className = 'video-indicator';
-                indicator.innerHTML = '<i class="fas fa-video"></i> Video';
-                
-                videoContainer.appendChild(video);
-                videoContainer.appendChild(playButton);
-                videoContainer.appendChild(indicator);
-                galleryItem.appendChild(videoContainer);
-            } else {
-                // Bild erstellen
-                const img = document.createElement('img');
-                img.src = item.image;
-                img.alt = item.title;
-                img.loading = 'lazy';
-                
-                // Error handling für Bilder
-                img.addEventListener('error', () => {
-                    console.error(`Failed to load image: ${item.image}`);
-                    img.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><rect width="300" height="300" fill="%23333"/><text x="150" y="150" font-family="Arial" font-size="14" fill="%23fff" text-anchor="middle">Bild nicht verfügbar</text></svg>';
-                });
-                
-                galleryItem.appendChild(img);
-            }
-
-            // Overlay hinzufügen
-            const overlay = document.createElement('div');
-            overlay.className = 'gallery-overlay';
-            const title = document.createElement('h3');
-            title.className = 'gallery-title';
-            title.textContent = item.title;
-            overlay.appendChild(title);
-            galleryItem.appendChild(overlay);
-
-            this.galleryGrid.appendChild(galleryItem);
-        });
-
-        // Trigger fade-in animation
-        setTimeout(() => {
-            document.querySelectorAll('.gallery-item').forEach(item => {
-                item.classList.add('active');
-            });
-        }, 100);
+        this.attachGalleryListeners();
     }
 
     bindEvents() {
-        // Modal schließen
         if (this.modalClose) {
             this.modalClose.addEventListener('click', () => this.closeModal());
         }
@@ -2239,7 +812,6 @@ class ImprovedGallery {
             if (e.target === this.modal) this.closeModal();
         });
 
-        // Navigation
         if (this.modalPrev) {
             this.modalPrev.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -2254,7 +826,7 @@ class ImprovedGallery {
             });
         }
 
-        // Tastatur-Navigation
+        // Keyboard navigation
         document.addEventListener('keydown', (e) => {
             if (!this.modal.classList.contains('active')) return;
             
@@ -2274,23 +846,27 @@ class ImprovedGallery {
             }
         });
 
-        // Touch-Events für Swipe
+        // Touch events
         this.modal.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: true });
         this.modal.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
         this.modal.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: true });
     }
 
+    attachGalleryListeners() {
+        setTimeout(() => {
+            const galleryItems = document.querySelectorAll('.gallery-item');
+            galleryItems.forEach((item, index) => {
+                item.addEventListener('click', () => this.openModal(index));
+            });
+        }, 500);
+    }
+
     openModal(index) {
         this.currentIndex = index;
-        
-        // Prevent pull-to-refresh and browser navigation
-        this.preventOverscroll();
-        
         this.showMedia();
         this.modal.classList.add('active');
         document.body.classList.add('improved-modal-open');
         
-        // Swipe-Hinweis auf Mobile anzeigen
         if (window.innerWidth <= 768) {
             this.showSwipeHint();
         }
@@ -2300,21 +876,12 @@ class ImprovedGallery {
         this.modal.classList.remove('active');
         document.body.classList.remove('improved-modal-open');
         
-        // Re-enable overscroll
-        this.restoreOverscroll();
-        
-        // Alle Videos stoppen
+        // Stop all videos
         const videos = this.modal.querySelectorAll('video');
         videos.forEach(video => {
             video.pause();
             video.currentTime = 0;
         });
-        
-        // Swipe hint entfernen falls vorhanden
-        const swipeHint = this.modal.querySelector('.swipe-hint');
-        if (swipeHint) {
-            swipeHint.remove();
-        }
     }
 
     showMedia() {
@@ -2323,47 +890,31 @@ class ImprovedGallery {
         
         this.updateCounter();
 
-        // Altes Video entfernen
+        // Remove existing video
         const existingVideo = this.modal.querySelector('video:not(#improved-modal-media)');
         if (existingVideo) {
             existingVideo.remove();
         }
 
         if (item.type === 'video') {
-            // Bild verstecken
             this.modalMedia.style.display = 'none';
             
-            // Video erstellen
             const video = document.createElement('video');
             video.className = 'improved-modal-media';
             video.controls = true;
             video.autoplay = false;
             video.muted = false;
             video.loop = true;
-            video.src = item.source;
+            video.src = item.source || item.image;
             video.volume = 0.2;
             video.setAttribute('playsinline', '');
-            video.setAttribute('webkit-playsinline', '');
             
-            // Video verhindern das Modal zu schließen
             video.addEventListener('click', (e) => e.stopPropagation());
             
-            // Error handling für Videos
-            video.addEventListener('error', () => {
-                console.error(`Failed to load video: ${item.source}`);
-                // Fallback: zeige einen Fehler-Platzhalter
-                video.style.display = 'none';
-                this.modalMedia.style.display = 'block';
-                this.modalMedia.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"><rect width="400" height="300" fill="%23333"/><text x="200" y="150" font-family="Arial" font-size="16" fill="%23fff" text-anchor="middle">Video nicht verfügbar</text></svg>';
-                this.modalMedia.alt = 'Video nicht verfügbar';
-            });
-            
-            // Video zur Modal hinzufügen
             this.modal.querySelector('.improved-modal-content').insertBefore(video, this.modalCounter);
         } else {
-            // Video verstecken, Bild anzeigen
             this.modalMedia.style.display = 'block';
-            this.modalMedia.src = item.image;
+            this.modalMedia.src = item.image || item.source;
             this.modalMedia.alt = item.title;
         }
     }
@@ -2385,7 +936,6 @@ class ImprovedGallery {
     }
 
     showSwipeHint() {
-        // Überprüfen ob bereits ein Hinweis existiert
         if (this.modal.querySelector('.swipe-hint')) return;
         
         const hint = document.createElement('div');
@@ -2393,7 +943,6 @@ class ImprovedGallery {
         hint.textContent = '← Wischen zum Navigieren →';
         this.modal.querySelector('.improved-modal-content').appendChild(hint);
         
-        // Hinweis nach 3 Sekunden entfernen
         setTimeout(() => {
             if (hint.parentNode) {
                 hint.remove();
@@ -2401,9 +950,7 @@ class ImprovedGallery {
         }, 3000);
     }
 
-    // Touch-Events für Swipe-Funktionalität
     handleTouchStart(e) {
-        // Verhindere Standard-Browser-Verhalten
         if (e.target.closest('.improved-modal-content')) {
             this.touchStartX = e.touches[0].clientX;
             this.touchStartY = e.touches[0].clientY;
@@ -2414,16 +961,14 @@ class ImprovedGallery {
     handleTouchMove(e) {
         if (!this.touchStartX || !this.touchStartY) return;
 
-        this.touchEndX = e.touches[0].clientX;
-        this.touchEndY = e.touches[0].clientY;
+        const touchEndX = e.touches[0].clientX;
+        const touchEndY = e.touches[0].clientY;
+        const diffX = this.touchStartX - touchEndX;
+        const diffY = this.touchStartY - touchEndY;
 
-        const diffX = this.touchStartX - this.touchEndX;
-        const diffY = this.touchStartY - this.touchEndY;
-
-        // Nur horizontale Swipes verarbeiten und Browser-Navigation verhindern
         if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 10) {
-            e.preventDefault(); // Scrollen und Browser-Navigation verhindern
-            e.stopPropagation(); // Event-Bubbling stoppen
+            e.preventDefault();
+            e.stopPropagation();
             this.isSwiping = true;
             this.modal.classList.add('swiping');
         }
@@ -2431,104 +976,464 @@ class ImprovedGallery {
 
     handleTouchEnd(e) {
         if (!this.isSwiping) {
-            // Reset touch coordinates
             this.touchStartX = 0;
             this.touchStartY = 0;
             return;
         }
 
-        const diffX = this.touchStartX - this.touchEndX;
+        const touchEndX = e.changedTouches[0].clientX;
+        const diffX = this.touchStartX - touchEndX;
         
         this.modal.classList.remove('swiping');
 
         if (Math.abs(diffX) > this.swipeThreshold) {
             if (diffX > 0) {
-                this.nextItem(); // Nach links wischen = nächstes Bild
+                this.nextItem();
             } else {
-                this.previousItem(); // Nach rechts wischen = vorheriges Bild
+                this.previousItem();
             }
         }
 
-        // Reset
         this.touchStartX = 0;
         this.touchStartY = 0;
-        this.touchEndX = 0;
-        this.touchEndY = 0;
         this.isSwiping = false;
     }
+}
 
-    // Prevent overscroll behavior
-    preventOverscroll() {
-        // Store current body position to restore later
-        this.bodyScrollTop = window.pageYOffset || document.documentElement.scrollTop;
+// ===== MOBILE TINDER-STYLE GALLERY =====
+class TinderGallery {
+    constructor() {
+        this.currentIndex = 0;
+        this.items = galleryItems;
+        this.swipedCards = [];
+        this.isDragging = false;
+        this.startX = 0;
+        this.startY = 0;
+        this.currentX = 0;
+        this.currentY = 0;
+        this.currentCard = null;
         
-        // Prevent pull-to-refresh and overscroll
-        document.body.style.position = 'fixed';
-        document.body.style.top = `-${this.bodyScrollTop}px`;
-        document.body.style.width = '100%';
+        if (window.innerWidth <= 768) {
+            this.init();
+        }
+    }
+
+    init() {
+        this.createTinderGallery();
+        this.attachEventListeners();
+    }
+
+    createTinderGallery() {
+        const gallerySection = document.querySelector('.gallery-container');
+        if (!gallerySection) return;
+
+        // Erstelle Tinder Container
+        const tinderContainer = document.createElement('div');
+        tinderContainer.className = 'tinder-gallery-mobile';
+        tinderContainer.innerHTML = `
+            <div class="tinder-card-stack" id="tinder-card-stack"></div>
+            <div class="swipe-indicator left"><i class="fas fa-times"></i></div>
+            <div class="swipe-indicator right"><i class="fas fa-heart"></i></div>
+            <div class="tinder-end-screen" id="tinder-end-screen">
+                <i class="fas fa-check-circle"></i>
+                <h3>Alle Bilder gesehen!</h3>
+                <p>Du hast alle Erinnerungen durchgeschaut</p>
+                <button class="btn" onclick="window.tinderGallery.restart()">
+                    <i class="fas fa-redo"></i> Nochmal
+                </button>
+            </div>
+        `;
+
+        // Füge nach dem Gallery Grid ein
+        const galleryGrid = document.getElementById('gallery-grid');
+        if (galleryGrid && galleryGrid.parentNode) {
+            galleryGrid.parentNode.insertBefore(tinderContainer, galleryGrid);
+        }
+
+        // Erstelle Karten
+        this.createCards();
+
+        // Erstelle Action Buttons
+        const actions = document.createElement('div');
+        actions.className = 'tinder-actions';
+        actions.innerHTML = `
+            <button class="tinder-action-btn undo" onclick="window.tinderGallery.undo()">
+                <i class="fas fa-undo"></i>
+            </button>
+            <button class="tinder-action-btn nope" onclick="window.tinderGallery.swipeLeft()">
+                <i class="fas fa-times"></i>
+            </button>
+            <button class="tinder-action-btn like" onclick="window.tinderGallery.swipeRight()">
+                <i class="fas fa-heart"></i>
+            </button>
+        `;
+        tinderContainer.appendChild(actions);
+    }
+
+    createCards() {
+        const stack = document.getElementById('tinder-card-stack');
+        if (!stack) return;
+
+        stack.innerHTML = '';
+
+        this.items.forEach((item, index) => {
+            const card = document.createElement('div');
+            card.className = 'tinder-card';
+            card.dataset.index = index;
+
+            const isVideo = item.type === 'video';
+            const mediaHtml = isVideo
+                ? `<video src="${item.source || item.image}" autoplay muted loop playsinline></video>`
+                : `<img src="${item.image || item.source}" alt="${item.title}">`;
+
+            card.innerHTML = mediaHtml;
+
+            stack.appendChild(card);
+        });
+
+        this.currentCard = stack.querySelector('.tinder-card:first-child');
+    }
+
+    attachEventListeners() {
+        const stack = document.getElementById('tinder-card-stack');
+        if (!stack) return;
+
+        // Touch Events
+        stack.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: false });
+        stack.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
+        stack.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: false });
+
+        // Mouse Events (für Testing)
+        stack.addEventListener('mousedown', (e) => this.handleMouseDown(e));
+        document.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+        document.addEventListener('mouseup', (e) => this.handleMouseUp(e));
+    }
+
+    handleTouchStart(e) {
+        if (e.target.closest('.tinder-action-btn')) return;
         
-        // Prevent touchmove on document level when modal is open
-        this.preventTouchMove = (e) => {
-            // Allow touch events only within modal content
-            if (!e.target.closest('.improved-modal-content')) {
-                e.preventDefault();
+        const touch = e.touches[0];
+        this.startDrag(touch.clientX, touch.clientY);
+        e.preventDefault();
+    }
+
+    handleTouchMove(e) {
+        if (!this.isDragging) return;
+        
+        const touch = e.touches[0];
+        this.drag(touch.clientX, touch.clientY);
+        e.preventDefault();
+    }
+
+    handleTouchEnd(e) {
+        if (!this.isDragging) return;
+        this.endDrag();
+    }
+
+    handleMouseDown(e) {
+        if (e.target.closest('.tinder-action-btn')) return;
+        this.startDrag(e.clientX, e.clientY);
+    }
+
+    handleMouseMove(e) {
+        if (!this.isDragging) return;
+        this.drag(e.clientX, e.clientY);
+    }
+
+    handleMouseUp(e) {
+        if (!this.isDragging) return;
+        this.endDrag();
+    }
+
+    startDrag(x, y) {
+        this.isDragging = true;
+        this.startX = x;
+        this.startY = y;
+        this.currentCard = document.querySelector('.tinder-card:first-child');
+        if (this.currentCard) {
+            this.currentCard.style.transition = 'none';
+        }
+    }
+
+    drag(x, y) {
+        if (!this.currentCard) return;
+
+        this.currentX = x;
+        this.currentY = y;
+        
+        const deltaX = x - this.startX;
+        const deltaY = y - this.startY;
+        const rotation = deltaX * 0.1;
+
+        this.currentCard.style.transform = `translate(${deltaX}px, ${deltaY}px) rotate(${rotation}deg)`;
+
+        // Zeige Swipe Indikatoren
+        const leftIndicator = document.querySelector('.swipe-indicator.left');
+        const rightIndicator = document.querySelector('.swipe-indicator.right');
+
+        if (Math.abs(deltaX) > 50) {
+            if (deltaX < 0) {
+                leftIndicator.classList.add('show');
+                rightIndicator.classList.remove('show');
+            } else {
+                rightIndicator.classList.add('show');
+                leftIndicator.classList.remove('show');
             }
-        };
-        
-        document.addEventListener('touchmove', this.preventTouchMove, { passive: false });
-    }
-
-    // Restore overscroll behavior
-    restoreOverscroll() {
-        // Remove event listener
-        if (this.preventTouchMove) {
-            document.removeEventListener('touchmove', this.preventTouchMove);
-        }
-        
-        // Restore body position
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.width = '';
-        
-        // Restore scroll position
-        if (this.bodyScrollTop !== undefined) {
-            window.scrollTo(0, this.bodyScrollTop);
+        } else {
+            leftIndicator.classList.remove('show');
+            rightIndicator.classList.remove('show');
         }
     }
-}
 
-// Globale Variable für die Galerie-Instanz
-let improvedGalleryInstance = null;
+    endDrag() {
+        if (!this.currentCard) return;
 
-// Funktion zum Initialisieren der verbesserten Galerie
-function initImprovedGallery() {
-    // Alte Galerie-Funktionalität deaktivieren falls vorhanden
-    const oldModal = document.getElementById('galleryModal');
-    if (oldModal) {
-        oldModal.style.display = 'none';
+        this.isDragging = false;
+        const deltaX = this.currentX - this.startX;
+
+        // Swipe Threshold
+        if (Math.abs(deltaX) > 100) {
+            if (deltaX < 0) {
+                this.animateSwipe('left');
+            } else {
+                this.animateSwipe('right');
+            }
+        } else {
+            // Zurück zur Mitte
+            this.currentCard.style.transition = 'transform 0.3s ease';
+            this.currentCard.style.transform = '';
+        }
+
+        // Verstecke Indikatoren
+        document.querySelectorAll('.swipe-indicator').forEach(ind => {
+            ind.classList.remove('show');
+        });
     }
-    
-    // Neue Galerie initialisieren
-    if (!improvedGalleryInstance) {
-        improvedGalleryInstance = new ImprovedGallery();
-    }
-}
 
-// Event-Listener für DOM-Bereitschaft
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initImprovedGallery);
-} else {
-    // DOM ist bereits geladen
-    initImprovedGallery();
-}
+    animateSwipe(direction) {
+        if (!this.currentCard) return;
 
-// Bestehende createGallery-Funktion überschreiben falls vorhanden
-if (typeof window.createGallery === 'function') {
-    const originalCreateGallery = window.createGallery;
-    window.createGallery = function() {
-        // Nach kurzer Verzögerung neue Galerie initialisieren
+        this.currentCard.classList.add(`swiped-${direction}`);
+        
+        // Speichere geswiped Card
+        this.swipedCards.push({
+            index: parseInt(this.currentCard.dataset.index),
+            direction: direction,
+            element: this.currentCard
+        });
+
         setTimeout(() => {
-            initImprovedGallery();
-        }, 100);
-    };
+            if (this.currentCard && this.currentCard.parentNode) {
+                this.currentCard.remove();
+            }
+            
+            this.currentIndex++;
+            this.currentCard = document.querySelector('.tinder-card:first-child');
+
+            // Prüfe ob alle Karten geswiped wurden
+            if (!this.currentCard) {
+                this.showEndScreen();
+            }
+        }, 500);
+    }
+
+    swipeLeft() {
+        this.currentCard = document.querySelector('.tinder-card:first-child');
+        if (!this.currentCard) return;
+
+        this.currentCard.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+        this.animateSwipe('left');
+    }
+
+    swipeRight() {
+        this.currentCard = document.querySelector('.tinder-card:first-child');
+        if (!this.currentCard) return;
+
+        this.currentCard.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+        this.animateSwipe('right');
+    }
+
+    undo() {
+        if (this.swipedCards.length === 0) return;
+
+        const lastCard = this.swipedCards.pop();
+        const stack = document.getElementById('tinder-card-stack');
+        
+        if (stack) {
+            // Erstelle Karte neu
+            const card = this.createSingleCard(lastCard.index);
+            stack.insertBefore(card, stack.firstChild);
+            
+            // Animation
+            setTimeout(() => {
+                card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+                card.classList.remove(`swiped-${lastCard.direction}`);
+            }, 10);
+
+            this.currentIndex--;
+            this.currentCard = card;
+        }
+    }
+
+    createSingleCard(index) {
+        const item = this.items[index];
+        const card = document.createElement('div');
+        card.className = 'tinder-card';
+        card.dataset.index = index;
+
+        const isVideo = item.type === 'video';
+        const mediaHtml = isVideo
+            ? `<video src="${item.source || item.image}" autoplay muted loop playsinline></video>`
+            : `<img src="${item.image || item.source}" alt="${item.title}">`;
+
+        card.innerHTML = mediaHtml;
+
+        return card;
+    }
+
+    showEndScreen() {
+        const endScreen = document.getElementById('tinder-end-screen');
+        if (endScreen) {
+            endScreen.classList.add('show');
+        }
+    }
+
+    restart() {
+        this.currentIndex = 0;
+        this.swipedCards = [];
+        
+        const endScreen = document.getElementById('tinder-end-screen');
+        if (endScreen) {
+            endScreen.classList.remove('show');
+        }
+
+        this.createCards();
+        this.currentCard = document.querySelector('.tinder-card:first-child');
+    }
 }
+
+// ===== INITIALIZATION =====
+document.addEventListener('DOMContentLoaded', function() {
+    initVersionManagement();
+    enhanceLogo();
+    initMobileMenu();
+    initScrollEvents();
+    initSmoothScrolling();
+    
+    createGallery();
+    createClubCards();
+    createTopLists();
+    
+    // NEU: Tinder Gallery für Mobile
+    setTimeout(() => {
+        initTinderGallery();
+    }, 1000);
+    
+    setTimeout(() => {
+        window.galleryModal = new ImprovedGallery();
+    }, 600);
+    
+    setTimeout(() => {
+        animateRatingBars();
+    }, 1000);
+});
+
+// Initialize when page loads
+window.addEventListener('load', () => {
+    // Initialize Three.js background
+    initThreeBackground();
+    
+    // Activate initial fade elements
+    elements.fadeElements.forEach(el => {
+        const elementTop = el.getBoundingClientRect().top;
+        const windowHeight = window.innerHeight;
+        
+        if (elementTop < windowHeight) {
+            el.classList.add('active');
+        }
+    });
+});
+
+// Make functions globally available
+window.createGallery = createGallery;
+window.createClubCards = createClubCards;
+window.toggleDetails = toggleDetails;
+window.galleryItems = galleryItems;
+
+// Track Tinder Gallery initialization
+let tinderGalleryInitialized = false;
+
+// Initialisiere Tinder Gallery auf Mobile
+function initTinderGallery() {
+    if (window.innerWidth <= 768) {
+        window.tinderGallery = new TinderGallery();
+        tinderGalleryInitialized = true;
+    }
+}
+
+// Helper Function für Mobile Club Cards
+function getStarsFromRating(rating) {
+    const fullStars = Math.floor(rating / 20);
+    const halfStar = (rating % 20) >= 10;
+    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+    
+    return '★'.repeat(fullStars) + 
+           (halfStar ? '☆' : '') + 
+           '☆'.repeat(emptyStars);
+}
+
+function toggleMobileClubDetails(card) {
+    const isExpanded = card.classList.contains('expanded');
+    
+    // Schließe alle anderen Cards
+    document.querySelectorAll('.club-card.expanded').forEach(otherCard => {
+        if (otherCard !== card) {
+            otherCard.classList.remove('expanded');
+        }
+    });
+    
+    // Toggle aktuelle Card
+    card.classList.toggle('expanded');
+    
+    // Animiere die Rating-Bars wenn geöffnet
+    if (!isExpanded) {
+        setTimeout(() => {
+            animateMobileRatingBars(card);
+        }, 200);
+        
+        // Smooth scroll zur Card
+        setTimeout(() => {
+            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+    }
+}
+
+function animateMobileRatingBars(card) {
+    const fills = card.querySelectorAll('.rating-fill-mobile');
+    fills.forEach(fill => {
+        const width = fill.getAttribute('data-width');
+        fill.style.width = width;
+    });
+}
+
+// Track current layout state
+let currentLayout = window.innerWidth <= 768 ? 'mobile' : 'desktop';
+
+window.addEventListener('resize', () => {
+    const newLayout = window.innerWidth <= 768 ? 'mobile' : 'desktop';
+    
+    if (currentLayout !== newLayout) {
+        currentLayout = newLayout;
+        
+        // Club Cards neu erstellen
+        createClubCards();
+        setTimeout(() => {
+            animateRatingBars();
+        }, 500);
+        
+        // Tinder Gallery initialisieren wenn auf Mobile gewechselt wird
+        if (newLayout === 'mobile' && !tinderGalleryInitialized) {
+            initTinderGallery();
+        }
+    }
+});
