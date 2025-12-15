@@ -433,11 +433,11 @@ function initScrollEvents() {
 // ===== GALLERY FUNCTIONS =====
 let currentGalleryMode = 'masonry';
 
-function createGallery(mode = 'masonry') {
+function createGallery() {
     if (!elements.galleryGrid) return;
 
     elements.galleryGrid.innerHTML = '';
-    elements.galleryGrid.className = `gallery-grid ${mode}`;
+    elements.galleryGrid.className = 'gallery-grid carousel';
 
     // Reset deck carousel state
     deckCarouselState = {
@@ -485,41 +485,15 @@ function createGallery(mode = 'masonry') {
             item.classList.add('active');
         });
 
-        // Initialize deck carousel if in carousel mode
-        if (mode === 'carousel') {
-            updateDeckCarousel();
-        }
+        // Initialize deck carousel
+        updateDeckCarousel();
     }, 300);
 
-    // Handle carousel nav visibility
+    // Show carousel nav
     const carouselNav = document.getElementById('carousel-nav');
     if (carouselNav) {
-        carouselNav.style.display = mode === 'carousel' ? 'flex' : 'none';
+        carouselNav.style.display = 'flex';
     }
-}
-
-function switchGalleryMode(mode) {
-    currentGalleryMode = mode;
-
-    // Update active button
-    document.querySelectorAll('.mode-btn').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.dataset.mode === mode) {
-            btn.classList.add('active');
-        }
-    });
-
-    // Recreate gallery with new mode
-    createGallery(mode);
-}
-
-// Setup gallery mode buttons
-function setupGalleryModeButtons() {
-    document.querySelectorAll('.mode-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            switchGalleryMode(btn.dataset.mode);
-        });
-    });
 }
 
 // Deck carousel state
@@ -1461,8 +1435,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initSmoothScrolling();
     initEnhancedScrollAnimations();
 
-    createGallery('masonry');
-    setupGalleryModeButtons();
+    createGallery();
     setupCarouselNavigation();
     createClubCards();
     createTopLists();
