@@ -10,9 +10,6 @@ const CONFIG = {
 
 // ===== DOM ELEMENTS =====
 const elements = {
-    header: document.getElementById('header'),
-    menuToggle: document.querySelector('.menu-toggle'),
-    navLinks: document.querySelector('.nav-links'),
     galleryGrid: document.getElementById('gallery-grid'),
     rankingGrid: document.getElementById('ranking-grid'),
     fadeElements: document.querySelectorAll('.fade-in'),
@@ -396,39 +393,14 @@ function enhanceLogo() {
     }
 }
 
-// ===== MOBILE MENU =====
-function initMobileMenu() {
-    if (elements.menuToggle && elements.navLinks) {
-        elements.menuToggle.addEventListener('click', () => {
-            elements.navLinks.classList.toggle('active');
-            
-            const icon = elements.menuToggle.querySelector('i');
-            if (elements.navLinks.classList.contains('active')) {
-                icon.className = 'fas fa-times';
-            } else {
-                icon.className = 'fas fa-bars';
-            }
-        });
-    }
-}
-
 // ===== SCROLL EVENTS =====
 function initScrollEvents() {
     window.addEventListener('scroll', () => {
-        // Header style on scroll
-        if (elements.header) {
-            if (window.scrollY > 100) {
-                elements.header.classList.add('scrolled');
-            } else {
-                elements.header.classList.remove('scrolled');
-            }
-        }
-        
         // Fade in elements
         elements.fadeElements.forEach(el => {
             const elementTop = el.getBoundingClientRect().top;
             const windowHeight = window.innerHeight;
-            
+
             if (elementTop < windowHeight - 50) {
                 el.classList.add('active');
             }
@@ -457,14 +429,27 @@ function createGallery() {
             video.style.objectFit = 'cover';
             galleryItem.appendChild(video);
         } else {
+            // Use picture element for WebP support with fallback
+            const picture = document.createElement('picture');
+
+            // WebP source
+            const webpSource = document.createElement('source');
+            webpSource.srcset = item.image.replace(/\.(jpg|jpeg|png)$/i, '.webp');
+            webpSource.type = 'image/webp';
+            picture.appendChild(webpSource);
+
+            // Fallback image
             const img = document.createElement('img');
             img.src = item.image;
             img.alt = item.title || 'Gallery image';
             img.loading = 'lazy';
+            img.decoding = 'async';
             img.style.width = '100%';
             img.style.height = '100%';
             img.style.objectFit = 'cover';
-            galleryItem.appendChild(img);
+            picture.appendChild(img);
+
+            galleryItem.appendChild(picture);
         }
 
         galleryItem.addEventListener('click', () => {
@@ -743,13 +728,6 @@ function initSmoothScrolling() {
                     top: targetElement.offsetTop,
                     behavior: 'smooth'
                 });
-                
-                // Close mobile menu if open
-                if (elements.navLinks && elements.navLinks.classList.contains('active')) {
-                    elements.navLinks.classList.remove('active');
-                    const icon = elements.menuToggle.querySelector('i');
-                    icon.className = 'fas fa-bars';
-                }
             }
         });
     });
@@ -1349,7 +1327,6 @@ class TinderGallery {
 document.addEventListener('DOMContentLoaded', function() {
     initVersionManagement();
     enhanceLogo();
-    initMobileMenu();
     initScrollEvents();
     initSmoothScrolling();
     initEnhancedScrollAnimations();
