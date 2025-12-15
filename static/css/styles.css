@@ -38,7 +38,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-    font-size: clamp(2.5rem, 7vw, 4rem);
+    font-size: clamp(2rem, 5vw, 3rem);
     letter-spacing: -1px;
 }
 
@@ -71,28 +71,28 @@ a:hover {
 }
 
 section {
-    padding: clamp(4rem, 10vw, 6rem) 0;
+    padding: clamp(3.5rem, 8vw, 5rem) 0;
     position: relative;
 }
 
 /* Buttons */
 .btn {
     display: inline-block;
-    padding: 1rem 2rem;
+    padding: 0.9rem 1.8rem;
     background: var(--primary);
     color: var(--darker);
     border: none;
     font-weight: 600;
-    font-size: 1rem;
+    font-size: 0.95rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    border-radius: 2px;
+    letter-spacing: 0.8px;
+    border-radius: 4px;
     cursor: pointer;
     transition: var(--transition);
     position: relative;
     overflow: hidden;
     z-index: 1;
-    box-shadow: 0 4px 15px rgba(0, 240, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 240, 255, 0.25);
 }
 
 .btn:before {
@@ -150,7 +150,7 @@ section {
 /* Utility Classes */
 .section-header {
     text-align: center;
-    margin-bottom: clamp(3rem, 6vw, 4rem);
+    margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
 }
 
 .section-header h2 {
@@ -303,15 +303,16 @@ nav {
 }
 
 .hero-subtitle {
-    font-size: clamp(1.1rem, 3vw, 1.3rem);
-    margin-bottom: 2.5rem;
+    font-size: clamp(1rem, 2.5vw, 1.2rem);
+    margin-bottom: 2rem;
     opacity: 0.9;
 }
 
 .hero-cta {
     display: flex;
     flex-wrap: wrap;
-    gap: clamp(1rem, 3vw, 1.5rem);
+    gap: clamp(0.8rem, 2vw, 1.2rem);
+    margin-top: 1.5rem;
 }
 
 .scroll-indicator {
