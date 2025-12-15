@@ -1096,7 +1096,6 @@ class TinderGallery {
             card.innerHTML = `
                 ${mediaHtml}
                 <div class="tinder-card-info">
-                    <h3 class="tinder-card-title">${item.title || 'Moment'}</h3>
                     <div class="tinder-card-counter">${index + 1} / ${this.items.length}</div>
                 </div>
             `;
