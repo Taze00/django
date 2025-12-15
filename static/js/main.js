@@ -1049,6 +1049,14 @@ class TinderGallery {
             galleryGrid.parentNode.insertBefore(tinderContainer, galleryGrid);
         }
 
+        // Erstelle Swipe-Anleitung
+        const instruction = document.createElement('div');
+        instruction.className = 'swipe-instruction';
+        instruction.innerHTML = `
+            <p><i class="fas fa-hand-paper"></i> <strong>Swipe</strong> nach links oder rechts</p>
+        `;
+        tinderContainer.appendChild(instruction);
+
         // Erstelle Karten
         this.createCards();
 
@@ -1056,13 +1064,13 @@ class TinderGallery {
         const actions = document.createElement('div');
         actions.className = 'tinder-actions';
         actions.innerHTML = `
-            <button class="tinder-action-btn undo" onclick="window.tinderGallery.undo()">
+            <button class="tinder-action-btn undo" onclick="window.tinderGallery.undo()" title="Rückgängig">
                 <i class="fas fa-undo"></i>
             </button>
-            <button class="tinder-action-btn nope" onclick="window.tinderGallery.swipeLeft()">
+            <button class="tinder-action-btn nope" onclick="window.tinderGallery.swipeLeft()" title="Skip">
                 <i class="fas fa-times"></i>
             </button>
-            <button class="tinder-action-btn like" onclick="window.tinderGallery.swipeRight()">
+            <button class="tinder-action-btn like" onclick="window.tinderGallery.swipeRight()" title="Weiter">
                 <i class="fas fa-heart"></i>
             </button>
         `;
@@ -1085,7 +1093,13 @@ class TinderGallery {
                 ? `<video src="${item.source || item.image}" autoplay muted loop playsinline></video>`
                 : `<img src="${item.image || item.source}" alt="${item.title}">`;
 
-            card.innerHTML = mediaHtml;
+            card.innerHTML = `
+                ${mediaHtml}
+                <div class="tinder-card-info">
+                    <h3 class="tinder-card-title">${item.title || 'Moment'}</h3>
+                    <div class="tinder-card-counter">${index + 1} / ${this.items.length}</div>
+                </div>
+            `;
 
             stack.appendChild(card);
         });
