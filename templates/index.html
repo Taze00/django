@@ -4,27 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-
     <title>Alex Volkmann | Berlin Club Culture</title>
-    
-    <!-- Favicon -->
+
     <link rel="icon" href="{% static 'css/images/favicon.ico' %}" type="image/x-icon">
-    
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Eigener CSS -->
     <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20250514-2">
 </head>
 
@@ -37,9 +21,9 @@
                     <li><a href="#home">Home</a></li>
                     <li><a href="#about">Über Mich</a></li>
                     <li><a href="#clubs">Club Ranking</a></li>
-                    <!--<li><a href="#top-lists">Filme</a></li>-->
                     <li><a href="#gallery">Galerie</a></li>
                     <li><a href="#contact">Kontakt</a></li>
+                    <li><a href="/impressum">Impressum</a></li>
                 </ul>
                 <div class="menu-toggle">
                     <i class="fas fa-bars"></i>
@@ -52,22 +36,18 @@
     <section id="home" class="hero">
         <div class="hero-bg" id="three-bg"></div>
         <div class="hero-overlay"></div>
-        
+
         <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="hero-content fade-in">
-                        <h1>Ein Einblick in meine<span class="text-gradient">Gedankenwelt</span></h1>
-                        <p class="hero-subtitle">Bachelor | Webdesign | Marketing</p>
-                        <div class="hero-cta">
-                            <a href="#clubs" class="btn">Club Ranking</a>
-                            <a href="#gallery" class="btn btn-outline">Galerie ansehen</a>
-                        </div>
-                    </div>
+            <div class="hero-content fade-in">
+                <h1>Ein Einblick in meine <span class="text-gradient">Gedankenwelt</span></h1>
+                <p class="hero-subtitle">Bachelor | Webdesign | Marketing</p>
+                <div class="hero-cta">
+                    <a href="#clubs" class="btn">Club Ranking</a>
+                    <a href="#gallery" class="btn btn-outline">Galerie ansehen</a>
                 </div>
             </div>
         </div>
-        
+
         <div class="scroll-indicator">
             <div class="scroll-arrow"></div>
         </div>
@@ -77,29 +57,26 @@
     <section id="about" class="about">
         <div class="about-pattern"></div>
         <div class="container">
-            <div class="row">
-                <div class="col-lg-6 order-lg-1 order-2">
-                    <div class="about-text fade-in">
-                        <h2>Über <span class="text-gradient">Mich</span></h2>
-                        <p>Hi, ich bin Alex und das ist meine Website, die eigentlich nie fertig wird.</p>
-                        <p>Ich bin 25, lebe in Werder und habe meinen Bachelor in Wirtschaftsinformatik abgeschlossen. In meiner Freizeit arbeite ich gerne an Webprojekten und probiere neue Technologien aus. Ich interessiere mich ziemlich schnell für neue Themen, am liebsten würde ich alle zwei Wochen was Neues lernen, was natürlich komplett unrealistisch ist, aber das Interesse ist da.</p>
-                        <p>Am Wochenende bin ich meistens in Berlin unterwegs. Clubs, Bars mit Freunden und den Fernsehturm bestaunen. Manche Momente davon landen dann hier auf der Seite, als Foto, als Gedanke oder als Club-Review, den ich nachts in mein Handy getippt habe.</p>
-                        <p>Diese Seite ist mein digitales Sammelsurium. Kein durchdachtes Portfolio mit Mission Statement, eher ein Ort für alles, was mir durch den Kopf geht und was ich nicht vergessen will.</p> 
-                        <div class="button-group">
-                            <a href="#contact" class="btn">Kontakt</a>
-                            <a href="https://soundcloud.com/alex_sasuke/sets/goat" target="_blank" rel="noopener noreferrer" class="btn btn-outline"><i class="fab fa-soundcloud"></i> Meine Playlist</a>
-                        </div>
+            <div class="about-grid">
+                <div class="about-text fade-in">
+                    <h2>Über <span class="text-gradient">Mich</span></h2>
+                    <p>Hi, ich bin Alex und das ist meine Website, die eigentlich nie fertig wird.</p>
+                    <p>Ich bin 25, lebe in Werder und habe meinen Bachelor in Wirtschaftsinformatik abgeschlossen. In meiner Freizeit arbeite ich gerne an Webprojekten und probiere neue Technologien aus. Ich interessiere mich ziemlich schnell für neue Themen, am liebsten würde ich alle zwei Wochen was Neues lernen, was natürlich komplett unrealistisch ist, aber das Interesse ist da.</p>
+                    <p>Am Wochenende bin ich meistens in Berlin unterwegs. Clubs, Bars mit Freunden und den Fernsehturm bestaunen. Manche Momente davon landen dann hier auf der Seite, als Foto, als Gedanke oder als Club-Review, den ich nachts in mein Handy getippt habe.</p>
+                    <p>Diese Seite ist mein digitales Sammelsurium. Kein durchdachtes Portfolio mit Mission Statement, eher ein Ort für alles, was mir durch den Kopf geht und was ich nicht vergessen will.</p>
+                    <div class="button-group">
+                        <a href="#contact" class="btn">Kontakt</a>
+                        <a href="https://soundcloud.com/alex_sasuke/sets/goat" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+                            <i class="fab fa-soundcloud"></i> Meine Playlist
+                        </a>
                     </div>
                 </div>
-                <div class="col-lg-6 order-lg-2 order-1 mb-lg-0 mb-5">
-                    <div class="about-image fade-in">
-                        <img src="{% static 'css/images/about-me/alex0.png' %}" alt="Über mich">
-                    </div>
+                <div class="about-image fade-in">
+                    <img src="{% static 'css/images/about-me/alex0.png' %}" alt="Alex Volkmann" loading="lazy">
                 </div>
             </div>
         </div>
     </section>
-     
 
     <!-- Club Ranking Section -->
     <section id="clubs" class="club-ranking">
@@ -109,62 +86,12 @@
                 <h2>Berlin Club <span class="text-gradient">Ranking</span></h2>
                 <p>Meine persönliche Bewertung der besten Clubs in Berlin, basierend auf Atmosphäre, Sound und Lineup</p>
             </div>
-            
-            <div class="row" id="ranking-grid">
+
+            <div class="ranking-grid" id="ranking-grid">
                 <!-- Club cards will be added via JavaScript -->
             </div>
         </div>
     </section>
-
-
-    <!-- 
-    <section id="top-lists" class="top-lists">
-        <img src="{% static 'css/images/movie/levi.png' %}" alt="Levi" class="anime-figure-left">
-        <img src="{% static 'css/images/movie/killua.png' %}" alt="Killua" class="anime-figure-right">
-        <div class="lists-pattern"></div>
-        <div class="container lists-container">
-            <div class="section-header fade-in">
-                <h2>Meine <span class="text-gradient">Top Listen</span></h2>
-                <p>Die besten Animes, Filme und Serien die ich dir empfehlen kann</p>
-            </div>
-            
-            <div class="lists-wrapper">
-
-                <div class="list-category fade-in">
-                    <div class="category-header">
-                        <i class="fas fa-torii-gate"></i>
-                        <h3>Top 5 Anime</h3>
-                    </div>
-                    <div class="top-list">
-
-                    </div>
-                </div>
-
-
-                <div class="list-category fade-in">
-                    <div class="category-header">
-                        <i class="fas fa-film"></i>
-                        <h3>Top 5 Filme</h3>
-                    </div>
-                    <div class="top-list">
-
-                    </div>
-                </div>
-
-
-                <div class="list-category fade-in">
-                    <div class="category-header">
-                        <i class="fas fa-tv"></i>
-                        <h3>Top 5 Serien</h3>
-                    </div>
-                    <div class="top-list">
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    -->  
 
     <!-- Gallery Section -->
     <section id="gallery" class="gallery">
@@ -172,9 +99,9 @@
         <div class="container gallery-container">
             <div class="section-header fade-in">
                 <h2>Galerie</h2>
-                <p>Swipe durch meine Erinnerungen – wie Tinder, nur bessere Matches! 😄</p>
+                <p>Meine Momente aus Berlin</p>
             </div>
-            
+
             <div class="gallery-grid" id="gallery-grid">
                 <!-- Gallery items will be inserted here by JavaScript -->
             </div>
@@ -184,15 +111,15 @@
     <!-- Improved Modal -->
     <div class="improved-modal" id="improved-modal">
         <div class="improved-modal-content">
-            <button class="improved-modal-close" id="improved-modal-close">&times;</button>
+            <button class="improved-modal-close" id="improved-modal-close" aria-label="Schließen">&times;</button>
             <img class="improved-modal-media" id="improved-modal-media" alt="">
-            <button class="improved-modal-navigation improved-modal-prev" id="improved-modal-prev">
+            <button class="improved-modal-navigation improved-modal-prev" id="improved-modal-prev" aria-label="Vorheriges Bild">
                 <i class="fas fa-chevron-left"></i>
             </button>
-            <button class="improved-modal-navigation improved-modal-next" id="improved-modal-next">
+            <button class="improved-modal-navigation improved-modal-next" id="improved-modal-next" aria-label="Nächstes Bild">
                 <i class="fas fa-chevron-right"></i>
             </button>
-            <div class="improved-modal-counter" id="improved-modal-counter">1 / 12</div>
+            <div class="improved-modal-counter" id="improved-modal-counter">1 / 13</div>
         </div>
     </div>
 
@@ -203,26 +130,26 @@
                 <h2>Kontakt</h2>
                 <p>Lass uns in Verbindung bleiben oder tausche dich mit mir über die Berliner Clubszene aus.</p>
                 <div class="social-links">
-                    <a href="https://www.instagram.com/a_.volkmann/" target="_blank" rel="noopener noreferrer" class="social-link"><i class="fab fa-instagram"></i></a>
-                    <a href="https://www.tiktok.com/@killua_alex" target="_blank" rel="noopener noreferrer" class="social-link"><i class="fab fa-tiktok"></i></a>
-                    <a href="https://soundcloud.com/alex_sasuke" target="_blank" rel="noopener noreferrer" class="social-link"><i class="fab fa-soundcloud"></i></a>
-                    <a href="https://www.linkedin.com/in/alex-volkmann-54677a239/" target="_blank" rel="noopener noreferrer" class="social-link"><i class="fab fa-linkedin"></i></a>
+                    <a href="https://www.instagram.com/a_.volkmann/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="https://www.tiktok.com/@killua_alex" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="TikTok">
+                        <i class="fab fa-tiktok"></i>
+                    </a>
+                    <a href="https://soundcloud.com/alex_sasuke" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="SoundCloud">
+                        <i class="fab fa-soundcloud"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/in/alex-volkmann-54677a239/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="LinkedIn">
+                        <i class="fab fa-linkedin"></i>
+                    </a>
                 </div>
-
+                <p><a href="/impressum" style="color: var(--primary);">Impressum</a></p>
                 <p class="copyright">&copy; {% now "Y" %} Alex Volkmann | Alle Rechte vorbehalten.</p>
             </div>
         </div>
     </footer>
-    
-    <!-- Bootstrap JS und jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
-    
-    <!-- Three.js für Hintergrundeffekte -->
+
     <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
-    
-    <!-- Eigener JavaScript -->
     <script src="{% static 'js/main.js' %}?v=20250514-2"></script>
 </body>
 </html>

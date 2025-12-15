@@ -5,3 +5,6 @@ def index(request):
 
 def freundin_page(request):
     return render(request, "schubi.html")
+
+def impressum(request):
+    return render(request, 'impressum.html')
