@@ -101,6 +101,12 @@ const galleryItems = [
         image: '/static/css/images/gallery/alex13.jpeg',
         title: 'Berlin Bar',
         category: 'architecture'
+    },
+    {
+        id: 14,
+        image: '/static/css/images/gallery/alex14.jpg',
+        title: 'Aftern nach Geburtstag',
+        category: 'clubs'
     }
 ];
 
@@ -431,149 +437,51 @@ function initScrollEvents() {
 }
 
 // ===== GALLERY FUNCTIONS =====
-let currentGalleryMode = 'masonry';
-
 function createGallery() {
     if (!elements.galleryGrid) return;
 
     elements.galleryGrid.innerHTML = '';
-    elements.galleryGrid.className = 'gallery-grid carousel';
-
-    // Reset deck carousel state
-    deckCarouselState = {
-        currentIndex: 0,
-        isAnimating: false
-    };
-
     galleryItems.forEach((item, index) => {
         const galleryItem = document.createElement('div');
-        galleryItem.className = 'gallery-item fade-in';
+        galleryItem.className = 'gallery-item';
 
-        const itemType = item.type || 'image';
-        const itemSource = item.source || item.image;
-
-        if (itemType === 'video') {
+        if (item.type === 'video') {
             const video = document.createElement('video');
+            video.src = item.source;
             video.autoplay = true;
             video.muted = true;
             video.loop = true;
             video.playsInline = true;
-            video.src = itemSource;
-
+            video.style.width = '100%';
+            video.style.height = '100%';
+            video.style.objectFit = 'cover';
             galleryItem.appendChild(video);
-
-            const overlay = document.createElement('div');
-            overlay.className = 'gallery-overlay';
-            overlay.innerHTML = `<h3 class="gallery-title">${item.title}</h3>`;
-            galleryItem.appendChild(overlay);
         } else {
-            galleryItem.innerHTML = `
-                <img src="${itemSource}" alt="${item.title}" loading="lazy">
-                <div class="gallery-overlay">
-                    <h3 class="gallery-title">${item.title}</h3>
-                </div>
-            `;
+            const img = document.createElement('img');
+            img.src = item.image;
+            img.alt = item.title || 'Gallery image';
+            img.loading = 'lazy';
+            img.style.width = '100%';
+            img.style.height = '100%';
+            img.style.objectFit = 'cover';
+            galleryItem.appendChild(img);
         }
 
-        // Attach click handler for modal
-        galleryItem.addEventListener('click', () => openImageModal(itemSource, index));
+        galleryItem.addEventListener('click', () => {
+            const source = item.source || item.image;
+            openImageModal(source, index);
+        });
         elements.galleryGrid.appendChild(galleryItem);
     });
 
-    setTimeout(() => {
-        document.querySelectorAll('.gallery-item').forEach(item => {
-            item.classList.add('active');
-        });
-
-        // Initialize deck carousel
-        updateDeckCarousel();
-    }, 300);
-
-    // Show carousel nav
     const carouselNav = document.getElementById('carousel-nav');
     if (carouselNav) {
-        carouselNav.style.display = 'flex';
+        carouselNav.style.display = 'none';
     }
 }
 
-// Deck carousel state
-let deckCarouselState = {
-    currentIndex: 0,
-    isAnimating: false
-};
-
-// Setup carousel navigation
 function setupCarouselNavigation() {
-    const galleryGrid = document.getElementById('gallery-grid');
-    const carouselPrev = document.getElementById('carousel-prev');
-    const carouselNext = document.getElementById('carousel-next');
-
-    if (carouselPrev && carouselNext && galleryGrid) {
-        carouselPrev.addEventListener('click', () => {
-            deckCarouselPrev();
-        });
-
-        carouselNext.addEventListener('click', () => {
-            deckCarouselNext();
-        });
-    }
-}
-
-// Update deck carousel classes
-function updateDeckCarousel() {
-    const galleryGrid = document.getElementById('gallery-grid');
-    if (!galleryGrid || currentGalleryMode !== 'carousel') return;
-
-    const items = galleryGrid.querySelectorAll('.gallery-item');
-    const totalItems = items.length;
-    const current = deckCarouselState.currentIndex;
-
-    items.forEach((item, index) => {
-        // Remove all deck classes
-        item.classList.remove('deck-active', 'deck-next', 'deck-next-2', 'deck-exit-left', 'deck-exit-right', 'deck-enter');
-
-        const relativeIndex = (index - current + totalItems) % totalItems;
-
-        if (relativeIndex === 0) {
-            item.classList.add('deck-active');
-        } else if (relativeIndex === 1) {
-            item.classList.add('deck-next');
-        } else if (relativeIndex === 2) {
-            item.classList.add('deck-next-2');
-        } else {
-            item.classList.add('deck-enter');
-        }
-    });
-}
-
-// Next card
-function deckCarouselNext() {
-    if (deckCarouselState.isAnimating) return;
-
-    deckCarouselState.isAnimating = true;
-    const totalItems = galleryItems.length;
-    deckCarouselState.currentIndex = (deckCarouselState.currentIndex + 1) % totalItems;
-
-    updateDeckCarousel();
-
-    setTimeout(() => {
-        deckCarouselState.isAnimating = false;
-    }, 600);
-}
-
-// Previous card
-function deckCarouselPrev() {
-    if (deckCarouselState.isAnimating) return;
-
-    deckCarouselState.isAnimating = true;
-    const totalItems = galleryItems.length;
-    deckCarouselState.currentIndex = (deckCarouselState.currentIndex - 1 + totalItems) % totalItems;
-
-    updateDeckCarousel();
-
-    setTimeout(() => {
-        deckCarouselState.isAnimating = false;
-    }, 600);
+    // Not needed for simple grid gallery
 }
 
 function openImageModal(imageSrc, index) {
@@ -900,12 +808,15 @@ class ImprovedGallery {
         this.modalPrev = document.getElementById('improved-modal-prev');
         this.modalNext = document.getElementById('improved-modal-next');
         this.modalCounter = document.getElementById('improved-modal-counter');
-        
+
         // Touch variables
         this.touchStartX = 0;
         this.touchStartY = 0;
         this.isSwiping = false;
         this.swipeThreshold = 50;
+
+        // Scroll position tracking
+        this.savedScrollPosition = 0;
         
         if (this.modal && elements.galleryGrid) {
             this.init();
@@ -978,9 +889,14 @@ class ImprovedGallery {
     openModal(index) {
         this.currentIndex = index;
         this.showMedia();
+
+        // Save scroll position before opening modal
+        this.savedScrollPosition = window.scrollY;
+        document.body.style.setProperty('--scroll-y', `${this.savedScrollPosition}px`);
+
         this.modal.classList.add('active');
         document.body.classList.add('improved-modal-open');
-        
+
         if (window.innerWidth <= 768) {
             this.showSwipeHint();
         }
@@ -989,13 +905,16 @@ class ImprovedGallery {
     closeModal() {
         this.modal.classList.remove('active');
         document.body.classList.remove('improved-modal-open');
-        
+
         // Stop all videos
         const videos = this.modal.querySelectorAll('video');
         videos.forEach(video => {
             video.pause();
             video.currentTime = 0;
         });
+
+        // Restore scroll position
+        window.scrollTo(0, this.savedScrollPosition);
     }
 
     showMedia() {
