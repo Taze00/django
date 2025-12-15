@@ -429,16 +429,6 @@ function createGallery() {
             video.style.objectFit = 'cover';
             galleryItem.appendChild(video);
         } else {
-            // Use picture element for WebP support with fallback
-            const picture = document.createElement('picture');
-
-            // WebP source
-            const webpSource = document.createElement('source');
-            webpSource.srcset = item.image.replace(/\.(jpg|jpeg|png)$/i, '.webp');
-            webpSource.type = 'image/webp';
-            picture.appendChild(webpSource);
-
-            // Fallback image
             const img = document.createElement('img');
             img.src = item.image;
             img.alt = item.title || 'Gallery image';
@@ -447,9 +437,7 @@ function createGallery() {
             img.style.width = '100%';
             img.style.height = '100%';
             img.style.objectFit = 'cover';
-            picture.appendChild(img);
-
-            galleryItem.appendChild(picture);
+            galleryItem.appendChild(img);
         }
 
         galleryItem.addEventListener('click', () => {
