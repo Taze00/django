@@ -38,7 +38,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-    font-size: clamp(2rem, 5vw, 3rem);
+    font-size: clamp(2.2rem, 6vw, 3.8rem);
     letter-spacing: -1px;
 }
 
@@ -71,7 +71,7 @@ a:hover {
 }
 
 section {
-    padding: clamp(3.5rem, 8vw, 5rem) 0;
+    padding: clamp(4rem, 10vw, 6rem) 0;
     position: relative;
 }
 
@@ -108,8 +108,9 @@ section {
 }
 
 .btn:hover {
-    color: white;
-    box-shadow: 0 6px 20px rgba(255, 46, 99, 0.4);
+    color: var(--darker);
+    box-shadow: 0 6px 25px rgba(0, 240, 255, 0.5);
+    transform: translateY(-2px);
 }
 
 .btn:hover:before {
@@ -233,18 +234,23 @@ nav {
     color: var(--text);
     font-weight: 500;
     position: relative;
-    font-size: 1.1rem;
+    font-size: 0.95rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 4px;
+    transition: var(--transition);
 }
 
 .nav-links a::after {
     content: '';
     position: absolute;
-    bottom: -5px;
+    bottom: 0;
     left: 0;
     width: 0;
-    height: 2px;
-    background: var(--primary);
+    height: 100%;
+    background: rgba(0, 240, 255, 0.1);
+    border-radius: 4px;
     transition: var(--transition);
+    z-index: -1;
 }
 
 .nav-links a:hover {
@@ -908,14 +914,16 @@ nav {
     border-radius: 12px;
     overflow: hidden;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
     background: #222;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 240, 255, 0.1);
 }
 
 .gallery-item:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 20px 40px rgba(0, 240, 255, 0.2);
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 25px 50px rgba(0, 240, 255, 0.25), 0 0 30px rgba(0, 240, 255, 0.15);
+    border-color: rgba(0, 240, 255, 0.3);
 }
 
 .gallery-item img,

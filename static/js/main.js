@@ -1319,20 +1319,21 @@ document.addEventListener('DOMContentLoaded', function() {
     initMobileMenu();
     initScrollEvents();
     initSmoothScrolling();
-    
+    initEnhancedScrollAnimations();
+
     createGallery();
     createClubCards();
     createTopLists();
-    
+
     // NEU: Tinder Gallery für Mobile
     setTimeout(() => {
         initTinderGallery();
     }, 1000);
-    
+
     setTimeout(() => {
         window.galleryModal = new ImprovedGallery();
     }, 600);
-    
+
     setTimeout(() => {
         animateRatingBars();
     }, 1000);
@@ -1417,6 +1418,47 @@ function animateMobileRatingBars(card) {
 }
 
 // Track current layout state
+// ===== ENHANCED SCROLL ANIMATIONS =====
+function initEnhancedScrollAnimations() {
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -100px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('active');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.fade-in').forEach(element => {
+        observer.observe(element);
+    });
+
+    // Gallery items with enhanced animation
+    document.querySelectorAll('.gallery-item').forEach((item, index) => {
+        const itemObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }, index * 50);
+                    itemObserver.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        item.style.opacity = '0';
+        item.style.transform = 'translateY(20px)';
+        item.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        itemObserver.observe(item);
+    });
+}
+
 let currentLayout = window.innerWidth <= 768 ? 'mobile' : 'desktop';
 
 window.addEventListener('resize', () => {
