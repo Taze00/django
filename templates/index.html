@@ -7,9 +7,11 @@
     <title>Alex Volkmann | Berlin Club Culture</title>
 
     <link rel="icon" href="{% static 'css/images/favicon.ico' %}" type="image/x-icon">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" as="style">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20250515-2">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
@@ -140,7 +142,7 @@
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
-    <script src="{% static 'js/main.js' %}?v=20250514-2"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
+    <script defer src="{% static 'js/main.js' %}?v=20250514-2"></script>
 </body>
 </html>
