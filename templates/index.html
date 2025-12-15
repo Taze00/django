@@ -102,8 +102,34 @@
                 <p>Meine Momente aus Berlin</p>
             </div>
 
+            <!-- Gallery Mode Toggle -->
+            <div class="gallery-modes fade-in">
+                <button class="mode-btn active" data-mode="masonry" aria-label="Masonry Layout">
+                    <i class="fas fa-th"></i>
+                    <span>Masonry</span>
+                </button>
+                <button class="mode-btn" data-mode="spotlight" aria-label="Spotlight Layout">
+                    <i class="fas fa-star"></i>
+                    <span>Spotlight</span>
+                </button>
+                <button class="mode-btn" data-mode="carousel" aria-label="Carousel Layout">
+                    <i class="fas fa-arrow-right"></i>
+                    <span>Carousel</span>
+                </button>
+            </div>
+
             <div class="gallery-grid" id="gallery-grid">
                 <!-- Gallery items will be inserted here by JavaScript -->
+            </div>
+
+            <!-- Carousel Navigation (hidden by default) -->
+            <div class="carousel-nav" id="carousel-nav" style="display: none;">
+                <button class="carousel-prev" id="carousel-prev" aria-label="Vorheriges Bild">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="carousel-next" id="carousel-next" aria-label="Nächstes Bild">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
             </div>
         </div>
     </section>

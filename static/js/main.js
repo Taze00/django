@@ -431,18 +431,27 @@ function initScrollEvents() {
 }
 
 // ===== GALLERY FUNCTIONS =====
-function createGallery() {
+let currentGalleryMode = 'masonry';
+
+function createGallery(mode = 'masonry') {
     if (!elements.galleryGrid) return;
-    
+
     elements.galleryGrid.innerHTML = '';
-    
+    elements.galleryGrid.className = `gallery-grid ${mode}`;
+
+    // Reset deck carousel state
+    deckCarouselState = {
+        currentIndex: 0,
+        isAnimating: false
+    };
+
     galleryItems.forEach((item, index) => {
         const galleryItem = document.createElement('div');
         galleryItem.className = 'gallery-item fade-in';
-        
+
         const itemType = item.type || 'image';
         const itemSource = item.source || item.image;
-        
+
         if (itemType === 'video') {
             const video = document.createElement('video');
             video.autoplay = true;
@@ -450,9 +459,9 @@ function createGallery() {
             video.loop = true;
             video.playsInline = true;
             video.src = itemSource;
-            
+
             galleryItem.appendChild(video);
-            
+
             const overlay = document.createElement('div');
             overlay.className = 'gallery-overlay';
             overlay.innerHTML = `<h3 class="gallery-title">${item.title}</h3>`;
@@ -465,15 +474,146 @@ function createGallery() {
                 </div>
             `;
         }
-        
+
+        // Attach click handler for modal
+        galleryItem.addEventListener('click', () => openImageModal(itemSource, index));
         elements.galleryGrid.appendChild(galleryItem);
     });
-    
+
     setTimeout(() => {
         document.querySelectorAll('.gallery-item').forEach(item => {
             item.classList.add('active');
         });
+
+        // Initialize deck carousel if in carousel mode
+        if (mode === 'carousel') {
+            updateDeckCarousel();
+        }
     }, 300);
+
+    // Handle carousel nav visibility
+    const carouselNav = document.getElementById('carousel-nav');
+    if (carouselNav) {
+        carouselNav.style.display = mode === 'carousel' ? 'flex' : 'none';
+    }
+}
+
+function switchGalleryMode(mode) {
+    currentGalleryMode = mode;
+
+    // Update active button
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.dataset.mode === mode) {
+            btn.classList.add('active');
+        }
+    });
+
+    // Recreate gallery with new mode
+    createGallery(mode);
+}
+
+// Setup gallery mode buttons
+function setupGalleryModeButtons() {
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            switchGalleryMode(btn.dataset.mode);
+        });
+    });
+}
+
+// Deck carousel state
+let deckCarouselState = {
+    currentIndex: 0,
+    isAnimating: false
+};
+
+// Setup carousel navigation
+function setupCarouselNavigation() {
+    const galleryGrid = document.getElementById('gallery-grid');
+    const carouselPrev = document.getElementById('carousel-prev');
+    const carouselNext = document.getElementById('carousel-next');
+
+    if (carouselPrev && carouselNext && galleryGrid) {
+        carouselPrev.addEventListener('click', () => {
+            deckCarouselPrev();
+        });
+
+        carouselNext.addEventListener('click', () => {
+            deckCarouselNext();
+        });
+    }
+}
+
+// Update deck carousel classes
+function updateDeckCarousel() {
+    const galleryGrid = document.getElementById('gallery-grid');
+    if (!galleryGrid || currentGalleryMode !== 'carousel') return;
+
+    const items = galleryGrid.querySelectorAll('.gallery-item');
+    const totalItems = items.length;
+    const current = deckCarouselState.currentIndex;
+
+    items.forEach((item, index) => {
+        // Remove all deck classes
+        item.classList.remove('deck-active', 'deck-next', 'deck-next-2', 'deck-exit-left', 'deck-exit-right', 'deck-enter');
+
+        const relativeIndex = (index - current + totalItems) % totalItems;
+
+        if (relativeIndex === 0) {
+            item.classList.add('deck-active');
+        } else if (relativeIndex === 1) {
+            item.classList.add('deck-next');
+        } else if (relativeIndex === 2) {
+            item.classList.add('deck-next-2');
+        } else {
+            item.classList.add('deck-enter');
+        }
+    });
+}
+
+// Next card
+function deckCarouselNext() {
+    if (deckCarouselState.isAnimating) return;
+
+    deckCarouselState.isAnimating = true;
+    const totalItems = galleryItems.length;
+    deckCarouselState.currentIndex = (deckCarouselState.currentIndex + 1) % totalItems;
+
+    updateDeckCarousel();
+
+    setTimeout(() => {
+        deckCarouselState.isAnimating = false;
+    }, 600);
+}
+
+// Previous card
+function deckCarouselPrev() {
+    if (deckCarouselState.isAnimating) return;
+
+    deckCarouselState.isAnimating = true;
+    const totalItems = galleryItems.length;
+    deckCarouselState.currentIndex = (deckCarouselState.currentIndex - 1 + totalItems) % totalItems;
+
+    updateDeckCarousel();
+
+    setTimeout(() => {
+        deckCarouselState.isAnimating = false;
+    }, 600);
+}
+
+function openImageModal(imageSrc, index) {
+    const modal = document.getElementById('improved-modal');
+    const modalMedia = document.getElementById('improved-modal-media');
+    const modalCounter = document.getElementById('improved-modal-counter');
+
+    if (modal && modalMedia) {
+        modalMedia.src = imageSrc;
+        modal.classList.add('active');
+        if (modalCounter) {
+            modalCounter.textContent = `${index + 1} / ${galleryItems.length}`;
+        }
+    }
 }
 
 // ===== CLUB CARDS FUNCTIONS =====
@@ -1321,7 +1461,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initSmoothScrolling();
     initEnhancedScrollAnimations();
 
-    createGallery();
+    createGallery('masonry');
+    setupGalleryModeButtons();
+    setupCarouselNavigation();
     createClubCards();
     createTopLists();
 
