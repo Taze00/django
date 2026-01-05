@@ -45,13 +45,12 @@ export default defineConfig({
           },
           {
             urlPattern: /\/api\/fitness\/.*/i,
-            handler: 'NetworkFirst',
+            handler: 'CacheFirst',
             options: {
               cacheName: 'api-cache',
-              networkTimeoutSeconds: 10,
               expiration: {
                 maxEntries: 50,
-                maxAgeSeconds: 60 * 5
+                maxAgeSeconds: 60 * 60 * 24 * 7
               }
             }
           }
