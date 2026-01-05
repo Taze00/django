@@ -80,13 +80,7 @@ export const Login = () => {
           </form>
 
           <p className="text-slate-400 text-center text-sm mt-6">
-            Noch kein Konto?{' '}
-            <button
-              onClick={() => navigate('/register')}
-              className="text-blue-400 hover:text-blue-300 font-semibold"
-            >
-              Jetzt registrieren
-            </button>
+            Kontakt zum Admin für einen Zugang erforderlich
           </p>
         </div>
       </div>
