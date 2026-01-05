@@ -3,6 +3,7 @@ import { Login } from './components/Auth/Login';
 import { ProtectedRoute } from './components/Auth/ProtectedRoute';
 import { useAuth } from './hooks/useAuth';
 import MainLayout from './components/Layout/MainLayout';
+import OfflineIndicator from './components/Layout/OfflineIndicator';
 import WorkoutView from './components/Workout/WorkoutView';
 import StatsView from './components/Stats/StatsView';
 import ProfileView from './components/Profile/ProfileView';
@@ -12,6 +13,7 @@ export const App = () => {
 
   return (
     <Router basename="/fitness">
+      <OfflineIndicator />
       <Routes>
         {/* Auth Routes */}
         <Route

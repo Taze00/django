@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { OfflineQueue } from '../utils/sync';
 
 // Use the deployment URL in production, fallback for local development
 const API_BASE_URL = typeof window !== 'undefined' && window.location.hostname === 'alex.volkmann.com'
@@ -24,11 +25,26 @@ client.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor: Handle token refresh
+// Response interceptor: Handle token refresh and offline
 client.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+
+    // Handle offline errors - queue for later sync
+    if (!navigator.onLine || error.code === 'ECONNABORTED' || error.message === 'Network Error') {
+      // Only queue POST/PUT/PATCH requests (data-mutating operations)
+      if (['post', 'put', 'patch'].includes(originalRequest.method)) {
+        console.log('[API Client] Offline: Queueing request:', originalRequest.method, originalRequest.url);
+        OfflineQueue.addToQueue({
+          method: originalRequest.method.toUpperCase(),
+          url: originalRequest.url.replace(API_BASE_URL, ''),
+          data: originalRequest.data,
+          type: originalRequest.data?.type || originalRequest.method.toUpperCase()
+        });
+        return Promise.reject({ ...error, offline: true });
+      }
+    }
 
     // If 401 and not already retrying
     if (error.response?.status === 401 && !originalRequest._retry) {

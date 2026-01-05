@@ -19,14 +19,14 @@ export default defineConfig({
         start_url: '/fitness/',
         icons: [
           {
-            src: '/fitness/icons/icon-192x192.png',
+            src: '/static/fitness/icons/icon-192x192.svg',
             sizes: '192x192',
-            type: 'image/png'
+            type: 'image/svg+xml'
           },
           {
-            src: '/fitness/icons/icon-512x512.png',
+            src: '/static/fitness/icons/icon-512x512.svg',
             sizes: '512x512',
-            type: 'image/png'
+            type: 'image/svg+xml'
           }
         ]
       },
