@@ -145,6 +145,43 @@ export default function WorkoutView() {
       </div>
 
       <div className="px-4 py-6 space-y-6 pb-24">
+        {/* Weekly Schedule */}
+        <div className="bg-slate-800 rounded-2xl p-4 border border-slate-700">
+          <h2 className="text-lg font-bold text-white mb-4">📅 Wochenplan</h2>
+          <div className="grid grid-cols-7 gap-2">
+            {['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'].map((day, idx) => {
+              const schedule = ['PUSH', 'PULL', 'Rest', 'PUSH', 'PULL', 'Rest', 'Rest'];
+              const type = schedule[idx];
+              const isToday = new Date().getDay() === (idx + 1) % 7;
+
+              return (
+                <div
+                  key={day}
+                  className={`flex flex-col items-center p-3 rounded-lg border-2 transition-all ${
+                    isToday
+                      ? 'border-blue-500 bg-blue-500/10'
+                      : type === 'Rest'
+                      ? 'border-slate-600 bg-slate-700/30'
+                      : 'border-slate-600 bg-slate-700/50'
+                  }`}
+                >
+                  <p className="text-slate-300 text-xs font-semibold mb-1">{day}</p>
+                  <p className={`text-sm font-bold ${
+                    type === 'Rest'
+                      ? 'text-slate-400'
+                      : type === 'PUSH'
+                      ? 'text-blue-300'
+                      : 'text-red-300'
+                  }`}>
+                    {type === 'Rest' ? '😴' : type === 'PUSH' ? '💪' : '🔥'}
+                  </p>
+                  <p className="text-xs text-slate-400 mt-1">{type === 'Rest' ? 'Rest' : type}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
         {/* Warmup Checklist */}
         <WarmupChecklist workout={currentWorkout} />
 
