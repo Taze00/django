@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import SetInput from './SetInput';
 import RestTimer from './RestTimer';
 import DropSetModal from './DropSetModal';
@@ -10,7 +10,6 @@ export default function ExerciseCard({
   exerciseIndex,
 }) {
   const [expandedSetIndex, setExpandedSetIndex] = useState(null);
-  const setInputRef = useRef(null);
   const [showRestTimer, setShowRestTimer] = useState(false);
   const [showDropSetModal, setShowDropSetModal] = useState(false);
   const [lastCompletedSetNumber, setLastCompletedSetNumber] = useState(null);
@@ -40,18 +39,6 @@ export default function ExerciseCard({
       setExpandedSetIndex(nextSet - 1);
     }
   };
-
-  // Auto-scroll to expanded set input
-  useEffect(() => {
-    if (expandedSetIndex !== null && setInputRef.current) {
-      setTimeout(() => {
-        setInputRef.current?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center'
-        });
-      }, 100);
-    }
-  }, [expandedSetIndex]);
 
   // Calculate sets statistics
   const completedSets = Array.isArray(workoutSets)
@@ -159,7 +146,7 @@ export default function ExerciseCard({
 
               {/* Set Input (Expanded) */}
               {isExpanded && (
-                <div ref={setInputRef} className="mt-3 bg-gradient-to-b from-slate-700/80 to-slate-800/50 rounded-xl p-4 border border-slate-600 shadow-lg focus:outline-none">
+                <div className="mt-3 bg-gradient-to-b from-slate-700/80 to-slate-800/50 rounded-xl p-4 border border-slate-600 shadow-lg">
                   <div className="mb-3 pb-3 border-b border-slate-600">
                     <p className="text-slate-400 text-xs font-semibold uppercase tracking-wide">
                       Reps eingeben für Set {setNumber}
