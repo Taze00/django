@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useAuthStore } from '../../store/authStore';
 import { useWorkoutStore } from '../../store/workoutStore';
-import shareIcon from '../../assets/share-icon.png';
-import mehrIcon from '../../assets/mehr-icon.png';
 
 export default function ProfileView() {
   const { user, logout, fetchUser } = useAuth();
@@ -13,16 +11,7 @@ export default function ProfileView() {
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState(null);
-  const [avatarCacheBuster, setAvatarCacheBuster] = useState(Date.now());
 
-  // Refresh profile data when user changes (from auth store updates)
-  // This ensures avatar updates immediately after upload
-  useEffect(() => {
-    if (user?.profile?.avatar) {
-      console.log('[ProfileView] Profile avatar detected:', user.profile.avatar);
-      setAvatarCacheBuster(Date.now());
-    }
-  }, [user?.profile?.avatar]);
 
   const handleLogout = () => {
     logout();
@@ -109,8 +98,6 @@ export default function ProfileView() {
           };
           // This updates the auth store user object directly
           useAuthStore.setState({ user: updatedUser });
-          // Update cache buster to force browser to fetch new image
-          setAvatarCacheBuster(Date.now());
         }
       } else {
         const errorData = await response.json().catch(() => ({}));
@@ -147,7 +134,7 @@ export default function ProfileView() {
                   />
                 ) : user.profile?.avatar ? (
                   <img
-                    src={`${user.profile.avatar}?t=${avatarCacheBuster}`}
+                    src={user.profile.avatar}
                     alt="Avatar"
                     className="w-24 h-24 rounded-full object-cover border-4 border-blue-500"
                   />
@@ -238,15 +225,13 @@ export default function ProfileView() {
               <div className="bg-slate-900/50 rounded-lg p-4 border border-slate-600">
                 <h3 className="font-semibold text-white mb-3">🍎 iPhone / iPad</h3>
                 <ol className="text-slate-300 text-sm space-y-2">
-                  <li className="flex gap-3 items-center">
+                  <li className="flex gap-3">
                     <span className="text-blue-400 font-bold">1.</span>
-                    <span>Tippe unten auf das Share-Icon:</span>
-                    <img src={shareIcon} alt="Share Icon" className="w-5 h-5 object-contain" />
+                    <span>Tippe unten auf das Share-Icon</span>
                   </li>
-                  <li className="flex gap-3 items-center">
+                  <li className="flex gap-3">
                     <span className="text-blue-400 font-bold">2.</span>
-                    <span>Klicke auf "Mehr":</span>
-                    <img src={mehrIcon} alt="Mehr Icon" style={{ height: '1.6rem' }} className="object-contain" />
+                    <span>Klicke auf "Mehr"</span>
                   </li>
                   <li className="flex gap-3">
                     <span className="text-blue-400 font-bold">3.</span>
