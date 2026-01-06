@@ -63,7 +63,8 @@ export default function SetInput({
       );
 
       if (result) {
-        onCompleted(setNumber);
+        // Pass info about whether this was an update or new set
+        onCompleted(setNumber, { isUpdate: !!existingSet, reps: reps });
       } else {
         setError('Failed to save set - please try again');
       }

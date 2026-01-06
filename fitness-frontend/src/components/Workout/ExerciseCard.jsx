@@ -14,14 +14,25 @@ export default function ExerciseCard({
   const [showDropSetModal, setShowDropSetModal] = useState(false);
   const [lastCompletedSetNumber, setLastCompletedSetNumber] = useState(null);
 
+  // Debug logging
+  if (!userProgression) {
+    console.warn(`[ExerciseCard] No userProgression for exercise ${exercise?.id} (${exercise?.name})`);
+  }
+
   // Get current progression level
   const currentProgression = Array.isArray(exercise?.progressions)
     ? exercise.progressions.find((p) => p?.id === userProgression?.current_progression)
     : null;
 
-  const handleSetCompleted = (setNumber) => {
+  const handleSetCompleted = (setNumber, info = {}) => {
     setLastCompletedSetNumber(setNumber);
     setExpandedSetIndex(null);
+
+    // Only show rest timer and drop set modal for NEW sets, not updates
+    if (info.isUpdate) {
+      console.log(`[ExerciseCard] Set ${setNumber} updated with ${info.reps} reps`);
+      return; // Don't show timer for updates
+    }
 
     // Show rest timer after each set (except last set, which shows drop set modal)
     if (setNumber < 3) {
