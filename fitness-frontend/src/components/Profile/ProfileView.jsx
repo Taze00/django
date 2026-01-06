@@ -15,37 +15,14 @@ export default function ProfileView() {
   const [uploadMessage, setUploadMessage] = useState(null);
   const [avatarCacheBuster, setAvatarCacheBuster] = useState(Date.now());
 
-  // Poll for profile updates from service worker background revalidation
+  // Refresh profile data when user changes (from auth store updates)
+  // This ensures avatar updates immediately after upload
   useEffect(() => {
-    const pollInterval = setInterval(async () => {
-      try {
-        const token = localStorage.getItem('access_token');
-        const response = await fetch('/api/fitness/user/profile/', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-        if (response.ok) {
-          const profileData = await response.json();
-          // If avatar changed, update UI
-          if (profileData.avatar && user?.profile?.avatar !== profileData.avatar) {
-            console.log('[ProfileView] Detected avatar change from background sync, updating...');
-            const updatedUser = {
-              ...user,
-              profile: profileData,
-            };
-            useAuthStore.setState({ user: updatedUser });
-            setAvatarCacheBuster(Date.now());
-          }
-        }
-      } catch (error) {
-        console.error('[ProfileView] Background profile poll error:', error);
-      }
-    }, 3000); // Poll every 3 seconds
-
-    return () => clearInterval(pollInterval);
-  }, [user]);
+    if (user?.profile?.avatar) {
+      console.log('[ProfileView] Profile avatar detected:', user.profile.avatar);
+      setAvatarCacheBuster(Date.now());
+    }
+  }, [user?.profile?.avatar]);
 
   const handleLogout = () => {
     logout();
@@ -108,14 +85,18 @@ export default function ProfileView() {
         setAvatarPreview(null);
 
         // Refresh user data to show new avatar
-        // fetchUser() gets /user/me/ which has basic user info
-        // We also need to refresh the profile which has the avatar
         await fetchUser();
-        // Refetch profile to get updated avatar URL
-        const profileResponse = await fetch('/api/fitness/user/profile/', {
+
+        // Give service worker a moment to update the cache, then fetch fresh profile data
+        // with cache busting to ensure we get the latest from network
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Refetch profile to get updated avatar URL - use cache busting to skip SW cache
+        const profileResponse = await fetch(`/api/fitness/user/profile/?t=${Date.now()}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
+            'Cache-Control': 'no-cache',
           },
         });
         if (profileResponse.ok) {
