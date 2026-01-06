@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useAuthStore } from '../../store/authStore';
 import { useWorkoutStore } from '../../store/workoutStore';
+import shareIcon from '../../assets/share-icon.png';
+import mehrIcon from '../../assets/mehr-icon.png';
 
 export default function ProfileView() {
   const { user, logout, fetchUser } = useAuth();
@@ -223,15 +225,17 @@ export default function ProfileView() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* iOS Instructions */}
               <div className="bg-slate-900/50 rounded-lg p-4 border border-slate-600">
-                <h3 className="font-semibold text-white mb-3">🍎 iPhone / iPad</h3>
+                <h3 className="font-semibold text-white mb-3">iPhone / iPad</h3>
                 <ol className="text-slate-300 text-sm space-y-2">
-                  <li className="flex gap-3">
+                  <li className="flex gap-3 items-center">
                     <span className="text-blue-400 font-bold">1.</span>
-                    <span>Tippe unten auf das Share-Icon</span>
+                    <span>Tippe unten auf das Share-Icon:</span>
+                    <img src={shareIcon} alt="Share Icon" className="w-5 h-5 object-contain" />
                   </li>
-                  <li className="flex gap-3">
+                  <li className="flex gap-3 items-center">
                     <span className="text-blue-400 font-bold">2.</span>
-                    <span>Klicke auf "Mehr"</span>
+                    <span>Klicke auf "Mehr":</span>
+                    <img src={mehrIcon} alt="Mehr Icon" style={{ height: '1.6rem' }} className="object-contain" />
                   </li>
                   <li className="flex gap-3">
                     <span className="text-blue-400 font-bold">3.</span>
@@ -246,7 +250,7 @@ export default function ProfileView() {
 
               {/* Android Instructions */}
               <div className="bg-slate-900/50 rounded-lg p-4 border border-slate-600">
-                <h3 className="font-semibold text-white mb-3">🤖 Android / Chrome</h3>
+                <h3 className="font-semibold text-white mb-3">Android / Chrome</h3>
                 <ol className="text-slate-300 text-sm space-y-2">
                   <li className="flex gap-3">
                     <span className="text-green-400 font-bold">1.</span>
