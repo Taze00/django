@@ -45,7 +45,7 @@ export default defineConfig({
           },
           {
             urlPattern: /\/media\/avatars\/.*/i,
-            handler: 'CacheFirst',
+            handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'avatar-cache',
               expiration: {
