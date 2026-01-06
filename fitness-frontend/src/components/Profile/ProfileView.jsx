@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useAuthStore } from '../../store/authStore';
@@ -14,6 +14,38 @@ export default function ProfileView() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState(null);
   const [avatarCacheBuster, setAvatarCacheBuster] = useState(Date.now());
+
+  // Poll for profile updates from service worker background revalidation
+  useEffect(() => {
+    const pollInterval = setInterval(async () => {
+      try {
+        const token = localStorage.getItem('access_token');
+        const response = await fetch('/api/fitness/user/profile/', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (response.ok) {
+          const profileData = await response.json();
+          // If avatar changed, update UI
+          if (profileData.avatar && user?.profile?.avatar !== profileData.avatar) {
+            console.log('[ProfileView] Detected avatar change from background sync, updating...');
+            const updatedUser = {
+              ...user,
+              profile: profileData,
+            };
+            useAuthStore.setState({ user: updatedUser });
+            setAvatarCacheBuster(Date.now());
+          }
+        }
+      } catch (error) {
+        console.error('[ProfileView] Background profile poll error:', error);
+      }
+    }, 3000); // Poll every 3 seconds
+
+    return () => clearInterval(pollInterval);
+  }, [user]);
 
   const handleLogout = () => {
     logout();

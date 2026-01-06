@@ -44,11 +44,21 @@ export default defineConfig({
             }
           },
           {
+            urlPattern: /\/api\/fitness\/user\/profile\/.*/i,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'profile-cache',
+              expiration: {
+                maxEntries: 10,
+                maxAgeSeconds: 60 * 5
+              }
+            }
+          },
+          {
             urlPattern: /\/api\/fitness\/.*/i,
-            handler: 'NetworkFirst',
+            handler: 'CacheFirst',
             options: {
               cacheName: 'api-cache',
-              networkTimeoutSeconds: 5,
               expiration: {
                 maxEntries: 50,
                 maxAgeSeconds: 60 * 60 * 24 * 7
