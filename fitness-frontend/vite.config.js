@@ -45,9 +45,10 @@ export default defineConfig({
           },
           {
             urlPattern: /\/api\/fitness\/.*/i,
-            handler: 'CacheFirst',
+            handler: 'NetworkFirst',
             options: {
               cacheName: 'api-cache',
+              networkTimeoutSeconds: 5,
               expiration: {
                 maxEntries: 50,
                 maxAgeSeconds: 60 * 60 * 24 * 7
@@ -69,5 +70,6 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     assetsDir: 'assets'
-  }
+  },
+  assetsInclude: ['**/*.JPG', '**/*.jpg', '**/*.png']
 })
