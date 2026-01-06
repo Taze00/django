@@ -14,8 +14,10 @@ services:
     # container_name: web-app
     image: django-dev
     restart: always
-    build: ./docker
-    command: python manage.py runserver 0.0.0.0:80
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+    command: bash -c "cd /code/fitness-frontend && npm install --legacy-peer-deps && npm run build && cp -r dist/* /code/static/fitness/ && cd /code && python3 manage.py runserver 0.0.0.0:80"
     volumes:
       - .:/code
     ports:

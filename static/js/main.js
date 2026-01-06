@@ -104,7 +104,14 @@ const galleryItems = [
         image: '/static/css/images/gallery/alex14.jpg',
         title: 'Aftern nach Geburtstag',
         category: 'clubs'
+    },
+    {
+        id: 15,
+        image: '/static/css/images/gallery/alex15.jpeg',
+        title: 'Aftern nach Geburtstag',
+        category: 'clubs'
     }
+
 ];
 
 const clubData = [
@@ -1049,18 +1056,10 @@ class TinderGallery {
             galleryGrid.parentNode.insertBefore(tinderContainer, galleryGrid);
         }
 
-        // Erstelle Swipe-Anleitung
-        const instruction = document.createElement('div');
-        instruction.className = 'swipe-instruction';
-        instruction.innerHTML = `
-            <p><i class="fas fa-hand-paper"></i> <strong>Swipe</strong> nach links oder rechts</p>
-        `;
-        tinderContainer.appendChild(instruction);
-
         // Erstelle Karten
         this.createCards();
 
-        // Erstelle Action Buttons
+        // Erstelle Action Buttons direkt in der gallery-container
         const actions = document.createElement('div');
         actions.className = 'tinder-actions';
         actions.innerHTML = `
@@ -1074,7 +1073,7 @@ class TinderGallery {
                 <i class="fas fa-heart"></i>
             </button>
         `;
-        tinderContainer.appendChild(actions);
+        gallerySection.appendChild(actions);
     }
 
     createCards() {
@@ -1086,12 +1085,15 @@ class TinderGallery {
         this.items.forEach((item, index) => {
             const card = document.createElement('div');
             card.className = 'tinder-card';
+            if (index === 0) {
+                card.classList.add('is-first-card');
+            }
             card.dataset.index = index;
 
             const isVideo = item.type === 'video';
             const mediaHtml = isVideo
                 ? `<video src="${item.source || item.image}" autoplay muted loop playsinline></video>`
-                : `<img src="${item.image || item.source}" alt="${item.title}">`;
+                : `<img src="${item.image || item.source}" alt="${item.title}" loading="eager" decoding="async">`;
 
             card.innerHTML = `
                 ${mediaHtml}
@@ -1104,6 +1106,20 @@ class TinderGallery {
         });
 
         this.currentCard = stack.querySelector('.tinder-card:first-child');
+        this.preloadNextCards();
+    }
+
+    preloadNextCards() {
+        // Preload alle verbleibenden Bilder
+        const startIndex = this.swipedCards.length;
+
+        for (let idx = startIndex; idx < this.items.length; idx++) {
+            const item = this.items[idx];
+            if (item.type !== 'video') {
+                const img = new Image();
+                img.src = item.image || item.source;
+            }
+        }
     }
 
     attachEventListeners() {
@@ -1212,7 +1228,7 @@ class TinderGallery {
             }
         } else {
             // Zurück zur Mitte
-            this.currentCard.style.transition = 'transform 0.3s ease';
+            this.currentCard.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
             this.currentCard.style.transform = '';
         }
 
@@ -1238,9 +1254,12 @@ class TinderGallery {
             if (this.currentCard && this.currentCard.parentNode) {
                 this.currentCard.remove();
             }
-            
+
             this.currentIndex++;
             this.currentCard = document.querySelector('.tinder-card:first-child');
+
+            // Preload nächste Karten
+            this.preloadNextCards();
 
             // Prüfe ob alle Karten geswiped wurden
             if (!this.currentCard) {

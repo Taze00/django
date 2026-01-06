@@ -52,18 +52,14 @@ export default function ProfileView() {
                 <ol className="text-slate-300 text-sm space-y-2">
                   <li className="flex gap-3">
                     <span className="text-blue-400 font-bold">1.</span>
-                    <span>Öffne Safari und gehe zu <span className="text-blue-300">alex.volkmann.com/fitness</span></span>
+                    <span>Tippe unten auf <span className="text-2xl">⬆️</span> "Teilen"</span>
                   </li>
                   <li className="flex gap-3">
                     <span className="text-blue-400 font-bold">2.</span>
-                    <span>Tippe unten auf "Teilen" (Kästchen mit Pfeil)</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <span className="text-blue-400 font-bold">3.</span>
                     <span>Wähle "Zum Home-Bildschirm"</span>
                   </li>
                   <li className="flex gap-3">
-                    <span className="text-blue-400 font-bold">4.</span>
+                    <span className="text-blue-400 font-bold">3.</span>
                     <span>Tippe "Hinzufügen" - fertig! 🎉</span>
                   </li>
                 </ol>
