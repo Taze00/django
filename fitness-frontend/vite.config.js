@@ -56,13 +56,12 @@ export default defineConfig({
           },
           {
             urlPattern: /\/api\/fitness\/user\/profile\/.*/i,
-            handler: 'NetworkFirst',
+            handler: 'CacheFirst',
             options: {
               cacheName: 'profile-cache',
-              networkTimeoutSeconds: 3,
               expiration: {
                 maxEntries: 10,
-                maxAgeSeconds: 60 * 60
+                maxAgeSeconds: 60 * 10
               }
             }
           },
