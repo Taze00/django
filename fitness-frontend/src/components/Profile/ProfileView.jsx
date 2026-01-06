@@ -13,6 +13,7 @@ export default function ProfileView() {
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState(null);
+  const [avatarCacheBuster, setAvatarCacheBuster] = useState(Date.now());
 
   const handleLogout = () => {
     logout();
@@ -95,6 +96,8 @@ export default function ProfileView() {
           };
           // This updates the auth store user object directly
           useAuthStore.setState({ user: updatedUser });
+          // Update cache buster to force browser to fetch new image
+          setAvatarCacheBuster(Date.now());
         }
       } else {
         const errorData = await response.json().catch(() => ({}));
@@ -131,7 +134,7 @@ export default function ProfileView() {
                   />
                 ) : user.profile?.avatar ? (
                   <img
-                    src={`${user.profile.avatar}?t=${new Date(user.profile.updated_at).getTime()}`}
+                    src={`${user.profile.avatar}?t=${avatarCacheBuster}`}
                     alt="Avatar"
                     className="w-24 h-24 rounded-full object-cover border-4 border-blue-500"
                   />
