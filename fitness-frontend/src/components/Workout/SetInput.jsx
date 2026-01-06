@@ -19,14 +19,18 @@ export default function SetInput({
     existingSet?.drop_set_progression || userProgression?.current_progression
   );
 
-  const currentProgression = exercise.progressions.find(
-    (p) => p.id === userProgression?.current_progression
-  );
+  const currentProgression = Array.isArray(exercise?.progressions)
+    ? exercise.progressions.find(
+        (p) => p?.id === userProgression?.current_progression
+      )
+    : null;
 
   // Get available progressions for drop set
-  const availableProgressions = exercise.progressions.filter(
-    (p) => p.level < currentProgression.level
-  );
+  const availableProgressions = currentProgression
+    ? (exercise?.progressions || []).filter(
+        (p) => p?.level < currentProgression.level
+      )
+    : [];
 
   const handleSave = async () => {
     if (reps === 0) {
