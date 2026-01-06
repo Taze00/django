@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+import os
 
 
 class Exercise(models.Model):
@@ -44,11 +45,27 @@ class UserProfile(models.Model):
     """Extended user profile for fitness app"""
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='fitness_profile')
     current_week = models.IntegerField(default=1)  # Training week number
+    avatar = models.ImageField(upload_to='avatars/', null=True, blank=True)  # User profile picture
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"Fitness Profile: {self.user.username}"
+
+    def save(self, *args, **kwargs):
+        """Delete old avatar if a new one is being set"""
+        if self.pk:  # Only if this is an update, not a new creation
+            try:
+                old_profile = UserProfile.objects.get(pk=self.pk)
+                # If avatar field has changed and old avatar exists
+                if old_profile.avatar and old_profile.avatar != self.avatar:
+                    # Delete the old avatar file from storage
+                    if os.path.isfile(old_profile.avatar.path):
+                        os.remove(old_profile.avatar.path)
+                        print(f"[UserProfile] Deleted old avatar: {old_profile.avatar.path}")
+            except UserProfile.DoesNotExist:
+                pass
+        super().save(*args, **kwargs)
 
 
 class UserExerciseProgression(models.Model):
