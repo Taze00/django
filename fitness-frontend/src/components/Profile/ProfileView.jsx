@@ -50,9 +50,10 @@ export default function ProfileView() {
               <div className="bg-slate-900/50 rounded-lg p-4 border border-slate-600">
                 <h3 className="font-semibold text-white mb-3">🍎 iPhone / iPad</h3>
                 <ol className="text-slate-300 text-sm space-y-2">
-                  <li className="flex gap-3">
+                  <li className="flex gap-3 items-center">
                     <span className="text-blue-400 font-bold">1.</span>
-                    <span>Tippe unten auf <span className="text-2xl">⬆️</span> "Teilen"</span>
+                    <span>Tippe unten auf das Share-Icon:</span>
+                    <span className="inline-block w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">⬆</span>
                   </li>
                   <li className="flex gap-3">
                     <span className="text-blue-400 font-bold">2.</span>
