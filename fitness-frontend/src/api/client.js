@@ -53,21 +53,25 @@ client.interceptors.response.use(
       try {
         const refreshToken = localStorage.getItem('refresh_token');
         if (refreshToken) {
+          console.log('[API Client] Token expired, attempting refresh...');
           const response = await axios.post(`${API_BASE_URL}/auth/refresh/`, {
             refresh: refreshToken,
           });
 
           const { access } = response.data;
           localStorage.setItem('access_token', access);
+          console.log('[API Client] Token refreshed successfully, retrying request...');
 
           originalRequest.headers.Authorization = `Bearer ${access}`;
           return client(originalRequest);
         } else {
           // No refresh token, logout
+          console.log('[API Client] No refresh token found, redirecting to login...');
           localStorage.clear();
           window.location.href = '/fitness/#/login';
         }
       } catch (refreshError) {
+        console.error('[API Client] Token refresh failed:', refreshError.response?.data || refreshError.message);
         localStorage.clear();
         window.location.href = '/fitness/#/login';
         return Promise.reject(refreshError);

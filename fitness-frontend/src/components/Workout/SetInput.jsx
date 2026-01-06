@@ -41,20 +41,25 @@ export default function SetInput({
     setIsLoading(true);
     setError(null);
 
-    const result = await addSet(
-      exercise.id,
-      isDropSet ? dropSetProgressionId : userProgression.current_progression,
-      reps,
-      setNumber,
-      isDropSet
-    );
+    try {
+      const result = await addSet(
+        exercise.id,
+        isDropSet ? dropSetProgressionId : userProgression.current_progression,
+        reps,
+        setNumber,
+        isDropSet
+      );
 
-    setIsLoading(false);
-
-    if (result) {
-      onCompleted(setNumber);
-    } else {
-      setError('Failed to save set');
+      if (result) {
+        onCompleted(setNumber);
+      } else {
+        setError('Failed to save set - please try again');
+      }
+    } catch (err) {
+      console.error('Error saving set:', err);
+      setError('Error saving set - please check your connection and try again');
+    } finally {
+      setIsLoading(false);
     }
   };
 
