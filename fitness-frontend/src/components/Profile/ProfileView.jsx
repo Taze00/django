@@ -75,28 +75,19 @@ export default function ProfileView() {
         setAvatarFile(null);
         setAvatarPreview(null);
 
-        // Clear service worker cache for profile to force fresh data
-        if ('caches' in window) {
-          try {
-            const cache = await caches.open('profile-cache');
-            await cache.delete('/api/fitness/user/profile/');
-            console.log('[ProfileView] Cleared profile cache');
-          } catch (error) {
-            console.error('[ProfileView] Error clearing cache:', error);
-          }
-        }
-
         // Refresh user data to show new avatar
+        // Use cache-busting to force fresh data from server (bypass any caches)
         await fetchUser();
 
-        // Give service worker a moment to update the cache, then fetch fresh profile data
-        await new Promise(resolve => setTimeout(resolve, 300));
+        // Wait a moment then fetch fresh profile data with cache-busting
+        await new Promise(resolve => setTimeout(resolve, 200));
 
-        // Refetch profile to get updated avatar URL
-        const profileResponse = await fetch('/api/fitness/user/profile/', {
+        const profileResponse = await fetch('/api/fitness/user/profile/?_t=' + Date.now(), {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
+            'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+            'Pragma': 'no-cache',
           },
         });
         if (profileResponse.ok) {

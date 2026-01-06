@@ -45,23 +45,12 @@ export default defineConfig({
           },
           {
             urlPattern: /\/media\/avatars\/.*/i,
-            handler: 'StaleWhileRevalidate',
+            handler: 'CacheFirst',
             options: {
               cacheName: 'avatar-cache',
               expiration: {
                 maxEntries: 20,
                 maxAgeSeconds: 60 * 60 * 24 * 30
-              }
-            }
-          },
-          {
-            urlPattern: /\/api\/fitness\/user\/profile\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'profile-cache',
-              expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 10
               }
             }
           },
