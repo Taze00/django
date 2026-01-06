@@ -62,7 +62,15 @@ export const useWorkoutStore = create((set, get) => ({
   addSet: async (exerciseId, progressionId, reps, setNumber, isDropSet = false) => {
     try {
       const currentWorkout = get().currentWorkout;
-      if (!currentWorkout) return null;
+      if (!currentWorkout) {
+        console.error('[Workout Store] No current workout found');
+        return null;
+      }
+
+      // Check if set already exists
+      const existingSet = currentWorkout.sets?.find(
+        (s) => s.exercise === exerciseId && s.set_number === setNumber && s.is_drop_set === isDropSet
+      );
 
       const setData = {
         workout: currentWorkout.id,
@@ -73,17 +81,39 @@ export const useWorkoutStore = create((set, get) => ({
         is_drop_set: isDropSet,
       };
 
-      const response = await setAPI.create(setData);
+      let response;
+      if (existingSet) {
+        // Update existing set
+        console.log('[Workout Store] Updating set with data:', setData);
+        response = await setAPI.update(existingSet.id, setData);
+        console.log('[Workout Store] Set updated successfully:', response.data);
+      } else {
+        // Create new set
+        console.log('[Workout Store] Creating set with data:', setData);
+        response = await setAPI.create(setData);
+        console.log('[Workout Store] Set created successfully:', response.data);
+      }
 
-      // Update current workout with new set
+      // Update current workout with new/updated set
       const updatedWorkout = { ...currentWorkout };
       if (!updatedWorkout.sets) updatedWorkout.sets = [];
-      updatedWorkout.sets.push(response.data);
+
+      if (existingSet) {
+        // Replace existing set
+        const index = updatedWorkout.sets.findIndex((s) => s.id === existingSet.id);
+        if (index !== -1) {
+          updatedWorkout.sets[index] = response.data;
+        }
+      } else {
+        // Add new set
+        updatedWorkout.sets.push(response.data);
+      }
 
       set({ currentWorkout: updatedWorkout });
       return response.data;
     } catch (error) {
-      set({ error: 'Failed to add set' });
+      console.error('[Workout Store] Error saving set:', error.response?.data || error.message);
+      set({ error: 'Failed to save set' });
       return null;
     }
   },

@@ -16,7 +16,7 @@ export default function SetInput({
 
   // For drop sets, we might use a different progression
   const [dropSetProgressionId, setDropSetProgressionId] = useState(
-    existingSet?.drop_set_progression || userProgression?.current_progression
+    existingSet?.drop_set_progression || userProgression?.current_progression || null
   );
 
   const currentProgression = Array.isArray(exercise?.progressions)
@@ -38,13 +38,25 @@ export default function SetInput({
       return;
     }
 
+    if (!userProgression) {
+      setError('User progression data not loaded - please reload the page');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
     try {
+      const progressionId = isDropSet ? dropSetProgressionId : userProgression.current_progression;
+
+      if (!progressionId) {
+        setError('Progression not found - please reload the page');
+        return;
+      }
+
       const result = await addSet(
         exercise.id,
-        isDropSet ? dropSetProgressionId : userProgression.current_progression,
+        progressionId,
         reps,
         setNumber,
         isDropSet
@@ -163,6 +175,8 @@ export default function SetInput({
             <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
             Saving...
           </span>
+        ) : existingSet?.reps ? (
+          `✓ Update Set ${setNumber}`
         ) : (
           `✓ Save Set ${setNumber}`
         )}
