@@ -6,17 +6,34 @@ from .models import (
 )
 
 
+class UserProfileMinimalSerializer(serializers.ModelSerializer):
+    """Minimal profile serializer to avoid circular references"""
+    class Meta:
+        model = UserProfile
+        fields = ['id', 'current_week', 'avatar', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+
 class UserSerializer(serializers.ModelSerializer):
+    profile = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'date_joined']
-        read_only_fields = ['id', 'date_joined']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'date_joined', 'profile']
+        read_only_fields = ['id', 'date_joined', 'profile']
+
+    def get_profile(self, obj):
+        try:
+            profile = UserProfile.objects.get(user=obj)
+            return UserProfileMinimalSerializer(profile).data
+        except UserProfile.DoesNotExist:
+            return None
 
 
 class ProgressionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Progression
-        fields = ['id', 'exercise', 'level', 'name', 'description', 'video_url']
+        fields = ['id', 'exercise', 'level', 'name', 'description', 'video_url', 'target_seconds']
         read_only_fields = ['id']
 
 
@@ -25,7 +42,7 @@ class ExerciseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Exercise
-        fields = ['id', 'name', 'category', 'description', 'video_url', 'order', 'progressions']
+        fields = ['id', 'name', 'category', 'description', 'video_url', 'is_timed', 'order', 'progressions']
         read_only_fields = ['id']
 
 
@@ -46,7 +63,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
-        fields = ['id', 'user', 'current_week', 'exercise_progressions', 'created_at', 'updated_at']
+        fields = ['id', 'user', 'current_week', 'avatar', 'exercise_progressions', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
 
 
@@ -66,8 +83,8 @@ class WorkoutSetSerializer(serializers.ModelSerializer):
         model = WorkoutSet
         fields = [
             'id', 'workout', 'exercise', 'exercise_name', 'progression', 'progression_name',
-            'set_number', 'reps', 'is_drop_set', 'drop_set_progression', 'drop_set_progression_name',
-            'drop_set_reps', 'rest_time_seconds', 'notes', 'created_at'
+            'set_number', 'reps', 'seconds', 'is_drop_set', 'drop_set_progression', 'drop_set_progression_name',
+            'drop_set_reps', 'drop_set_seconds', 'rest_time_seconds', 'notes', 'created_at'
         ]
         read_only_fields = ['id', 'created_at']
 

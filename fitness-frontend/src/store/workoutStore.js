@@ -59,7 +59,7 @@ export const useWorkoutStore = create((set, get) => ({
   },
 
   // Add set to workout
-  addSet: async (exerciseId, progressionId, reps, setNumber, isDropSet = false) => {
+  addSet: async (exerciseId, progressionId, reps, setNumber, isDropSet = false, seconds = null) => {
     try {
       const currentWorkout = get().currentWorkout;
       if (!currentWorkout) {
@@ -76,10 +76,16 @@ export const useWorkoutStore = create((set, get) => ({
         workout: currentWorkout.id,
         exercise: exerciseId,
         progression: progressionId,
-        reps: reps,
         set_number: setNumber,
         is_drop_set: isDropSet,
       };
+
+      // Add reps or seconds based on exercise type
+      if (seconds !== null) {
+        setData.seconds = seconds;
+      } else {
+        setData.reps = reps;
+      }
 
       let response;
       if (existingSet) {

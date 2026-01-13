@@ -15,6 +15,7 @@ class Exercise(models.Model):
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     description = models.TextField(blank=True)
     video_url = models.URLField(blank=True, null=True)
+    is_timed = models.BooleanField(default=False)  # True for time-based exercises (Dead Hang, etc.)
     order = models.IntegerField(default=0)  # Display order
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -32,6 +33,7 @@ class Progression(models.Model):
     name = models.CharField(max_length=100)  # "Wall Push-ups", "Regular Push-ups", etc.
     description = models.TextField(blank=True)
     video_url = models.URLField(blank=True, null=True)
+    target_seconds = models.IntegerField(null=True, blank=True)  # For time-based exercises (e.g., 30 seconds for Dead Hang)
 
     class Meta:
         ordering = ['exercise', 'level']
@@ -130,7 +132,8 @@ class WorkoutSet(models.Model):
     exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
     progression = models.ForeignKey(Progression, on_delete=models.CASCADE)
     set_number = models.IntegerField()  # 1, 2, 3
-    reps = models.IntegerField()
+    reps = models.IntegerField(null=True, blank=True)  # For rep-based exercises
+    seconds = models.IntegerField(null=True, blank=True)  # For time-based exercises (e.g., Dead Hang)
     is_drop_set = models.BooleanField(default=False)
     drop_set_progression = models.ForeignKey(
         Progression,
@@ -140,6 +143,7 @@ class WorkoutSet(models.Model):
         related_name='drop_sets'
     )
     drop_set_reps = models.IntegerField(null=True, blank=True)
+    drop_set_seconds = models.IntegerField(null=True, blank=True)  # Total seconds for time-based drop sets
     rest_time_seconds = models.IntegerField(default=90)
     notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -148,4 +152,8 @@ class WorkoutSet(models.Model):
         ordering = ['set_number']
 
     def __str__(self):
+        if self.seconds is not None:
+            mins = self.seconds // 60
+            secs = self.seconds % 60
+            return f"{self.workout} - {self.exercise.name} Set {self.set_number}: {mins}:{secs:02d}"
         return f"{self.workout} - {self.exercise.name} Set {self.set_number}: {self.reps} reps"
