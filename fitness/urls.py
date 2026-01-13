@@ -19,7 +19,7 @@ urlpatterns = [
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
     # User endpoints
-    path('user/me/', UserViewSet.as_view({'get': 'me'}), name='user_me'),
+    path('user/me/', UserViewSet.as_view({'get': 'me', 'put': 'me'}), name='user_me'),
     path('user/profile/', UserProfileViewSet.as_view({'get': 'profile', 'put': 'profile'}), name='user_profile'),
     path('user/progressions/', UserProfileViewSet.as_view({'get': 'progressions'}), name='user_progressions'),
     path('user/check-upgrades/', UserProfileViewSet.as_view({'get': 'check_upgrades'}), name='check_upgrades'),

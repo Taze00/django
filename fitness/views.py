@@ -52,10 +52,14 @@ class UserProfileViewSet(viewsets.GenericViewSet):
             profile = UserProfile.objects.create(user=request.user)
 
         if request.method == 'PUT':
+            print(f"[Profile] Request data keys: {request.data.keys()}")
+            print(f"[Profile] Avatar in data: {'avatar' in request.data}")
             serializer = UserProfileSerializer(profile, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
+                print(f"[Profile] Avatar saved successfully: {profile.avatar}")
                 return Response(serializer.data)
+            print(f"[Profile] Validation errors: {serializer.errors}")
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = UserProfileSerializer(profile)
@@ -291,9 +295,16 @@ class UserViewSet(viewsets.GenericViewSet):
     """User management"""
     permission_classes = [IsAuthenticated]
 
-    @action(detail=False, methods=['get'])
+    @action(detail=False, methods=['get', 'put'])
     def me(self, request):
-        """Get current user info"""
+        """Get or update current user info"""
+        if request.method == 'PUT':
+            serializer = UserSerializer(request.user, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=400)
+
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
 
