@@ -32,6 +32,7 @@ export default defineConfig({
       },
       workbox: {
         runtimeCaching: [
+          // Fonts - cache with long expiration
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: 'CacheFirst',
@@ -43,6 +44,7 @@ export default defineConfig({
               }
             }
           },
+          // Avatars - cache with long expiration
           {
             urlPattern: /\/media\/avatars\/.*/i,
             handler: 'CacheFirst',
@@ -54,14 +56,18 @@ export default defineConfig({
               }
             }
           },
+          // API Calls - StaleWhileRevalidate for fresh data but offline support
           {
             urlPattern: /\/api\/fitness\/.*/i,
-            handler: 'CacheFirst',
+            handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'api-cache',
               expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24 * 7
+                maxEntries: 100,
+                maxAgeSeconds: 60 * 60 * 24 * 7  // 7 days
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
               }
             }
           }
