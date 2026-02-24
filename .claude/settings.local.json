@@ -34,7 +34,16 @@
       "Bash(convert:*)",
       "Bash(ls:*)",
       "Bash(sudo cp:*)",
-      "Bash(docker cp:*)"
+      "Bash(docker cp:*)",
+      "Bash(xargs basename:*)",
+      "Bash(TOKEN=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY3Njc2MTQ3LCJpYXQiOjE3Njc2NzI1NDcsImp0aSI6IjI5MGFkMDJlNzE0NTRlMmM4ZTM4MmNlYWQwZDdkYWI2IiwidXNlcl9pZCI6NH0.DkoLVMSDXgFfqTllWGhxzOrbVN89R0xjA7wS-EBCreE\")",
+      "Bash(__NEW_LINE__ curl -s -X POST \"http://localhost:8000/api/fitness/sets/\" )",
+      "Bash(__NEW_LINE__ curl -s -X GET \"http://localhost:8000/api/fitness/user/progressions/\" )",
+      "Bash(docker-compose ps:*)",
+      "Bash(docker run:*)",
+      "Bash(git checkout:*)",
+      "Bash(git clean:*)",
+      "Bash(python -m py_compile static/js/*.js)"
     ],
     "deny": [],
     "ask": []

@@ -1,2 +1,41 @@
 data/db
 static/css/images/schubi/birthday-video.mp4
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.env
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+
+# Project specific
+.claude/
+avatars/
+media/
+fitness-frontend/
+=3.7
+
+# Fitness app (auto-generated)
+static/fitness/assets/
+static/fitness/icons/
+static/fitness/*.html
+static/fitness/*.js
