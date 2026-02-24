@@ -34,6 +34,10 @@ media/
 fitness-frontend/
 =3.7
 
+# Media and Images (server-only, not versioned)
+static/css/images/movie/
+static/css/images/gallery/
+
 # Fitness app (auto-generated)
 static/fitness/assets/
 static/fitness/icons/
