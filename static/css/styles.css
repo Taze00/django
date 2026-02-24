@@ -182,7 +182,7 @@ section {
     left: 0;
     width: 100%;
     height: 3px;
-    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    background: var(--primary);
     box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);
 }
 
@@ -213,10 +213,8 @@ section {
 }
 
 .text-gradient {
-    background: linear-gradient(90deg, var(--primary), var(--secondary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    display: inline-block;
+    color: var(--primary);
+    font-weight: 700;
 }
 
 .fade-in {
@@ -844,7 +842,7 @@ section {
 
 /* Gallery Section - BERLIN AUTHENTIC */
 .gallery {
-    background: linear-gradient(135deg, #050505 0%, #1a0a1f 50%, #050505 100%);
+    background: linear-gradient(135deg, #000000 0%, #0a0a0f 50%, #000000 100%);
     position: relative;
     padding-top: clamp(3rem, 6vw, 4.5rem);
     padding-bottom: clamp(3rem, 6vw, 4.5rem);
@@ -1276,7 +1274,7 @@ footer {
 
     /* Bild/Video in der Karte */
     .gallery h2::after{
-        background: white;
+        background: var(--primary);
     }
 
     /* Swipe Indikatoren */
@@ -1746,9 +1744,6 @@ footer {
         margin-bottom: 1.5rem;
     }
 
-    .text-gradient {
-        display: inline-block;
-    }
 
     .club-ranking {
         padding-top: 4rem;
@@ -1919,4 +1914,215 @@ footer {
     .about-image {
         max-width: 100%;
     }
+
 }
+
+/* ===== RANKINGS SECTION ===== */
+#rankings-section {
+    padding: 4rem 0;
+    background: var(--darker);
+    position: relative;
+}
+
+#rankings-section h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: clamp(1.8rem, 5vw, 2.5rem);
+    font-family: var(--font-display);
+    position: relative;
+    display: inline-block;
+    width: 100%;
+    padding-bottom: 0.5rem;
+}
+
+#rankings-section h2::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 300px;
+    height: 3px;
+    background: var(--primary);
+    box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);
+}
+
+.rankings-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+    flex-wrap: wrap;
+}
+
+.rankings-tab-btn {
+    background: transparent;
+    border: 2px solid var(--gray);
+    color: var(--text);
+    padding: 0.7rem 1.5rem;
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 4px;
+}
+
+.rankings-tab-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.rankings-tab-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: var(--darker);
+}
+
+.rankings-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.ranking-item {
+    display: grid;
+    grid-template-columns: 60px 100px 1fr;
+    gap: 1.5rem;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    align-items: start;
+}
+
+.ranking-item:last-child {
+    border-bottom: none;
+}
+
+.ranking-rank {
+    font-size: 2.5rem;
+    font-weight: 700;
+    font-family: var(--font-display);
+    color: var(--primary);
+    line-height: 1;
+}
+
+.ranking-poster {
+    width: 100px;
+    height: 150px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--gray);
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.ranking-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.ranking-item:hover .ranking-poster img {
+    transform: scale(1.05);
+}
+
+.ranking-content {
+    padding-top: 0.3rem;
+}
+
+.ranking-title {
+    display: block;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-bright);
+    text-decoration: none;
+    margin-bottom: 0.5rem;
+    font-family: var(--font-display);
+    transition: color 0.2s;
+}
+
+.ranking-title:hover {
+    color: var(--primary);
+}
+
+.ranking-description {
+    font-size: 0.95rem;
+    color: var(--text);
+    margin-bottom: 0.7rem;
+    line-height: 1.5;
+}
+
+.ranking-meta {
+    display: flex;
+    gap: 1.2rem;
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+    font-family: 'IBM Plex Mono', monospace;
+}
+
+.ranking-rating {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.star {
+    color: var(--primary) !important;
+    font-style: normal !important;
+    filter: brightness(0) saturate(100%) invert(71%) sepia(91%) saturate(5000%) hue-rotate(170deg) brightness(102%) contrast(103%);
+}
+
+@media (max-width: 600px) {
+    #rankings-section h2 {
+        font-size: 1.5rem;
+    }
+
+    .rankings-tabs {
+        gap: 0.5rem;
+    }
+
+    .rankings-tab-btn {
+        padding: 0.6rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    .ranking-item {
+        grid-template-columns: 45px 60px 1fr;
+        gap: 0.6rem;
+        padding: 0.8rem 0;
+    }
+
+    .ranking-rank {
+        font-size: 1.8rem;
+    }
+
+    .ranking-poster {
+        width: 60px;
+        height: 90px;
+    }
+
+    .ranking-title {
+        font-size: 0.95rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .ranking-description {
+        font-size: 0.8rem;
+        line-height: 1.4;
+        margin-bottom: 0.3rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .ranking-meta {
+        font-size: 0.7rem;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+}
+

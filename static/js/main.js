@@ -1,3 +1,43 @@
+// ===== RANKINGS DATA =====
+// HIER KANNST DU DIE POSTER URLS UND IMDB LINKS ÄNDERN
+// Format für jeden Eintrag:
+// { rank: 1, title: 'Filmname', year: 2023, rating: '9.2', length: '120min', description: '...', platform: 'Netflix', imdb: 'https://www.imdb.com/title/ttXXXXXX/', poster: '/static/css/images/movie/poster-name.jpg' }
+//
+// POSTER BILDER:
+// 1. Speichere deine Bilder im Ordner: /static/css/images/movie/
+// 2. Trage den Pfad ein: '/static/css/images/movie/dein-bild.jpg'
+// 3. Empfohlene Größe: 336×500px (2:3 Seitenverhältnis)
+//
+// IMDb Link: Format ist https://www.imdb.com/title/ttXXXXXX/
+// Die ttXXXXXX ist die IMDb ID (kannst du auf imdb.com finden)
+
+const RANKINGS = {
+    movies: [
+        { rank: 1, title: 'The Sixth Sense', year: 1999, rating: '9.5', length: '107min', genre: 'Thriller', description: 'Unvergesslicher Twist, meisterhaft gemacht, Gänsehaut beim Schauen.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt0167404/', poster: '/static/css/images/movie/the-sixth-sense.jpeg' },
+        { rank: 2, title: 'Fight Club', year: 1999, rating: '9.2', length: '139min', genre: 'Thriller', description: 'Tiefgründige Fragen aufs Leben mit David Fincher, der zum Denken anregt.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt0137523/', poster: '/static/css/images/movie/fightclub.png' },
+        { rank: 3, title: 'Prisoners', year: 2013, rating: '9.1', length: '153min', genre: 'Thriller', description: 'Meisterhafte Darstellungen, unfassbar wie echte Eltern reagieren.', platform: 'Netflix', imdb: 'https://www.imdb.com/title/tt1392214/', poster: '/static/css/images/movie/prisoners.png' },
+        { rank: 4, title: 'The Green Mile', year: 1999, rating: '9.0', length: '189min', genre: 'Drama', description: 'Emotional und tiefgründig, ein Film, der einen nicht mehr loslässt.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt0120689/', poster: '/static/css/images/movie/thegreenmile.png' },
+        { rank: 5, title: 'Interstellar', year: 2014, rating: '8.7', length: '169min', genre: 'Sci-Fi', description: 'Visuelle Wucht kombiniert mit emotionalem Storytelling und der besten Filmmusik.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt0816692/', poster: '/static/css/images/movie/interstellar.png' },
+        { rank: 6, title: 'Train Dreams', year: 2023, rating: '8.5', length: '127min', genre: 'Drama', description: 'Tiefgründig über Träume und Verlust, emotional überwältigend.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt29768334/', poster: '/static/css/images/movie/traindreams.png' }
+    ],
+    series: [
+        { rank: 1, title: 'Prison Break', year: 2005, rating: '9.4', length: '5 Staffeln', genre: 'Thriller', description: 'Durchgehend spannend, echtes Meisterwerk der Serienwelt.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt0455275/', poster: '/static/css/images/movie/prisonbreak.png' },
+        { rank: 2, title: 'Haus des Geldes', year: 2017, rating: '9.1', length: '5 Staffeln', genre: 'Heist', description: 'Eine verdammt geile Idee mit unverwechselbaren Charakteren und packenden Wendungen.', platform: 'Netflix', imdb: 'https://www.imdb.com/title/tt6468322/', poster: '/static/css/images/movie/hausdesgeldes.png' },
+        { rank: 3, title: 'From', year: 2022, rating: '9.0', length: '3 Staffeln', genre: 'Mystery', description: 'Mysteriös und atmosphärisch, ständig neue Fragen.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt9813792/', poster: '/static/css/images/movie/from.png' },
+        { rank: 4, title: 'The Watcher', year: 2022, rating: '8.7', length: '1 Staffel', genre: 'Thriller', description: 'Ryan Murphy Thriller über Obsession und Paranoia mit einem verrückten Ende.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt14852808/', poster: '/static/css/images/movie/the-watcher_cover.png' },
+        { rank: 5, title: 'Solange wir lügen', year: 2024, rating: '8.5', length: '8 Episoden', genre: 'Drama', description: 'Spannend über Geheimnisse und Verrat, überraschend.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/de/title/tt3914054/', poster: '/static/css/images/movie/solangewirlügen.png' },
+        { rank: 6, title: 'Discounter', year: 2022, rating: '8.0', length: '2 Staffeln', genre: 'Comedy', description: 'Mal was Anderes, echt lustig mit genau meinem Humor.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/de/title/tt16463942/', poster: '/static/css/images/movie/Discounter.png' }
+    ],
+    anime: [
+        { rank: 1, title: 'Attack on Titan', year: 2013, rating: '9.9', length: '4 Staffeln', genre: 'Action', description: 'Immer spannend, unglaubliche Plottwists, absolutes Meisterwerk.', platform: 'Crunchyroll', imdb: 'https://www.imdb.com/title/tt2560140/', poster: '/static/css/images/movie/attackontitan.png' },
+        { rank: 2, title: 'Hunter x Hunter', year: 2011, rating: '9.4', length: '6 Staffeln', genre: 'Adventure', description: 'Sehr cool, macht dich wach, willst was Großes erreichen.', platform: 'Crunchyroll', imdb: 'https://www.imdb.com/title/tt2098220/', poster: '/static/css/images/movie/hunterxhunter.png' },
+        { rank: 3, title: 'Death Note', year: 2006, rating: '9.0', length: '2 Staffeln', genre: 'Thriller', description: 'Hin und her mit Tricks, pure Spannung auf höchstem Niveau.', platform: 'Netflix', imdb: 'https://www.imdb.com/title/tt0877057/', poster: '/static/css/images/movie/DEATH_NOTE.png' },
+        { rank: 4, title: '7 Deadly Sins', year: 2014, rating: '8.2', length: '5 Staffeln', genre: 'Fantasy', description: 'Ich feier die Charaktere und die Story, einfach solid durchzuschauen.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt3909224/', poster: '/static/css/images/movie/7deadlysins.png' },
+        { rank: 5, title: 'Demon Slayer', year: 2019, rating: '7.8', length: '4 Staffeln', genre: 'Action', description: 'Wahnsinn Animationen, emotional, unforgettable Kämpfe.', platform: 'Netflix', imdb: 'https://www.imdb.com/title/tt9335498/', poster: '/static/css/images/movie/DemonSlayer.png' },
+        { rank: 6, title: 'My Hero Academia', year: 2016, rating: '7.6', length: '7 Staffeln', genre: 'Action', description: 'Viele Charaktere und die sind alle wichtig, gute Story mit guter Action.', platform: 'Crunchyroll', imdb: 'https://www.imdb.com/title/tt5626028/', poster: '/static/css/images/movie/myheroacademia.png' }
+    ]
+};
+
 // ===== MAIN CONFIGURATION =====
 const CONFIG = {
     SITE_VERSION: '20250515-2',
@@ -189,134 +229,6 @@ const clubData = [
     }
 ];
 
-const topListsData = {
-    anime: [
-        {
-            rank: 1,
-            title: 'Attack on Titan',
-            rating: '★★★★★',
-            description: 'Die Menschheit lebt hinter riesigen Mauern, um sich vor menschenfressenden Titanen zu schützen. Was als einfache Survival-Story beginnt, entwickelt sich zu einer komplexen Erzählung über Krieg, Rassismus und den Kreislauf der Gewalt. Jede Staffel übertrifft die vorherige.',
-            platform: 'Crunchyroll',
-            episodes: '87 Episoden'
-        },
-        {
-            rank: 2,
-            title: 'Hunter x Hunter',
-            rating: '★★★★★',
-            description: 'Gon Freecss begibt sich auf die Suche nach seinem Vater und wird dabei zum Hunter. Die Serie brilliert durch komplexe Charaktere, ein ausgeklügeltes Nen-System und Kämpfe, die mehr auf Strategie als auf rohe Kraft setzen. Der Chimera Ant Arc gilt als einer der besten Anime-Arcs aller Zeiten.',
-            platform: 'Prime',
-            episodes: '148 Episoden'
-        },
-        {
-            rank: 3,
-            title: 'Death Note',
-            rating: '★★★★☆',
-            description: 'Light Yagami findet ein Notizbuch, mit dem er jeden töten kann, dessen Namen er hineinschreibt. Der daraus entstehende Kampf zwischen Light und dem Detektiv L ist ein brillantes Katz-und-Maus-Spiel voller Wendungen und moralischer Fragen über Gerechtigkeit.',
-            platform: 'Netflix',
-            episodes: '37 Episoden'
-        },
-        {
-            rank: 4,
-            title: '7 Deadly Sins',
-            rating: '★★★☆☆',
-            description: 'Die Seven Deadly Sins sind gefallene Helden, die ein zerschlagenes Königreich retten wollen. Die Dynamik der Charaktere und die überraschenden Wendungen sorgen für ein mitreißendes Abenteuer, das süchtig macht.',
-            platform: 'Netflix',
-            episodes: '100 Episoden'
-        },
-        {
-            rank: 5,
-            title: 'Demon Slayer',
-            rating: '★★★☆☆',
-            description: 'Tanjiro Kamado wird zum Dämonenjäger, um seine in einen Dämon verwandelte Schwester zu retten. Ufotable\'s Animation setzt neue Maßstäbe, besonders in Kampfszenen. Die emotionale Geschichte und liebenswerten Charaktere machen es zu einem modernen Klassiker.',
-            platform: 'Netflix',
-            episodes: '44 Episoden'
-        }
-    ],
-    movies: [
-        {
-            rank: 1,
-            title: 'The Sixth Sense',
-            rating: '★★★★★',
-            description: 'Dr. Crowe ist ein angesehener Kinderpsychologe, der einem verstörten Jungen helfen soll. The Sixth Sense ist ein atmosphärisch dichter Psychothriller über Verlust, Schuld und das Unbewusste. Noch nie hat mich ein Plottwist am Ende so heftig getroffen. Mit großem Abstand mein Lieblingsfilm!',
-            platform: 'Prime',
-            year: '1999'
-        },
-        {
-            rank: 2,
-            title: 'The Green Mile',
-            rating: '★★★★★',
-            description: 'Paul Edgecomb arbeitet als Aufseher im Todestrakt, doch ein neuer Häftling stellt alles infrage, was er je für wahr hielt. The Green Mile ist ein zutiefst bewegendes Drama über Mitgefühl, Gerechtigkeit und das Übernatürliche.',
-            platform: 'Prime',
-            year: '1999'
-        },
-        {
-            rank: 3,
-            title: 'Shutter Island',
-            rating: '★★★★★',
-            description: 'Teddy Daniels ist US-Marshal und ermittelt auf einer abgelegenen Inselklinik, doch nichts ist, wie es scheint. Shutter Island ist ein packender Psychothriller über Trauma, Wahrnehmung und Wahnsinn. Das verstörende Ende entfaltet eine Wucht, die einen noch lange danach nicht loslässt.',
-            platform: 'Netflix',
-            year: '2010'
-        },
-        {
-            rank: 4,
-            title: 'Interstellar',
-            rating: '★★★★☆',
-            description: 'Cooper ist Pilot und Vater, seine Mission: das Überleben der Menschheit jenseits der Sterne. Interstellar ist ein visuell überwältigendes Sci-Fi-Epos über Zeit, Raum und die Kraft der Liebe. Hans Zimmers Score und die emotionale Tiefe machen das Finale zu einem der eindrucksvollsten der Filmgeschichte.',
-            platform: 'Netflix',
-            year: '2014'
-        },
-        {
-            rank: 5,
-            title: 'Joker',
-            rating: '★★★★☆',
-            description: 'Arthur Fleck ist ein Außenseiter in einer kalten, zerrissenen Gesellschaft. Joker ist ein düsteres Charakterporträt über Wahnsinn, Isolation und Identität. Mit einer verstörenden Intensität und Joaquin Phoenix in Höchstform hinterlässt dieser Film ein Gefühl, das lange nachwirkt.',
-            platform: 'Prime',
-            year: '2019'
-        }
-    ],
-    series: [
-        {
-            rank: 1,
-            title: 'Prison Break',
-            rating: '★★★★★',
-            description: 'Ein Ingenieur entwickelt einen ausgeklügelten Plan, um seinen Bruder aus dem Gefängnis zu befreien. Clevere Wendungen und psychologische Spannung in einem der besten Gefängnis-Thriller aller Zeiten.',
-            platform: 'Prime',
-            episodes: '90 Episoden'
-        },
-        {
-            rank: 2,
-            title: 'Haus des Geldes',
-            rating: '★★★★☆',
-            description: 'Ein geheimnisvoller Mastermind plant den spektakulärsten Bankraub Spaniens. Heist-Thriller mit emotionaler Tiefe und gesellschaftskritischen Untertönen, der weltweit zum Phänomen wurde.',
-            platform: 'Netflix',
-            episodes: '48 Episoden'
-        },
-        {
-            rank: 3,
-            title: 'From',
-            rating: '★★★☆☆',
-            description: 'Eine Familie strandet in einer mysteriösen Stadt, aus der niemand entkommen kann. Mystery-Horror mit psychologischen Elementen, der Spannung bis zur letzten Minute garantiert.',
-            platform: 'Prime',
-            episodes: '40 Episoden'
-        },
-        {
-            rank: 4,
-            title: 'The Watcher',
-            rating: '★★★☆☆',
-            description: 'Eine Familie zieht in ihr Traumhaus und wird von anonymen, bedrohlichen Briefen terrorisiert. Psychothriller über Paranoia und die dunklen Geheimnisse der Nachbarschaft.',
-            platform: 'Netflix',
-            episodes: '7 Episoden'
-        },
-        {
-            rank: 5,
-            title: 'Discounter',
-            rating: '★★★☆☆',
-            description: 'Das chaotische Leben in einem deutschen Discounter zwischen Sonderangeboten und sozialen Abgründen. Schwarze Komödie, die den Einzelhandel-Wahnsinn mit viel Humor entlarvt.',
-            platform: 'Prime',
-            episodes: '40 Episoden'
-        }
-    ]
-};
 
 // ===== THREE.JS BACKGROUND =====
 function initThreeBackground() {
@@ -615,6 +527,8 @@ function createClubCards() {
         });
     }, 300);
 }
+
+// ===== RANKINGS FUNCTIONS =====
 
 // ===== TOP LISTS FUNCTIONS =====
 function createTopLists() {
@@ -1343,6 +1257,81 @@ class TinderGallery {
     }
 }
 
+// ===== RANKINGS INITIALIZATION =====
+function initRankings() {
+    const container = document.getElementById('rankings-container');
+    const tabs = document.querySelectorAll('.rankings-tab-btn');
+    const rankingCategory = document.getElementById('ranking-category');
+
+    if (!container || tabs.length === 0) return;
+
+    let currentCategory = 'movies';
+
+    const categoryLabels = {
+        movies: 'Film',
+        series: 'Serien',
+        anime: 'Anime'
+    };
+
+    // Funktion zum Konvertieren von Minuten zu h:min Format
+    function formatLength(length) {
+        // Wenn es schon "X Staffeln" ist, nicht konvertieren
+        if (length.includes('Staffel')) {
+            return length;
+        }
+
+        // Wenn es "XXXmin" ist, konvertieren
+        if (length.includes('min')) {
+            const minutes = parseInt(length);
+            const hours = Math.floor(minutes / 60);
+            const mins = minutes % 60;
+            return `${hours}h${mins}min`;
+        }
+
+        return length;
+    }
+
+    function renderRankings(category) {
+        const items = RANKINGS[category];
+        container.innerHTML = items.map(item => `
+            <div class="ranking-item">
+                <div class="ranking-rank">${String(item.rank).padStart(2, '0')}</div>
+                <div class="ranking-poster">
+                    <img src="${item.poster}" alt="${item.title}" loading="lazy">
+                </div>
+                <div class="ranking-content">
+                    <a href="${item.imdb}" target="_blank" rel="noopener noreferrer" class="ranking-title">${item.title}</a>
+                    <p class="ranking-description">${item.description}</p>
+                    <div class="ranking-meta">
+                        <span class="ranking-rating"><span class="star">⭐</span> ${item.rating}</span>
+                        <span>${item.genre || ''}</span>
+                        <span>${item.platform}</span>
+                        <span>${formatLength(item.length)}</span>
+                        <span>${item.year}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            currentCategory = tab.dataset.category;
+            renderRankings(currentCategory);
+            if (rankingCategory) {
+                rankingCategory.textContent = categoryLabels[currentCategory];
+            }
+        });
+    });
+
+    renderRankings('movies');
+    if (rankingCategory) {
+        rankingCategory.textContent = categoryLabels['movies'];
+    }
+}
+
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', function() {
     initVersionManagement();
@@ -1354,7 +1343,7 @@ document.addEventListener('DOMContentLoaded', function() {
     createGallery();
     setupCarouselNavigation();
     createClubCards();
-    createTopLists();
+    initRankings();
 
     // NEU: Tinder Gallery für Mobile
     setTimeout(() => {

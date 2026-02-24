@@ -9,7 +9,7 @@
     <link rel="icon" href="{% static 'css/images/favicon.ico' %}" type="image/x-icon">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" as="style">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20250515-2">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20250224-23">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -117,6 +117,21 @@
         </div>
     </div>
 
+    <!-- Rankings Section -->
+    <section id="rankings-section" class="rankings-section">
+        <div class="container">
+            <h2 class="fade-in" id="ranking-title"><span id="ranking-category">Film</span> <span class="text-gradient">Ranking</span></h2>
+
+            <div class="rankings-tabs fade-in">
+                <button class="rankings-tab-btn active" data-category="movies">Filme</button>
+                <button class="rankings-tab-btn" data-category="series">Serien</button>
+                <button class="rankings-tab-btn" data-category="anime">Anime</button>
+            </div>
+
+            <div id="rankings-container" class="rankings-container"></div>
+        </div>
+    </section>
+
     <!-- Footer -->
     <footer id="contact">
         <div class="container">
@@ -144,6 +159,6 @@
     </footer>
 
     <script defer src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
-    <script defer src="{% static 'js/main.js' %}?v=20250514-2"></script>
+    <script defer src="{% static 'js/main.js' %}?v=20250224-23"></script>
 </body>
 </html>
