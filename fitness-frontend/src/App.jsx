@@ -5,6 +5,7 @@ import { ProtectedRoute } from './components/Auth/ProtectedRoute';
 import { useAuth } from './hooks/useAuth';
 import MainLayout from './components/Layout/MainLayout';
 import OfflineIndicator from './components/Layout/OfflineIndicator';
+import HomeView from './components/Home/HomeView';
 import WorkoutView from './components/Workout/WorkoutView';
 
 // Lazy load profile view for code splitting
@@ -86,9 +87,21 @@ export const App = () => {
             element={isAuthenticated ? <Navigate to="/" /> : <Login />}
           />
 
-          {/* Protected Routes with MainLayout */}
+          {/* Home Route */}
           <Route
             path="/"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <HomeView />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Workout Route */}
+          <Route
+            path="/workout"
             element={
               <ProtectedRoute>
                 <MainLayout>
@@ -98,6 +111,7 @@ export const App = () => {
             }
           />
 
+          {/* Profile Route */}
           <Route
             path="/profile"
             element={

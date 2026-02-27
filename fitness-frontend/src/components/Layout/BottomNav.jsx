@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 export default function BottomNav() {
   const location = useLocation();
 
+  const isActive = (path) => location.pathname === path ? '#60a5fa' : '#94a3b8';
+
   return (
     <nav style={{
       position: 'fixed',
@@ -17,12 +19,17 @@ export default function BottomNav() {
       alignItems: 'center',
       zIndex: 50,
     }}>
-      <Link to="/" style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: location.pathname === '/' ? '#60a5fa' : '#94a3b8', textDecoration: 'none' }}>
+      <Link to="/" style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: isActive('/'), textDecoration: 'none' }}>
+        <span style={{ fontSize: '24px', marginBottom: '4px' }}>🏠</span>
+        <span style={{ fontSize: '12px' }}>Home</span>
+      </Link>
+
+      <Link to="/workout" style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: isActive('/workout'), textDecoration: 'none' }}>
         <span style={{ fontSize: '24px', marginBottom: '4px' }}>💪</span>
         <span style={{ fontSize: '12px' }}>Workout</span>
       </Link>
 
-      <Link to="/profile" style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: location.pathname === '/profile' ? '#60a5fa' : '#94a3b8', textDecoration: 'none' }}>
+      <Link to="/profile" style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: isActive('/profile'), textDecoration: 'none' }}>
         <span style={{ fontSize: '24px', marginBottom: '4px' }}>👤</span>
         <span style={{ fontSize: '12px' }}>Profile</span>
       </Link>

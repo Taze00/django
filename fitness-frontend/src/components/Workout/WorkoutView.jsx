@@ -59,10 +59,10 @@ export default function WorkoutView() {
 
     const schedule = {
       1: ['Push-up', 'Pull-up'],   // Monday
-      2: ['Pull-up'],               // Tuesday
-      3: ['Push-up', 'Pull-up'],    // Wednesday
-      4: ['Pull-up'],               // Thursday
-      5: ['Push-up', 'Pull-up'],    // Friday
+      2: ['Push-up', 'Pull-up'],   // Tuesday
+      3: ['Push-up', 'Pull-up'],   // Wednesday
+      4: ['Push-up', 'Pull-up'],   // Thursday
+      5: ['Push-up', 'Pull-up'],   // Friday
       // 6 = Saturday (Rest), 0/7 = Sunday (Rest)
     };
 

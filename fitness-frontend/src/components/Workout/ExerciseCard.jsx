@@ -56,9 +56,6 @@ export default function ExerciseCard({
       {/* Header - Exercise Name + Set Number */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-blue-500/40 flex items-center justify-center border border-blue-500/30 font-bold text-blue-300 text-sm">
-            {exerciseIndex + 1}
-          </div>
           <div>
             <h3 className="text-lg font-bold text-white">{currentProgression.name}</h3>
             <p className="text-slate-400 text-xs">
