@@ -458,11 +458,11 @@ class WorkoutViewSet(viewsets.ModelViewSet):
             workout=workout,
             exercise=exercise,
             set_number=set_number,
+            is_drop_set=is_drop_set,
             defaults={
                 'progression': progression,
                 'reps': reps,
                 'seconds': seconds,
-                'is_drop_set': is_drop_set,
                 'drop_set_data': drop_set_data,
             }
         )
