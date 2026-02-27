@@ -58,14 +58,9 @@ export default function StatsView() {
             icon="🔢"
           />
           <StatsCard
-            label="Push"
-            value={overview.push_workouts}
-            icon="⬆️"
-          />
-          <StatsCard
-            label="Pull"
-            value={overview.pull_workouts}
-            icon="⬇️"
+            label="Total Sets"
+            value={overview.total_sets}
+            icon="📦"
           />
         </div>
       ) : null}

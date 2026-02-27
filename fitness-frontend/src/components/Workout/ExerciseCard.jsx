@@ -3,7 +3,6 @@ import SetInput from './SetInput';
 import TimerInput from './TimerInput';
 import RestTimer from './RestTimer';
 import DropSetModal from './DropSetModal';
-import CircularProgress from './CircularProgress';
 
 export default function ExerciseCard({
   exercise,
@@ -16,12 +15,10 @@ export default function ExerciseCard({
   const [showDropSetModal, setShowDropSetModal] = useState(false);
   const [lastCompletedSetNumber, setLastCompletedSetNumber] = useState(null);
 
-  // Debug logging
   if (!userProgression) {
     console.warn(`[ExerciseCard] No userProgression for exercise ${exercise?.id} (${exercise?.name})`);
   }
 
-  // Get current progression level
   const currentProgression = Array.isArray(exercise?.progressions)
     ? exercise.progressions.find((p) => p?.id === userProgression?.current_progression)
     : null;
@@ -30,17 +27,14 @@ export default function ExerciseCard({
     setLastCompletedSetNumber(setNumber);
     setExpandedSetIndex(null);
 
-    // Only show rest timer and drop set modal for NEW sets, not updates
     if (info.isUpdate) {
-      console.log(`[ExerciseCard] Set ${setNumber} updated with ${info.reps} reps`);
-      return; // Don't show timer for updates
+      console.log(`[ExerciseCard] Set ${setNumber} updated`);
+      return;
     }
 
-    // Show rest timer after each set (except last set, which shows drop set modal)
     if (setNumber < 3) {
       setShowRestTimer(true);
     } else if (setNumber === 3) {
-      // For set 3, show drop set modal
       setShowDropSetModal(true);
     }
   };
@@ -53,15 +47,13 @@ export default function ExerciseCard({
     }
   };
 
-  // Calculate sets statistics
   const completedSets = Array.isArray(workoutSets)
-    ? workoutSets.filter(s => exercise.is_timed ? s?.seconds !== null : s?.reps !== null).length
+    ? workoutSets.filter(s => currentProgression?.target_type === 'time' ? s?.seconds !== null : s?.reps !== null).length
     : 0;
   const totalSets = 3;
 
   return (
     <div className="bg-slate-900/40 backdrop-blur-lg rounded-2xl p-5 border border-slate-700/50 hover:border-slate-600/70 transition-all duration-200 shadow-lg shadow-blue-500/5">
-      {/* Exercise Header with Number Badge */}
       <div className="flex items-start gap-3 mb-4">
         <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-500/30 flex items-center justify-center border border-blue-500/50">
           <span className="text-blue-300 font-bold text-lg">{exerciseIndex + 1}</span>
@@ -74,60 +66,73 @@ export default function ExerciseCard({
         </div>
       </div>
 
-      {/* Current Progression Info */}
       {currentProgression && (
         <div className="bg-gradient-to-r from-blue-500/15 to-purple-500/15 backdrop-blur-sm border border-blue-500/30 rounded-xl p-4 mb-4">
-          <div className="flex items-center justify-between gap-4">
-            <div className="flex-1">
-              <p className="text-blue-300 text-xs font-semibold uppercase tracking-wide mb-1">
-                📊 Current Level
-              </p>
-              <p className="text-white font-semibold text-lg">{currentProgression.name}</p>
-              {currentProgression.description && (
-                <p className="text-slate-300 text-xs mt-2">
-                  {currentProgression.description}
+          <div>
+            <div className="flex items-start justify-between gap-2">
+              <div>
+                <p className="text-blue-300 text-xs font-semibold uppercase tracking-wide mb-1">
+                  📊 Level {currentProgression.level}
                 </p>
-              )}
+                <p className="text-white font-semibold text-lg">{currentProgression.name}</p>
+              </div>
+              <div className="text-right">
+                <p className="text-2xl font-bold text-green-300">
+                  {userProgression?.sessions_at_target || 0}<span className="text-sm text-slate-400">/3</span>
+                </p>
+                <p className="text-xs text-slate-300">sessions</p>
+              </div>
             </div>
-            <div className="flex-shrink-0">
-              <CircularProgress
-                percentage={(currentProgression.level / exercise.progressions.length) * 100}
-                color="from-blue-500 to-purple-600"
-                size="sm"
-                label={`${currentProgression.level}/${exercise.progressions.length}`}
-              />
+
+            {currentProgression.description && (
+              <p className="text-slate-300 text-sm mt-2">
+                {currentProgression.description}
+              </p>
+            )}
+
+            <div className="mt-3 pt-3 border-t border-blue-500/20 space-y-2">
+              <div className="flex items-center gap-2 text-sm">
+                <span className="font-semibold text-amber-300">🎯 Target:</span>
+                <span className="font-bold text-white">
+                  Set 1+2 each: {currentProgression.target_type === 'time'
+                    ? `${currentProgression.target_value}s`
+                    : `${currentProgression.target_value} reps`}
+                </span>
+              </div>
+
+              {currentProgression.form_cues && currentProgression.form_cues.length > 0 && (
+                <div className="mt-2">
+                  <p className="text-xs font-semibold text-amber-300 mb-1">✓ Form Cues:</p>
+                  <div className="space-y-0.5">
+                    {currentProgression.form_cues.slice(0, 3).map((cue, idx) => (
+                      <p key={idx} className="text-xs text-slate-200">
+                        {cue}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       )}
 
-      {/* Sets Progress */}
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <p className="text-slate-300 text-sm font-semibold">Sets Fortschritt</p>
-          <p className="text-slate-400 text-xs mt-1">{completedSets} von {totalSets} Sets abgeschlossen</p>
-        </div>
-        <div className="flex-shrink-0">
-          <CircularProgress
-            percentage={(completedSets / totalSets) * 100}
-            color="from-blue-500 to-purple-600"
-            size="md"
-            label={`${completedSets}/${totalSets}`}
-          />
+          <p className="text-slate-300 text-sm font-semibold">Sets Progress</p>
+          <p className="text-slate-400 text-xs mt-1">{completedSets} of {totalSets} sets</p>
         </div>
       </div>
 
-      {/* Sets Grid */}
       <div className="space-y-2">
         {[1, 2, 3].map((setNumber) => {
           const setsArray = Array.isArray(workoutSets) ? workoutSets : [];
           const existingSet = setsArray.find((s) => s?.set_number === setNumber);
           const isExpanded = expandedSetIndex === setNumber - 1;
-          const isCompleted = existingSet && (exercise.is_timed ? existingSet.seconds !== null : existingSet.reps !== null);
+          const isCompleted = existingSet && (currentProgression?.target_type === 'time' ? existingSet.seconds !== null : existingSet.reps !== null);
 
           return (
             <div key={setNumber}>
-              {/* Set Button/Header */}
               <button
                 onClick={() =>
                   setExpandedSetIndex(isExpanded ? null : setNumber - 1)
@@ -151,9 +156,9 @@ export default function ExerciseCard({
                   </div>
                   {isCompleted && existingSet && (
                     <span className="text-sm font-bold bg-white/20 px-3 py-1 rounded-full">
-                      ✓ {exercise.is_timed
+                      ✓ {currentProgression?.target_type === 'time'
                         ? `${Math.floor(existingSet.seconds / 60)}:${(existingSet.seconds % 60).toString().padStart(2, '0')}`
-                        : `${existingSet.reps} reps`}
+                        : `${existingSet.reps}/${currentProgression?.target_value}`}
                     </span>
                   )}
                   <span className={`transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
@@ -162,15 +167,16 @@ export default function ExerciseCard({
                 </div>
               </button>
 
-              {/* Set Input (Expanded) */}
               {isExpanded && (
                 <div className="mt-3 bg-gradient-to-b from-slate-700/80 to-slate-800/50 rounded-xl p-4 border border-slate-600 shadow-lg">
                   <div className="mb-3 pb-3 border-b border-slate-600">
                     <p className="text-slate-400 text-xs font-semibold uppercase tracking-wide">
-                      {exercise.is_timed ? `Zeit halten für Set ${setNumber}` : `Reps eingeben für Set ${setNumber}`}
+                      {setNumber < 3
+                        ? `Set ${setNumber}${currentProgression?.target_type === 'time' ? ' - Hold Time' : ' - Enter Reps'}`
+                        : 'Drop Set - Choose Drop Progression'}
                     </p>
                   </div>
-                  {exercise.is_timed ? (
+                  {currentProgression?.target_type === 'time' ? (
                     <TimerInput
                       exercise={exercise}
                       setNumber={setNumber}
@@ -178,6 +184,7 @@ export default function ExerciseCard({
                       existingSet={existingSet}
                       onCompleted={handleSetCompleted}
                       isDropSet={setNumber === 3}
+                      currentProgression={currentProgression}
                     />
                   ) : (
                     <SetInput
@@ -187,6 +194,7 @@ export default function ExerciseCard({
                       existingSet={existingSet}
                       onCompleted={handleSetCompleted}
                       isDropSet={setNumber === 3}
+                      currentProgression={currentProgression}
                     />
                   )}
                 </div>
@@ -196,7 +204,6 @@ export default function ExerciseCard({
         })}
       </div>
 
-      {/* Rest Timer Modal */}
       {showRestTimer && lastCompletedSetNumber && lastCompletedSetNumber < 3 && (
         <RestTimer
           onComplete={handleTimerComplete}
@@ -204,7 +211,6 @@ export default function ExerciseCard({
         />
       )}
 
-      {/* Drop Set Modal */}
       {showDropSetModal && (
         <DropSetModal
           exercise={exercise}

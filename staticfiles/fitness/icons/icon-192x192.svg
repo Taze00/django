@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <defs>
+    <style>
+      .bg { fill: #0f172a; }
+      .text { fill: #3b82f6; font-size: 100px; font-weight: bold; font-family: Arial, sans-serif; }
+    </style>
+  </defs>
+  <rect class="bg" width="192" height="192" rx="40"/>
+  <text class="text" x="50%" y="130" text-anchor="middle">💪</text>
+</svg>

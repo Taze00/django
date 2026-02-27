@@ -169,16 +169,19 @@ export const useWorkoutStore = create((set, get) => ({
   // Clear error
   clearError: () => set({ error: null }),
 
-  // Initialize (fetch all data in parallel)
+  // Initialize (fetch all data in correct order)
   initialize: async () => {
     set({ isLoading: true });
     try {
-      // Fetch exercises, progressions, and current workout in parallel instead of sequentially
-      await Promise.all([
-        get().fetchExercises(),
-        get().fetchUserProgressions(),
-        get().fetchCurrentWorkout()
-      ]);
+      // IMPORTANT: Must fetch current workout FIRST to initialize UserExerciseProgressions
+      await get().fetchCurrentWorkout();
+      // Then fetch progressions after workout (to get the newly created ones)
+      await get().fetchUserProgressions();
+      // Finally fetch exercises in parallel with above if not done yet
+      await get().fetchExercises();
+    } catch (error) {
+      console.error('Initialize error:', error);
+      set({ error: 'Failed to initialize' });
     } finally {
       set({ isLoading: false });
     }

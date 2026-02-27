@@ -3,8 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useAuthStore } from '../../store/authStore';
 import { useWorkoutStore } from '../../store/workoutStore';
-import shareIcon from '../../assets/share-icon.png';
-import mehrIcon from '../../assets/mehr-icon.png';
 
 export default function ProfileView() {
   const { user, logout, fetchUser } = useAuth();
@@ -230,12 +228,12 @@ export default function ProfileView() {
                   <li className="flex gap-3 items-center">
                     <span className="text-blue-400 font-bold">1.</span>
                     <span>Tippe unten auf das Share-Icon:</span>
-                    <img src={shareIcon} alt="Share Icon" className="w-5 h-5 object-contain" />
+                    📤
                   </li>
                   <li className="flex gap-3 items-center">
                     <span className="text-blue-400 font-bold">2.</span>
                     <span>Klicke auf "Mehr":</span>
-                    <img src={mehrIcon} alt="Mehr Icon" style={{ height: '1.6rem' }} className="object-contain" />
+                    📤
                   </li>
                   <li className="flex gap-3">
                     <span className="text-blue-400 font-bold">3.</span>

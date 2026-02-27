@@ -8,29 +8,28 @@ export default function SetInput({
   existingSet,
   onCompleted,
   isDropSet = false,
+  currentProgression,
 }) {
   const { addSet } = useWorkoutStore();
   const [reps, setReps] = useState(existingSet?.reps || 0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  // For drop sets, we might use a different progression
   const [dropSetProgressionId, setDropSetProgressionId] = useState(
     existingSet?.drop_set_progression || userProgression?.current_progression || null
   );
 
-  const currentProgression = Array.isArray(exercise?.progressions)
-    ? exercise.progressions.find(
-        (p) => p?.id === userProgression?.current_progression
-      )
-    : null;
+  // Get current progression if not passed as prop
+  const progression = currentProgression ||
+    (Array.isArray(exercise?.progressions)
+      ? exercise.progressions.find((p) => p?.id === userProgression?.current_progression)
+      : null);
 
   // Get available progressions for drop set
-  const availableProgressions = currentProgression
-    ? (exercise?.progressions || []).filter(
-        (p) => p?.level < currentProgression.level
-      )
+  const availableProgressions = progression
+    ? (exercise?.progressions || []).filter((p) => p?.level < progression.level)
     : [];
+
+  const targetReps = progression?.target_value || 8;
 
   const handleSave = async () => {
     if (reps === 0) {
@@ -63,7 +62,6 @@ export default function SetInput({
       );
 
       if (result) {
-        // Pass info about whether this was an update or new set
         onCompleted(setNumber, { isUpdate: !!existingSet, reps: reps });
       } else {
         setError('Failed to save set - please try again');
@@ -79,34 +77,44 @@ export default function SetInput({
   const handleIncrement = () => setReps((r) => r + 1);
   const handleDecrement = () => setReps((r) => (r > 0 ? r - 1 : 0));
 
-  // Calculate target reps based on progression
-  const targetReps = currentProgression?.rep_min || 0;
-  const maxReps = currentProgression?.rep_max || 15;
+  const meetsTarget = reps >= targetReps;
+  const rirCount = Math.max(0, reps - targetReps);
 
   return (
     <div className="space-y-4">
-      {/* Target Info Box */}
-      {currentProgression && (
-        <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 flex items-center justify-between">
-          <div>
-            <p className="text-blue-300 text-xs font-semibold uppercase">Target Range</p>
-            <p className="text-white font-bold text-sm mt-0.5">
-              {targetReps} - {maxReps} reps
-            </p>
+      {/* Target Info & RIR Status */}
+      {progression && (
+        <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 space-y-2">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-blue-300 text-xs font-semibold uppercase">Target</p>
+              <p className="text-white font-bold text-lg">
+                {targetReps} reps
+              </p>
+            </div>
+            <div className={`text-right px-3 py-1 rounded-lg ${
+              meetsTarget
+                ? 'bg-green-500/20 border border-green-500/50'
+                : 'bg-slate-500/20 border border-slate-500/50'
+            }`}>
+              <p className="text-slate-400 text-xs">Current:</p>
+              <p className={`text-xl font-bold ${meetsTarget ? 'text-green-400' : 'text-slate-300'}`}>
+                {reps}
+              </p>
+            </div>
           </div>
-          <div className="text-right">
-            <p className="text-slate-400 text-xs">Aktuell eingegeben:</p>
-            <p className={`text-lg font-bold ${reps >= targetReps ? 'text-green-400' : 'text-slate-300'}`}>
-              {reps} reps
-            </p>
-          </div>
+          {meetsTarget && (
+            <div className="text-xs text-green-300 font-semibold">
+              ✓ RIR {rirCount} (Reps In Reserve)
+            </div>
+          )}
         </div>
       )}
 
       {/* Rep Counter */}
       <div className="space-y-2">
         <label className="block text-sm font-semibold text-slate-300">
-          Reps Eingeben
+          Enter Reps
         </label>
         <div className="flex items-center gap-2 justify-center bg-slate-800/50 rounded-xl p-4 border border-slate-700">
           <button
@@ -122,8 +130,11 @@ export default function SetInput({
               {reps}
             </div>
             <p className="text-slate-400 text-xs mt-1 uppercase tracking-widest">reps</p>
-            {reps >= targetReps && reps <= maxReps && (
-              <p className="text-green-400 text-xs font-bold mt-1">✓ Im Target!</p>
+            {meetsTarget && (
+              <p className="text-green-400 text-xs font-bold mt-1">✓ Target Hit!</p>
+            )}
+            {!meetsTarget && reps > 0 && (
+              <p className="text-amber-300 text-xs font-bold mt-1">Need {targetReps - reps} more</p>
             )}
           </div>
 
@@ -141,7 +152,7 @@ export default function SetInput({
       {isDropSet && availableProgressions.length > 0 && (
         <div className="space-y-2">
           <label className="block text-sm font-semibold text-slate-300">
-            Drop Set Progression
+            🔥 Drop Set Progression
           </label>
           <select
             value={dropSetProgressionId}

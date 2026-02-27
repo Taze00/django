@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "npm run build && rm -rf ../static/fitness && mkdir -p ../static/fitness && cp -r dist/* ../static/fitness/"
+    "deploy": "npm run build && rm -rf ../static/fitness/assets && rm -f ../static/fitness/sw.js ../static/fitness/workbox-*.js && cp -r dist/* ../static/fitness/ && echo '✓ Assets cleared and new files deployed'"
   },
   "dependencies": {
     "react": "^18.2.0",

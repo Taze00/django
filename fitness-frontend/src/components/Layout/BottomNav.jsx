@@ -22,11 +22,6 @@ export default function BottomNav() {
         <span style={{ fontSize: '12px' }}>Workout</span>
       </Link>
 
-      <Link to="/stats" style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: location.pathname === '/stats' ? '#60a5fa' : '#94a3b8', textDecoration: 'none' }}>
-        <span style={{ fontSize: '24px', marginBottom: '4px' }}>📊</span>
-        <span style={{ fontSize: '12px' }}>Stats</span>
-      </Link>
-
       <Link to="/profile" style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: location.pathname === '/profile' ? '#60a5fa' : '#94a3b8', textDecoration: 'none' }}>
         <span style={{ fontSize: '24px', marginBottom: '4px' }}>👤</span>
         <span style={{ fontSize: '12px' }}>Profile</span>
