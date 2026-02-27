@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import SetInput from './SetInput';
 import TimerInput from './TimerInput';
+import DropSetModal from './DropSetModal';
 
 export default function ExerciseCard({
   exercise,
@@ -12,6 +13,7 @@ export default function ExerciseCard({
 }) {
   const [expandedSetInput, setExpandedSetInput] = useState(true); // Always expanded in Phase 8
   const [showFormTips, setShowFormTips] = useState(false);
+  const [showDropSetModal, setShowDropSetModal] = useState(false);
 
   if (!userProgression) {
     console.warn(`[ExerciseCard] No userProgression for exercise ${exercise?.id} (${exercise?.name})`);
@@ -32,7 +34,11 @@ export default function ExerciseCard({
   );
 
   const handleSetCompleted = (completedSetNumber, info = {}) => {
-    if (onSetCompleted) {
+    // If this is Set 3 and we have drop-set options, show drop-set modal
+    if (completedSetNumber === 3 && currentProgression?.level > 1 && !info.isUpdate) {
+      setShowDropSetModal(true);
+    } else if (onSetCompleted) {
+      // Otherwise proceed to next step
       onSetCompleted(completedSetNumber, info);
     }
   };
@@ -109,6 +115,22 @@ export default function ExerciseCard({
             </div>
           )}
         </div>
+      )}
+
+      {/* Drop Set Modal - Show after Set 3 if available */}
+      {showDropSetModal && (
+        <DropSetModal
+          exercise={exercise}
+          workoutSet={workoutSets?.find(s => s.set_number === 3 && s.is_drop_set)}
+          userProgression={userProgression}
+          onClose={() => {
+            setShowDropSetModal(false);
+            // After drop set is done, proceed to next step
+            if (onSetCompleted) {
+              onSetCompleted(3, { isDropSetDone: true });
+            }
+          }}
+        />
       )}
     </div>
   );

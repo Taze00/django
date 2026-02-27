@@ -280,29 +280,42 @@ export default function WorkoutView() {
       {!showRestTimer && !workoutCompleted && (
         <div className="fixed bottom-20 left-0 right-0 p-4 bg-slate-900/80 backdrop-blur-sm border-t border-slate-700/50">
           <div className="flex gap-3 max-w-md mx-auto">
+            {/* Back Button - Always available if not first step */}
             {currentStep > 0 && (
               <button
                 onClick={() => setCurrentStep(currentStep - 1)}
                 className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-4 rounded-lg transition-all"
+                title="Go back to previous set"
               >
-                ← Previous
+                ← Back
               </button>
             )}
+
+            {/* Complete Button - Last step */}
             {currentStep === workoutFlow.length - 1 && (
               <button
                 onClick={handleCompleteWorkout}
                 disabled={isCompleting}
                 className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-slate-600 disabled:to-slate-700 text-white font-bold py-3 px-4 rounded-lg transition-all"
               >
-                {isCompleting ? 'Completing...' : '✓ Complete'}
+                {isCompleting ? (
+                  <span className="flex items-center justify-center">
+                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></span>
+                    Completing...
+                  </span>
+                ) : (
+                  '✓ Complete Workout'
+                )}
               </button>
             )}
+
+            {/* Next Button - Middle steps */}
             {currentStep < workoutFlow.length - 1 && (
               <button
                 onClick={() => setCurrentStep(currentStep + 1)}
                 className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-all"
               >
-                Next →
+                Next Set →
               </button>
             )}
           </div>
