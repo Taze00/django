@@ -60,29 +60,17 @@ class ErrorBoundary extends React.Component {
 export const App = () => {
   const { isAuthenticated } = useAuth();
 
-  // Force Service Worker update check
+  // Disable Service Worker for development - too many caching issues
   useEffect(() => {
-    // Check if there's a new Service Worker available
+    // During development, unregister all Service Workers to avoid caching problems
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.ready.then(registration => {
-        // Check for updates immediately
-        registration.update().then(() => {
-          // Listen for new Service Worker waiting
-          registration.onupdatefound = () => {
-            const newWorker = registration.installing;
-            newWorker.onstatechange = () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                // New Service Worker is ready - reload the page
-                console.log('[App] New Service Worker available, reloading...');
-                window.location.reload();
-              }
-            };
-          };
-        }).catch(err => {
-          console.error('[App] Service Worker update check failed:', err);
-        });
+      navigator.serviceWorker.getRegistrations().then(registrations => {
+        for (let registration of registrations) {
+          registration.unregister();
+          console.log('[App] Service Worker unregistered');
+        }
       }).catch(err => {
-        console.error('[App] Service Worker ready check failed:', err);
+        console.error('[App] Failed to unregister Service Worker:', err);
       });
     }
   }, []);
