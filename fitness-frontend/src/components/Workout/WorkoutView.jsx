@@ -7,11 +7,11 @@ import ProgressionUpgradeModal from './ProgressionUpgradeModal';
 // Simple 2-exercise rotation
 // Mo/We/Fr = PUSH (Push-ups), Tu/Th = PULL (Pull-ups)
 const SCHEDULE = {
-  1: ['Push-up', 'Pull-up'],   // Monday
+  1: ['Push-ups', 'Pull-up'],   // Monday
   2: ['Pull-up'],               // Tuesday
-  3: ['Push-up', 'Pull-up'],    // Wednesday
+  3: ['Push-ups', 'Pull-up'],    // Wednesday
   4: ['Pull-up'],               // Thursday
-  5: ['Push-up', 'Pull-up'],    // Friday
+  5: ['Push-ups', 'Pull-up'],    // Friday
   // 6 = Saturday (Rest)
   // 0/7 = Sunday (Rest)
 };
@@ -87,28 +87,21 @@ export default function WorkoutView() {
     );
   }
 
-  // Wait for exercises to load before rendering
-  if (exercises.length === 0) {
-    return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-900">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-slate-300">Loading exercises...</p>
-        </div>
-      </div>
-    );
-  }
-
   // Get current day (1=Monday, ..., 5=Friday, 6=Saturday, 7=Sunday)
   const now = new Date();
   const dayOfWeek = now.getDay() === 0 ? 7 : now.getDay();
   const isRestDay = dayOfWeek === 6 || dayOfWeek === 7;  // Saturday or Sunday
   const todaysExerciseNames = SCHEDULE[dayOfWeek] || [];
 
+  console.log('[WorkoutView] Day:', dayOfWeek, 'Rest day:', isRestDay, 'Scheduled exercises:', todaysExerciseNames);
+  console.log('[WorkoutView] Available exercises:', exercises.map(e => e.name));
+
   // Get today's exercises from the exercises list
   const todaysExercises = todaysExerciseNames
     .map(name => exercises.find(e => e.name === name))
     .filter(Boolean);
+
+  console.log('[WorkoutView] Todays exercises matched:', todaysExercises.length);
 
   if (isRestDay) {
     return (
