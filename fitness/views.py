@@ -180,29 +180,25 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         # Start with user_starts_here=True progressions only
         exercises = Exercise.objects.all().prefetch_related('progressions')
         for exercise in exercises:
-            uep, created = UserExerciseProgression.objects.get_or_create(
-                user=request.user,
-                exercise=exercise,
-                defaults={'current_progression': None}
-            )
+            # Find the starting progression first
+            start_progression = exercise.progressions.filter(
+                user_starts_here=True
+            ).first()
 
-            # If newly created, find the user_starts_here progression
-            if created:
-                start_progression = exercise.progressions.filter(
-                    user_starts_here=True
-                ).first()
+            if not start_progression:
+                # Fallback to first progression if no user_starts_here marked
+                start_progression = exercise.progressions.order_by('level').first()
 
-                if start_progression:
-                    uep.current_progression = start_progression
-                    uep.sessions_at_target = 0
-                    uep.save()
-                else:
-                    # Fallback to first progression if no user_starts_here marked
-                    first_progression = exercise.progressions.order_by('level').first()
-                    if first_progression:
-                        uep.current_progression = first_progression
-                        uep.sessions_at_target = 0
-                        uep.save()
+            if start_progression:
+                # Create or get with the starting progression
+                uep, created = UserExerciseProgression.objects.get_or_create(
+                    user=request.user,
+                    exercise=exercise,
+                    defaults={
+                        'current_progression': start_progression,
+                        'sessions_at_target': 0
+                    }
+                )
 
         serializer = WorkoutDetailSerializer(workout)
         return Response(serializer.data)
