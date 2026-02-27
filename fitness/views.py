@@ -231,7 +231,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
 
         # Check progression qualifying for each exercise in this workout
         exercises_in_workout = Exercise.objects.filter(
-            sets__workout=workout
+            workoutset__workout=workout
         ).distinct()
 
         upgrades = []
