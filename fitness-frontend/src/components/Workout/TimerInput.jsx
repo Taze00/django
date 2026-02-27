@@ -16,6 +16,7 @@ export default function TimerInput({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [intervalId, setIntervalId] = useState(null);
+  const [editSeconds, setEditSeconds] = useState(null); // For manual time entry
 
   const [dropSetProgressionId, setDropSetProgressionId] = useState(
     existingSet?.drop_set_progression || userProgression?.current_progression || null
@@ -177,13 +178,13 @@ export default function TimerInput({
         </button>
       )}
 
-      {phase === 'stopped' && (
+      {phase === 'stopped' && !editSeconds && (
         <div className="space-y-2">
           <button
-            onClick={() => setPhase('timing')}
+            onClick={() => setEditSeconds(seconds)}
             className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white font-bold py-3 px-4 rounded-lg transition-all duration-200 active:scale-95"
           >
-            ▶ Resume Timer
+            ✏️ Edit Time
           </button>
           <button
             onClick={() => setPhase('ready')}
@@ -191,6 +192,39 @@ export default function TimerInput({
           >
             ↻ Reset
           </button>
+        </div>
+      )}
+
+      {phase === 'stopped' && editSeconds !== null && (
+        <div className="space-y-2">
+          <label className="block text-sm font-semibold text-slate-300">Edit Time (seconds)</label>
+          <div className="flex gap-2 items-center">
+            <input
+              type="number"
+              min="1"
+              value={editSeconds}
+              onChange={(e) => setEditSeconds(Number(e.target.value))}
+              className="flex-1 px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white text-center"
+              disabled={isLoading}
+            />
+            <span className="text-slate-400 text-sm min-w-16">
+              = {formatTime(editSeconds)}
+            </span>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setSeconds(editSeconds) || setEditSeconds(null)}
+              className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-2 px-3 rounded-lg transition-all text-sm"
+            >
+              ✓ Accept
+            </button>
+            <button
+              onClick={() => setEditSeconds(null)}
+              className="flex-1 bg-slate-600 hover:bg-slate-500 text-white font-bold py-2 px-3 rounded-lg transition-all text-sm"
+            >
+              ✕ Cancel
+            </button>
+          </div>
         </div>
       )}
 
