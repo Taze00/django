@@ -18,7 +18,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class WarmupChecklistSerializer(serializers.ModelSerializer):
     class Meta:
         model = WarmupChecklist
-        fields = ['id', 'workout', 'general_warmup', 'sport_specific', 'dynamic_stretches']
+        fields = ['id', 'workout', 'wrists', 'shoulders', 'elbows', 'back', 'legs', 'completed_at']
+        read_only_fields = ['id']
 
 
 class ProgressionSerializer(serializers.ModelSerializer):
@@ -49,17 +50,18 @@ class UserExerciseProgressionSerializer(serializers.ModelSerializer):
 
 class WorkoutSetSerializer(serializers.ModelSerializer):
     exercise_name = serializers.CharField(source='exercise.name', read_only=True)
+    progression_name = serializers.CharField(source='progression.name', read_only=True)
 
     class Meta:
         model = WorkoutSet
-        fields = ['id', 'workout', 'exercise', 'exercise_name', 'set_number', 'reps', 'seconds', 'is_drop_set', 'drop_set_progression']
+        fields = ['id', 'workout', 'exercise', 'exercise_name', 'progression', 'progression_name', 'set_number', 'reps', 'seconds', 'is_drop_set', 'drop_set_data', 'rest_time_seconds', 'notes']
         read_only_fields = ['id']
 
 
 class WorkoutListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Workout
-        fields = ['id', 'user', 'date', 'workout_type', 'completed', 'completed_at', 'duration_seconds']
+        fields = ['id', 'user', 'date', 'completed', 'completed_at', 'duration_seconds']
         read_only_fields = ['id', 'user']
 
 
@@ -69,12 +71,12 @@ class WorkoutDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Workout
-        fields = ['id', 'user', 'date', 'workout_type', 'week_number', 'completed', 'completed_at', 'duration_seconds', 'sets', 'warmup']
+        fields = ['id', 'user', 'date', 'completed', 'completed_at', 'duration_seconds', 'notes', 'sets', 'warmup']
         read_only_fields = ['id', 'user', 'created_at']
 
 
 class WorkoutCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Workout
-        fields = ['user', 'date', 'workout_type', 'week_number']
+        fields = ['user', 'date', 'notes']
         read_only_fields = ['user']

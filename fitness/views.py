@@ -52,14 +52,28 @@ class UserProfileViewSet(viewsets.GenericViewSet):
             profile = UserProfile.objects.create(user=request.user)
 
         if request.method == 'PUT':
-            print(f"[Profile] Request data keys: {request.data.keys()}")
-            print(f"[Profile] Avatar in data: {'avatar' in request.data}")
             serializer = UserProfileSerializer(profile, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
-                print(f"[Profile] Avatar saved successfully: {profile.avatar}")
                 return Response(serializer.data)
-            print(f"[Profile] Validation errors: {serializer.errors}")
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = UserProfileSerializer(profile)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def me(self, request):
+        """Get or update current user profile info"""
+        try:
+            profile = UserProfile.objects.get(user=request.user)
+        except UserProfile.DoesNotExist:
+            profile = UserProfile.objects.create(user=request.user)
+
+        if request.method == 'PUT':
+            serializer = UserProfileSerializer(profile, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = UserProfileSerializer(profile)
@@ -126,7 +140,6 @@ class UserProfileViewSet(viewsets.GenericViewSet):
 class WorkoutViewSet(viewsets.ModelViewSet):
     """Manage workouts"""
     permission_classes = [IsAuthenticated]
-    filterset_fields = ['date', 'workout_type', 'completed']
 
     def get_queryset(self):
         return Workout.objects.filter(user=self.request.user).prefetch_related('sets', 'warmup')
@@ -309,238 +322,41 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         serializer = WarmupChecklistSerializer(warmup)
         return Response(serializer.data)
 
+    @action(detail=True, methods=['post'])
+    def add_set(self, request, pk=None):
+        """Add a set to the workout"""
+        workout = self.get_object()
+        
+        exercise_id = request.data.get('exercise_id')
+        progression_id = request.data.get('progression_id')
+        set_number = request.data.get('set_number')
+        reps = request.data.get('reps')
+        seconds = request.data.get('seconds')
+        is_drop_set = request.data.get('is_drop_set', False)
+        drop_set_data = request.data.get('drop_set_data')
 
-class WorkoutSetViewSet(viewsets.ModelViewSet):
-    """Manage workout sets"""
-    serializer_class = WorkoutSetSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return WorkoutSet.objects.filter(workout__user=self.request.user)
-
-    def perform_create(self, serializer):
-        serializer.save()
-
-
-class UserViewSet(viewsets.GenericViewSet):
-    """User management"""
-    permission_classes = [IsAuthenticated]
-
-    @action(detail=False, methods=['get', 'put'])
-    def me(self, request):
-        """Get or update current user profile info"""
         try:
-            profile = UserProfile.objects.get(user=request.user)
-        except UserProfile.DoesNotExist:
-            profile = UserProfile.objects.create(user=request.user)
+            exercise = Exercise.objects.get(id=exercise_id)
+            progression = Progression.objects.get(id=progression_id)
+        except (Exercise.DoesNotExist, Progression.DoesNotExist):
+            return Response(
+                {'error': 'Exercise or progression not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
-        if request.method == 'PUT':
-            serializer = UserProfileSerializer(profile, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            return Response(serializer.errors, status=400)
+        # Create or update the set
+        workout_set, created = WorkoutSet.objects.update_or_create(
+            workout=workout,
+            exercise=exercise,
+            set_number=set_number,
+            defaults={
+                'progression': progression,
+                'reps': reps,
+                'seconds': seconds,
+                'is_drop_set': is_drop_set,
+                'drop_set_data': drop_set_data,
+            }
+        )
 
-        serializer = UserProfileSerializer(profile)
+        serializer = WorkoutSetSerializer(workout_set)
         return Response(serializer.data)
-
-
-class StatsViewSet(viewsets.GenericViewSet):
-    """Statistics and analytics"""
-    permission_classes = [IsAuthenticated]
-
-    @action(detail=False, methods=['get'])
-    def overview(self, request):
-        """Get overall statistics"""
-        from django.db.models import Sum, Count, Q
-
-        user_workouts = request.user.workouts.all()
-        completed_workouts = user_workouts.filter(completed=True)
-
-        # Total workouts
-        total_workouts = completed_workouts.count()
-
-        # Total time (sum of duration_seconds)
-        total_time_result = completed_workouts.aggregate(Sum('duration_seconds'))
-        total_time_seconds = total_time_result['duration_seconds__sum'] or 0
-
-        # Total reps (sum of all reps)
-        total_reps_result = WorkoutSet.objects.filter(
-            workout__user=request.user,
-            workout__completed=True
-        ).aggregate(Sum('reps'))
-        total_reps = total_reps_result['reps__sum'] or 0
-
-        # Current streak (consecutive days with completed workouts)
-        current_streak = 0
-        if completed_workouts.exists():
-            today = timezone.now().date()
-            check_date = today
-
-            while True:
-                if not completed_workouts.filter(date=check_date).exists():
-                    break
-                current_streak += 1
-                check_date -= timedelta(days=1)
-
-        # Count total sets completed
-        total_sets = WorkoutSet.objects.filter(
-            workout__user=request.user,
-            workout__completed=True
-        ).count()
-
-        return Response({
-            'total_workouts': total_workouts,
-            'total_time_seconds': int(total_time_seconds),
-            'total_reps': total_reps,
-            'total_sets': total_sets,
-            'current_streak': current_streak,
-        })
-
-    @action(detail=False, methods=['get'])
-    def exercise_progress(self, request):
-        """Get time-series data for exercise progress"""
-        exercise_id = request.query_params.get('exercise_id')
-        days = int(request.query_params.get('days', 30))
-
-        if not exercise_id:
-            return Response(
-                {'error': 'exercise_id is required'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        try:
-            exercise = Exercise.objects.get(id=exercise_id)
-        except Exercise.DoesNotExist:
-            return Response(
-                {'error': 'Exercise not found'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        # Get user's current progression for this exercise
-        try:
-            user_progression = UserExerciseProgression.objects.get(
-                user=request.user,
-                exercise=exercise
-            )
-            current_progression_name = user_progression.current_progression.name
-        except UserExerciseProgression.DoesNotExist:
-            current_progression_name = 'Unknown'
-
-        # Get data points from last N days
-        start_date = timezone.now().date() - timedelta(days=days)
-        workouts = request.user.workouts.filter(
-            date__gte=start_date,
-            completed=True,
-            sets__exercise=exercise
-        ).distinct().order_by('date')
-
-        data_points = []
-        for workout in workouts:
-            sets = workout.sets.filter(
-                exercise=exercise,
-                is_drop_set=False
-            ).order_by('set_number')[:2]
-
-            if sets.count() == 2:
-                set1_reps = sets[0].reps
-                set2_reps = sets[1].reps
-                total_reps = set1_reps + set2_reps
-
-                data_points.append({
-                    'date': workout.date.isoformat(),
-                    'set1_reps': set1_reps,
-                    'set2_reps': set2_reps,
-                    'total_reps': total_reps,
-                })
-
-        return Response({
-            'exercise_name': exercise.name,
-            'current_progression': current_progression_name,
-            'data_points': data_points,
-        })
-
-    @action(detail=False, methods=['get'])
-    def progression_history(self, request):
-        """Get progression upgrade history for an exercise"""
-        exercise_id = request.query_params.get('exercise_id')
-
-        if not exercise_id:
-            return Response(
-                {'error': 'exercise_id is required'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        try:
-            exercise = Exercise.objects.get(id=exercise_id)
-        except Exercise.DoesNotExist:
-            return Response(
-                {'error': 'Exercise not found'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        try:
-            user_progression = UserExerciseProgression.objects.get(
-                user=request.user,
-                exercise=exercise
-            )
-        except UserExerciseProgression.DoesNotExist:
-            return Response(
-                {'exercise_name': exercise.name, 'progressions': []}
-            )
-
-        # Get all progressions for this exercise (ordered by level)
-        all_progressions = Progression.objects.filter(
-            exercise=exercise
-        ).order_by('level')
-
-        progressions_data = []
-        current_progression_level = user_progression.current_progression.level
-
-        for progression in all_progressions:
-            # Find workouts where this was the user's progression
-            # (based on dates and progression levels)
-            workouts_at_level = request.user.workouts.filter(
-                completed=True,
-                sets__exercise=exercise,
-            ).distinct()
-
-            # Count workouts at this progression
-            workout_count = 0
-            first_date = None
-            last_date = None
-
-            for workout in workouts_at_level:
-                # Check if this workout had this progression
-                sets = workout.sets.filter(exercise=exercise)
-                if sets.exists():
-                    # Simple heuristic: if current progression matches, count it
-                    if progression.level <= current_progression_level:
-                        if first_date is None:
-                            first_date = workout.date
-                        last_date = workout.date
-                        workout_count += 1
-
-            if progression.level == current_progression_level:
-                # Current progression - no end date
-                progressions_data.append({
-                    'progression_name': progression.name,
-                    'level': progression.level,
-                    'started_at': first_date.isoformat() if first_date else None,
-                    'ended_at': None,
-                    'total_workouts': workout_count,
-                })
-            elif progression.level < current_progression_level:
-                # Past progression
-                progressions_data.append({
-                    'progression_name': progression.name,
-                    'level': progression.level,
-                    'started_at': first_date.isoformat() if first_date else None,
-                    'ended_at': last_date.isoformat() if last_date else None,
-                    'total_workouts': workout_count,
-                })
-
-        return Response({
-            'exercise_name': exercise.name,
-            'progressions': progressions_data,
-        })
