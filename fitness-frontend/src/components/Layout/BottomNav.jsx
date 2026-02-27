@@ -11,7 +11,7 @@ export default function BottomNav() {
       bottom: 0,
       left: 0,
       right: 0,
-      height: '80px',
+      height: '70px',
       backgroundColor: '#1e293b',
       borderTop: '1px solid #475569',
       display: 'flex',
@@ -19,19 +19,19 @@ export default function BottomNav() {
       alignItems: 'center',
       zIndex: 50,
     }}>
-      <Link to="/" style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: isActive('/'), textDecoration: 'none' }}>
-        <span style={{ fontSize: '24px', marginBottom: '4px' }}>🏠</span>
-        <span style={{ fontSize: '12px' }}>Home</span>
+      <Link to="/" style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px', color: isActive('/'), textDecoration: 'none' }}>
+        <span style={{ fontSize: '22px', lineHeight: '1' }}>🏠</span>
+        <span style={{ fontSize: '11px', fontWeight: '500' }}>Home</span>
       </Link>
 
-      <Link to="/workout" style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: isActive('/workout'), textDecoration: 'none' }}>
-        <span style={{ fontSize: '24px', marginBottom: '4px' }}>💪</span>
-        <span style={{ fontSize: '12px' }}>Workout</span>
+      <Link to="/workout" style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px', color: isActive('/workout'), textDecoration: 'none' }}>
+        <span style={{ fontSize: '22px', lineHeight: '1' }}>💪</span>
+        <span style={{ fontSize: '11px', fontWeight: '500' }}>Workout</span>
       </Link>
 
-      <Link to="/profile" style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: isActive('/profile'), textDecoration: 'none' }}>
-        <span style={{ fontSize: '24px', marginBottom: '4px' }}>👤</span>
-        <span style={{ fontSize: '12px' }}>Profile</span>
+      <Link to="/profile" style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px', color: isActive('/profile'), textDecoration: 'none' }}>
+        <span style={{ fontSize: '22px', lineHeight: '1' }}>👤</span>
+        <span style={{ fontSize: '11px', fontWeight: '500' }}>Profile</span>
       </Link>
     </nav>
   );
