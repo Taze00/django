@@ -469,3 +469,42 @@ class WorkoutViewSet(viewsets.ModelViewSet):
 
         serializer = WorkoutSetSerializer(workout_set)
         return Response(serializer.data)
+
+class UserExerciseProgressionViewSet(viewsets.ModelViewSet):
+    """User exercise progression management"""
+    queryset = UserExerciseProgression.objects.all()
+    serializer_class = UserExerciseProgressionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """Only show progressions for the current user"""
+        return self.queryset.filter(user=self.request.user)
+
+    @action(detail=True, methods=['post'])
+    def set_progression(self, request, pk=None):
+        """Manually set user to a specific progression level"""
+        user_prog = self.get_object()
+        
+        # Check that the progression belongs to the same exercise
+        progression_id = request.data.get('progression_id')
+        
+        try:
+            progression = Progression.objects.get(
+                id=progression_id,
+                exercise=user_prog.exercise
+            )
+        except Progression.DoesNotExist:
+            return Response(
+                {'error': 'Invalid progression for this exercise'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Update the user progression
+        user_prog.current_progression = progression
+        user_prog.sessions_at_target = 0  # Reset progress to new level
+        user_prog.custom_target = None
+        user_prog.is_first_session = True
+        user_prog.save()
+        
+        serializer = UserExerciseProgressionSerializer(user_prog)
+        return Response(serializer.data)

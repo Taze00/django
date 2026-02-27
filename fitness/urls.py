@@ -3,13 +3,15 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from .views import (
-    ExerciseViewSet, ProgressionViewSet, WorkoutViewSet, UserProfileViewSet
+    ExerciseViewSet, ProgressionViewSet, WorkoutViewSet, UserProfileViewSet,
+    UserExerciseProgressionViewSet
 )
 
 router = DefaultRouter()
 router.register(r'exercises', ExerciseViewSet, basename='exercise')
 router.register(r'progressions', ProgressionViewSet, basename='progression')
 router.register(r'workouts', WorkoutViewSet, basename='workout')
+router.register(r'user-progressions', UserExerciseProgressionViewSet, basename='user-progression')
 
 urlpatterns = [
     # JWT Token endpoints
