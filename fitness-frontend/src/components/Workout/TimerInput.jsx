@@ -9,15 +9,14 @@ export default function TimerInput({
   onCompleted,
   isDropSet = false,
 }) {
-  const { addSet } = useWorkoutStore();
-  const [phase, setPhase] = useState('ready'); // 'ready' | 'countdown' | 'timing' | 'stopped'
+  const { addSet, lastPerformances } = useWorkoutStore();
+  const [phase, setPhase] = useState('ready');
   const [countdownValue, setCountdownValue] = useState(3);
   const [seconds, setSeconds] = useState(existingSet?.seconds || 0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [intervalId, setIntervalId] = useState(null);
 
-  // For drop sets, we might use a different progression
   const [dropSetProgressionId, setDropSetProgressionId] = useState(
     existingSet?.drop_set_progression || userProgression?.current_progression || null
   );
@@ -28,14 +27,15 @@ export default function TimerInput({
       )
     : null;
 
-  // Get available progressions for drop set
   const availableProgressions = currentProgression
     ? (exercise?.progressions || []).filter(
         (p) => p?.level < currentProgression.level
       )
     : [];
 
-  // Countdown effect
+  // Get last performance for this progression
+  const lastPerf = currentProgression ? lastPerformances?.[currentProgression.id] : null;
+
   useEffect(() => {
     if (phase === 'countdown') {
       if (countdownValue > 0) {
@@ -44,13 +44,11 @@ export default function TimerInput({
         }, 1000);
         return () => clearTimeout(timer);
       } else {
-        // Countdown finished, auto-start timing
         setPhase('timing');
       }
     }
   }, [phase, countdownValue]);
 
-  // Timing effect
   useEffect(() => {
     if (phase === 'timing') {
       const interval = setInterval(() => {
@@ -61,7 +59,6 @@ export default function TimerInput({
     }
   }, [phase]);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (intervalId) clearInterval(intervalId);
@@ -103,10 +100,10 @@ export default function TimerInput({
       const result = await addSet(
         exercise.id,
         progressionId,
-        null, // reps = null for timed exercises
+        null,
         setNumber,
         isDropSet,
-        seconds // pass seconds instead
+        seconds
       );
 
       if (result) {
@@ -122,8 +119,6 @@ export default function TimerInput({
     }
   };
 
-  const targetSeconds = currentProgression?.target_value || 30;
-
   const formatTime = (totalSeconds) => {
     const mins = Math.floor(totalSeconds / 60);
     const secs = totalSeconds % 60;
@@ -132,49 +127,37 @@ export default function TimerInput({
 
   return (
     <div className="space-y-4">
-      {/* Target Info Box */}
-      {currentProgression && (
-        <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 flex items-center justify-between">
-          <div>
-            <p className="text-blue-300 text-xs font-semibold uppercase">Target Zeit</p>
-            <p className="text-white font-bold text-sm mt-0.5">
-              {targetSeconds} Sekunden
-            </p>
-          </div>
-          <div className="text-right">
-            <p className="text-slate-400 text-xs">Aktuell:</p>
-            <p className={`text-lg font-bold ${seconds >= targetSeconds ? 'text-green-400' : 'text-slate-300'}`}>
-              {formatTime(seconds)}
-            </p>
-          </div>
+      {/* Last Time Info */}
+      {lastPerf && !isDropSet && (
+        <div className="bg-slate-700/30 border border-slate-600/30 rounded-lg p-3">
+          <p className="text-slate-400 text-xs font-semibold mb-1">LAST TIME</p>
+          <p className="text-white text-lg font-bold">{formatTime(lastPerf.last_seconds)}</p>
+        </div>
+      )}
+      {!lastPerf && !isDropSet && (
+        <div className="bg-slate-700/30 border border-slate-600/30 rounded-lg p-3">
+          <p className="text-slate-400 text-xs font-semibold">FIRST TIME AT THIS LEVEL!</p>
         </div>
       )}
 
-      {/* Countdown Display */}
       {phase === 'countdown' && (
-        <div className="text-center bg-slate-800/50 rounded-xl p-8 border border-slate-700 space-y-4">
-          <div className="text-9xl font-bold text-blue-400 animate-pulse font-mono">
+        <div className="text-center bg-slate-800/50 rounded-xl p-5 border border-slate-700 space-y-2">
+          <div className="text-8xl font-bold text-blue-400 animate-pulse font-mono">
             {countdownValue}
           </div>
-          <p className="text-slate-400 text-sm">Bereite dich vor...</p>
+          <p className="text-slate-400 text-xs">Bereite dich vor...</p>
         </div>
       )}
 
-      {/* Timer Display */}
       {(phase === 'timing' || phase === 'stopped') && (
-        <div className="text-center bg-slate-800/50 rounded-xl p-8 border border-slate-700 space-y-4">
-          <p className="text-slate-400 text-xs uppercase mb-2">Zeit</p>
-          <div className="text-7xl font-bold text-blue-400 font-mono">
+        <div className="text-center bg-slate-800/50 rounded-xl p-5 border border-slate-700 space-y-2">
+          <p className="text-slate-400 text-xs uppercase">Zeit</p>
+          <div className="text-6xl font-bold text-blue-400 font-mono">
             {formatTime(seconds)}
           </div>
-          <p className="text-slate-400 text-xs mt-2">Sekunden</p>
-          {seconds >= targetSeconds && (
-            <p className="text-green-400 text-xs font-bold mt-1">✓ Target erreicht!</p>
-          )}
         </div>
       )}
 
-      {/* Ready State - Show Start Button */}
       {phase === 'ready' && (
         <button
           onClick={handleStart}
@@ -185,7 +168,6 @@ export default function TimerInput({
         </button>
       )}
 
-      {/* Countdown/Timing State - Show Stop Button */}
       {(phase === 'countdown' || phase === 'timing') && (
         <button
           onClick={handleStop}
@@ -195,7 +177,6 @@ export default function TimerInput({
         </button>
       )}
 
-      {/* Stopped State - Show Save Button */}
       {phase === 'stopped' && (
         <div className="space-y-2">
           <button
@@ -213,7 +194,6 @@ export default function TimerInput({
         </div>
       )}
 
-      {/* Drop Set Progression Selector */}
       {isDropSet && availableProgressions.length > 0 && (
         <div className="space-y-2">
           <label className="block text-sm font-semibold text-slate-300">
@@ -234,14 +214,12 @@ export default function TimerInput({
         </div>
       )}
 
-      {/* Error Message */}
       {error && (
         <div className="bg-red-500/10 border border-red-500/30 text-red-300 px-3 py-2 rounded-lg text-sm">
           {error}
         </div>
       )}
 
-      {/* Save Button */}
       {phase === 'stopped' && (
         <button
           onClick={handleSave}

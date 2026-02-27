@@ -5,6 +5,7 @@ export const useWorkoutStore = create((set, get) => ({
   currentWorkout: null,
   exercises: [],
   userProgressions: {},
+  lastPerformances: {}, // New: track last set values per progression
   isLoading: false,
   error: null,
   activeExerciseIndex: 0,
@@ -37,6 +38,18 @@ export const useWorkoutStore = create((set, get) => ({
       return progressionsMap;
     } catch (error) {
       set({ error: 'Failed to fetch progressions' });
+      return {};
+    }
+  },
+
+  // Fetch last performance for each progression
+  fetchLastPerformances: async () => {
+    try {
+      const response = await workoutAPI.lastPerformance();
+      set({ lastPerformances: response.data || {} });
+      return response.data || {};
+    } catch (error) {
+      console.error('Failed to fetch last performances:', error);
       return {};
     }
   },
@@ -177,6 +190,8 @@ export const useWorkoutStore = create((set, get) => ({
       await get().fetchCurrentWorkout();
       // Then fetch progressions after workout (to get the newly created ones)
       await get().fetchUserProgressions();
+      // Fetch last performances for "Last time" display
+      await get().fetchLastPerformances();
       // Finally fetch exercises in parallel with above if not done yet
       await get().fetchExercises();
     } catch (error) {

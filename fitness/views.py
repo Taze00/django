@@ -216,6 +216,34 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         serializer = WorkoutDetailSerializer(workout)
         return Response(serializer.data)
 
+    @action(detail=False, methods=['get'])
+    def last_performance(self, request):
+        """Get last set values for each exercise/progression"""
+        user_progressions = UserExerciseProgression.objects.filter(
+            user=request.user
+        ).select_related('exercise', 'current_progression')
+
+        last_performances = {}
+
+        for uep in user_progressions:
+            # Get last set for this progression
+            last_set = WorkoutSet.objects.filter(
+                exercise=uep.exercise,
+                progression=uep.current_progression,
+                is_drop_set=False
+            ).order_by('-created_at').first()
+
+            if last_set:
+                last_performances[uep.current_progression.id] = {
+                    'exercise_id': uep.exercise.id,
+                    'progression_id': uep.current_progression.id,
+                    'last_reps': last_set.reps,
+                    'last_seconds': last_set.seconds,
+                    'created_at': last_set.created_at,
+                }
+
+        return Response(last_performances)
+
     @action(detail=True, methods=['post'])
     def complete(self, request, pk=None):
         """Mark workout as completed"""
@@ -235,6 +263,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         ).distinct()
 
         upgrades = []
+        downgrades = []
 
         for exercise in exercises_in_workout:
             # Get Set 1 and Set 2 (non-drop-sets only)
@@ -256,7 +285,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
                     continue
 
                 progression = user_prog.current_progression
-                target_value = progression.target_value
+                effective_target = user_prog.custom_target or progression.target_value
                 target_type = progression.target_type
 
                 # Get values for Set 1 and Set 2
@@ -267,8 +296,8 @@ class WorkoutViewSet(viewsets.ModelViewSet):
                     set1_value = set1.reps or 0
                     set2_value = set2.reps or 0
 
-                # Check if BOTH Set 1 AND Set 2 meet or exceed target
-                if set1_value >= target_value and set2_value >= target_value:
+                # Check if BOTH Set 1 AND Set 2 meet or exceed effective target
+                if set1_value >= effective_target and set2_value >= effective_target:
                     # Qualifies! Increment sessions_at_target
                     user_prog.sessions_at_target += 1
                     user_prog.save()
@@ -295,12 +324,92 @@ class WorkoutViewSet(viewsets.ModelViewSet):
                             'sessions_at_target': user_prog.sessions_at_target,
                             'sessions_required': progression.sessions_required,
                         })
+                else:
+                    # Failed to meet target on first session after upgrade
+                    if user_prog.is_first_session and progression.level > 1:
+                        # Perform downgrade check
+                        downgrade_result = self._check_and_perform_downgrade(
+                            user_prog, set1_value, set2_value, target_type
+                        )
+                        if downgrade_result:
+                            downgrades.append(downgrade_result)
 
         return Response({
             'success': True,
             'workout': WorkoutDetailSerializer(workout).data,
-            'upgrades': upgrades
+            'upgrades': upgrades,
+            'downgrades': downgrades
         })
+
+    def _check_and_perform_downgrade(self, user_prog, set1_value, set2_value, target_type):
+        """
+        Check if downgrade is needed based on first session performance.
+
+        Reps-based downgrade:
+        - set1 < 3 OR (set1 + set2) < 5
+
+        Time-based downgrade:
+        - set1 < target/3 OR total < target/2
+
+        Adjustment:
+        - 0 reps: +6, 1 rep: +4, 2 reps: +2 (capped at 20)
+        - Time follows same relative logic
+        """
+        progression = user_prog.current_progression
+        target_value = progression.target_value
+
+        should_downgrade = False
+
+        if target_type == 'reps':
+            # Check reps-based conditions
+            if set1_value < 3 or (set1_value + set2_value) < 5:
+                should_downgrade = True
+                # Calculate custom target adjustment
+                if set1_value == 0:
+                    adjustment = 6
+                elif set1_value == 1:
+                    adjustment = 4
+                elif set1_value == 2:
+                    adjustment = 2
+                else:
+                    adjustment = 0
+
+                new_target = min(target_value - adjustment, 20)
+        else:  # time
+            # Check time-based conditions
+            total_seconds = set1_value + set2_value
+            if set1_value < (target_value / 3) or total_seconds < (target_value / 2):
+                should_downgrade = True
+                # Similar adjustment logic
+                if set1_value == 0:
+                    adjustment = target_value // 3
+                elif set1_value < (target_value / 6):
+                    adjustment = target_value // 6
+                else:
+                    adjustment = 0
+
+                new_target = max(target_value - adjustment, 5)
+
+        if should_downgrade:
+            user_prog.custom_target = new_target
+            user_prog.is_first_session = False
+            user_prog.save()
+
+            return {
+                'exercise_id': user_prog.exercise.id,
+                'exercise_name': user_prog.exercise.name,
+                'progression_id': progression.id,
+                'progression_name': progression.name,
+                'old_target': target_value,
+                'new_target': new_target,
+                'reason': 'adaptive_downgrade'
+            }
+        else:
+            # Met target or beyond on first session - mark as no longer first session
+            user_prog.is_first_session = False
+            user_prog.save()
+
+        return None
 
     @action(detail=True, methods=['get', 'put'])
     def warmup(self, request, pk=None):

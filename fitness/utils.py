@@ -8,11 +8,13 @@ def check_progression_upgrade(user, exercise):
 
     Rules for Progressive Overload:
     - User needs sessions_required (3) consecutive workouts where:
-      * Set 1 >= target_value AND Set 2 >= target_value (BOTH must meet target individually)
+      * Set 1 >= effective_target AND Set 2 >= effective_target (BOTH must meet target individually)
+      * Effective target = custom_target OR progression.target_value
       * Only non-drop-sets count (is_drop_set=False)
     - This is tracked in UserExerciseProgression.sessions_at_target counter
     - After completing a qualifying workout, sessions_at_target increments
     - When sessions_at_target >= sessions_required, user is ready to upgrade
+    - After upgrade: is_first_session = True (enables downgrade check on next progression)
 
     Returns:
         dict: {
@@ -78,6 +80,7 @@ def check_progression_upgrade(user, exercise):
 def upgrade_progression(user, exercise, new_progression):
     """
     Upgrade user's progression for an exercise and reset sessions_at_target counter.
+    Also set is_first_session = True to enable downgrade check on first session with new progression.
     """
     try:
         user_prog = UserExerciseProgression.objects.get(
@@ -86,6 +89,8 @@ def upgrade_progression(user, exercise, new_progression):
         )
         user_prog.current_progression = new_progression
         user_prog.sessions_at_target = 0  # Reset counter for new progression
+        user_prog.custom_target = None  # Clear any previous custom target
+        user_prog.is_first_session = True  # Enable downgrade check on first session
         user_prog.save()
         return True
     except UserExerciseProgression.DoesNotExist:

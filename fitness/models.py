@@ -88,6 +88,8 @@ class UserExerciseProgression(models.Model):
     exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE)
     current_progression = models.ForeignKey(Progression, on_delete=models.CASCADE)
     sessions_at_target = models.IntegerField(default=0)
+    custom_target = models.IntegerField(null=True, blank=True)
+    is_first_session = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

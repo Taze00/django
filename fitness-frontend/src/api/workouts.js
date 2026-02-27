@@ -22,4 +22,6 @@ export const workoutAPI = {
 
   updateWarmup: (id, data) =>
     client.put(`/workouts/${id}/warmup/`, data),
+
+  lastPerformance: () => client.get('/workouts/last_performance/'),
 };

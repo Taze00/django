@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import SetInput from './SetInput';
 import TimerInput from './TimerInput';
-import RestTimer from './RestTimer';
 import DropSetModal from './DropSetModal';
 
 export default function ExerciseCard({
@@ -9,11 +8,10 @@ export default function ExerciseCard({
   workoutSets,
   userProgression,
   exerciseIndex,
+  onSetCompleted = null, // New prop for Phase 8
 }) {
   const [expandedSetIndex, setExpandedSetIndex] = useState(null);
-  const [showRestTimer, setShowRestTimer] = useState(false);
   const [showDropSetModal, setShowDropSetModal] = useState(false);
-  const [lastCompletedSetNumber, setLastCompletedSetNumber] = useState(null);
   const [showFormTips, setShowFormTips] = useState(false);
 
   if (!userProgression) {
@@ -25,7 +23,6 @@ export default function ExerciseCard({
     : null;
 
   const handleSetCompleted = (setNumber, info = {}) => {
-    setLastCompletedSetNumber(setNumber);
     setExpandedSetIndex(null);
 
     if (info.isUpdate) {
@@ -33,18 +30,18 @@ export default function ExerciseCard({
       return;
     }
 
-    if (setNumber < 3) {
-      setShowRestTimer(true);
-    } else if (setNumber === 3) {
-      setShowDropSetModal(true);
+    // For Phase 8: callback to parent for rest timer management
+    if (onSetCompleted) {
+      onSetCompleted(setNumber, info);
+      return;
     }
-  };
 
-  const handleTimerComplete = () => {
-    setShowRestTimer(false);
-    const nextSet = (lastCompletedSetNumber || 0) + 1;
-    if (nextSet <= 3) {
-      setExpandedSetIndex(nextSet - 1);
+    // Original behavior (backward compat for non-Phase8 usage)
+    if (setNumber === 3) {
+      // Only show drop set modal if progression level > 1
+      if (currentProgression?.level > 1) {
+        setShowDropSetModal(true);
+      }
     }
   };
 
@@ -156,16 +153,11 @@ export default function ExerciseCard({
         </div>
       )}
 
-      {/* Rest Timer */}
-      {showRestTimer && (
-        <RestTimer onComplete={handleTimerComplete} restSeconds={180} />
-      )}
-
       {/* Drop Set Modal */}
       {showDropSetModal && (
         <DropSetModal
           exercise={exercise}
-          currentProgression={currentProgression}
+          workoutSet={workoutSets?.find(s => s.set_number === 3 && s.is_drop_set)}
           userProgression={userProgression}
           onClose={() => setShowDropSetModal(false)}
         />

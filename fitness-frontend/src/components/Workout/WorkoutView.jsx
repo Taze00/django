@@ -4,17 +4,8 @@ import ExerciseCard from './ExerciseCard';
 import WarmupChecklist from './WarmupChecklist';
 import ProgressionUpgradeModal from './ProgressionUpgradeModal';
 
-// Simple 2-exercise rotation - FIXED: Push-up (singular), Pull-up (singular)
-// Mo/We/Fr = PUSH (Push-up), Tu/Th = PULL (Pull-up)
-const SCHEDULE = {
-  1: ['Push-up', 'Pull-up'],   // Monday
-  2: ['Pull-up'],               // Tuesday
-  3: ['Push-up', 'Pull-up'],    // Wednesday
-  4: ['Pull-up'],               // Thursday
-  5: ['Push-up', 'Pull-up'],    // Friday
-  // 6 = Saturday (Rest)
-  // 0/7 = Sunday (Rest)
-};
+// 6-Step Alternating Flow: Push1 → Pull1 → Push2 → Pull2 → Push3 → Pull3
+// Rest times: 3 min between sets, 5 min after Set 3 (before drop set)
 
 export default function WorkoutView() {
   const {
@@ -28,10 +19,31 @@ export default function WorkoutView() {
     clearError,
   } = useWorkoutStore();
 
+  const [currentStep, setCurrentStep] = useState(0); // 0-5 = 6 steps
+  const [showRestTimer, setShowRestTimer] = useState(false);
+  const [restTimeRemaining, setRestTimeRemaining] = useState(0);
   const [isCompleting, setIsCompleting] = useState(false);
   const [workoutCompleted, setWorkoutCompleted] = useState(false);
   const [upgrades, setUpgrades] = useState([]);
+  const [downgrades, setDowngrades] = useState([]);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
+
+  // Rest timer countdown effect
+  useEffect(() => {
+    if (!showRestTimer || restTimeRemaining <= 0) return;
+
+    const interval = setInterval(() => {
+      setRestTimeRemaining(prev => {
+        if (prev <= 1) {
+          handleRestTimerComplete();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [showRestTimer, restTimeRemaining]);
 
   useEffect(() => {
     console.log('[WorkoutView] Initializing...');
@@ -40,9 +52,77 @@ export default function WorkoutView() {
     });
   }, []);
 
-  useEffect(() => {
-    console.log('[WorkoutView] State:', { isLoading, error, currentWorkout: !!currentWorkout, exercises: exercises.length });
-  }, [isLoading, error, currentWorkout, exercises]);
+  // Get today's schedule (2 exercises max)
+  const getTodaysExercises = () => {
+    const now = new Date();
+    const dayOfWeek = now.getDay() === 0 ? 7 : now.getDay();
+
+    const schedule = {
+      1: ['Push-up', 'Pull-up'],   // Monday
+      2: ['Pull-up'],               // Tuesday
+      3: ['Push-up', 'Pull-up'],    // Wednesday
+      4: ['Pull-up'],               // Thursday
+      5: ['Push-up', 'Pull-up'],    // Friday
+      // 6 = Saturday (Rest), 0/7 = Sunday (Rest)
+    };
+
+    const exerciseNames = schedule[dayOfWeek] || [];
+    return exerciseNames
+      .map(name => exercises.find(e => e.name === name))
+      .filter(Boolean);
+  };
+
+  const todaysExercises = getTodaysExercises();
+  const isRestDay = todaysExercises.length === 0;
+
+  // Build 6-step workout flow
+  const buildWorkoutFlow = () => {
+    if (todaysExercises.length < 2) {
+      // Single exercise: 3 sets + drop set
+      return todaysExercises[0]
+        ? [
+            { exercise: todaysExercises[0], setNum: 1, type: 'regular' },
+            { exercise: todaysExercises[0], setNum: 2, type: 'regular' },
+            { exercise: todaysExercises[0], setNum: 3, type: 'regular' },
+          ]
+        : [];
+    }
+
+    // 2 exercises: alternating flow
+    const [push, pull] = todaysExercises;
+    return [
+      { exercise: push, setNum: 1, type: 'regular' },
+      { exercise: pull, setNum: 1, type: 'regular' },
+      { exercise: push, setNum: 2, type: 'regular' },
+      { exercise: pull, setNum: 2, type: 'regular' },
+      { exercise: push, setNum: 3, type: 'regular' },
+      { exercise: pull, setNum: 3, type: 'regular' },
+    ];
+  };
+
+  const workoutFlow = buildWorkoutFlow();
+  const currentStepData = workoutFlow[currentStep];
+
+  const handleSetCompleted = () => {
+    // Show rest timer
+    const isAfterDropSet = currentStep === workoutFlow.length - 1;
+    const restTime = isAfterDropSet ? 300 : 180; // 5 min after Set 3, 3 min between
+
+    setRestTimeRemaining(restTime);
+    setShowRestTimer(true);
+  };
+
+  const handleRestTimerComplete = () => {
+    setShowRestTimer(false);
+
+    // Move to next step
+    if (currentStep < workoutFlow.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      // Workout complete - ask to finish
+      handleCompleteWorkout();
+    }
+  };
 
   const handleCompleteWorkout = async () => {
     setIsCompleting(true);
@@ -72,6 +152,10 @@ export default function WorkoutView() {
         setUpgrades(formattedUpgrades);
         setShowUpgradeModal(true);
       }
+
+      if (result.downgrades && result.downgrades.length > 0) {
+        setDowngrades(result.downgrades);
+      }
     }
   };
 
@@ -87,21 +171,9 @@ export default function WorkoutView() {
     );
   }
 
-  // Get current day (1=Monday, ..., 5=Friday, 6=Saturday, 7=Sunday)
   const now = new Date();
   const dayOfWeek = now.getDay() === 0 ? 7 : now.getDay();
-  const isRestDay = dayOfWeek === 6 || dayOfWeek === 7;  // Saturday or Sunday
-  const todaysExerciseNames = SCHEDULE[dayOfWeek] || [];
-
-  console.log('[WorkoutView] Day:', dayOfWeek, 'Rest day:', isRestDay, 'Scheduled exercises:', todaysExerciseNames);
-  console.log('[WorkoutView] Available exercises:', exercises.map(e => e.name));
-
-  // Get today's exercises from the exercises list
-  const todaysExercises = todaysExerciseNames
-    .map(name => exercises.find(e => e.name === name))
-    .filter(Boolean);
-
-  console.log('[WorkoutView] Todays exercises matched:', todaysExercises.length);
+  const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayOfWeek];
 
   if (isRestDay) {
     return (
@@ -127,7 +199,19 @@ export default function WorkoutView() {
     );
   }
 
-  const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][dayOfWeek];
+  if (!currentStepData) {
+    return (
+      <div className="min-h-screen bg-slate-900 p-6 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-slate-400">Workout flow not configured</p>
+        </div>
+      </div>
+    );
+  }
+
+  const exercise = currentStepData.exercise;
+  const userProg = userProgressions?.[exercise.id];
+  const workoutSets = currentWorkout?.sets?.filter(s => s.exercise === exercise.id) || [];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-4 sm:p-6 pb-20">
@@ -137,52 +221,90 @@ export default function WorkoutView() {
           💪 {dayName}'s Workout
         </h1>
         <p className="text-slate-400 text-sm">
-          {todaysExercises.length} exercise{todaysExercises.length !== 1 ? 's' : ''} scheduled
+          Step {currentStep + 1} of {workoutFlow.length}
         </p>
       </div>
 
-      {/* Warmup Section */}
-      {currentWorkout && (
+      {/* Progress Bar */}
+      <div className="mb-6 bg-slate-800/50 rounded-lg p-4 border border-slate-700/30">
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-slate-300 text-sm font-semibold">Workout Progress</p>
+          <p className="text-slate-400 text-xs">{currentStep + 1}/{workoutFlow.length}</p>
+        </div>
+        <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300"
+            style={{ width: `${((currentStep + 1) / workoutFlow.length) * 100}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Warmup - Show only on first step */}
+      {currentStep === 0 && currentWorkout && (
         <div className="mb-6">
           <WarmupChecklist workout={currentWorkout} />
         </div>
       )}
 
-      {/* Exercises */}
-      <div className="space-y-4 mb-6">
-        {todaysExercises.map((exercise, index) => {
-          const workoutSets = currentWorkout?.sets?.filter(s => s.exercise === exercise.id) || [];
-          const userProg = userProgressions?.[exercise.id];
-
-          return (
-            <ExerciseCard
-              key={exercise.id}
-              exercise={exercise}
-              workoutSets={workoutSets}
-              userProgression={userProg}
-              exerciseIndex={index}
-            />
-          );
-        })}
+      {/* Current Exercise */}
+      <div className="mb-6">
+        <ExerciseCard
+          exercise={exercise}
+          workoutSets={workoutSets}
+          userProgression={userProg}
+          exerciseIndex={0}
+          onSetCompleted={handleSetCompleted}
+        />
       </div>
 
-      {/* Complete Workout Button */}
-      {!workoutCompleted && (
+      {/* Rest Timer */}
+      {showRestTimer && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-800 rounded-2xl border border-slate-700 p-8 max-w-sm w-full text-center">
+            <p className="text-slate-400 text-sm mb-4">Next Exercise in</p>
+            <div className="text-6xl font-bold text-blue-400 font-mono mb-4">
+              {Math.floor(restTimeRemaining / 60)}:{(restTimeRemaining % 60).toString().padStart(2, '0')}
+            </div>
+            <button
+              onClick={handleRestTimerComplete}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-all"
+            >
+              ▶ I'm Ready
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Navigation */}
+      {!showRestTimer && !workoutCompleted && (
         <div className="fixed bottom-20 left-0 right-0 p-4 bg-slate-900/80 backdrop-blur-sm border-t border-slate-700/50">
-          <button
-            onClick={handleCompleteWorkout}
-            disabled={isCompleting || !currentWorkout}
-            className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-slate-600 disabled:to-slate-700 text-white font-bold py-4 px-6 rounded-xl transition-all duration-200 active:scale-95 text-lg"
-          >
-            {isCompleting ? (
-              <span className="flex items-center justify-center">
-                <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></span>
-                Completing...
-              </span>
-            ) : (
-              '✓ Complete Workout'
+          <div className="flex gap-3 max-w-md mx-auto">
+            {currentStep > 0 && (
+              <button
+                onClick={() => setCurrentStep(currentStep - 1)}
+                className="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 px-4 rounded-lg transition-all"
+              >
+                ← Previous
+              </button>
             )}
-          </button>
+            {currentStep === workoutFlow.length - 1 && (
+              <button
+                onClick={handleCompleteWorkout}
+                disabled={isCompleting}
+                className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-slate-600 disabled:to-slate-700 text-white font-bold py-3 px-4 rounded-lg transition-all"
+              >
+                {isCompleting ? 'Completing...' : '✓ Complete'}
+              </button>
+            )}
+            {currentStep < workoutFlow.length - 1 && (
+              <button
+                onClick={() => setCurrentStep(currentStep + 1)}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-all"
+              >
+                Next →
+              </button>
+            )}
+          </div>
         </div>
       )}
 

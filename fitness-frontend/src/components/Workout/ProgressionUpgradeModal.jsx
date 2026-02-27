@@ -20,116 +20,68 @@ export default function ProgressionUpgradeModal({ upgrades, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700 rounded-2xl max-w-md w-full overflow-hidden">
-        {/* Animated Header */}
-        <div className="bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-8 text-center animate-pulse">
-          <div className="text-6xl mb-4">🎉</div>
-          <h2 className="text-3xl font-bold text-white">
-            Progression Upgrade!
+      <div className="bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full overflow-hidden">
+        {/* Header - Compact */}
+        <div className="bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-4 text-center">
+          <div className="text-4xl mb-2">🎉</div>
+          <h2 className="text-2xl font-bold text-white">
+            Upgrade!
           </h2>
         </div>
 
-        {/* Content */}
-        <div className="px-6 py-8 space-y-6">
+        {/* Content - Compact */}
+        <div className="px-6 py-5 space-y-4">
           {/* Exercise Name */}
           <div className="text-center">
-            <p className="text-slate-400 text-sm mb-2">EXERCISE</p>
-            <h3 className="text-2xl font-bold text-white">
+            <p className="text-slate-400 text-xs mb-1">EXERCISE</p>
+            <h3 className="text-lg font-bold text-white">
               {currentUpgrade.exercise_name}
             </h3>
           </div>
 
           {/* Old vs New Progression */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             {/* From */}
             <div>
-              <p className="text-slate-400 text-xs mb-2">FROM</p>
-              <div className="bg-slate-700/50 rounded-lg p-3">
-                <p className="text-slate-300 font-semibold">
-                  Level {currentUpgrade.old_progression.level}:{' '}
+              <p className="text-slate-400 text-xs mb-1">FROM</p>
+              <div className="bg-slate-700/50 rounded-lg p-2">
+                <p className="text-slate-300 text-sm font-semibold">
                   {currentUpgrade.old_progression.name}
                 </p>
-                {currentUpgrade.old_progression.description && (
-                  <p className="text-slate-400 text-sm mt-1">
-                    {currentUpgrade.old_progression.description}
-                  </p>
-                )}
               </div>
             </div>
 
             {/* Arrow */}
             <div className="flex justify-center">
-              <div className="text-3xl">⬇️</div>
+              <div className="text-2xl">⬇️</div>
             </div>
 
             {/* To */}
             <div>
-              <p className="text-green-400 text-xs font-bold mb-2">TO (NEW!)</p>
-              <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-3">
-                <p className="text-green-300 font-bold text-lg">
-                  Level {currentUpgrade.new_progression.level}:{' '}
+              <p className="text-green-400 text-xs font-bold mb-1">TO (NEW!)</p>
+              <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-2">
+                <p className="text-green-300 font-bold text-sm">
                   {currentUpgrade.new_progression.name}
                 </p>
-                {currentUpgrade.new_progression.description && (
-                  <p className="text-green-200 text-sm mt-1">
-                    {currentUpgrade.new_progression.description}
-                  </p>
-                )}
               </div>
             </div>
           </div>
 
-          {/* Stats */}
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="text-center">
-                <p className="text-blue-400 text-xs font-semibold">LAST WORKOUTS</p>
-                <p className="text-white text-2xl font-bold mt-1">
-                  {currentUpgrade.qualifying_workouts}
-                </p>
-              </div>
-              <div className="text-center">
-                <p className="text-blue-400 text-xs font-semibold">AVG REPS</p>
-                <p className="text-white text-2xl font-bold mt-1">
-                  {currentUpgrade.average_reps.toFixed(1)}
-                </p>
-              </div>
-            </div>
+          {/* Navigation */}
+          <div className="flex gap-2 text-xs pt-2">
+            <span className="text-slate-400">
+              {currentUpgradeIndex + 1} / {upgrades.length}
+            </span>
           </div>
-
-          {/* Upgrade Count Indicator */}
-          {upgrades.length > 1 && (
-            <div className="text-center">
-              <p className="text-slate-400 text-sm">
-                {currentUpgradeIndex + 1} of {upgrades.length} upgrades
-              </p>
-              <div className="mt-2 flex gap-1 justify-center">
-                {upgrades.map((_, idx) => (
-                  <div
-                    key={idx}
-                    className={`h-2 rounded-full transition-all ${
-                      idx <= currentUpgradeIndex ? 'bg-green-500 w-4' : 'bg-slate-600 w-2'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* Actions */}
-        <div className="border-t border-slate-700 px-6 py-4 flex gap-3">
-          <button
-            onClick={onClose}
-            className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-semibold transition-colors"
-          >
-            Skip
-          </button>
+        {/* Button */}
+        <div className="bg-slate-700 px-6 py-3 border-t border-slate-600">
           <button
             onClick={handleNext}
-            className="flex-1 px-4 py-3 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white rounded-lg font-bold transition-all active:scale-95"
+            className="w-full px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-bold rounded-lg transition-all text-sm"
           >
-            {isLastUpgrade ? '🎉 Done!' : 'Next →'}
+            {isLastUpgrade ? 'Done!' : 'Next'}
           </button>
         </div>
       </div>
