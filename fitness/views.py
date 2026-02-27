@@ -160,15 +160,15 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         today = timezone.now().date()
         today_day = today.weekday()  # 0=Monday, 1=Tuesday, etc.
 
-        # 2-Exercise Schedule: Mo/We/Fr = Push-ups+Pull-ups, Tu/Th = Pull-ups, Sa/Su = Rest
+        # 2-Exercise Schedule: Mo/We/Fr = Push-up+Pull-up, Tu/Th = Pull-up, Sa/Su = Rest
         schedule = {
-            0: ['Push-ups', 'Pull-ups'],     # Monday
-            1: ['Pull-ups'],                 # Tuesday
-            2: ['Push-ups', 'Pull-ups'],     # Wednesday
-            3: ['Pull-ups'],                 # Thursday
-            4: ['Push-ups', 'Pull-ups'],     # Friday
-            5: [],                           # Saturday - no workout
-            6: [],                           # Sunday - no workout
+            0: ['Push-up', 'Pull-up'],     # Monday
+            1: ['Pull-up'],                 # Tuesday
+            2: ['Push-up', 'Pull-up'],     # Wednesday
+            3: ['Pull-up'],                 # Thursday
+            4: ['Push-up', 'Pull-up'],     # Friday
+            5: [],                          # Saturday - no workout
+            6: [],                          # Sunday - no workout
         }
 
         scheduled_exercise_names = schedule.get(today_day, [])

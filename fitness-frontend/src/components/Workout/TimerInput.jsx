@@ -122,7 +122,7 @@ export default function TimerInput({
     }
   };
 
-  const targetSeconds = currentProgression?.target_seconds || 30;
+  const targetSeconds = currentProgression?.target_value || 30;
 
   const formatTime = (totalSeconds) => {
     const mins = Math.floor(totalSeconds / 60);

@@ -8,9 +8,9 @@ export const setAPI = {
   },
 
   update: (id, data) => {
-    // PUT to /workouts/{workout_id}/add_set/
+    // POST to /workouts/{workout_id}/add_set/ (backend uses update_or_create, no PUT needed)
     const workoutId = data.workout;
-    return client.put(`/workouts/${workoutId}/add_set/`, data);
+    return client.post(`/workouts/${workoutId}/add_set/`, data);
   },
 
   delete: (id) => client.delete(`/workouts/sets/${id}/`),

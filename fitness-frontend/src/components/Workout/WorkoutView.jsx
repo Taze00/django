@@ -4,14 +4,14 @@ import ExerciseCard from './ExerciseCard';
 import WarmupChecklist from './WarmupChecklist';
 import ProgressionUpgradeModal from './ProgressionUpgradeModal';
 
-// Simple 2-exercise rotation
-// Mo/We/Fr = PUSH (Push-ups), Tu/Th = PULL (Pull-ups)
+// Simple 2-exercise rotation - FIXED: Push-up (singular), Pull-up (singular)
+// Mo/We/Fr = PUSH (Push-up), Tu/Th = PULL (Pull-up)
 const SCHEDULE = {
-  1: ['Push-ups', 'Pull-up'],   // Monday
+  1: ['Push-up', 'Pull-up'],   // Monday
   2: ['Pull-up'],               // Tuesday
-  3: ['Push-ups', 'Pull-up'],    // Wednesday
+  3: ['Push-up', 'Pull-up'],    // Wednesday
   4: ['Pull-up'],               // Thursday
-  5: ['Push-ups', 'Pull-up'],    // Friday
+  5: ['Push-up', 'Pull-up'],    // Friday
   // 6 = Saturday (Rest)
   // 0/7 = Sunday (Rest)
 };
