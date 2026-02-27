@@ -4,7 +4,6 @@ import { Login } from './components/Auth/Login';
 import { ProtectedRoute } from './components/Auth/ProtectedRoute';
 import { useAuth } from './hooks/useAuth';
 import MainLayout from './components/Layout/MainLayout';
-import OfflineIndicator from './components/Layout/OfflineIndicator';
 import HomeView from './components/Home/HomeView';
 import WorkoutView from './components/Workout/WorkoutView';
 
@@ -79,7 +78,6 @@ export const App = () => {
   return (
     <ErrorBoundary>
       <Router basename="/fitness">
-        <OfflineIndicator />
         <Routes>
           {/* Auth Routes */}
           <Route
