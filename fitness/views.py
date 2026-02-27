@@ -147,21 +147,20 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         today = timezone.now().date()
         today_day = today.weekday()  # 0=Monday, 1=Tuesday, etc.
 
-        # Determine workout type based on day
-        # Mo=PUSH, Tu=PULL, We=PUSH, Th=PULL, Fr=PUSH, Sa/Su=REST
-        workout_types = {
-            0: 'PUSH',  # Monday
-            1: 'PULL',  # Tuesday
-            2: 'PUSH',  # Wednesday
-            3: 'PULL',  # Thursday
-            4: 'PUSH',  # Friday
-            5: None,    # Saturday - no workout
-            6: None,    # Sunday - no workout
+        # 2-Exercise Schedule: Mo/We/Fr = Push-ups+Pull-ups, Tu/Th = Pull-ups, Sa/Su = Rest
+        schedule = {
+            0: ['Push-ups', 'Pull-ups'],     # Monday
+            1: ['Pull-ups'],                 # Tuesday
+            2: ['Push-ups', 'Pull-ups'],     # Wednesday
+            3: ['Pull-ups'],                 # Thursday
+            4: ['Push-ups', 'Pull-ups'],     # Friday
+            5: [],                           # Saturday - no workout
+            6: [],                           # Sunday - no workout
         }
 
-        workout_type = workout_types.get(today_day)
+        scheduled_exercise_names = schedule.get(today_day, [])
 
-        if not workout_type:
+        if not scheduled_exercise_names:
             return Response(
                 {'error': 'No workout scheduled for today'},
                 status=status.HTTP_400_BAD_REQUEST
@@ -172,8 +171,8 @@ class WorkoutViewSet(viewsets.ModelViewSet):
             user=request.user,
             date=today,
             defaults={
-                'workout_type': workout_type,
-                'week_number': 1,  # TODO: Calculate actual week number
+                'workout_type': 'workout',  # Generic type for all workouts
+                'week_number': 1,
             }
         )
 
@@ -181,76 +180,116 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         if not hasattr(workout, 'warmup'):
             WarmupChecklist.objects.create(workout=workout)
 
+        # Initialize UserExerciseProgressions for new users
+        # Start with user_starts_here=True progressions only
+        exercises = Exercise.objects.all().prefetch_related('progressions')
+        for exercise in exercises:
+            uep, created = UserExerciseProgression.objects.get_or_create(
+                user=request.user,
+                exercise=exercise,
+                defaults={'current_progression': None}
+            )
+
+            # If newly created, find the user_starts_here progression
+            if created:
+                start_progression = exercise.progressions.filter(
+                    user_starts_here=True
+                ).first()
+
+                if start_progression:
+                    uep.current_progression = start_progression
+                    uep.sessions_at_target = 0
+                    uep.save()
+                else:
+                    # Fallback to first progression if no user_starts_here marked
+                    first_progression = exercise.progressions.order_by('level').first()
+                    if first_progression:
+                        uep.current_progression = first_progression
+                        uep.sessions_at_target = 0
+                        uep.save()
+
         serializer = WorkoutDetailSerializer(workout)
         return Response(serializer.data)
 
     @action(detail=True, methods=['post'])
     def complete(self, request, pk=None):
         """Mark workout as completed"""
-        from django.db.models import Sum, Count
-
         workout = self.get_object()
         workout.completed = True
         workout.completed_at = timezone.now()
 
-        # Calculate duration if we have set times
         if workout.sets.exists():
             duration = (workout.completed_at - workout.created_at).total_seconds()
             workout.duration_seconds = int(duration)
 
         workout.save()
 
-        # Check for progression upgrades
-        exercises = Exercise.objects.all()
+        # Check progression qualifying for each exercise in this workout
+        exercises_in_workout = Exercise.objects.filter(
+            sets__workout=workout
+        ).distinct()
+
         upgrades = []
-        for exercise in exercises:
-            result = check_progression_upgrade(request.user, exercise)
-            if result['ready']:
-                # Get current progression
-                user_prog = UserExerciseProgression.objects.get(
-                    user=request.user,
-                    exercise=exercise
-                )
-                current_prog = user_prog.current_progression
-                next_prog = result['next_progression']
 
-                # Calculate average reps from last qualifying workouts
-                last_3_workouts = request.user.workouts.filter(
-                    sets__exercise=exercise,
-                    completed=True
-                ).distinct().order_by('-date')[:3]
+        for exercise in exercises_in_workout:
+            # Get Set 1 and Set 2 (non-drop-sets only)
+            sets_1_2 = workout.sets.filter(
+                exercise=exercise,
+                is_drop_set=False
+            ).order_by('set_number')[:2]
 
-                total_reps = 0
-                set_count = 0
-                for w in last_3_workouts:
-                    sets = w.sets.filter(
-                        exercise=exercise,
-                        is_drop_set=False
-                    ).order_by('set_number')[:2]
-                    for s in sets:
-                        total_reps += s.reps
-                        set_count += 1
+            # Only process if we have both sets
+            if sets_1_2.count() == 2:
+                set1, set2 = sets_1_2[0], sets_1_2[1]
 
-                avg_reps = total_reps / set_count if set_count > 0 else 0
+                try:
+                    user_prog = UserExerciseProgression.objects.get(
+                        user=request.user,
+                        exercise=exercise
+                    )
+                except UserExerciseProgression.DoesNotExist:
+                    continue
 
-                upgrades.append({
-                    'exercise_id': exercise.id,
-                    'exercise_name': exercise.name,
-                    'old_progression': {
-                        'id': current_prog.id,
-                        'level': current_prog.level,
-                        'name': current_prog.name,
-                        'description': current_prog.description,
-                    },
-                    'new_progression': {
-                        'id': next_prog.id,
-                        'level': next_prog.level,
-                        'name': next_prog.name,
-                        'description': next_prog.description,
-                    },
-                    'qualifying_workouts': 3,
-                    'average_reps': avg_reps,
-                })
+                progression = user_prog.current_progression
+                target_value = progression.target_value
+                target_type = progression.target_type
+
+                # Get values for Set 1 and Set 2
+                if target_type == 'time':
+                    set1_value = set1.seconds or 0
+                    set2_value = set2.seconds or 0
+                else:  # 'reps'
+                    set1_value = set1.reps or 0
+                    set2_value = set2.reps or 0
+
+                # Check if BOTH Set 1 AND Set 2 meet or exceed target
+                if set1_value >= target_value and set2_value >= target_value:
+                    # Qualifies! Increment sessions_at_target
+                    user_prog.sessions_at_target += 1
+                    user_prog.save()
+
+                    # Check if ready for upgrade
+                    result = check_progression_upgrade(request.user, exercise)
+                    if result['ready']:
+                        next_prog = result['next_progression']
+                        upgrades.append({
+                            'exercise_id': exercise.id,
+                            'exercise_name': exercise.name,
+                            'old_progression': {
+                                'id': progression.id,
+                                'level': progression.level,
+                                'name': progression.name,
+                                'description': progression.description,
+                            },
+                            'new_progression': {
+                                'id': next_prog.id,
+                                'level': next_prog.level,
+                                'name': next_prog.name,
+                                'description': next_prog.description,
+                            },
+                            'sessions_at_target': user_prog.sessions_at_target,
+                            'sessions_required': progression.sessions_required,
+                        })
 
         return Response({
             'success': True,
@@ -347,17 +386,18 @@ class StatsViewSet(viewsets.GenericViewSet):
                 current_streak += 1
                 check_date -= timedelta(days=1)
 
-        # Count push vs pull workouts
-        push_workouts = completed_workouts.filter(workout_type='PUSH').count()
-        pull_workouts = completed_workouts.filter(workout_type='PULL').count()
+        # Count total sets completed
+        total_sets = WorkoutSet.objects.filter(
+            workout__user=request.user,
+            workout__completed=True
+        ).count()
 
         return Response({
             'total_workouts': total_workouts,
             'total_time_seconds': int(total_time_seconds),
             'total_reps': total_reps,
+            'total_sets': total_sets,
             'current_streak': current_streak,
-            'push_workouts': push_workouts,
-            'pull_workouts': pull_workouts,
         })
 
     @action(detail=False, methods=['get'])
