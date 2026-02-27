@@ -169,11 +169,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         # Get or create workout
         workout, created = Workout.objects.get_or_create(
             user=request.user,
-            date=today,
-            defaults={
-                'workout_type': 'workout',  # Generic type for all workouts
-                'week_number': 1,
-            }
+            date=today
         )
 
         # Create warmup if not exists
@@ -336,15 +332,20 @@ class UserViewSet(viewsets.GenericViewSet):
 
     @action(detail=False, methods=['get', 'put'])
     def me(self, request):
-        """Get or update current user info"""
+        """Get or update current user profile info"""
+        try:
+            profile = UserProfile.objects.get(user=request.user)
+        except UserProfile.DoesNotExist:
+            profile = UserProfile.objects.create(user=request.user)
+
         if request.method == 'PUT':
-            serializer = UserSerializer(request.user, data=request.data, partial=True)
+            serializer = UserProfileSerializer(profile, data=request.data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
             return Response(serializer.errors, status=400)
 
-        serializer = UserSerializer(request.user)
+        serializer = UserProfileSerializer(profile)
         return Response(serializer.data)
 
 
