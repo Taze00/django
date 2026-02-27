@@ -326,9 +326,9 @@ class WorkoutViewSet(viewsets.ModelViewSet):
     def add_set(self, request, pk=None):
         """Add a set to the workout"""
         workout = self.get_object()
-        
-        exercise_id = request.data.get('exercise_id')
-        progression_id = request.data.get('progression_id')
+
+        exercise_id = request.data.get('exercise')
+        progression_id = request.data.get('progression')
         set_number = request.data.get('set_number')
         reps = request.data.get('reps')
         seconds = request.data.get('seconds')
