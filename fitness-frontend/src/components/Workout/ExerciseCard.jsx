@@ -1,57 +1,41 @@
 import { useState } from 'react';
 import SetInput from './SetInput';
 import TimerInput from './TimerInput';
-import DropSetModal from './DropSetModal';
 
 export default function ExerciseCard({
   exercise,
   workoutSets,
   userProgression,
   exerciseIndex,
-  onSetCompleted = null, // New prop for Phase 8
+  onSetCompleted = null,
+  setNumber = 1, // ← Which set number are we on (1, 2, or 3)
 }) {
-  const [expandedSetIndex, setExpandedSetIndex] = useState(null);
-  const [showDropSetModal, setShowDropSetModal] = useState(false);
+  const [expandedSetInput, setExpandedSetInput] = useState(true); // Always expanded in Phase 8
   const [showFormTips, setShowFormTips] = useState(false);
 
   if (!userProgression) {
     console.warn(`[ExerciseCard] No userProgression for exercise ${exercise?.id} (${exercise?.name})`);
+    return null;
   }
 
   const currentProgression = Array.isArray(exercise?.progressions)
     ? exercise.progressions.find((p) => p?.id === userProgression?.current_progression)
     : null;
 
-  const handleSetCompleted = (setNumber, info = {}) => {
-    setExpandedSetIndex(null);
-
-    if (info.isUpdate) {
-      console.log(`[ExerciseCard] Set ${setNumber} updated`);
-      return;
-    }
-
-    // For Phase 8: callback to parent for rest timer management
-    if (onSetCompleted) {
-      onSetCompleted(setNumber, info);
-      return;
-    }
-
-    // Original behavior (backward compat for non-Phase8 usage)
-    if (setNumber === 3) {
-      // Only show drop set modal if progression level > 1
-      if (currentProgression?.level > 1) {
-        setShowDropSetModal(true);
-      }
-    }
-  };
-
-  const completedSets = Array.isArray(workoutSets)
-    ? workoutSets.filter(s => currentProgression?.target_type === 'time' ? s?.seconds !== null : s?.reps !== null).length
-    : 0;
-
   if (!currentProgression) {
     return null;
   }
+
+  // Find the set for this specific set number
+  const existingSet = workoutSets?.find(
+    (s) => s.set_number === setNumber && !s.is_drop_set
+  );
+
+  const handleSetCompleted = (completedSetNumber, info = {}) => {
+    if (onSetCompleted) {
+      onSetCompleted(completedSetNumber, info);
+    }
+  };
 
   const targetValue = currentProgression.target_value;
   const targetUnit = currentProgression.target_type === 'time' ? 's' : 'reps';
@@ -63,7 +47,7 @@ export default function ExerciseCard({
 
   return (
     <div className="bg-slate-800/40 backdrop-blur-sm rounded-xl p-6 border border-slate-700/30 shadow-md">
-      {/* Header - Exercise Name + Number */}
+      {/* Header - Exercise Name + Set Number */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-blue-500/40 flex items-center justify-center border border-blue-500/30 font-bold text-blue-300 text-sm">
@@ -71,60 +55,34 @@ export default function ExerciseCard({
           </div>
           <div>
             <h3 className="text-lg font-bold text-white">{currentProgression.name}</h3>
-            <p className="text-slate-400 text-xs">Level {currentProgression.level}</p>
+            <p className="text-slate-400 text-xs">
+              Level {currentProgression.level} • Set {setNumber} of 3
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Target Info - Minimal */}
-      <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4 mb-6">
-        <p className="text-slate-300 text-xs font-semibold tracking-wide mb-1">TARGET</p>
-        <p className="text-white text-2xl font-bold">{targetValue} {targetUnit}</p>
-        <p className="text-slate-400 text-xs mt-1">Set 1 & 2</p>
-      </div>
-
-      {/* Sets - Expandable */}
-      <div className="space-y-3 mb-6">
-        {[1, 2, 3].map((setNum) => {
-          const set = workoutSets?.find(s => s.set_number === setNum && !s.is_drop_set);
-          const isExpanded = expandedSetIndex === setNum - 1;
-          const isCompleted = set && (set.reps || set.seconds);
-
-          return (
-            <div key={setNum}>
-              {isExpanded ? (
-                currentProgression.target_type === 'time' ? (
-                  <TimerInput
-                    exercise={exercise}
-                    setNumber={setNum}
-                    userProgression={userProgression}
-                    existingSet={set}
-                    onCompleted={handleSetCompleted}
-                  />
-                ) : (
-                  <SetInput
-                    exercise={exercise}
-                    setNumber={setNum}
-                    userProgression={userProgression}
-                    existingSet={set}
-                    onCompleted={handleSetCompleted}
-                  />
-                )
-              ) : (
-                <button
-                  onClick={() => setExpandedSetIndex(setNum - 1)}
-                  className={`w-full p-3 rounded-lg border transition-all text-left font-medium ${
-                    isCompleted
-                      ? 'bg-green-500/10 border-green-500/30 text-green-300 hover:bg-green-500/20'
-                      : 'bg-slate-700/30 border-slate-600/30 text-slate-300 hover:bg-slate-700/50'
-                  }`}
-                >
-                  {isCompleted ? `✓ Set ${setNum}` : `Set ${setNum}`}
-                </button>
-              )}
-            </div>
-          );
-        })}
+      {/* Set Input - Always Expanded in Phase 8 */}
+      <div className="mb-6">
+        {currentProgression.target_type === 'time' ? (
+          <TimerInput
+            exercise={exercise}
+            setNumber={setNumber}
+            userProgression={userProgression}
+            existingSet={existingSet}
+            onCompleted={handleSetCompleted}
+            isDropSet={false}
+          />
+        ) : (
+          <SetInput
+            exercise={exercise}
+            setNumber={setNumber}
+            userProgression={userProgression}
+            existingSet={existingSet}
+            onCompleted={handleSetCompleted}
+            isDropSet={false}
+          />
+        )}
       </div>
 
       {/* Form Tips - Collapsed by default */}
@@ -151,16 +109,6 @@ export default function ExerciseCard({
             </div>
           )}
         </div>
-      )}
-
-      {/* Drop Set Modal */}
-      {showDropSetModal && (
-        <DropSetModal
-          exercise={exercise}
-          workoutSet={workoutSets?.find(s => s.set_number === 3 && s.is_drop_set)}
-          userProgression={userProgression}
-          onClose={() => setShowDropSetModal(false)}
-        />
       )}
     </div>
   );

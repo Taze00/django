@@ -254,6 +254,7 @@ export default function WorkoutView() {
           userProgression={userProg}
           exerciseIndex={0}
           onSetCompleted={handleSetCompleted}
+          setNumber={currentStepData?.setNum}
         />
       </div>
 
