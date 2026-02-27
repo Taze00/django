@@ -6,6 +6,7 @@ import { useAuth } from './hooks/useAuth';
 import MainLayout from './components/Layout/MainLayout';
 import HomeView from './components/Home/HomeView';
 import WorkoutView from './components/Workout/WorkoutView';
+import ExercisesView from './components/Exercises/ExercisesView';
 
 // Lazy load profile view for code splitting
 const ProfileView = lazy(() => import('./components/Profile/ProfileView'));
@@ -92,6 +93,18 @@ export const App = () => {
               <ProtectedRoute>
                 <MainLayout>
                   <HomeView />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Exercises Route */}
+          <Route
+            path="/exercises"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <ExercisesView />
                 </MainLayout>
               </ProtectedRoute>
             }

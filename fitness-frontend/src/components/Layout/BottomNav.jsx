@@ -26,6 +26,16 @@ export default function BottomNav() {
         <span style={{ fontSize: '11px', fontWeight: '500' }}>Home</span>
       </Link>
 
+      <Link to="/exercises" style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px', color: isActive('/exercises'), textDecoration: 'none' }}>
+        <span style={{ fontSize: '22px', lineHeight: '1' }}>📚</span>
+        <span style={{ fontSize: '11px', fontWeight: '500' }}>Exercises</span>
+      </Link>
+
+      <Link to="/workout" style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px', color: isActive('/workout'), textDecoration: 'none' }}>
+        <span style={{ fontSize: '22px', lineHeight: '1' }}>💪</span>
+        <span style={{ fontSize: '11px', fontWeight: '500' }}>Workout</span>
+      </Link>
+
       <Link to="/profile" style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px', color: isActive('/profile'), textDecoration: 'none' }}>
         {user?.profile?.avatar ? (
           <img
@@ -44,11 +54,6 @@ export default function BottomNav() {
           <span style={{ fontSize: '22px', lineHeight: '1' }}>👤</span>
         )}
         <span style={{ fontSize: '11px', fontWeight: '500' }}>Profile</span>
-      </Link>
-
-      <Link to="/workout" style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px', color: isActive('/workout'), textDecoration: 'none' }}>
-        <span style={{ fontSize: '22px', lineHeight: '1' }}>💪</span>
-        <span style={{ fontSize: '11px', fontWeight: '500' }}>Workout</span>
       </Link>
     </nav>
   );
