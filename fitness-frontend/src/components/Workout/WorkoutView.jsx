@@ -3,6 +3,7 @@ import { useWorkoutStore } from '../../store/workoutStore';
 import ExerciseCard from './ExerciseCard';
 import WarmupChecklist from './WarmupChecklist';
 import ProgressionUpgradeModal from './ProgressionUpgradeModal';
+import Header from '../Layout/Header';
 
 // 6-Step Alternating Flow: Push1 → Pull1 → Push2 → Pull2 → Push3 → Pull3
 // Rest times: 3 min between sets, 5 min after Set 3 (before drop set)
@@ -177,13 +178,16 @@ export default function WorkoutView() {
 
   if (isRestDay) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-6 flex flex-col items-center justify-center">
-        <div className="bg-gradient-to-r from-emerald-500/15 to-teal-500/15 backdrop-blur-sm border border-emerald-500/30 rounded-2xl p-8 text-center max-w-md">
-          <p className="text-4xl mb-4">😎</p>
-          <h2 className="text-2xl font-bold text-white mb-2">Rest Day!</h2>
-          <p className="text-slate-300 text-sm">
-            Great job pushing yourself! Take today to recover and prepare for your next workout.
-          </p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800">
+        <Header title="Workout" icon="💪" />
+        <div className="p-6 flex flex-col items-center justify-center min-h-[calc(100vh-70px)]">
+          <div className="bg-gradient-to-r from-emerald-500/15 to-teal-500/15 backdrop-blur-sm border border-emerald-500/30 rounded-2xl p-8 text-center max-w-md">
+            <p className="text-4xl mb-4">😎</p>
+            <h2 className="text-2xl font-bold text-white mb-2">Rest Day!</h2>
+            <p className="text-slate-300 text-sm">
+              Great job pushing yourself! Take today to recover and prepare for your next workout.
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -191,9 +195,12 @@ export default function WorkoutView() {
 
   if (!currentWorkout) {
     return (
-      <div className="min-h-screen bg-slate-900 p-6 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-slate-400">No workout scheduled for today</p>
+      <div className="min-h-screen bg-slate-900">
+        <Header title="Workout" icon="💪" />
+        <div className="p-6 flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-slate-400">No workout scheduled for today</p>
+          </div>
         </div>
       </div>
     );
@@ -201,9 +208,12 @@ export default function WorkoutView() {
 
   if (!currentStepData) {
     return (
-      <div className="min-h-screen bg-slate-900 p-6 flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-slate-400">Workout flow not configured</p>
+      <div className="min-h-screen bg-slate-900">
+        <Header title="Workout" icon="💪" />
+        <div className="p-6 flex items-center justify-center">
+          <div className="text-center">
+            <p className="text-slate-400">Workout flow not configured</p>
+          </div>
         </div>
       </div>
     );
@@ -214,48 +224,47 @@ export default function WorkoutView() {
   const workoutSets = currentWorkout?.sets?.filter(s => s.exercise === exercise.id) || [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-4 sm:p-6 pb-20">
-      {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-white mb-2">
-          💪 {dayName}'s Workout
-        </h1>
-        <p className="text-slate-400 text-sm">
-          Step {currentStep + 1} of {workoutFlow.length}
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 pb-20">
+      <Header title="Workout" icon="💪" />
 
-      {/* Progress Bar */}
-      <div className="mb-6 bg-slate-800/50 rounded-lg p-4 border border-slate-700/30">
-        <div className="flex items-center justify-between mb-2">
-          <p className="text-slate-300 text-sm font-semibold">Workout Progress</p>
-          <p className="text-slate-400 text-xs">{currentStep + 1}/{workoutFlow.length}</p>
+      <div className="p-4 sm:p-6 space-y-6">
+        {/* Progress Info */}
+        <div className="text-sm text-slate-400">
+          Step {currentStep + 1} of {workoutFlow.length}
         </div>
-        <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300"
-            style={{ width: `${((currentStep + 1) / workoutFlow.length) * 100}%` }}
+
+        {/* Progress Bar */}
+        <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700/30">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-slate-300 text-sm font-semibold">Workout Progress</p>
+            <p className="text-slate-400 text-xs">{currentStep + 1}/{workoutFlow.length}</p>
+          </div>
+          <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-gradient-to-r from-blue-500 to-blue-600 transition-all duration-300"
+              style={{ width: `${((currentStep + 1) / workoutFlow.length) * 100}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Warmup - Show only on first step */}
+        {currentStep === 0 && currentWorkout && (
+          <div>
+            <WarmupChecklist workout={currentWorkout} />
+          </div>
+        )}
+
+        {/* Current Exercise */}
+        <div>
+          <ExerciseCard
+            exercise={exercise}
+            workoutSets={workoutSets}
+            userProgression={userProg}
+            exerciseIndex={0}
+            onSetCompleted={handleSetCompleted}
+            setNumber={currentStepData?.setNum}
           />
         </div>
-      </div>
-
-      {/* Warmup - Show only on first step */}
-      {currentStep === 0 && currentWorkout && (
-        <div className="mb-6">
-          <WarmupChecklist workout={currentWorkout} />
-        </div>
-      )}
-
-      {/* Current Exercise */}
-      <div className="mb-6">
-        <ExerciseCard
-          exercise={exercise}
-          workoutSets={workoutSets}
-          userProgression={userProg}
-          exerciseIndex={0}
-          onSetCompleted={handleSetCompleted}
-          setNumber={currentStepData?.setNum}
-        />
       </div>
 
       {/* Rest Timer */}

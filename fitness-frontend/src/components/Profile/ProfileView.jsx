@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useAuthStore } from '../../store/authStore';
 import { useWorkoutStore } from '../../store/workoutStore';
+import Header from '../Layout/Header';
 
 export default function ProfileView() {
   const { user, logout, fetchUser } = useAuth();
@@ -114,10 +115,7 @@ export default function ProfileView() {
 
   return (
     <div className="min-h-screen bg-slate-900 pb-20">
-      {/* Header */}
-      <div className="sticky top-0 bg-slate-800/95 backdrop-blur border-b border-slate-700 z-10">
-        <h1 className="text-2xl font-bold text-white p-4">👤 Profile</h1>
-      </div>
+      <Header title="Profile" icon="👤" />
 
       {user && (
         <div className="p-4 space-y-6">
