@@ -11,7 +11,7 @@ from .models import (
     Workout, WarmupChecklist, WorkoutSet
 )
 from .serializers import (
-    UserSerializer, ExerciseSerializer, ProgressionSerializer,
+    ExerciseSerializer, ProgressionSerializer,
     UserProfileSerializer, UserExerciseProgressionSerializer,
     WorkoutDetailSerializer, WorkoutListSerializer, WorkoutCreateSerializer,
     WarmupChecklistSerializer, WorkoutSetSerializer

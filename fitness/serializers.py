@@ -5,20 +5,14 @@ from .models import (
 )
 
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = UserProfile
-        fields = ['id', 'user', 'avatar', 'bio']
-
-
 class UserProfileSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(source='user.id', read_only=True)
     username = serializers.CharField(source='user.username', read_only=True)
 
     class Meta:
         model = UserProfile
-        fields = ['id', 'user_id', 'username', 'avatar', 'bio']
-        read_only_fields = ['id', 'user_id', 'username']
+        fields = ['id', 'user_id', 'username', 'avatar', 'current_week', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'user_id', 'username', 'created_at', 'updated_at']
 
 
 class WarmupChecklistSerializer(serializers.ModelSerializer):
