@@ -38,13 +38,13 @@ def update_template(template_path, hashes):
 
     original_content = content
 
-    # Update JS hash - use a looser pattern to handle the hash format
-    js_pattern = r'src="/static/fitness/assets/index-[A-Za-z0-9\-]*\.js'
+    # Update JS hash - use a looser pattern to handle the hash format (includes _, -, alphanumeric)
+    js_pattern = r'src="/static/fitness/assets/index-[\w\-]*\.js'
     js_replacement = f'src="/static/fitness/assets/{hashes["js"]}'
     content = re.sub(js_pattern, js_replacement, content)
 
     # Update CSS hash
-    css_pattern = r'href="/static/fitness/assets/index-[A-Za-z0-9\-]*\.css'
+    css_pattern = r'href="/static/fitness/assets/index-[\w\-]*\.css'
     css_replacement = f'href="/static/fitness/assets/{hashes["css"]}'
     content = re.sub(css_pattern, css_replacement, content)
 
