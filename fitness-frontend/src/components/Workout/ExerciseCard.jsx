@@ -45,7 +45,7 @@ export default function ExerciseCard({
           <TimerInput
             exercise={exercise}
             setNumber={setNumber}
-            progression={progression}
+            userProgression={{ current_progression: progression.id }}
             onCompleted={handleSetCompleted}
             isDropSet={false}
           />
@@ -64,7 +64,7 @@ export default function ExerciseCard({
       {showDropSetModal && (
         <DropSetModal
           exercise={exercise}
-          progression={progression}
+          userProgression={{ current_progression: progression.id }}
           onClose={() => {
             setShowDropSetModal(false);
             if (onSetCompleted) {
