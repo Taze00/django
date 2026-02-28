@@ -4,9 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && python3 ../update_template_hashes.py",
     "preview": "vite preview",
-    "deploy": "npm run build && rm -rf ../static/fitness/assets && rm -f ../static/fitness/sw.js ../static/fitness/workbox-*.js && cp -r dist/* ../static/fitness/ && echo '✓ Assets cleared and new files deployed'"
+    "deploy": "npm run build && rm -rf ../static/fitness/assets && rm -f ../static/fitness/sw.js ../static/fitness/workbox-*.js && cp -r dist/* ../static/fitness/ && echo '\u2713 Assets cleared and new files deployed'"
   },
   "dependencies": {
     "react": "^18.2.0",
