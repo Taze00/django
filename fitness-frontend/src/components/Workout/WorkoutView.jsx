@@ -238,13 +238,21 @@ export default function WorkoutView() {
     <>
       <Header title="Workout" icon="💪" />
       {showRestTimer ? (
-        <div className="min-h-screen bg-slate-900 pb-20 flex items-center justify-center">
-          <div className="text-center">
-            <div className="text-6xl mb-4">⏱️</div>
-            <div className="text-white">
-              <p className="text-sm text-slate-400 mb-2">Rest Time</p>
-              <p className="text-5xl font-bold">{Math.floor(restTimeRemaining / 60)}:{String(restTimeRemaining % 60).padStart(2, "0")}</p>
+        <div className="min-h-screen bg-slate-900 pb-20 flex items-center justify-center p-4">
+          <div className="text-center space-y-8">
+            <div>
+              <div className="text-6xl mb-4">⏱️</div>
+              <div className="text-white">
+                <p className="text-sm text-slate-400 mb-2">Rest Time</p>
+                <p className="text-5xl font-bold">{Math.floor(restTimeRemaining / 60)}:{String(restTimeRemaining % 60).padStart(2, "0")}</p>
+              </div>
             </div>
+            <button
+              onClick={handleRestTimerComplete}
+              className="mx-auto px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-all text-lg"
+            >
+              Skip ⏭️
+            </button>
           </div>
         </div>
       ) : currentStepData ? (
