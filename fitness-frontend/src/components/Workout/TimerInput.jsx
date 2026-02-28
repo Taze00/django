@@ -172,12 +172,24 @@ export default function TimerInput({
       )}
 
       {(phase === 'countdown' || phase === 'timing') && (
-        <button
-          onClick={handleStop}
-          className="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold py-3 px-4 rounded-lg transition-all duration-200 active:scale-95"
-        >
-          ⏹ Stop & Save
-        </button>
+        <div className="space-y-2">
+          <button
+            onClick={handleStop}
+            className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 px-4 rounded-lg transition-all duration-200 active:scale-95"
+          >
+            ✓ Stop & Save
+          </button>
+          <button
+            onClick={() => {
+              setPhase('ready');
+              setSeconds(0);
+              setCountdownValue(3);
+            }}
+            className="w-full bg-slate-600 hover:bg-slate-500 text-white font-bold py-2 px-4 rounded-lg transition-all text-sm"
+          >
+            ↻ Reset
+          </button>
+        </div>
       )}
 
       {phase === 'stopped' && !editSeconds && (
