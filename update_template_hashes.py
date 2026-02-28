@@ -38,14 +38,14 @@ def update_template(template_path, hashes):
 
     original_content = content
 
-    # Update JS hash
-    js_pattern = r'src="/static/fitness/assets/index-[A-Za-z0-9]*\.js"'
-    js_replacement = f'src="/static/fitness/assets/{hashes["js"]}"'
+    # Update JS hash - use a looser pattern to handle the hash format
+    js_pattern = r'src="/static/fitness/assets/index-[A-Za-z0-9\-]*\.js'
+    js_replacement = f'src="/static/fitness/assets/{hashes["js"]}'
     content = re.sub(js_pattern, js_replacement, content)
 
     # Update CSS hash
-    css_pattern = r'href="/static/fitness/assets/index-[A-Za-z0-9]*\.css"'
-    css_replacement = f'href="/static/fitness/assets/{hashes["css"]}"'
+    css_pattern = r'href="/static/fitness/assets/index-[A-Za-z0-9\-]*\.css'
+    css_replacement = f'href="/static/fitness/assets/{hashes["css"]}'
     content = re.sub(css_pattern, css_replacement, content)
 
     # Check if anything changed
@@ -62,12 +62,18 @@ def update_template(template_path, hashes):
     return True
 
 def main():
-    # Determine paths
-    script_dir = Path(__file__).parent
+    # Determine paths - try multiple locations since script may be run from different dirs
+    script_dir = Path(__file__).parent.resolve()
+
+    # If running from fitness-frontend, go up one level
+    if script_dir.name == 'fitness-frontend':
+        script_dir = script_dir.parent
+
     dist_dir = script_dir / 'fitness-frontend' / 'dist'
     template_path = script_dir / 'templates' / 'fitness.html'
 
     print("[update_template_hashes.py]")
+    print(f"Script dir: {script_dir}")
     print(f"Looking for assets in: {dist_dir}")
     print(f"Template to update: {template_path}\n")
 
