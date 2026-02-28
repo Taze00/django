@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useWorkoutStore } from '../../store/workoutStore';
 import ExerciseCard from './ExerciseCard';
 import WarmupChecklist from './WarmupChecklist';
@@ -11,6 +11,7 @@ export default function WorkoutView() {
     currentWorkout,
     exercises,
     userProgressions,
+    lastPerformances,
     isLoading,
     error,
     initialize,
@@ -29,28 +30,31 @@ export default function WorkoutView() {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [showRestDayModal, setShowRestDayModal] = useState(false);
   const [allowRestDayTraining, setAllowRestDayTraining] = useState(false);
+  const [hasShownRestDayModal, setHasShownRestDayModal] = useState(false);
 
+  // Rest timer effect
   useEffect(() => {
     if (!showRestTimer || restTimeRemaining <= 0) return;
     const interval = setInterval(() => {
-      setRestTimeRemaining(prev => {
-        if (prev <= 1) {
-          handleRestTimerComplete();
-          return 0;
-        }
-        return prev - 1;
-      });
+      setRestTimeRemaining(prev => (prev > 1 ? prev - 1 : 0));
     }, 1000);
     return () => clearInterval(interval);
   }, [showRestTimer, restTimeRemaining]);
 
+  // Initialize only once on mount
   useEffect(() => {
-    initialize().catch(err => {
-      console.error("Initialize error:", err);
-    });
+    console.log('[WorkoutView] Initializing...');
+    initialize();
   }, []);
 
-  const getTodaysExercises = (forceIncludeRestDay = false) => {
+  // Handle rest timer completion
+  useEffect(() => {
+    if (restTimeRemaining === 0 && showRestTimer) {
+      handleRestTimerComplete();
+    }
+  }, [restTimeRemaining, showRestTimer]);
+
+  const getTodaysExercises = useCallback((forceIncludeRestDay = false) => {
     const now = new Date();
     const dayOfWeek = now.getDay() === 0 ? 7 : now.getDay();
     const schedule = {
@@ -61,31 +65,63 @@ export default function WorkoutView() {
       5: ["Push-up", "Pull-up"],
     };
 
-    // If it's a rest day (Sa/Su) and user hasn't overridden, return empty
     if (!forceIncludeRestDay && !schedule[dayOfWeek]) {
       return [];
     }
 
-    // If forceIncludeRestDay is true, return the Push+Pull exercises even on rest days
     if (forceIncludeRestDay && !schedule[dayOfWeek]) {
-      return exercises
-        .filter(e => e.name === 'Push-up' || e.name === 'Pull-up');
+      return (exercises || []).filter(e => e.name === 'Push-up' || e.name === 'Pull-up');
     }
 
     const exerciseNames = schedule[dayOfWeek] || [];
     return exerciseNames
-      .map(name => exercises.find(e => e.name === name))
+      .map(name => (exercises || []).find(e => e.name === name))
       .filter(Boolean);
-  };
+  }, [exercises]);
+
+  if (isLoading || !exercises || exercises.length === 0) {
+    return (
+      <>
+        <Header title="Workout" icon="💪" />
+        <div className="min-h-screen bg-slate-900 flex items-center justify-center pb-20">
+          <div className="text-white">Loading...</div>
+        </div>
+      </>
+    );
+  }
 
   const todaysExercises = getTodaysExercises(allowRestDayTraining);
   const isRestDay = todaysExercises.length === 0;
 
-  useEffect(() => {
-    if (isRestDay && !warmupCompleted && !showRestDayModal && !allowRestDayTraining) {
-      setShowRestDayModal(true);
-    }
-  }, [isRestDay, warmupCompleted, showRestDayModal, allowRestDayTraining]);
+  if (isRestDay && !allowRestDayTraining && !hasShownRestDayModal) {
+    return (
+      <>
+        <Header title="Workout" icon="💪" />
+        <RestDayModal
+          onContinue={() => {
+            setAllowRestDayTraining(true);
+            setHasShownRestDayModal(true);
+            setWarmupCompleted(false);
+          }}
+        />
+      </>
+    );
+  }
+
+  if (isRestDay && !currentWorkout && hasShownRestDayModal) {
+    return (
+      <>
+        <Header title="Workout" icon="💪" />
+        <div className="min-h-screen bg-slate-900 pb-20 flex items-center justify-center p-4">
+          <div className="text-center">
+            <div className="text-6xl mb-4">😎</div>
+            <p className="text-slate-300 mb-4">It's a rest day!</p>
+            <p className="text-slate-400 text-sm">You clicked "Train Anyway" but the system needs a workout. Try again tomorrow!</p>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   const buildWorkoutFlow = () => {
     if (todaysExercises.length < 2) {
@@ -152,35 +188,6 @@ export default function WorkoutView() {
     }
   };
 
-  if (isRestDay && !allowRestDayTraining && showRestDayModal) {
-    return (
-      <>
-        <Header title="Workout" icon="💪" />
-        <RestDayModal
-          onContinue={() => {
-            setAllowRestDayTraining(true);
-            setShowRestDayModal(false);
-            setWarmupCompleted(false);
-          }}
-          onCancel={() => {
-            setShowRestDayModal(false);
-          }}
-        />
-      </>
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <>
-        <Header title="Workout" icon="💪" />
-        <div className="min-h-screen bg-slate-900 flex items-center justify-center pb-20">
-          <div className="text-white">Loading...</div>
-        </div>
-      </>
-    );
-  }
-
   if (!warmupCompleted) {
     return (
       <>
@@ -242,10 +249,14 @@ export default function WorkoutView() {
         </div>
       ) : currentStepData ? (
         <div className="min-h-screen bg-slate-900 pb-20 p-4 space-y-6">
-          <ExerciseCard 
+          <ExerciseCard
             exercise={currentStepData.exercise}
             setNumber={currentStepData.setNum}
-            progression={userProgressions?.find(p => p.exercise === currentStepData.exercise.id)?.current_progression_details}
+            progression={(() => {
+              const userProg = userProgressions[currentStepData.exercise.id];
+              if (!userProg) return null;
+              return currentStepData.exercise.progressions?.find(p => p.id === userProg.current_progression);
+            })()}
             onSetCompleted={handleSetCompleted}
           />
           <button

@@ -22,18 +22,18 @@ export default function BottomNav() {
       zIndex: 50,
     }}>
       <Link to="/" style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px', color: isActive('/'), textDecoration: 'none' }}>
-        <span style={{ fontSize: '22px', lineHeight: '1' }}>🏠</span>
-        <span style={{ fontSize: '11px', fontWeight: '500' }}>Home</span>
+        <span style={{ fontSize: '28px', lineHeight: '1' }}>🏠</span>
+        <span style={{ fontSize: '12px', fontWeight: '500' }}>Home</span>
       </Link>
 
       <Link to="/exercises" style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px', color: isActive('/exercises'), textDecoration: 'none' }}>
-        <span style={{ fontSize: '22px', lineHeight: '1' }}>📚</span>
-        <span style={{ fontSize: '11px', fontWeight: '500' }}>Exercises</span>
+        <span style={{ fontSize: '28px', lineHeight: '1' }}>📚</span>
+        <span style={{ fontSize: '12px', fontWeight: '500' }}>Exercises</span>
       </Link>
 
       <Link to="/workout" style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px', color: isActive('/workout'), textDecoration: 'none' }}>
-        <span style={{ fontSize: '22px', lineHeight: '1' }}>💪</span>
-        <span style={{ fontSize: '11px', fontWeight: '500' }}>Workout</span>
+        <span style={{ fontSize: '28px', lineHeight: '1' }}>💪</span>
+        <span style={{ fontSize: '12px', fontWeight: '500' }}>Workout</span>
       </Link>
 
       <Link to="/profile" style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '2px', color: isActive('/profile'), textDecoration: 'none' }}>
@@ -42,18 +42,18 @@ export default function BottomNav() {
             src={user.profile.avatar}
             alt="Avatar"
             style={{
-              width: '22px',
-              height: '22px',
+              width: '28px',
+              height: '28px',
               borderRadius: '50%',
               objectFit: 'cover',
-              border: isActive('/profile') === '#60a5fa' ? '2px solid #60a5fa' : '2px solid #94a3b8',
+              border: 'none',
               transition: 'border-color 0.2s'
             }}
           />
         ) : (
-          <span style={{ fontSize: '22px', lineHeight: '1' }}>👤</span>
+          <span style={{ fontSize: '28px', lineHeight: '1' }}>👤</span>
         )}
-        <span style={{ fontSize: '11px', fontWeight: '500' }}>Profile</span>
+        <span style={{ fontSize: '12px', fontWeight: '500' }}>Profile</span>
       </Link>
     </nav>
   );

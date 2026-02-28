@@ -5,51 +5,25 @@ import DropSetModal from './DropSetModal';
 
 export default function ExerciseCard({
   exercise,
-  workoutSets,
-  userProgression,
-  exerciseIndex,
+  setNumber = 1,
+  progression,
   onSetCompleted = null,
-  setNumber = 1, // ← Which set number are we on (1, 2, or 3)
 }) {
-  const [expandedSetInput, setExpandedSetInput] = useState(true); // Always expanded in Phase 8
-  const [showFormTips, setShowFormTips] = useState(false);
   const [showDropSetModal, setShowDropSetModal] = useState(false);
 
-  if (!userProgression) {
-    console.warn(`[ExerciseCard] No userProgression for exercise ${exercise?.id} (${exercise?.name})`);
+  if (!exercise || !progression) {
     return null;
   }
-
-  const currentProgression = Array.isArray(exercise?.progressions)
-    ? exercise.progressions.find((p) => p?.id === userProgression?.current_progression)
-    : null;
-
-  if (!currentProgression) {
-    return null;
-  }
-
-  // Find the set for this specific set number
-  const existingSet = workoutSets?.find(
-    (s) => s.set_number === setNumber && !s.is_drop_set
-  );
 
   const handleSetCompleted = (completedSetNumber, info = {}) => {
     // If this is Set 3 and we have drop-set options, show drop-set modal
-    if (completedSetNumber === 3 && currentProgression?.level > 1 && !info.isUpdate) {
+    if (completedSetNumber === 3 && progression?.level > 1 && !info.isUpdate) {
       setShowDropSetModal(true);
     } else if (onSetCompleted) {
       // Otherwise proceed to next step
-      onSetCompleted(completedSetNumber, info);
+      onSetCompleted();
     }
   };
-
-  const targetValue = currentProgression.target_value;
-  const targetUnit = currentProgression.target_type === 'time' ? 's' : 'reps';
-
-  // Get first 3 form cues only
-  const formCuesShort = Array.isArray(currentProgression.form_cues)
-    ? currentProgression.form_cues.slice(0, 3)
-    : [];
 
   return (
     <div className="bg-slate-800/40 backdrop-blur-sm rounded-xl p-6 border border-slate-700/30 shadow-md">
@@ -57,22 +31,21 @@ export default function ExerciseCard({
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div>
-            <h3 className="text-lg font-bold text-white">{currentProgression.name}</h3>
+            <h3 className="text-lg font-bold text-white">{exercise.name}</h3>
             <p className="text-slate-400 text-xs">
-              Level {currentProgression.level} • Set {setNumber} of 3
+              Level {progression.level}: {progression.name} • Set {setNumber} of 3
             </p>
           </div>
         </div>
       </div>
 
-      {/* Set Input - Always Expanded in Phase 8 */}
+      {/* Set Input - Always Expanded */}
       <div className="mb-6">
-        {currentProgression.target_type === 'time' ? (
+        {progression.target_type === 'time' ? (
           <TimerInput
             exercise={exercise}
             setNumber={setNumber}
-            userProgression={userProgression}
-            existingSet={existingSet}
+            progression={progression}
             onCompleted={handleSetCompleted}
             isDropSet={false}
           />
@@ -80,51 +53,22 @@ export default function ExerciseCard({
           <SetInput
             exercise={exercise}
             setNumber={setNumber}
-            userProgression={userProgression}
-            existingSet={existingSet}
+            progression={progression}
             onCompleted={handleSetCompleted}
             isDropSet={false}
           />
         )}
       </div>
 
-      {/* Form Tips - Collapsed by default */}
-      {formCuesShort.length > 0 && (
-        <div>
-          <button
-            onClick={() => setShowFormTips(!showFormTips)}
-            className="w-full flex items-center justify-between p-3 rounded-lg border border-slate-600/30 text-slate-300 hover:bg-slate-700/30 transition-all"
-          >
-            <span className="text-sm font-medium">💡 Form Tips</span>
-            <span className="text-xs">{showFormTips ? '−' : '+'}</span>
-          </button>
-
-          {showFormTips && (
-            <div className="mt-2 p-3 bg-slate-700/20 border border-slate-600/20 rounded-lg">
-              <ul className="space-y-1.5">
-                {formCuesShort.map((cue, i) => (
-                  <li key={i} className="text-slate-300 text-xs flex gap-2">
-                    <span className="text-green-400 flex-shrink-0">✓</span>
-                    <span>{cue}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      )}
-
       {/* Drop Set Modal - Show after Set 3 if available */}
       {showDropSetModal && (
         <DropSetModal
           exercise={exercise}
-          workoutSet={workoutSets?.find(s => s.set_number === 3 && s.is_drop_set)}
-          userProgression={userProgression}
+          progression={progression}
           onClose={() => {
             setShowDropSetModal(false);
-            // After drop set is done, proceed to next step
             if (onSetCompleted) {
-              onSetCompleted(3, { isDropSetDone: true });
+              onSetCompleted();
             }
           }}
         />

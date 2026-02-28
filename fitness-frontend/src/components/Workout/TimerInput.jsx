@@ -9,7 +9,8 @@ export default function TimerInput({
   onCompleted,
   isDropSet = false,
 }) {
-  const { addSet, lastPerformances } = useWorkoutStore();
+  const lastPerformances = useWorkoutStore((state) => state.lastPerformances);
+  const addSet = useWorkoutStore((state) => state.addSet);
   const [phase, setPhase] = useState('ready');
   const [countdownValue, setCountdownValue] = useState(3);
   const [seconds, setSeconds] = useState(existingSet?.seconds || 0);
@@ -35,7 +36,8 @@ export default function TimerInput({
     : [];
 
   // Get last performance for this progression
-  const lastPerf = currentProgression ? lastPerformances?.[currentProgression.id] : null;
+  // currentProgression.id is a number, but lastPerformances keys are strings
+  const lastPerf = currentProgression ? lastPerformances?.[String(currentProgression.id)] : null;
 
   useEffect(() => {
     if (phase === 'countdown') {
@@ -187,7 +189,11 @@ export default function TimerInput({
             ✏️ Edit Time
           </button>
           <button
-            onClick={() => setPhase('ready')}
+            onClick={() => {
+              setPhase('ready');
+              setSeconds(0);
+              setCountdownValue(3);
+            }}
             className="w-full bg-slate-600 hover:bg-slate-500 text-white font-bold py-2 px-4 rounded-lg transition-all"
           >
             ↻ Reset

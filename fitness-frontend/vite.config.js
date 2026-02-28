@@ -44,27 +44,41 @@ export default defineConfig({
               }
             }
           },
-          // Avatars - cache with long expiration
+          // Avatars - NetworkFirst to always get fresh avatar images
           {
             urlPattern: /\/media\/avatars\/.*/i,
-            handler: 'CacheFirst',
+            handler: 'NetworkFirst',
             options: {
-              cacheName: 'avatar-cache',
+              cacheName: 'avatar-cache-v3',
               expiration: {
                 maxEntries: 20,
                 maxAgeSeconds: 60 * 60 * 24 * 30
-              }
+              },
+              networkTimeoutSeconds: 2
             }
           },
-          // API Calls - StaleWhileRevalidate for fresh data but offline support
+          // User Profile - NetworkFirst for always fresh user data
+          {
+            urlPattern: /\/api\/fitness\/user\/.*/i,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'user-cache-v3',
+              expiration: {
+                maxEntries: 5,
+                maxAgeSeconds: 60 * 5
+              },
+              networkTimeoutSeconds: 3
+            }
+          },
+          // Other API Calls - StaleWhileRevalidate for fresh data but offline support
           {
             urlPattern: /\/api\/fitness\/.*/i,
             handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'api-cache',
+              cacheName: 'api-cache-v3',
               expiration: {
                 maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 7  // 7 days
+                maxAgeSeconds: 60 * 60 * 24 * 7
               },
               cacheableResponse: {
                 statuses: [0, 200]
@@ -79,13 +93,9 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://localhost:8000',
-        changeOrigin: true
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '/api')
       }
     }
-  },
-  build: {
-    outDir: 'dist',
-    assetsDir: 'assets'
-  },
-  assetsInclude: ['**/*.JPG', '**/*.jpg', '**/*.png']
+  }
 })

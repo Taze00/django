@@ -20,9 +20,9 @@ export default function ProgressionUpgradeModal({ upgrades, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-b from-slate-800 to-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full overflow-hidden">
+      <div className="bg-slate-900 border border-slate-700 rounded-2xl max-w-sm w-full overflow-hidden">
         {/* Header - Compact */}
-        <div className="bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-4 text-center">
+        <div className="bg-green-600 px-6 py-4 text-center">
           <div className="text-4xl mb-2">🎉</div>
           <h2 className="text-2xl font-bold text-white">
             Upgrade!
@@ -79,7 +79,7 @@ export default function ProgressionUpgradeModal({ upgrades, onClose }) {
         <div className="bg-slate-700 px-6 py-3 border-t border-slate-600">
           <button
             onClick={handleNext}
-            className="w-full px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-bold rounded-lg transition-all text-sm"
+            className="w-full px-4 py-2 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg transition-all text-sm"
           >
             {isLastUpgrade ? 'Done!' : 'Next'}
           </button>

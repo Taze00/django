@@ -1,11 +1,11 @@
 import { create } from 'zustand';
 import { workoutAPI, exerciseAPI, setAPI } from '../api';
 
-export const useWorkoutStore = create((set, get) => ({
+const useWorkoutStore = create((set, get) => ({
   currentWorkout: null,
   exercises: [],
   userProgressions: {},
-  lastPerformances: {}, // New: track last set values per progression
+  lastPerformances: {},
   isLoading: false,
   error: null,
   activeExerciseIndex: 0,
@@ -44,12 +44,27 @@ export const useWorkoutStore = create((set, get) => ({
 
   // Fetch last performance for each progression
   fetchLastPerformances: async () => {
+    console.log('[WorkoutStore] fetchLastPerformances called!');
     try {
       const response = await workoutAPI.lastPerformance();
-      set({ lastPerformances: response.data || {} });
-      return response.data || {};
+      console.log('[WorkoutStore] API Response received:', response);
+      const rawData = response.data || {};
+      // Convert ALL keys to strings using JSON trick
+      const jsonStr = JSON.stringify(rawData);
+      console.log('[WorkoutStore] Raw JSON:', jsonStr);
+      const data = JSON.parse(jsonStr, (key, value) => value);
+      // Now convert keys to strings by rebuilding object
+      const stringKeyData = {};
+      Object.keys(data).forEach(key => {
+        stringKeyData[String(key)] = data[key];
+      });
+      console.log('[WorkoutStore] String key data:', stringKeyData);
+      console.log('[WorkoutStore] Keys:', Object.keys(stringKeyData));
+      set({ lastPerformances: stringKeyData });
+      console.log('[WorkoutStore] Store updated with lastPerformances');
+      return stringKeyData;
     } catch (error) {
-      console.error('Failed to fetch last performances:', error);
+      console.error('[WorkoutStore] FAILED to fetch last performances:', error);
       return {};
     }
   },
@@ -66,7 +81,9 @@ export const useWorkoutStore = create((set, get) => ({
       });
       return response.data;
     } catch (error) {
-      set({ error: 'Failed to fetch workout', isLoading: false });
+      // Rest day or other error - don't crash, just clear and continue
+      console.log('[WorkoutStore] fetchCurrentWorkout: Rest day or error', error.response?.status);
+      set({ currentWorkout: null, isLoading: false });
       return null;
     }
   },
@@ -184,21 +201,39 @@ export const useWorkoutStore = create((set, get) => ({
 
   // Initialize (fetch all data in correct order)
   initialize: async () => {
+    console.log('[WorkoutStore] initialize() STARTED');
     set({ isLoading: true });
     try {
       // IMPORTANT: Must fetch current workout FIRST to initialize UserExerciseProgressions
+      console.log('[WorkoutStore] Step 1: fetchCurrentWorkout');
       await get().fetchCurrentWorkout();
+      console.log('[WorkoutStore] Step 1 complete');
+
       // Then fetch progressions after workout (to get the newly created ones)
+      // These work even if fetchCurrentWorkout returned null (rest day)
+      console.log('[WorkoutStore] Step 2: fetchUserProgressions');
       await get().fetchUserProgressions();
+      console.log('[WorkoutStore] Step 2 complete');
+
       // Fetch last performances for "Last time" display
+      console.log('[WorkoutStore] Step 3: fetchLastPerformances');
       await get().fetchLastPerformances();
+      console.log('[WorkoutStore] Step 3 complete');
+
       // Finally fetch exercises in parallel with above if not done yet
+      console.log('[WorkoutStore] Step 4: fetchExercises');
       await get().fetchExercises();
+      console.log('[WorkoutStore] Step 4 complete');
+
+      console.log('[WorkoutStore] initialize() SUCCESS');
     } catch (error) {
-      console.error('Initialize error:', error);
+      console.error('[WorkoutStore] initialize() FAILED:', error);
       set({ error: 'Failed to initialize' });
     } finally {
+      console.log('[WorkoutStore] Setting isLoading to false');
       set({ isLoading: false });
     }
   },
 }));
+
+export { useWorkoutStore };

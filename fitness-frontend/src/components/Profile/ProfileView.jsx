@@ -12,11 +12,53 @@ export default function ProfileView() {
   const [avatarPreview, setAvatarPreview] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadMessage, setUploadMessage] = useState(null);
+  const [isDeletingWorkout, setIsDeletingWorkout] = useState(false);
 
 
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const handleDeleteTodaysWorkout = async () => {
+    if (!window.confirm('Möchtest du wirklich heute\'s Training löschen?')) {
+      return;
+    }
+
+    setIsDeletingWorkout(true);
+    try {
+      const token = localStorage.getItem('access_token');
+      const response = await fetch('/api/fitness/workouts/delete_today/', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('[ProfileView] Deleted:', data);
+        setUploadMessage({
+          type: 'success',
+          text: '✓ Trainings gelöscht!'
+        });
+        setTimeout(() => setUploadMessage(null), 3000);
+      } else {
+        setUploadMessage({
+          type: 'error',
+          text: 'Fehler beim Löschen'
+        });
+      }
+    } catch (error) {
+      console.error('[ProfileView] Delete error:', error);
+      setUploadMessage({
+        type: 'error',
+        text: 'Fehler beim Löschen'
+      });
+    } finally {
+      setIsDeletingWorkout(false);
+    }
   };
 
   const handleAvatarChange = (e) => {
@@ -125,17 +167,27 @@ export default function ProfileView() {
             <div className="flex flex-col items-center mb-6">
               <div className="relative mb-4">
                 {avatarPreview ? (
-                  <img
-                    src={avatarPreview}
-                    alt="Avatar Preview"
-                    className="w-24 h-24 rounded-full object-cover border-4 border-blue-500"
-                  />
+                  <div className="relative">
+                    <img
+                      src={avatarPreview}
+                      alt="Avatar Preview"
+                      className="w-24 h-24 rounded-full object-cover border-4 border-green-500"
+                    />
+                    <span className="absolute -top-1 -right-1 bg-green-500 text-white text-xs px-2 py-1 rounded-full">✓ Neu</span>
+                  </div>
                 ) : user.profile?.avatar ? (
-                  <img
-                    src={user.profile.avatar}
-                    alt="Avatar"
-                    className="w-24 h-24 rounded-full object-cover border-4 border-blue-500"
-                  />
+                  <div className="relative">
+                    <img
+                      src={user.profile.avatar}
+                      alt="Avatar"
+                      className="w-24 h-24 rounded-full object-cover border-4 border-blue-500"
+                      onError={(e) => {
+                        console.error('[ProfileView] Avatar failed to load:', user.profile.avatar);
+                        e.target.style.display = 'none';
+                      }}
+                    />
+                    <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">✓</span>
+                  </div>
                 ) : (
                   <div className="w-24 h-24 rounded-full bg-blue-500/20 flex items-center justify-center text-5xl border-4 border-blue-500">
                     💪
@@ -208,7 +260,14 @@ export default function ProfileView() {
               <div className="flex justify-between items-center">
                 <p className="text-slate-400">Mitglied seit</p>
                 <p className="text-white font-semibold">
-                  {new Date(user.date_joined).toLocaleDateString('de-DE')}
+                  {user.date_joined ? (() => {
+                    try {
+                      const date = new Date(user.date_joined);
+                      return date.toLocaleDateString('de-DE', { year: 'numeric', month: 'long', day: 'numeric' });
+                    } catch (e) {
+                      return user.date_joined;
+                    }
+                  })() : '-'}
                 </p>
               </div>
             </div>
@@ -271,6 +330,15 @@ export default function ProfileView() {
               </p>
             </div>
           </div>
+
+          {/* Reset Workout Button */}
+          <button
+            onClick={handleDeleteTodaysWorkout}
+            disabled={isDeletingWorkout}
+            className="w-full bg-orange-500/20 text-orange-300 border border-orange-500/30 rounded-lg py-3 font-semibold hover:bg-orange-500/30 transition-colors disabled:opacity-50"
+          >
+            {isDeletingWorkout ? 'Wird gelöscht...' : '↻ Heute\'s Training zurücksetzen'}
+          </button>
 
           {/* Logout Button */}
           <button

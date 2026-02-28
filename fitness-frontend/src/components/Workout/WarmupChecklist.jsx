@@ -9,10 +9,10 @@ const WARMUP_ITEMS = [
   { key: 'legs', label: 'Leg Shakes', emoji: '🦵' },
 ];
 
-export default function WarmupChecklist({ workout }) {
+export default function WarmupChecklist({ workout = {}, onCompleted }) {
   const { updateWarmup } = useWorkoutStore();
   const [warmupData, setWarmupData] = useState(() => {
-    if (!workout.warmup) {
+    if (!workout || !workout.warmup) {
       return { wrists: false, shoulders: false, elbows: false, back: false, legs: false };
     }
     // Only extract the warmup fields we need, ignore other API fields
@@ -24,11 +24,18 @@ export default function WarmupChecklist({ workout }) {
       legs: workout.warmup.legs === true,
     };
   });
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
   const completedCount = Object.values(warmupData).filter(Boolean).length;
   const isAllCompleted = completedCount === WARMUP_ITEMS.length;
+
+  // Call onCompleted when all items are checked
+  useEffect(() => {
+    if (isAllCompleted && onCompleted) {
+      onCompleted();
+    }
+  }, [isAllCompleted, onCompleted]);
 
   const handleToggle = async (key) => {
     const newData = { ...warmupData, [key]: !warmupData[key] };
@@ -92,15 +99,13 @@ export default function WarmupChecklist({ workout }) {
             </button>
           ))}
 
-          {/* Warmup Tips */}
-          <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 mt-4">
-            <p className="text-blue-300 text-xs font-semibold mb-2">💡 Tips</p>
-            <ul className="text-blue-200 text-xs space-y-1">
-              <li>• 10-15 rotations per direction</li>
-              <li>• Keep movements smooth and controlled</li>
-              <li>• Light cardiovascular activity (2-3 min)</li>
-            </ul>
-          </div>
+          {/* Warmup Complete Message */}
+          {isAllCompleted && (
+            <div className="bg-green-500/15 border border-green-500/30 rounded-lg p-4 mt-4 text-center">
+              <p className="text-green-300 font-bold text-lg">✓ Warmup Complete!</p>
+              <p className="text-slate-300 text-sm mt-1">Ready to start your workout</p>
+            </div>
+          )}
         </div>
       )}
 

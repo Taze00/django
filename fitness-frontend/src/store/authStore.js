@@ -3,9 +3,9 @@ import { authAPI } from '../api/auth';
 
 export const useAuthStore = create((set) => ({
   user: null,
-  accessToken: localStorage.getItem('access_token'),
-  refreshToken: localStorage.getItem('refresh_token'),
-  isAuthenticated: !!localStorage.getItem('access_token'),
+  accessToken: typeof window !== 'undefined' ? localStorage.getItem('access_token') : null,
+  refreshToken: typeof window !== 'undefined' ? localStorage.getItem('refresh_token') : null,
+  isAuthenticated: typeof window !== 'undefined' ? !!localStorage.getItem('access_token') : false,
   isLoading: false,
   error: null,
 

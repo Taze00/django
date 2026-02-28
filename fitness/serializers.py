@@ -8,21 +8,25 @@ from .models import (
 class UserProfileSerializer(serializers.ModelSerializer):
     user_id = serializers.IntegerField(source='user.id', read_only=True)
     username = serializers.CharField(source='user.username', read_only=True)
-    avatar = serializers.SerializerMethodField()
+    email = serializers.CharField(source='user.email', read_only=True)
+    date_joined = serializers.DateTimeField(source='user.date_joined', read_only=True)
+    avatar = serializers.ImageField(required=False, allow_null=True)
 
-    def get_avatar(self, obj):
-        """Return full absolute URL for avatar"""
-        if obj.avatar:
+    def to_representation(self, instance):
+        """Override to return full URL for avatar"""
+        ret = super().to_representation(instance)
+        if instance.avatar:
             request = self.context.get('request')
             if request:
-                return request.build_absolute_uri(obj.avatar.url)
-            return obj.avatar.url
-        return None
+                ret['avatar'] = request.build_absolute_uri(instance.avatar.url)
+            else:
+                ret['avatar'] = instance.avatar.url
+        return ret
 
     class Meta:
         model = UserProfile
-        fields = ['id', 'user_id', 'username', 'avatar', 'current_week', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'user_id', 'username', 'created_at', 'updated_at']
+        fields = ['id', 'user_id', 'username', 'email', 'date_joined', 'avatar', 'current_week', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'user_id', 'username', 'email', 'date_joined', 'created_at', 'updated_at']
 
 
 class WarmupChecklistSerializer(serializers.ModelSerializer):

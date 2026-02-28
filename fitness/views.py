@@ -52,13 +52,13 @@ class UserProfileViewSet(viewsets.GenericViewSet):
             profile = UserProfile.objects.create(user=request.user)
 
         if request.method == 'PUT':
-            serializer = UserProfileSerializer(profile, data=request.data, partial=True)
+            serializer = UserProfileSerializer(profile, data=request.data, partial=True, context={'request': request})
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = UserProfileSerializer(profile)
+        serializer = UserProfileSerializer(profile, context={'request': request})
         return Response(serializer.data)
 
     @action(detail=False, methods=['get'])
@@ -160,24 +160,9 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         today = timezone.now().date()
         today_day = today.weekday()  # 0=Monday, 1=Tuesday, etc.
 
-        # 2-Exercise Schedule: Mo/We/Fr = Push-up+Pull-up, Tu/Th = Pull-up, Sa/Su = Rest
-        schedule = {
-            0: ['Push-up', 'Pull-up'],     # Monday
-            1: ['Pull-up'],                 # Tuesday
-            2: ['Push-up', 'Pull-up'],     # Wednesday
-            3: ['Pull-up'],                 # Thursday
-            4: ['Push-up', 'Pull-up'],     # Friday
-            5: [],                          # Saturday - no workout
-            6: [],                          # Sunday - no workout
-        }
-
-        scheduled_exercise_names = schedule.get(today_day, [])
-
-        if not scheduled_exercise_names:
-            return Response(
-                {'error': 'No workout scheduled for today'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        # Schedule: Always Push+Pull every day
+        # (Frontend handles Rest Day UI, but Backend always allows workout)
+        scheduled_exercise_names = ['Push-up', 'Pull-up']
 
         # Get or create workout
         workout, created = Workout.objects.get_or_create(
@@ -410,6 +395,20 @@ class WorkoutViewSet(viewsets.ModelViewSet):
             user_prog.save()
 
         return None
+
+    @action(detail=False, methods=['post'])
+    def delete_today(self, request):
+        """Delete today's workout and all sets"""
+        today = timezone.now().date()
+        deleted_count, _ = Workout.objects.filter(
+            user=request.user,
+            date=today
+        ).delete()
+        return Response({
+            'success': True,
+            'deleted_count': deleted_count,
+            'message': f'Deleted {deleted_count} workout(s) for today'
+        })
 
     @action(detail=True, methods=['get', 'put'])
     def warmup(self, request, pk=None):
