@@ -30,7 +30,7 @@ urlpatterns = [
     path('impressum/', views.impressum, name='impressum'),
 
     # Fitness API
-    path('api/fitness/', include('fitness.urls')),
+    path('api/', include('fitness.urls')),
 ]
 
 # Serve media files in development

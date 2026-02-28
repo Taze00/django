@@ -3,8 +3,8 @@ import { OfflineQueue } from '../utils/sync';
 
 // Use the deployment URL in production, fallback for local development
 const API_BASE_URL = typeof window !== 'undefined' && window.location.hostname === 'alex.volkmann.com'
-  ? 'https://alex.volkmann.com/api/fitness'
-  : (process.env.VITE_API_URL || '/api/fitness');
+  ? 'https://alex.volkmann.com/api'
+  : (process.env.VITE_API_URL || '/api');
 
 const client = axios.create({
   baseURL: API_BASE_URL,
