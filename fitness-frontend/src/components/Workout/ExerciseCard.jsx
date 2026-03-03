@@ -33,7 +33,7 @@ export default function ExerciseCard({
           <div>
             <h3 className="text-lg font-bold text-white">{exercise.name}</h3>
             <p className="text-slate-400 text-xs">
-              Level {progression.level}: {progression.name} • Set {setNumber} of 3
+              Level {progression.level}: {progression.name} • Set {setNumber}
             </p>
           </div>
         </div>
