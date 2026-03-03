@@ -203,7 +203,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def last_performance(self, request):
-        """Get last set values for each exercise/progression"""
+        """Get last set values for each exercise/progression, per set number"""
         user_progressions = UserExerciseProgression.objects.filter(
             user=request.user
         ).select_related('exercise', 'current_progression')
@@ -211,21 +211,23 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         last_performances = {}
 
         for uep in user_progressions:
-            # Get last set for this progression
-            last_set = WorkoutSet.objects.filter(
-                exercise=uep.exercise,
-                progression=uep.current_progression,
-                is_drop_set=False
-            ).order_by('-created_at').first()
+            prog_id = str(uep.current_progression.id)
+            last_performances[prog_id] = {}
 
-            if last_set:
-                last_performances[uep.current_progression.id] = {
-                    'exercise_id': uep.exercise.id,
-                    'progression_id': uep.current_progression.id,
-                    'last_reps': last_set.reps,
-                    'last_seconds': last_set.seconds,
-                    'created_at': last_set.created_at,
-                }
+            # Get last Set 1 and Set 2 separately
+            for set_num in [1, 2]:
+                last_set = WorkoutSet.objects.filter(
+                    exercise=uep.exercise,
+                    progression=uep.current_progression,
+                    set_number=set_num,
+                    is_drop_set=False
+                ).order_by('-created_at').first()
+
+                if last_set:
+                    last_performances[prog_id][f'set{set_num}'] = {
+                        'last_reps': last_set.reps,
+                        'last_seconds': last_set.seconds,
+                    }
 
         return Response(last_performances)
 

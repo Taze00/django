@@ -17,6 +17,7 @@ export default function WorkoutView() {
     initialize,
     completeWorkout,
     clearError,
+    setWorkoutActive,
   } = useWorkoutStore();
 
   const [warmupCompleted, setWarmupCompleted] = useState(false);
@@ -53,6 +54,15 @@ export default function WorkoutView() {
       handleRestTimerComplete();
     }
   }, [restTimeRemaining, showRestTimer]);
+
+  // Set isWorkoutActive based on current step
+  useEffect(() => {
+    const isActive = currentStep > 0 || showUpgradeModal || showRestDayModal;
+    setWorkoutActive(isActive);
+    return () => {
+      setWorkoutActive(false);
+    };
+  }, [currentStep, showUpgradeModal, showRestDayModal, setWorkoutActive]);
 
   const getTodaysExercises = useCallback((forceIncludeRestDay = false) => {
     const now = new Date();
@@ -251,7 +261,7 @@ export default function WorkoutView() {
               onClick={handleRestTimerComplete}
               className="mx-auto px-8 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg transition-all text-lg"
             >
-              Skip ⏭️
+              Skip
             </button>
           </div>
         </div>

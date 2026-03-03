@@ -18,15 +18,18 @@ export default function SetInput({
     return null;
   }
 
-  // Get last performance for this progression
+  // Get last performance for this progression and set number
   // progression.id is a number, but lastPerformances keys are strings
-  const lastPerf = lastPerformances?.[String(progression.id)];
+  const progPerf = lastPerformances?.[String(progression.id)];
+  const lastPerf = progPerf?.[`set${setNumber}`];
 
   console.log('[SetInput] DEBUG:', {
     'progression.id': progression?.id,
+    'setNumber': setNumber,
     'progression.id as string': String(progression?.id),
     'lastPerformances keys': Object.keys(lastPerformances),
     'lastPerformances': lastPerformances,
+    'progPerf': progPerf,
     'lastPerf result': lastPerf,
     'lastPerf truthy?': !!lastPerf
   });

@@ -9,6 +9,7 @@ const useWorkoutStore = create((set, get) => ({
   isLoading: false,
   error: null,
   activeExerciseIndex: 0,
+  isWorkoutActive: false,
 
   // Fetch exercises
   fetchExercises: async () => {
@@ -195,6 +196,9 @@ const useWorkoutStore = create((set, get) => ({
 
   // Set active exercise
   setActiveExerciseIndex: (index) => set({ activeExerciseIndex: index }),
+
+  // Set workout active status
+  setWorkoutActive: (isActive) => set({ isWorkoutActive: isActive }),
 
   // Clear error
   clearError: () => set({ error: null }),

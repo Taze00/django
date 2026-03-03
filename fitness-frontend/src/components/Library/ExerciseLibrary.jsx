@@ -58,7 +58,7 @@ export default function ExerciseLibrary() {
 
       <div className="px-4 py-6 space-y-3">
         {filteredExercises.map((exercise) => {
-          const userProgression = userProgressions[exercise.id];
+          const userProgression = userProgressions[String(exercise.id)];
           const currentProgression = exercise.progressions.find(
             (p) => p.id === userProgression?.current_progression
           );

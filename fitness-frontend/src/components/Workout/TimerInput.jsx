@@ -35,9 +35,10 @@ export default function TimerInput({
       )
     : [];
 
-  // Get last performance for this progression
+  // Get last performance for this progression and set number
   // currentProgression.id is a number, but lastPerformances keys are strings
-  const lastPerf = currentProgression ? lastPerformances?.[String(currentProgression.id)] : null;
+  const progPerf = currentProgression ? lastPerformances?.[String(currentProgression.id)] : null;
+  const lastPerf = progPerf?.[`set${setNumber}`];
 
   useEffect(() => {
     if (phase === 'countdown') {

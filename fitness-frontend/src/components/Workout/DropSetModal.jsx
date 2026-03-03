@@ -24,14 +24,14 @@ export default function DropSetModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-slate-800 rounded-2xl border border-slate-700 max-w-sm w-full overflow-hidden">
+      <div className="bg-slate-800 rounded-2xl border border-slate-700 max-w-sm w-full overflow-hidden flex flex-col max-h-[85vh]">
         {/* Header */}
-        <div className="bg-gradient-to-r from-orange-600 to-red-600 px-6 py-3">
-          <h2 className="text-lg font-bold text-white">🔥 Drop Set</h2>
+        <div className="bg-gradient-to-r from-orange-600 to-red-600 px-4 py-2 flex-shrink-0">
+          <h2 className="text-base font-bold text-white">🔥 Drop Set</h2>
         </div>
 
         {/* Content */}
-        <div className="p-4 space-y-3">
+        <div className="p-3 space-y-2 overflow-y-auto flex-1">
           {/* Current Progression Info */}
           <div className="bg-slate-700/50 rounded-lg p-2">
             <p className="text-slate-400 text-xs mb-0.5">Main Level</p>
@@ -93,12 +93,12 @@ export default function DropSetModal({
 
         {/* Close Button */}
         {!isExpanded && (
-          <div className="bg-slate-700 px-6 py-2 border-t border-slate-600">
+          <div className="bg-slate-700 px-3 py-1.5 border-t border-slate-600 flex-shrink-0">
             <button
               onClick={onClose}
-              className="w-full px-4 py-1.5 bg-slate-600 hover:bg-slate-500 text-white rounded-lg font-semibold text-sm transition-colors"
+              className="w-full px-3 py-1 bg-slate-600 hover:bg-slate-500 text-white rounded text-xs font-semibold transition-colors"
             >
-              Close
+              Done
             </button>
           </div>
         )}
