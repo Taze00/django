@@ -287,12 +287,15 @@ class WorkoutViewSet(viewsets.ModelViewSet):
                 if set1_value >= effective_target and set2_value >= effective_target:
                     # Qualifies! Increment sessions_at_target
                     user_prog.sessions_at_target += 1
+                    user_prog.is_first_session = False  # No longer first session
                     user_prog.save()
 
                     # Check if ready for upgrade
                     result = check_progression_upgrade(request.user, exercise)
                     if result['ready']:
                         next_prog = result['next_progression']
+                        # CRITICAL FIX: Actually perform the upgrade now
+                        upgrade_progression(request.user, exercise, next_prog)
                         upgrades.append({
                             'exercise_id': exercise.id,
                             'exercise_name': exercise.name,
@@ -361,7 +364,9 @@ class WorkoutViewSet(viewsets.ModelViewSet):
                 else:
                     adjustment = 0
 
-                new_target = min(target_value - adjustment, 20)
+                # FIX: Add adjustment to target, don't subtract!
+                current_target = user_prog.custom_target or target_value
+                new_target = min(current_target + adjustment, 20)
         else:  # time
             # Check time-based conditions
             total_seconds = set1_value + set2_value
@@ -375,10 +380,24 @@ class WorkoutViewSet(viewsets.ModelViewSet):
                 else:
                     adjustment = 0
 
-                new_target = max(target_value - adjustment, 5)
+                # FIX: Add adjustment to target, don't subtract!
+                current_target = user_prog.custom_target or target_value
+                new_target = min(current_target + adjustment, current_target * 2)
 
         if should_downgrade:
+            # Revert to previous progression level
+            prev_level = progression.level - 1
+            try:
+                prev_progression = Progression.objects.get(
+                    exercise=user_prog.exercise,
+                    level=prev_level
+                )
+                user_prog.current_progression = prev_progression
+            except Progression.DoesNotExist:
+                pass  # Stay at current if no previous exists (shouldn't happen)
+
             user_prog.custom_target = new_target
+            user_prog.sessions_at_target = 0  # Reset counter
             user_prog.is_first_session = False
             user_prog.save()
 
@@ -387,6 +406,8 @@ class WorkoutViewSet(viewsets.ModelViewSet):
                 'exercise_name': user_prog.exercise.name,
                 'progression_id': progression.id,
                 'progression_name': progression.name,
+                'old_progression_level': progression.level,
+                'new_progression_level': prev_level,
                 'old_target': target_value,
                 'new_target': new_target,
                 'reason': 'adaptive_downgrade'

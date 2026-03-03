@@ -68,11 +68,13 @@ export default function WorkoutView() {
     const now = new Date();
     const dayOfWeek = now.getDay() === 0 ? 7 : now.getDay();
     const schedule = {
-      1: ["Push-up", "Pull-up"],
-      2: ["Push-up", "Pull-up"],
-      3: ["Push-up", "Pull-up"],
-      4: ["Push-up", "Pull-up"],
-      5: ["Push-up", "Pull-up"],
+      1: ["Push-up", "Pull-up"],  // Monday
+      2: ["Push-up", "Pull-up"],  // Tuesday
+      // 3 = Wednesday → REST (optional)
+      4: ["Push-up", "Pull-up"],  // Thursday
+      5: ["Push-up", "Pull-up"],  // Friday
+      6: ["Push-up", "Pull-up"],  // Saturday
+      // 7 = Sunday → REST (optional)
     };
 
     if (!forceIncludeRestDay && !schedule[dayOfWeek]) {
@@ -158,19 +160,22 @@ export default function WorkoutView() {
   const currentStepData = workoutFlow[currentStep];
 
   const handleSetCompleted = () => {
-    const isAfterDropSet = currentStep === workoutFlow.length - 1;
-    const restTime = isAfterDropSet ? 300 : 180;
+    // Last step (Pull drop-set): no rest timer, go directly to complete
+    if (currentStep === workoutFlow.length - 1) {
+      handleCompleteWorkout();
+      return;
+    }
+
+    // Rest timer: 3 min for steps 0-2, 5 min for steps 3-4
+    const restTime = currentStep >= 3 ? 300 : 180;
     setRestTimeRemaining(restTime);
     setShowRestTimer(true);
   };
 
   const handleRestTimerComplete = () => {
     setShowRestTimer(false);
-    if (currentStep < workoutFlow.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      handleCompleteWorkout();
-    }
+    // Always advance to next step (never auto-complete from here)
+    setCurrentStep(prev => prev + 1);
   };
 
   const handleCompleteWorkout = async () => {
@@ -217,7 +222,14 @@ export default function WorkoutView() {
       <>
         <Header title="Workout" icon="💪" />
         {showUpgradeModal ? (
-          <ProgressionUpgradeModal upgrades={upgrades} downgrades={downgrades} />
+          <ProgressionUpgradeModal
+            upgrades={upgrades}
+            downgrades={downgrades}
+            onClose={() => {
+              setShowUpgradeModal(false);
+              initialize();  // Refresh progressions after upgrade
+            }}
+          />
         ) : (
           <div className="min-h-screen bg-slate-900 pb-20 flex items-center justify-center">
             <div className="text-center">
@@ -271,7 +283,7 @@ export default function WorkoutView() {
             exercise={currentStepData.exercise}
             setNumber={currentStepData.setNum}
             progression={(() => {
-              const userProg = userProgressions[currentStepData.exercise.id];
+              const userProg = userProgressions[String(currentStepData.exercise.id)];
               if (!userProg) return null;
               return currentStepData.exercise.progressions?.find(p => p.id === userProg.current_progression);
             })()}

@@ -1,7 +1,6 @@
-import { useState } from 'react';
 import SetInput from './SetInput';
 import TimerInput from './TimerInput';
-import DropSetModal from './DropSetModal';
+import DropSetInstructions from './DropSetInstructions';
 
 export default function ExerciseCard({
   exercise,
@@ -9,18 +8,26 @@ export default function ExerciseCard({
   progression,
   onSetCompleted = null,
 }) {
-  const [showDropSetModal, setShowDropSetModal] = useState(false);
-
   if (!exercise || !progression) {
     return null;
   }
 
-  const handleSetCompleted = (completedSetNumber, info = {}) => {
-    // If this is Set 3 and we have drop-set options, show drop-set modal
-    if (completedSetNumber === 3 && progression?.level > 1 && !info.isUpdate) {
-      setShowDropSetModal(true);
-    } else if (onSetCompleted) {
-      // Otherwise proceed to next step
+  // Set 3 is always the DROP-SET (no input, just instructions)
+  if (setNumber === 3) {
+    return (
+      <div className="bg-slate-800/40 backdrop-blur-sm rounded-xl p-6 border border-slate-700/30 shadow-md">
+        <DropSetInstructions
+          exercise={exercise}
+          progression={progression}
+          onDone={() => onSetCompleted?.()}
+        />
+      </div>
+    );
+  }
+
+  // Sets 1 and 2: normal input (reps or time)
+  const handleSetCompleted = () => {
+    if (onSetCompleted) {
       onSetCompleted();
     }
   };
@@ -39,7 +46,7 @@ export default function ExerciseCard({
         </div>
       </div>
 
-      {/* Set Input - Always Expanded */}
+      {/* Set Input - Reps or Timer */}
       <div className="mb-6">
         {progression.target_type === 'time' ? (
           <TimerInput
@@ -59,20 +66,6 @@ export default function ExerciseCard({
           />
         )}
       </div>
-
-      {/* Drop Set Modal - Show after Set 3 if available */}
-      {showDropSetModal && (
-        <DropSetModal
-          exercise={exercise}
-          userProgression={{ current_progression: progression.id }}
-          onClose={() => {
-            setShowDropSetModal(false);
-            if (onSetCompleted) {
-              onSetCompleted();
-            }
-          }}
-        />
-      )}
     </div>
   );
 }

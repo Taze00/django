@@ -48,8 +48,6 @@ export default function HomeView() {
       return {
         name,
         level: details?.level || 1,
-        sessions: prog.sessions_at_target || 0,
-        sessionsRequired: details?.sessions_required || 3,
       };
     }).filter(Boolean);
   };

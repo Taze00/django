@@ -168,6 +168,9 @@ const useWorkoutStore = create((set, get) => ({
         error: null
       });
 
+      // CRITICAL: Refresh progressions after complete since server called upgrade_progression()
+      await get().fetchUserProgressions();
+
       return response.data;
     } catch (error) {
       set({ error: 'Failed to complete workout' });
@@ -205,6 +208,12 @@ const useWorkoutStore = create((set, get) => ({
 
   // Initialize (fetch all data in correct order)
   initialize: async () => {
+    // Guard: skip if already initialized and has data
+    if (get().exercises.length > 0 && Object.keys(get().userProgressions).length > 0) {
+      console.log('[WorkoutStore] Already initialized, skipping');
+      return;
+    }
+
     console.log('[WorkoutStore] initialize() STARTED');
     set({ isLoading: true });
     try {
