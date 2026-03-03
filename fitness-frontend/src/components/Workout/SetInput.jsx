@@ -53,7 +53,7 @@ export default function SetInput({
       );
 
       if (result) {
-        onCompleted(setNumber, { reps });
+        onCompleted?.(setNumber, { reps, exerciseName: exercise.name });
       } else {
         setError('Failed to save set');
       }

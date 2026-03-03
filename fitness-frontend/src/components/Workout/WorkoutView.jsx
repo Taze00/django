@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useWorkoutStore } from '../../store/workoutStore';
 import ExerciseCard from './ExerciseCard';
 import WarmupChecklist from './WarmupChecklist';
@@ -6,17 +6,101 @@ import ProgressionUpgradeModal from './ProgressionUpgradeModal';
 import RestDayModal from './RestDayModal';
 import Header from '../Layout/Header';
 
+function WorkoutSummary({ completedSets, onClose }) {
+  if (!completedSets || Object.keys(completedSets).length === 0) {
+    return null;
+  }
+
+  // Group sets by exercise
+  const exerciseGroups = {};
+  Object.entries(completedSets).forEach(([key, data]) => {
+    const exerciseName = data.exerciseName || key.split('-')[0];
+    if (!exerciseGroups[exerciseName]) {
+      exerciseGroups[exerciseName] = [];
+    }
+    exerciseGroups[exerciseName].push(data);
+  });
+
+  // Calculate totals
+  const totals = {};
+  Object.entries(exerciseGroups).forEach(([exerciseName, sets]) => {
+    let total = 0;
+    sets.forEach(set => {
+      if (set.reps !== undefined) {
+        total += set.reps;
+      } else if (set.seconds !== undefined) {
+        total += set.seconds;
+      }
+    });
+    totals[exerciseName] = {
+      total,
+      unit: sets[0]?.reps !== undefined ? 'reps' : 'seconds',
+      sets: sets
+    };
+  });
+
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-900 pb-20 p-4">
+      <div className="max-w-2xl mx-auto space-y-6">
+        <div className="text-center mb-8">
+          <div className="text-6xl mb-4">📊</div>
+          <h2 className="text-3xl font-bold text-white">Workout Summary</h2>
+          <p className="text-slate-400 mt-2">Great job completing your workout!</p>
+        </div>
+
+        <div className="space-y-4">
+          {Object.entries(totals).map(([exerciseName, { total, unit, sets }]) => (
+            <div key={exerciseName} className="bg-slate-800/40 backdrop-blur-sm rounded-xl p-6 border border-slate-700/30">
+              <h3 className="text-lg font-bold text-white mb-4">{exerciseName}</h3>
+
+              <div className="space-y-2 mb-4">
+                {sets.map((set, idx) => (
+                  <div key={idx} className="flex items-center justify-between bg-slate-700/30 rounded-lg p-3">
+                    <span className="text-slate-400 text-sm">Set {idx + 1}</span>
+                    <span className="text-white font-bold">
+                      {set.reps !== undefined ? `${set.reps} reps` : formatTime(set.seconds)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="border-t border-slate-600/30 pt-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-300 font-semibold">Total</span>
+                  <span className="text-2xl font-bold text-green-400">
+                    {unit === 'reps' ? `${total} reps` : formatTime(total)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <button
+          onClick={onClose}
+          className="w-full px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition text-lg"
+        >
+          Great! 🎉
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function WorkoutView() {
   const {
     currentWorkout,
     exercises,
     userProgressions,
-    lastPerformances,
     isLoading,
-    error,
     initialize,
     completeWorkout,
-    clearError,
     setWorkoutActive,
   } = useWorkoutStore();
 
@@ -24,14 +108,14 @@ export default function WorkoutView() {
   const [currentStep, setCurrentStep] = useState(0);
   const [showRestTimer, setShowRestTimer] = useState(false);
   const [restTimeRemaining, setRestTimeRemaining] = useState(0);
-  const [isCompleting, setIsCompleting] = useState(false);
   const [workoutCompleted, setWorkoutCompleted] = useState(false);
   const [upgrades, setUpgrades] = useState([]);
   const [downgrades, setDowngrades] = useState([]);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
-  const [showRestDayModal, setShowRestDayModal] = useState(false);
   const [allowRestDayTraining, setAllowRestDayTraining] = useState(false);
   const [hasShownRestDayModal, setHasShownRestDayModal] = useState(false);
+  const [completedSets, setCompletedSets] = useState({});
+  const [showSummary, setShowSummary] = useState(false);
 
   // Rest timer effect
   useEffect(() => {
@@ -55,14 +139,14 @@ export default function WorkoutView() {
     }
   }, [restTimeRemaining, showRestTimer]);
 
-  // Set isWorkoutActive based on current step
+  // Set isWorkoutActive based on current step (not during completed state or upgrade modal)
   useEffect(() => {
-    const isActive = currentStep > 0 || showUpgradeModal || showRestDayModal;
+    const isActive = currentStep > 0 && !workoutCompleted && !showUpgradeModal;
     setWorkoutActive(isActive);
     return () => {
       setWorkoutActive(false);
     };
-  }, [currentStep, showUpgradeModal, showRestDayModal, setWorkoutActive]);
+  }, [currentStep, showUpgradeModal, workoutCompleted, setWorkoutActive]);
 
   const getTodaysExercises = useCallback((forceIncludeRestDay = false) => {
     const now = new Date();
@@ -159,15 +243,33 @@ export default function WorkoutView() {
   const workoutFlow = buildWorkoutFlow();
   const currentStepData = workoutFlow[currentStep];
 
-  const handleSetCompleted = () => {
+  const handleSetCompleted = (setNum, data) => {
+    // Track the completed set
+    if (currentStepData && data) {
+      const key = `${currentStepData.exercise.name}-Set${setNum}`;
+      setCompletedSets(prev => ({
+        ...prev,
+        [key]: data
+      }));
+    }
+
     // Last step (Pull drop-set): no rest timer, go directly to complete
     if (currentStep === workoutFlow.length - 1) {
       handleCompleteWorkout();
       return;
     }
 
-    // Rest timer: 3 min for steps 0-2, 5 min for steps 3-4
-    const restTime = currentStep >= 3 ? 300 : 180;
+    // Rest timer logic:
+    // Steps 0-2 (Push Set1, Pull Set1, Push Set2): 3 min
+    // Step 3 (Pull Set2, before first drop-set): 5 min
+    // Step 4 (Push Set3/drop-set, before next drop-set): 8 min
+    // Step 5 (Pull Set3/drop-set): no timer (handled above as last step)
+    let restTime = 180; // default 3 min
+    if (currentStep === 3) {
+      restTime = 300; // 5 min before first drop-set
+    } else if (currentStep === 4) {
+      restTime = 480; // 8 min between drop-sets
+    }
     setRestTimeRemaining(restTime);
     setShowRestTimer(true);
   };
@@ -179,9 +281,9 @@ export default function WorkoutView() {
   };
 
   const handleCompleteWorkout = async () => {
-    setIsCompleting(true);
+    // First show summary
+    setShowSummary(true);
     const result = await completeWorkout();
-    setIsCompleting(false);
     if (result) {
       setWorkoutCompleted(true);
       if (result.upgrades && result.upgrades.length > 0) {
@@ -189,9 +291,6 @@ export default function WorkoutView() {
       }
       if (result.downgrades && result.downgrades.length > 0) {
         setDowngrades(result.downgrades);
-      }
-      if ((result.upgrades && result.upgrades.length > 0) || (result.downgrades && result.downgrades.length > 0)) {
-        setShowUpgradeModal(true);
       }
     }
   };
@@ -221,7 +320,17 @@ export default function WorkoutView() {
     return (
       <>
         <Header title="Workout" icon="💪" />
-        {showUpgradeModal ? (
+        {showSummary ? (
+          <WorkoutSummary
+            completedSets={completedSets}
+            onClose={() => {
+              setShowSummary(false);
+              if ((upgrades && upgrades.length > 0) || (downgrades && downgrades.length > 0)) {
+                setShowUpgradeModal(true);
+              }
+            }}
+          />
+        ) : showUpgradeModal ? (
           <ProgressionUpgradeModal
             upgrades={upgrades}
             downgrades={downgrades}

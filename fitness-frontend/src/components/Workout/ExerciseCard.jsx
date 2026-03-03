@@ -26,9 +26,9 @@ export default function ExerciseCard({
   }
 
   // Sets 1 and 2: normal input (reps or time)
-  const handleSetCompleted = () => {
+  const handleSetCompleted = (setNum, data) => {
     if (onSetCompleted) {
-      onSetCompleted();
+      onSetCompleted(setNum, data);
     }
   };
 

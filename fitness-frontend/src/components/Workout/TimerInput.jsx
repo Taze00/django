@@ -111,7 +111,7 @@ export default function TimerInput({
       );
 
       if (result) {
-        onCompleted(setNumber, { isUpdate: !!existingSet, seconds: seconds });
+        onCompleted?.(setNumber, { isUpdate: !!existingSet, seconds: seconds, exerciseName: exercise.name });
       } else {
         setError('Fehler beim Speichern - bitte versuche es erneut');
       }
