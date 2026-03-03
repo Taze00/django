@@ -1,0 +1,304 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alles Liebe zum Geburtstag, Schubi!</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    
+    <!-- Eigene CSS-Dateien -->
+    <link rel="stylesheet" href="{% static 'css/general_settings.css' %}">
+    <link rel="stylesheet" href="{% static 'css/schubi.css' %}">
+</head>
+<body>
+    <!-- Konfetti Elemente werden per JavaScript hinzugefügt -->
+    <div id="confetti-container"></div>
+
+    <header class="birthday-header">
+        <h1 class="birthday-title">Alles Liebe zum Geburtstag, Schubi! 🎂</h1>
+        <p class="lead">Auf viele weitere wundervolle gemeinsame Jahre</p>
+    </header>
+
+    <div class="container">
+        <div class="wishes-section">
+            <i class="fas fa-heart heart-icon"></i>
+            <h2>Herzlichen Glückwunsch zum Geburtstag!</h2>
+            <p>Liebe Schubi, an deinem besonderen Tag möchte ich dir sagen, wie froh ich bin, dich in meinem Leben zu haben. 
+               Möge dein neues Lebensjahr voller Freude, Lachen und unvergesslicher Momente sein!</p>
+            <p>Diese Seite ist mein Geschenk an dich.</p>
+        </div>
+
+        <section class="quiz-section">
+            <div class="container">
+                <h2 class="text-center mb-5">Wie gut verstehen wir uns? 💭 </h2>
+                <p class="text-center mb-4">Wähle die gleichen Antworten wie ich!</p>
+                <div class="quiz-container">
+                    <div class="quiz-progress">
+                        <div class="progress-bar"></div>
+                    </div>
+                    
+                    <div class="quiz-questions">
+                        <!-- Frage 1 -->
+                        <div class="quiz-question" data-question="1">
+                            <h3>Frage 1: Was essen wir am liebsten zusammen?</h3>
+                            <div class="quiz-options">
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="option-label">A</span>
+                                    <span class="option-text">Pizza</span>
+                                </div>
+                                <div class="quiz-option" data-correct="true">
+                                    <span class="option-label">B</span>
+                                    <span class="option-text">Pasta</span>
+                                </div>
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="option-label">C</span>
+                                    <span class="option-text">Burger</span>
+                                </div>
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="option-label">D</span>
+                                    <span class="option-text">McDonalds</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Frage 2 -->
+                        <div class="quiz-question" data-question="2" style="display: none;">
+                            <h3>Frage 2: Wo haben wir uns zum ersten Mal getroffen?</h3>
+                            <div class="quiz-options">
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="option-label">A</span>
+                                    <span class="option-text">Alexanderplatz</span>
+                                </div>
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="option-label">B</span>
+                                    <span class="option-text">Colo</span>
+                                </div>
+                                <div class="quiz-option" data-correct="true">
+                                    <span class="option-label">C</span>
+                                    <span class="option-text">Waschhaus</span>
+                                </div>
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="option-label">D</span>
+                                    <span class="option-text">Fußballplatz</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Frage 3 -->
+                        <div class="quiz-question" data-question="3" style="display: none;">
+                            <h3>Frage 3: Wer von uns beiden ist besser im Kochen?</h3>
+                            <div class="quiz-options">
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="option-label">A</span>
+                                    <span class="option-text">Schubi</span>
+                                </div>
+                                <div class="quiz-option" data-correct="true">
+                                    <span class="option-label">B</span>
+                                    <span class="option-text">Alex</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Frage 4 -->
+                        <div class="quiz-question" data-question="4" style="display: none;">
+                            <h3>Frage 4: Wer ist der Bessere im Tanzen nach ein paar Drinks?</h3>
+                            <div class="quiz-options">
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="option-label">A</span>
+                                    <span class="option-text">Alex</span>
+                                </div>
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="option-label">B</span>
+                                    <span class="option-text">Schubi</span>
+                                </div>
+                                <div class="quiz-option" data-correct="true">
+                                    <span class="option-label">C</span>
+                                    <span class="option-text">Wir sind ein unschlagbares Dance-Duo</span>
+                                </div>
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="option-label">D</span>
+                                    <span class="option-text">Wir tanzen beide furchtbar</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Frage 5 -->
+                        <div class="quiz-question" data-question="5" style="display: none;">
+                            <h3>Frage 5: Wer macht alberne Selfies, wenn der andere nicht hinschaut?</h3>
+                            <div class="quiz-options">
+                                <div class="quiz-option" data-correct="false">
+                                    <span class="option-label">A</span>
+                                    <span class="option-text">Alex</span>
+                                </div>
+                                <div class="quiz-option" data-correct="true">
+                                    <span class="option-label">B</span>
+                                    <span class="option-text">Schubi</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Ergebnis -->
+                        <div class="quiz-result" style="display: none;">
+                            <h3>Quiz abgeschlossen!</h3>
+                            <div class="result-container">
+                                <div class="result-score">
+                                    <span class="score-number">0</span>
+                                    <span class="score-text">von 5 Punkten</span>
+                                </div>
+                                <div class="result-message">
+                                    <!-- Wird durch JavaScript gefüllt -->
+                                </div>
+                                <div class="heart-container">
+                                    <div class="heart-icon">💜</div>
+                                </div>
+                                <button class="restart-quiz">Noch einmal spielen</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Zeitstrahl / Timeline -->
+        <section class="timeline-section">
+            <h2 class="text-center mb-5">Unsere gemeinsame Reise</h2>
+            
+            <div class="timeline">
+                <!-- Zeitpunkt 1: Erstes Treffen -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">19.12.23</div>
+                    <div class="timeline-content">
+                        <h3>Unser erster Kontakt</h3>
+                        <!-- Bild-Platzhalter -->
+                        <div class="timeline-media">
+                            <img src="{% static 'css/images/schubi/insta.jpg' %}" alt="Erstes Treffen" class="timeline-image">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Zeitpunkt 2: Erster Ausflug -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">04.06.24</div>
+                    <div class="timeline-content">
+                        <h3>Und nun hattest du mich an der backe</h3>
+                        <!-- Bild-Platzhalter -->
+                        <div class="timeline-media">
+                            <img src="{% static 'css/images/schubi/whatsapp.jpeg' %}" alt="Whatsapp" class="timeline-image">
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Zeitpunkt 6: Weihnachtsmarkt -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">Dezember 2024</div>
+                    <div class="timeline-content">
+                        <h3>Gemeinsam auf dem Weihnachtsmarkt</h3>
+                        <!-- Mehrere Bilder in einer Galerie -->
+                        <div class="timeline-media timeline-gallery">
+                            <img src="/static/css/images/schubi/wei.JPG" alt="Weihnachtsmarkt 1" class="gallery-img">
+                            <img src="/static/css/images/schubi/wei2.jpg" alt="Weihnachtsmarkt 2" class="gallery-img">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Zeitpunkt 7: Silvester -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">31. Dezember 2024</div>
+                    <div class="timeline-content">
+                        <h3>Unser erstes Silvester</h3>
+                        <p>Der perfekte Start ins neue Jahr mit dir!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Zeitpunkt 10: Dein Geburtstag -->
+                <div class="timeline-item special-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">Heute</div>
+                    <div class="timeline-content">
+                        <h3>Dein Geburtstag!</h3>
+                        <p>Ein weiterer besonderer Tag mit dir. Ich bin so glücklich, ihn mit dir zu teilen und freue mich auf viele weitere unvergessliche Momente.</p>
+                        <!-- Herz-Animation -->
+                        <div class="timeline-media">
+                            <div class="heart-animation">❤️</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Zeitpunkt 11: Zukunft -->
+                <div class="timeline-item future-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-date">Unsere Zukunft</div>
+                    <div class="timeline-content">
+                        <h3>Gemeinsam in die Zukunft</h3>
+                        <p>Ich freue mich auf alles, was noch vor uns liegt. Auf viele weitere Abenteuer, Lachen und gemeinsame Momente mit dir!</p>
+                        <!-- Platzhalter für zukünftige Erinnerungen -->
+                        <div class="timeline-media">
+                            <div class="future-placeholder">
+                                <p>Hier werden wir noch viele Erinnerungen sammeln...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+
+        <!-- Video Section -->
+        <section class="video-section">
+            <div class="container">
+                <h2 class="text-center mb-4">Unsere schönsten Momente</h2>
+                <div class="video-container">
+                    <video id="birthday-video" controls poster="/static/css/images/schubi/anzeige.jpg">
+                        <source src="/static/css/images/schubi/birthday-video.mp4" type="video/mp4">
+                        Dein Browser unterstützt keine Videos.
+                    </video>
+                    <div class="video-controls">
+                        <button class="download-video-btn">
+                            <i class="fas fa-download"></i> Video herunterladen
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+       
+
+        <div class="wishes-section">
+            <h2>Meine Wünsche für dich</h2>
+            <p>Ich wünsche dir:</p>
+            <ul class="list-unstyled">
+                <li>✨ Gesundheit und Glück ✨</li>
+                <li>✨ Erfolg bei allem, was du dir vornimmst   ✨</li>
+                <li>✨ Liebe und Freundschaft, die dich umgibt  ✨</li>
+                <li>✨ Viele weitere gemeinsame Abenteuer mit mir!  ✨</li>
+            </ul>
+            <p class="mt-4">💜  Bleib für immer so wie du bist! 💜</p>
+        </div>
+    </div>
+
+
+
+    <footer class="birthday-footer">
+        <p>Mit Liebe gemacht von Alex für Schubi 💜</p>
+    </footer>
+
+    <!-- JavaScript für Konfetti-Effekt und Timeline-Animation -->
+    <script src="{% static 'js/schubi.js' %}"></script>
+
+    <!-- Bootstrap JS und jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
