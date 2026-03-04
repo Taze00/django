@@ -41,10 +41,10 @@ export default function DropSetInstructions({ exercise, currentProgression, prog
             }`}
           >
             <p className="text-sm font-medium text-gray-600">
-              Drop {idx + 1}: {prog.name}
+              Drop {idx + 1}
             </p>
             <p className="text-lg font-bold text-gray-900 mt-1">
-              {prog.target_type === 'time' ? `${prog.target_value}s` : `${prog.target_value} reps`}
+              {prog.name}
             </p>
             <p className="text-xs text-gray-500 mt-2">
               {idx === 0 && 'Go until failure'}
