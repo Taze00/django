@@ -134,6 +134,7 @@ export default function WorkoutView({ onBack }) {
             <ExerciseCard
               exercise={currentExercise}
               setNumber={currentFlowItem.setNumber}
+              currentProgression={userProgressions[String(currentExercise.id)]?.current_progression}
               lastPerformance={lastPerformances[String(currentExercise.id)]}
               onSetCompleted={handleSetCompleted}
             />

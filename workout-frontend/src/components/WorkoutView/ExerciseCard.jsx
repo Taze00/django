@@ -3,19 +3,17 @@ import SetInput from './SetInput'
 import TimerInput from './TimerInput'
 import DropSetInstructions from './DropSetInstructions'
 
-export default function ExerciseCard({ exercise, setNumber, lastPerformance, onSetCompleted }) {
+export default function ExerciseCard({ exercise, setNumber, currentProgression, lastPerformance, onSetCompleted }) {
   // Get exercise-specific progressions for this set
   const exerciseProgressions = useMemo(() => {
     return exercise.progressions.sort((a, b) => a.level - b.level)
   }, [exercise])
 
-  // Find current progression for this exercise in the workflow
-  // For now, just use last item (highest level) as fallback
-  // This will be passed in via props from WorkoutView
-  const progression = exerciseProgressions[exerciseProgressions.length - 1]
+  // Use current progression passed from WorkoutView
+  const progression = currentProgression
 
   if (!progression) {
-    return <div className="p-4 text-red-600">Error: No progression found</div>
+    return <div className="p-4 text-red-600">Error: No current progression found</div>
   }
 
   // Get last performance for this specific set number
@@ -52,6 +50,7 @@ export default function ExerciseCard({ exercise, setNumber, lastPerformance, onS
       return (
         <DropSetInstructions
           exercise={exercise}
+          currentProgression={progression}
           progressions={exerciseProgressions}
           onDone={() => onSetCompleted({ is_drop_set: true })}
         />

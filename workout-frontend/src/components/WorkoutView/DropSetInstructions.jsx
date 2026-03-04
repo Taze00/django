@@ -1,12 +1,17 @@
 import { useState } from 'react'
 
-export default function DropSetInstructions({ exercise, progressions, onDone }) {
+export default function DropSetInstructions({ exercise, currentProgression, progressions, onDone }) {
   const [step, setStep] = useState(1)
 
+  // Find current progression index
+  const currentLevel = currentProgression?.level || 0
+  const currentIndex = progressions.findIndex((p) => p.level === currentLevel)
+
+  // Drop-set: current level + 2 levels down (or as many as available)
   const dropSetLevels = [
-    progressions[progressions.length - 1],
-    progressions.length > 1 ? progressions[progressions.length - 2] : null,
-    progressions.length > 2 ? progressions[progressions.length - 3] : null,
+    progressions[currentIndex],
+    currentIndex > 0 ? progressions[currentIndex - 1] : null,
+    currentIndex > 1 ? progressions[currentIndex - 2] : null,
   ].filter(Boolean)
 
   return (
