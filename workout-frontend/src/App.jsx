@@ -1,36 +1,45 @@
-import { useState, useEffect } from 'react'
-import './App.css'
+import { useEffect, useState } from 'react'
+import { workoutStore } from './store/workoutStore'
+import LoginView from './components/LoginView'
+import HomeView from './components/HomeView'
+import WorkoutView from './components/WorkoutView/WorkoutView'
 
 export default function App() {
-  const [exercises, setExercises] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const isAuthenticated = workoutStore((state) => state.isAuthenticated)
+  const initialize = workoutStore((state) => state.initialize)
+  const startWorkout = workoutStore((state) => state.startWorkout)
+  const setWorkoutActive = workoutStore((state) => state.setWorkoutActive)
+
+  const [view, setView] = useState('home') // 'home' or 'workout'
 
   useEffect(() => {
-    fetch('/api/workout/exercises/')
-      .then(res => res.json())
-      .then(data => {
-        setExercises(data.results || [])
-        setLoading(false)
-      })
-      .catch(err => {
-        setError(err.message)
-        setLoading(false)
-      })
-  }, [])
+    if (isAuthenticated) {
+      initialize()
+    }
+  }, [isAuthenticated, initialize])
 
-  if (loading) return <div className="container"><p>Loading...</p></div>
-  if (error) return <div className="container"><p>Error: {error}</p></div>
+  if (!isAuthenticated) {
+    return <LoginView />
+  }
+
+  if (view === 'workout') {
+    return (
+      <WorkoutView
+        onBack={() => {
+          setWorkoutActive(false)
+          setView('home')
+        }}
+      />
+    )
+  }
 
   return (
-    <div className="container">
-      <h1>💪 Workout Tracker</h1>
-      <p>Backend is ready! Exercises loaded:</p>
-      <ul>
-        {exercises.map(ex => (
-          <li key={ex.id}>{ex.name} ({ex.progressions.length} progressions)</li>
-        ))}
-      </ul>
-    </div>
+    <HomeView
+      onStartWorkout={async () => {
+        await startWorkout()
+        setWorkoutActive(true)
+        setView('workout')
+      }}
+    />
   )
 }

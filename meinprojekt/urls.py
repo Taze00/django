@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from . import views
 
 
@@ -27,6 +28,8 @@ urlpatterns = [
     path("schubi/", views.freundin_page, name="schubi_page"),
     path('impressum/', views.impressum, name='impressum'),
     path('workout/', views.workout, name='workout'),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/workout/', include('workout.urls')),
 ]
 
