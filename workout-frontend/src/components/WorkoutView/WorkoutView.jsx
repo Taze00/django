@@ -61,7 +61,7 @@ export default function WorkoutView({ onBack }) {
       const result = await completeWorkout()
       setModalData(result)
       setShowModal(true)
-      setWorkoutActive(false)
+      // Don't set setWorkoutActive(false) here - let the modal close handler do it
     } else {
       // Show rest timer or move to next step
       const restTime = currentStep >= 3 ? 300 : 180
@@ -80,6 +80,7 @@ export default function WorkoutView({ onBack }) {
 
   const handleModalClose = () => {
     setShowModal(false)
+    setWorkoutActive(false)
     onBack()
   }
 
