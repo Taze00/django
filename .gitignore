@@ -32,6 +32,8 @@ Thumbs.db
 avatars/
 media/
 fitness-frontend/
+workout-frontend/node_modules/
+workout-frontend/dist/
 =3.7
 
 # Media and Images (server-only, not versioned)
@@ -43,3 +45,6 @@ static/fitness/assets/
 static/fitness/icons/
 static/fitness/*.html
 static/fitness/*.js
+
+# Workout app (auto-generated)
+static/workout/
