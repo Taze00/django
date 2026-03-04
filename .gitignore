@@ -48,3 +48,4 @@ static/fitness/*.js
 
 # Workout app (auto-generated)
 static/workout/
+staticfiles/
