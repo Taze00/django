@@ -69,15 +69,10 @@ export const workoutStore = create((set, get) => ({
         workoutAPI.userProgressions(),
       ])
 
-      // Normalize progressions to string keys
-      const progMap = {}
-      progData.forEach((prog) => {
-        progMap[String(prog.exercise_id)] = prog
-      })
-
+      // progData is already a dictionary with string keys from backend
       set({
         exercises: exData,
-        userProgressions: progMap,
+        userProgressions: progData,
       })
     } catch (error) {
       console.error('Initialize failed:', error)
@@ -89,11 +84,8 @@ export const workoutStore = create((set, get) => ({
   fetchUserProgressions: async () => {
     try {
       const progData = await workoutAPI.userProgressions()
-      const progMap = {}
-      progData.forEach((prog) => {
-        progMap[String(prog.exercise_id)] = prog
-      })
-      set({ userProgressions: progMap })
+      // progData is already a dictionary with string keys from backend
+      set({ userProgressions: progData })
     } catch (error) {
       console.error('Fetch progressions failed:', error)
     }
@@ -128,12 +120,12 @@ export const workoutStore = create((set, get) => ({
     }
   },
 
-  addSet: async (exerciseId, setNumber, data) => {
+  addSet: async (exerciseId, setNumber, progressionId, data) => {
     try {
       const { activeWorkout } = get()
       if (!activeWorkout) return
 
-      await workoutAPI.addSet(activeWorkout.id, exerciseId, setNumber, data)
+      await workoutAPI.addSet(activeWorkout.id, exerciseId, setNumber, progressionId, data)
     } catch (error) {
       console.error('Add set failed:', error)
     }

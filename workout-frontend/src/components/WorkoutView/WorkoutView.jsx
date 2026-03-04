@@ -43,10 +43,15 @@ export default function WorkoutView({ onBack }) {
   const currentExercise = exercises.find((e) => e.id === currentFlowItem.exerciseId)
 
   const handleSetCompleted = async (data = {}) => {
+    // Get progression ID for current exercise
+    const exerciseProgression = userProgressions[String(currentFlowItem.exerciseId)]
+    const progressionId = exerciseProgression?.current_progression_id
+
     // Add set to backend
     await addSet(
       currentFlowItem.exerciseId,
       currentFlowItem.setNumber,
+      progressionId,
       data
     )
 

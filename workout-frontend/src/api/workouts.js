@@ -7,7 +7,7 @@ export const exercises = async () => {
 
 export const userProgressions = async () => {
   const response = await client.get('/workout/user-progressions/')
-  return response.data.results
+  return response.data
 }
 
 export const currentWorkout = async () => {
@@ -27,9 +27,10 @@ export const createWorkout = async () => {
   return response.data
 }
 
-export const addSet = async (workoutId, exerciseId, setNumber, data) => {
+export const addSet = async (workoutId, exerciseId, setNumber, progressionId, data) => {
   const response = await client.post(`/workout/workouts/${workoutId}/add_set/`, {
-    exercise: exerciseId,
+    exercise_id: exerciseId,
+    progression_id: progressionId,
     set_number: setNumber,
     ...data,
   })
