@@ -107,18 +107,23 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         except (Exercise.DoesNotExist, Progression.DoesNotExist):
             return Response({'error': 'Exercise oder Progression nicht gefunden'}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Build defaults dict with only non-None values
+        defaults = {
+            'progression': progression,
+            'is_drop_set': is_drop_set,
+            'rest_time_seconds': 300 if set_number >= 3 else 180,
+        }
+        if reps is not None:
+            defaults['reps'] = reps
+        if seconds is not None:
+            defaults['seconds'] = seconds
+
         # update_or_create: idempotent!
         workout_set, created = WorkoutSet.objects.update_or_create(
             workout=workout,
             exercise=exercise,
             set_number=set_number,
-            defaults={
-                'progression': progression,
-                'reps': reps,
-                'seconds': seconds,
-                'is_drop_set': is_drop_set,
-                'rest_time_seconds': 300 if set_number >= 3 else 180,
-            },
+            defaults=defaults,
         )
 
         serializer = WorkoutSetSerializer(workout_set)
@@ -153,11 +158,22 @@ class WorkoutViewSet(viewsets.ModelViewSet):
             if not (set1 and set2):
                 continue  # Übung nicht komplett, überspringe
 
+            # Get values for sets (handle None values)
+            user_prog = UserExerciseProgression.objects.get(user=request.user, exercise=exercise)
+            progression = user_prog.current_progression
+
+            if progression.target_type == 'reps':
+                set1_value = set1.reps or 0
+                set2_value = set2.reps or 0
+            else:  # time
+                set1_value = set1.seconds or 0
+                set2_value = set2.seconds or 0
+
             # Downgrade Check (nur wenn is_first_session=True)
             downgrade_result = check_and_perform_downgrade(
                 request.user, exercise,
-                set1.reps or set1.seconds or 0,
-                set2.reps or set2.seconds or 0,
+                set1_value,
+                set2_value,
             )
 
             if downgrade_result['downgraded']:
@@ -167,17 +183,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
                 })
             else:
                 # Upgrade Check (nur wenn kein Downgrade)
-                user_prog = UserExerciseProgression.objects.get(user=request.user, exercise=exercise)
-                progression = user_prog.current_progression
                 effective_target = get_effective_target(user_prog)
-
-                # Prüfe ob Set1 und Set2 beide >= target
-                if progression.target_type == 'reps':
-                    set1_value = set1.reps
-                    set2_value = set2.reps
-                else:  # time
-                    set1_value = set1.seconds
-                    set2_value = set2.seconds
 
                 if set1_value >= effective_target and set2_value >= effective_target:
                     user_prog.sessions_at_target += 1
