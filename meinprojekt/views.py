@@ -8,6 +8,3 @@ def freundin_page(request):
 
 def impressum(request):
     return render(request, 'impressum.html')
-
-def workout(request):
-    return render(request, 'workout.html')
