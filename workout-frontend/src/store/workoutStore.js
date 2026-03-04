@@ -139,7 +139,11 @@ export const workoutStore = create((set, get) => ({
       const result = await workoutAPI.completeWorkout(activeWorkout.id)
 
       // Refresh progressions to show new levels
-      await get().fetchUserProgressions()
+      try {
+        await get().fetchUserProgressions()
+      } catch (error) {
+        console.error('Failed to refresh progressions:', error)
+      }
 
       set({
         activeWorkout: null,
@@ -150,6 +154,7 @@ export const workoutStore = create((set, get) => ({
       return result // {workout, upgrades, downgrades}
     } catch (error) {
       console.error('Complete workout failed:', error)
+      return null
     }
   },
 
