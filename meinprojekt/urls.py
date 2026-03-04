@@ -27,8 +27,10 @@ urlpatterns = [
     path('', views.index, name='index'),
     path("schubi/", views.freundin_page, name="schubi_page"),
     path('impressum/', views.impressum, name='impressum'),
+    path('fitness/', views.fitness_page, name='fitness_page'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/fitness/', include('fitness.urls')),
 ]
 
 # Serve media files in development

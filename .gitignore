@@ -31,21 +31,13 @@ Thumbs.db
 .claude/
 avatars/
 media/
-fitness-frontend/
-workout-frontend/node_modules/
-workout-frontend/dist/
-=3.7
+fitness-frontend/node_modules/
+fitness-frontend/dist/
 
 # Media and Images (server-only, not versioned)
 static/css/images/movie/
 static/css/images/gallery/
 
 # Fitness app (auto-generated)
-static/fitness/assets/
-static/fitness/icons/
-static/fitness/*.html
-static/fitness/*.js
-
-# Workout app (auto-generated)
-static/workout/
+static/fitness/
 staticfiles/
