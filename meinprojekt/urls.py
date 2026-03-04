@@ -26,6 +26,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path("schubi/", views.freundin_page, name="schubi_page"),
     path('impressum/', views.impressum, name='impressum'),
+    path('workout/', views.workout, name='workout'),
     path('api/workout/', include('workout.urls')),
 ]
 
