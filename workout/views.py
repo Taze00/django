@@ -178,7 +178,9 @@ class WorkoutViewSet(viewsets.ModelViewSet):
 
             if downgrade_result['downgraded']:
                 downgrades.append({
-                    'exercise': exercise.name,
+                    'exercise_id': exercise.id,
+                    'exercise_name': exercise.name,
+                    'progression_name': user_prog.current_progression.name,
                     'details': downgrade_result['details'],
                 })
             else:
@@ -195,9 +197,12 @@ class WorkoutViewSet(viewsets.ModelViewSet):
                         next_prog = upgrade_check['next_progression']
                         upgrade_progression(request.user, exercise, next_prog)
                         upgrades.append({
-                            'exercise': exercise.name,
+                            'exercise_id': exercise.id,
+                            'exercise_name': exercise.name,
                             'from_progression': progression.name,
                             'to_progression': next_prog.name,
+                            'new_progression_name': next_prog.name,
+                            'sessions_at_target': user_prog.sessions_at_target,
                         })
 
         serializer = self.get_serializer(workout)
