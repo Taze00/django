@@ -37,6 +37,17 @@ export default function HomeView() {
 
   const weekStatus = { Mon: true, Tue: true, Wed: true, Thu: false, Fri: false };
 
+  // Test data for performance chart showing workout minutes
+  const performanceData = {
+    Mon: 32,
+    Tue: 28,
+    Wed: 35,
+    Thu: 0,
+    Fri: 0,
+    Sat: 0,
+    Sun: 0
+  };
+
   return (
     <div className="home-container">
       <div className="header">
@@ -106,12 +117,14 @@ export default function HomeView() {
               <div className="performance-chart">
                 <div className="chart-bars">
                   {WORKOUT_DAYS.concat(REST_DAYS).map((day, idx) => {
-                    const height = Math.random() * 100;
+                    const minutes = performanceData[day];
+                    const maxMinutes = 40;
+                    const height = (minutes / maxMinutes) * 100;
                     const isCompleted = weekStatus[day];
                     return (
                       <div key={day} className="chart-bar-wrapper">
                         <div
-                          className={`chart-bar ${isCompleted ? 'completed' : 'empty'}`}
+                          className={`chart-bar ${isCompleted && minutes > 0 ? 'completed' : 'empty'}`}
                           style={{ height: `${Math.max(20, height)}%` }}
                         ></div>
                         <p className="chart-label">{day}</p>

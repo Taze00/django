@@ -312,10 +312,6 @@ body {
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 1px;
-  background: linear-gradient(90deg, #34d399 0%, #3b82f6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .section-subtitle {
