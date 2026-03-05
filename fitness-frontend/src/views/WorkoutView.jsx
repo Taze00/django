@@ -26,24 +26,30 @@ export default function WorkoutView() {
   const [currentWorkout, setCurrentWorkout] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [progressionData, setProgressionData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const exercises = useWorkoutStore(state => state.exercises);
   const userProgressions = useWorkoutStore(state => state.userProgressions);
+  const isInitialized = useWorkoutStore(state => state.isInitialized);
   const getCurrentWorkout = useWorkoutStore(state => state.getCurrentWorkout);
   const addSet = useWorkoutStore(state => state.addSet);
   const completeWorkout = useWorkoutStore(state => state.completeWorkout);
 
   useEffect(() => {
-    initializeWorkout();
-  }, []);
+    // Wait for exercises to be loaded before initializing workout
+    if (isInitialized && exercises.length > 0) {
+      initializeWorkout();
+    }
+  }, [isInitialized, exercises.length]);
 
   const initializeWorkout = async () => {
     try {
       const workout = await getCurrentWorkout();
       setCurrentWorkout(workout);
+      setIsLoading(false);
     } catch (error) {
       console.error('Error starting workout:', error);
+      setIsLoading(false);
     }
   };
 
@@ -53,10 +59,21 @@ export default function WorkoutView() {
 
   const getProgressionInfo = (exerciseName, setNumber, isDropSet) => {
     const exercise = getExerciseById(exerciseName);
-    if (!exercise) return null;
+    if (!exercise) {
+      console.warn(`Exercise not found: ${exerciseName}`);
+      return null;
+    }
 
     const userProg = userProgressions[String(exercise.id)];
-    if (!userProg) return null;
+    if (!userProg) {
+      console.warn(`User progression not found for exercise: ${exerciseName} (id=${exercise.id})`);
+      return null;
+    }
+
+    if (!userProg.current_progression) {
+      console.warn(`Current progression is null for exercise: ${exerciseName}`);
+      return null;
+    }
 
     return {
       exercise,
@@ -73,6 +90,12 @@ export default function WorkoutView() {
     try {
       const step = WORKOUT_STEPS[currentStep];
       const progInfo = getProgressionInfo(step.exercise, step.setNumber, step.type === 'drop');
+
+      if (!progInfo) {
+        console.error('Could not get progression info for step', step);
+        setIsLoading(false);
+        return;
+      }
 
       const reps = progInfo.currentProgression.target_type === 'reps' ? value : null;
       const seconds = progInfo.currentProgression.target_type === 'time' ? value : null;
@@ -117,9 +140,9 @@ export default function WorkoutView() {
     window.location.href = '/fitness/';
   };
 
-  if (!currentWorkout || (isLoading && currentStep === 0)) {
+  if (isLoading || !isInitialized || exercises.length === 0 || !currentWorkout) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex items-center justify-center min-h-screen bg-slate-900">
         <p className="text-slate-300">Loading workout...</p>
       </div>
     );
@@ -154,7 +177,16 @@ export default function WorkoutView() {
   const progInfo = getProgressionInfo(step.exercise, step.setNumber, step.type === 'drop');
 
   if (!progInfo) {
-    return <div className="flex items-center justify-center min-h-screen"><p className="text-slate-300">Error loading exercise data</p></div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-900">
+        <div className="text-center">
+          <p className="text-red-400 mb-4">Error loading exercise data</p>
+          <p className="text-slate-400 text-sm">Exercise: {step.exercise}</p>
+          <p className="text-slate-400 text-sm">Exercises loaded: {exercises.length}</p>
+          <p className="text-slate-400 text-sm">User progressions: {Object.keys(userProgressions).length}</p>
+        </div>
+      </div>
+    );
   }
 
   return (
