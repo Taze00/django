@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import axios from 'axios';
 import api from '../api';
 
 export const useAuthStore = create((set) => ({
@@ -9,7 +10,8 @@ export const useAuthStore = create((set) => ({
   login: async (username, password) => {
     set({ isLoading: true });
     try {
-      const res = await api.post('/token/', { username, password });
+      // Use global /api/token/ endpoint, not fitness-specific
+      const res = await axios.post('/api/token/', { username, password });
       localStorage.setItem('access_token', res.data.access);
       localStorage.setItem('refresh_token', res.data.refresh);
       
