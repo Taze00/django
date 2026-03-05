@@ -88,8 +88,8 @@ body {
   position: absolute;
   border-radius: 50%;
   filter: blur(100px);
-  opacity: 0.1;
-  animation: pulse 4s ease-in-out infinite;
+  opacity: 0;
+  display: none;
 }
 
 .login-bg-orb-1 {
@@ -98,6 +98,7 @@ body {
   background: #3b82f6;
   top: -100px;
   left: -100px;
+  display: none;
 }
 
 .login-bg-orb-2 {
@@ -106,7 +107,7 @@ body {
   background: #10b981;
   bottom: -100px;
   right: -100px;
-  animation-delay: 2s;
+  display: none;
 }
 
 .login-card {
