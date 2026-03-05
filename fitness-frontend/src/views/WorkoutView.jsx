@@ -61,26 +61,40 @@ export default function WorkoutView() {
     const exercise = getExerciseById(exerciseName);
     if (!exercise) {
       console.warn(`Exercise not found: ${exerciseName}`);
+      console.log('Available exercises:', exercises.map(e => e.name));
       return null;
     }
 
     const userProg = userProgressions[String(exercise.id)];
     if (!userProg) {
       console.warn(`User progression not found for exercise: ${exerciseName} (id=${exercise.id})`);
+      console.log('Available progressions:', Object.keys(userProgressions));
+      console.log('Full userProgressions:', userProgressions);
       return null;
     }
 
     if (!userProg.current_progression) {
       console.warn(`Current progression is null for exercise: ${exerciseName}`);
+      console.log('userProg object:', userProg);
       return null;
     }
 
-    return {
+    const progInfo = {
       exercise,
       userProg,
       currentProgression: userProg.current_progression,
       nextProgressions: exercise.progressions.filter(p => p.level < userProg.current_progression.level),
     };
+    
+    console.log(`getProgressionInfo for ${exerciseName}:`, {
+      exercise: exercise.name,
+      currentProgression: userProg.current_progression.name,
+      level: userProg.current_progression.level,
+      targetType: userProg.current_progression.target_type,
+      target: userProg.current_progression.target_value,
+    });
+    
+    return progInfo;
   };
 
   const handleSetComplete = async (value) => {
@@ -89,6 +103,8 @@ export default function WorkoutView() {
     setIsLoading(true);
     try {
       const step = WORKOUT_STEPS[currentStep];
+      console.log(`Completing Set: Step ${currentStep}, Exercise: ${step.exercise}, Type: ${step.type}`);
+      
       const progInfo = getProgressionInfo(step.exercise, step.setNumber, step.type === 'drop');
 
       if (!progInfo) {
@@ -101,6 +117,8 @@ export default function WorkoutView() {
       const seconds = progInfo.currentProgression.target_type === 'time' ? value : null;
 
       const restTime = step.type === 'drop' ? REST_TIMES.afterDrop : REST_TIMES.normal;
+
+      console.log(`Saving set: reps=${reps}, seconds=${seconds}, drop=${step.type === 'drop'}`);
 
       await addSet(
         currentWorkout.id,
@@ -115,11 +133,14 @@ export default function WorkoutView() {
 
       if (currentStep === WORKOUT_STEPS.length - 1) {
         // Last step - complete workout
+        console.log('Completing workout...');
         const result = await completeWorkout(currentWorkout.id);
+        console.log('Workout result:', result);
         setProgressionData(result);
         setShowModal(true);
       } else {
         // Show rest timer
+        console.log(`Rest timer: ${restTime}s`);
         setIsResting(true);
       }
     } catch (error) {
@@ -185,6 +206,7 @@ export default function WorkoutView() {
           <p className="text-slate-400 text-sm">Exercise: {step.exercise}</p>
           <p className="text-slate-400 text-sm">Exercises loaded: {exercises.length}</p>
           <p className="text-slate-400 text-sm">User progressions: {Object.keys(userProgressions).length}</p>
+          <p className="text-slate-400 text-sm mt-4">Check console for details</p>
         </div>
       </div>
     );
