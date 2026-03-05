@@ -97,6 +97,21 @@ export default function HomeView() {
               </div>
             </div>
 
+            <div className="stats-summary">
+              <div className="stat-item">
+                <p className="stat-label">Push-ups</p>
+                <p className="stat-value">427</p>
+              </div>
+              <div className="stat-item">
+                <p className="stat-label">Pull-ups</p>
+                <p className="stat-value">156</p>
+              </div>
+              <div className="stat-item">
+                <p className="stat-label">Workouts</p>
+                <p className="stat-value">23</p>
+              </div>
+            </div>
+
             <button className="btn-start-inline" onClick={handleStartWorkout}>
               <span className="btn-start-emoji">💪</span>
               Start Workout

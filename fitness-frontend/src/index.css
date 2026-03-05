@@ -305,10 +305,10 @@ body {
 }
 
 .welcome-text {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 28px;
+  font-weight: 700;
   color: #f1f5f9;
-  margin-bottom: 24px;
+  margin-bottom: 32px;
   text-align: center;
 }
 
@@ -1508,4 +1508,47 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   margin-top: 4px;
+}
+
+/* ===================================== */
+/* STATS SUMMARY CARD */
+/* ===================================== */
+
+.stats-summary {
+  background: rgba(51, 65, 85, 0.2);
+  border: 1px solid rgba(71, 85, 99, 0.3);
+  border-radius: 16px;
+  padding: 20px;
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+  animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #34d399;
+}
+
+.stat-item:nth-child(2) .stat-value {
+  color: #60a5fa;
+}
+
+.stat-item:nth-child(3) .stat-value {
+  color: #fbbf24;
 }
