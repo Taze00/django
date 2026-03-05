@@ -7,16 +7,12 @@ const REST_DAYS = ['Sat', 'Sun'];
 
 export default function HomeView() {
   const navigate = useNavigate();
-  const logout = useAuthStore(state => state.logout);
+  const user = useAuthStore(state => state.user);
   const exercises = useWorkoutStore(state => state.exercises);
   const userProgressions = useWorkoutStore(state => state.userProgressions);
   const isLoading = useWorkoutStore(state => state.isLoading);
 
   const handleStartWorkout = () => navigate('/workout');
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
 
   const getPushProgress = () => {
     const pushExercise = exercises.find(e => e.name === 'Push-ups');
@@ -37,23 +33,11 @@ export default function HomeView() {
 
   const weekStatus = { Mon: true, Tue: true, Wed: true, Thu: false, Fri: false };
 
-  // Test data for performance chart showing workout minutes
-  const performanceData = {
-    Mon: 32,
-    Tue: 28,
-    Wed: 35,
-    Thu: 0,
-    Fri: 0,
-    Sat: 0,
-    Sun: 0
-  };
-
   return (
     <div className="home-container">
       <div className="header">
         <div className="header-content">
           <h1 className="header-title">Calisthenics</h1>
-          <button className="btn-logout" onClick={handleLogout}>Logout</button>
         </div>
       </div>
 
@@ -65,6 +49,7 @@ export default function HomeView() {
           </div>
         ) : (
           <>
+            <p className="welcome-text">Welcome, {user?.username || 'Athlete'}</p>
             <div className="week-plan">
               <div className="week-grid-inline">
                 {WORKOUT_DAYS.map(day => (
@@ -112,37 +97,12 @@ export default function HomeView() {
               </div>
             </div>
 
-            <div className="performance-section">
-              <h2 className="section-title">Performance Chart</h2>
-              <div className="performance-chart">
-                <div className="chart-bars">
-                  {WORKOUT_DAYS.concat(REST_DAYS).map((day, idx) => {
-                    const minutes = performanceData[day];
-                    const maxMinutes = 40;
-                    const height = (minutes / maxMinutes) * 100;
-                    const isCompleted = weekStatus[day];
-                    return (
-                      <div key={day} className="chart-bar-wrapper">
-                        <div
-                          className={`chart-bar ${isCompleted && minutes > 0 ? 'completed' : 'empty'}`}
-                          style={{ height: `${Math.max(20, height)}%` }}
-                        ></div>
-                        <p className="chart-label">{day}</p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
+            <button className="btn-start-inline" onClick={handleStartWorkout}>
+              <span className="btn-start-emoji">💪</span>
+              Start Workout
+            </button>
           </>
         )}
-      </div>
-
-      <div className="floating-button">
-        <button className="btn-start" onClick={handleStartWorkout}>
-          <span className="btn-start-emoji">💪</span>
-          Start Workout
-        </button>
       </div>
     </div>
   );

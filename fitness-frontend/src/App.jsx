@@ -1,14 +1,32 @@
 import { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore';
 import { useWorkoutStore } from './stores/workoutStore';
+import BottomNav from './components/BottomNav';
 import LoginView from './views/LoginView';
 import HomeView from './views/HomeView';
 import WorkoutView from './views/WorkoutView';
+import ExercisesView from './views/ExercisesView';
+import StatisticsView from './views/StatisticsView';
+import ProfileView from './views/ProfileView';
 
 function PrivateRoute({ children }) {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
   return isAuthenticated ? children : <Navigate to="/login" />;
+}
+
+function PrivateLayout({ children }) {
+  const location = useLocation();
+  const isWorkout = location.pathname === '/workout';
+  
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+      <div style={{ flex: 1 }}>
+        {children}
+      </div>
+      {!isWorkout && <BottomNav />}
+    </div>
+  );
 }
 
 function App() {
@@ -34,7 +52,9 @@ function App() {
           path="/"
           element={
             <PrivateRoute>
-              <HomeView />
+              <PrivateLayout>
+                <HomeView />
+              </PrivateLayout>
             </PrivateRoute>
           }
         />
@@ -43,6 +63,36 @@ function App() {
           element={
             <PrivateRoute>
               <WorkoutView />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/exercises"
+          element={
+            <PrivateRoute>
+              <PrivateLayout>
+                <ExercisesView />
+              </PrivateLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/statistics"
+          element={
+            <PrivateRoute>
+              <PrivateLayout>
+                <StatisticsView />
+              </PrivateLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <PrivateLayout>
+                <ProfileView />
+              </PrivateLayout>
             </PrivateRoute>
           }
         />
