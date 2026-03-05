@@ -534,26 +534,34 @@ body {
   background: rgba(51, 65, 85, 0.3);
   border: 1px solid rgba(52, 211, 153, 0.3);
   border-radius: 16px;
-  padding: 20px;
+  padding: 16px 20px;
   text-align: center;
   margin-bottom: 24px;
   animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
   animation-delay: 0.1s;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
 }
 
 .info-label {
-  font-size: 12px;
+  font-size: 11px;
   color: #94a3b8;
   font-weight: 600;
   text-transform: uppercase;
-  margin-bottom: 8px;
+  margin-bottom: 0;
   letter-spacing: 0.5px;
 }
 
 .info-value {
-  font-size: 28px;
+  font-size: 20px;
   font-weight: 900;
   color: #34d399;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .counter-display {
@@ -960,12 +968,6 @@ body {
   margin-bottom: 32px;
 }
 
-.drop-set-emoji {
-  font-size: 48px;
-  display: block;
-  margin-bottom: 16px;
-  animation: bounce 1s ease-in-out infinite;
-}
 
 .drop-set-warning {
   background: linear-gradient(135deg, rgba(234, 88, 12, 0.2) 0%, rgba(194, 65, 12, 0.15) 100%);
@@ -1099,6 +1101,7 @@ body {
 }
 
 .workout-header {
+  position: relative;
   position: sticky;
   top: 0;
   z-index: 40;
@@ -1552,4 +1555,249 @@ body {
 
 .stat-item:nth-child(3) .stat-value {
   color: #fbbf24;
+}
+
+/* ===================================== */
+/* EXIT BUTTON & WORKOUT COMPLETE */
+/* ===================================== */
+
+.btn-exit-workout {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: transparent;
+  color: #f1f5f9;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-exit-workout:hover {
+  background-color: rgba(241, 245, 249, 0.1);
+}
+
+.workout-complete {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
+  z-index: 100;
+}
+
+.workout-complete-card {
+  background: linear-gradient(135deg, rgba(51, 65, 85, 0.3) 0%, rgba(30, 41, 59, 0.3) 100%);
+  border: 1px solid rgba(100, 116, 139, 0.3);
+  border-radius: 24px;
+  padding: 48px 32px;
+  text-align: center;
+  max-width: 400px;
+  margin: 0 20px;
+  width: calc(100% - 40px);
+  animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.workout-complete-emoji {
+  font-size: 72px;
+  margin-bottom: 24px;
+  display: block;
+  animation: bounce 0.6s ease-in-out;
+}
+
+.workout-complete-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 12px;
+}
+
+.workout-complete-subtitle {
+  font-size: 1.125rem;
+  color: #cbd5e1;
+  margin-bottom: 32px;
+  line-height: 1.6;
+}
+
+.workout-complete-btn {
+  width: 100%;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.workout-complete-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
+}
+
+.workout-complete-btn:active {
+  transform: translateY(0);
+}
+
+/* ===================================== */
+/* WARM-UP CHECKLIST */
+/* ===================================== */
+
+.warmup-checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.warmup-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(51, 65, 85, 0.3);
+  border: 2px solid rgba(71, 85, 99, 0.3);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+  font-size: 16px;
+  font-weight: 600;
+  color: #f1f5f9;
+}
+
+.warmup-item:hover {
+  background: rgba(51, 65, 85, 0.5);
+  border-color: rgba(71, 85, 99, 0.5);
+  transform: translateX(4px);
+}
+
+.warmup-item.checked {
+  background: rgba(52, 211, 153, 0.15);
+  border-color: rgba(52, 211, 153, 0.5);
+}
+
+.warmup-emoji {
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.warmup-label {
+  flex: 1;
+}
+
+.warmup-checkbox {
+  font-size: 20px;
+  color: #34d399;
+  font-weight: 700;
+  flex-shrink: 0;
+  min-width: 24px;
+  text-align: center;
+}
+
+/* ===================================== */
+/* PROGRESSION MODAL */
+/* ===================================== */
+
+.progression-complete {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
+  z-index: 100;
+}
+
+.progression-complete-card {
+  background: linear-gradient(135deg, rgba(51, 65, 85, 0.3) 0%, rgba(30, 41, 59, 0.3) 100%);
+  border: 1px solid rgba(100, 116, 139, 0.3);
+  border-radius: 24px;
+  padding: 48px 32px;
+  text-align: center;
+  max-width: 400px;
+  margin: 0 20px;
+  width: calc(100% - 40px);
+  animation: scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.progression-complete-emoji {
+  font-size: 72px;
+  margin-bottom: 24px;
+  display: block;
+  animation: bounce 0.6s ease-in-out;
+}
+
+.progression-complete-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #f1f5f9;
+  margin-bottom: 12px;
+}
+
+.progression-complete-subtitle {
+  font-size: 1.125rem;
+  color: #cbd5e1;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.progression-info {
+  background: rgba(51, 65, 85, 0.5);
+  border: 1px solid rgba(71, 85, 99, 0.3);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.progression-label {
+  font-size: 12px;
+  color: #94a3b8;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.progression-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #34d399;
+}
+
+.progression-complete-btn {
+  width: 100%;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.progression-complete-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(16, 185, 129, 0.3);
+}
+
+.progression-complete-btn:active {
+  transform: translateY(0);
+}
+
+.progression-counter {
+  font-size: 12px;
+  color: #64748b;
+  margin-top: 16px;
 }
