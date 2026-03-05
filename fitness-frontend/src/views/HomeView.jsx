@@ -2,6 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { useWorkoutStore } from '../stores/workoutStore';
 
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+
 export default function HomeView() {
   const navigate = useNavigate();
   const logout = useAuthStore(state => state.logout);
@@ -15,6 +17,25 @@ export default function HomeView() {
     navigate('/login');
   };
 
+  const getPushProgress = () => {
+    const pushExercise = exercises.find(e => e.name === 'Push-ups');
+    if (!pushExercise) return null;
+    const prog = userProgressions[String(pushExercise.id)];
+    return prog ? prog.current_progression : null;
+  };
+
+  const getPullProgress = () => {
+    const pullExercise = exercises.find(e => e.name === 'Pull-ups');
+    if (!pullExercise) return null;
+    const prog = userProgressions[String(pullExercise.id)];
+    return prog ? prog.current_progression : null;
+  };
+
+  const pushProg = getPushProgress();
+  const pullProg = getPullProgress();
+
+  const weekStatus = { Mon: true, Tue: true, Wed: true, Thu: false, Fri: false };
+
   return (
     <div className="home-container">
       <div className="header">
@@ -25,9 +46,6 @@ export default function HomeView() {
       </div>
 
       <div className="main-content">
-        <h2 className="section-title">Today's Workout</h2>
-        <p className="section-subtitle">Check your current progression levels</p>
-
         {isLoading ? (
           <div style={{ textAlign: 'center', padding: '60px 20px' }}>
             <div style={{ fontSize: '48px', marginBottom: '16px' }}>⏳</div>
@@ -35,38 +53,47 @@ export default function HomeView() {
           </div>
         ) : (
           <>
-            <div className="exercise-grid">
-              {exercises.map((exercise) => {
-                const prog = userProgressions[String(exercise.id)];
-                return (
-                  <div key={exercise.id} className="exercise-card">
-                    <div className="exercise-icon">
-                      {exercise.name.includes('Push') ? '💪' : '🔥'}
-                    </div>
-                    <div className="exercise-info">
-                      <h3 className="exercise-name">{exercise.name}</h3>
-                      <p className="exercise-label">Current Level</p>
-                      {prog ? (
-                        <>
-                          <p className="exercise-level">{prog.current_progression.name}</p>
-                          <p className="exercise-target">
-                            Target: {prog.current_progression.target_value}
-                            {prog.current_progression.target_type === 'reps' ? ' reps' : 's'}
-                          </p>
-                        </>
-                      ) : (
-                        <p className="exercise-target">Loading...</p>
-                      )}
-                    </div>
-                    <div className="exercise-arrow">→</div>
+            <div className="week-plan">
+              <h2 className="section-title">This Week</h2>
+              <div className="week-grid">
+                {DAYS.map(day => (
+                  <div key={day} className={weekStatus[day] ? 'week-day completed' : 'week-day pending'}>
+                    <p className="week-day-name">{day}</p>
+                    <p className="week-day-status">{weekStatus[day] ? '✓' : '○'}</p>
                   </div>
-                );
-              })}
+                ))}
+              </div>
             </div>
 
-            <div className="motivation-card">
-              <h3 className="motivation-title">Ready to push?</h3>
-              <p className="motivation-text">Every rep brings you closer to your goals</p>
+            <div className="progression-section">
+              <h2 className="section-title">Current Progression</h2>
+              <div className="progression-grid">
+                <div className="progression-card progression-push">
+                  <div className="progression-icon">💪</div>
+                  <h3 className="progression-title">Push-ups</h3>
+                  {pushProg ? (
+                    <>
+                      <p className="progression-name">{pushProg.name}</p>
+                      <p className="progression-target">Target: {pushProg.target_value}{pushProg.target_type === 'reps' ? ' reps' : 's'}</p>
+                    </>
+                  ) : (
+                    <p className="progression-target">Loading...</p>
+                  )}
+                </div>
+
+                <div className="progression-card progression-pull">
+                  <div className="progression-icon">🔥</div>
+                  <h3 className="progression-title">Pull-ups</h3>
+                  {pullProg ? (
+                    <>
+                      <p className="progression-name">{pullProg.name}</p>
+                      <p className="progression-target">Target: {pullProg.target_value}{pullProg.target_type === 'reps' ? ' reps' : 's'}</p>
+                    </>
+                  ) : (
+                    <p className="progression-target">Loading...</p>
+                  )}
+                </div>
+              </div>
             </div>
           </>
         )}
