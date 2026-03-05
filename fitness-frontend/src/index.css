@@ -247,7 +247,7 @@ body {
 .home-container {
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(to bottom, #0f172a 0%, #0f172a 70%, #1e293b 100%);
+  background: #0f172a;
 }
 
 .header {
@@ -1007,7 +1007,7 @@ body {
 .workout-main {
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(to bottom, #0f172a 0%, #0f172a 70%, #1e293b 100%);
+  background: #0f172a;
   padding-bottom: 160px;
 }
 
