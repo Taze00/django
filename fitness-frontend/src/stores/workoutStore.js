@@ -4,6 +4,7 @@ import api from '../api';
 export const useWorkoutStore = create((set, get) => ({
   exercises: [],
   userProgressions: {},
+  workouts: [],
   currentWorkout: null,
   lastPerformance: {},
   isInitialized: false,
@@ -12,14 +13,15 @@ export const useWorkoutStore = create((set, get) => ({
   initialize: async () => {
     const state = get();
     if (state.isInitialized && state.exercises.length > 0) return;
-    
+
     set({ isLoading: true });
     try {
-      const [exRes, progRes] = await Promise.all([
+      const [exRes, progRes, workRes] = await Promise.all([
         api.get('/exercises/'),
         api.get('/user-progressions/'),
+        api.get('/workouts/'),
       ]);
-      
+
       const progressionsMap = {};
       (progRes.data.results || []).forEach(prog => {
         progressionsMap[String(prog.exercise)] = prog;
@@ -28,6 +30,7 @@ export const useWorkoutStore = create((set, get) => ({
       set({
         exercises: exRes.data.results || [],
         userProgressions: progressionsMap,
+        workouts: workRes.data.results || [],
         isInitialized: true,
         isLoading: false,
       });

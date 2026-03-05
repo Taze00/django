@@ -10,6 +10,7 @@ export default function HomeView() {
   const user = useAuthStore(state => state.user);
   const exercises = useWorkoutStore(state => state.exercises);
   const userProgressions = useWorkoutStore(state => state.userProgressions);
+  const workouts = useWorkoutStore(state => state.workouts);
   const isLoading = useWorkoutStore(state => state.isLoading);
 
   const handleStartWorkout = () => navigate('/workout');
@@ -31,7 +32,54 @@ export default function HomeView() {
   const pushProg = getPushProgress();
   const pullProg = getPullProgress();
 
-  const weekStatus = { Mon: true, Tue: true, Wed: true, Thu: false, Fri: false };
+  // Calculate week status based on actual workouts
+  const getWeekStatus = () => {
+    const now = new Date();
+    const dayIndex = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+
+    // Get Monday of current week
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - (dayIndex === 0 ? 6 : dayIndex - 1));
+    monday.setHours(0, 0, 0, 0);
+
+    const status = { Mon: false, Tue: false, Wed: false, Thu: false, Fri: false };
+
+    workouts.forEach(workout => {
+      const workoutDate = new Date(workout.date);
+      workoutDate.setHours(0, 0, 0, 0);
+
+      // Check if workout is in current week
+      if (workoutDate >= monday) {
+        const dayOfWeek = workoutDate.getDay();
+        if (dayOfWeek === 1) status.Mon = true;
+        else if (dayOfWeek === 2) status.Tue = true;
+        else if (dayOfWeek === 3) status.Wed = true;
+        else if (dayOfWeek === 4) status.Thu = true;
+        else if (dayOfWeek === 5) status.Fri = true;
+      }
+    });
+
+    return status;
+  };
+
+  const weekStatus = getWeekStatus();
+
+  // Calculate total reps and workout count
+  const stats = {
+    pushReps: 0,
+    pullReps: 0,
+    totalWorkouts: workouts.length
+  };
+
+  workouts.forEach(workout => {
+    workout.sets?.forEach(set => {
+      if (set.exercise_name === 'Push-ups' && set.reps) {
+        stats.pushReps += set.reps;
+      } else if (set.exercise_name === 'Pull-ups' && set.reps) {
+        stats.pullReps += set.reps;
+      }
+    });
+  });
 
   return (
     <div className="home-container">
@@ -100,15 +148,15 @@ export default function HomeView() {
             <div className="stats-summary">
               <div className="stat-item">
                 <p className="stat-label">Push-ups</p>
-                <p className="stat-value">427</p>
+                <p className="stat-value">{stats.pushReps}</p>
               </div>
               <div className="stat-item">
                 <p className="stat-label">Pull-ups</p>
-                <p className="stat-value">156</p>
+                <p className="stat-value">{stats.pullReps}</p>
               </div>
               <div className="stat-item">
                 <p className="stat-label">Workouts</p>
-                <p className="stat-value">23</p>
+                <p className="stat-value">{stats.totalWorkouts}</p>
               </div>
             </div>
 
