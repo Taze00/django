@@ -4,6 +4,7 @@ import { useAuthStore } from './stores/authStore';
 import { useWorkoutStore } from './stores/workoutStore';
 import LoginView from './views/LoginView';
 import HomeView from './views/HomeView';
+import WorkoutView from './views/WorkoutView';
 
 function PrivateRoute({ children }) {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
@@ -34,6 +35,14 @@ function App() {
           element={
             <PrivateRoute>
               <HomeView />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/workout"
+          element={
+            <PrivateRoute>
+              <WorkoutView />
             </PrivateRoute>
           }
         />

@@ -1,17 +1,24 @@
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { useWorkoutStore } from '../stores/workoutStore';
 
 export default function HomeView() {
+  const navigate = useNavigate();
   const user = useAuthStore(state => state.user);
   const logout = useAuthStore(state => state.logout);
   const exercises = useWorkoutStore(state => state.exercises);
   const userProgressions = useWorkoutStore(state => state.userProgressions);
   const isLoading = useWorkoutStore(state => state.isLoading);
 
-  useEffect(() => {
-    // Initialize on mount
-  }, []);
+  const handleStartWorkout = () => {
+    navigate('/workout');
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <div className="min-h-screen bg-slate-900">
@@ -22,7 +29,7 @@ export default function HomeView() {
           <div className="flex items-center gap-4">
             <span className="text-slate-300">{user?.username}</span>
             <button
-              onClick={logout}
+              onClick={handleLogout}
               className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium"
             >
               Logout
@@ -65,8 +72,11 @@ export default function HomeView() {
               })}
             </div>
 
-            <button className="fixed bottom-6 left-1/2 transform -translate-x-1/2 w-11/12 max-w-sm py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg text-lg">
-              Start Workout
+            <button
+              onClick={handleStartWorkout}
+              className="fixed bottom-6 left-1/2 transform -translate-x-1/2 w-11/12 max-w-sm py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-lg text-lg"
+            >
+              💪 Start Workout
             </button>
           </>
         )}
