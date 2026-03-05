@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useWorkoutStore } from '../stores/workoutStore';
+import { useNavigate } from 'react-router-dom';
 import SetInput from '../components/SetInput';
 import TimerInput from '../components/TimerInput';
 import RestTimer from '../components/RestTimer';
 import DropSetInstructions from '../components/DropSetInstructions';
+import WarmupChecklist from '../components/WarmupChecklist';
 import ProgressionModal from '../components/ProgressionModal';
 
 const WORKOUT_STEPS = [
@@ -21,11 +23,13 @@ const REST_TIMES = {
 };
 
 export default function WorkoutView() {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [isResting, setIsResting] = useState(false);
   const [currentWorkout, setCurrentWorkout] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [progressionData, setProgressionData] = useState(null);
+  const [isWarmupComplete, setIsWarmupComplete] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const exercises = useWorkoutStore(state => state.exercises);
@@ -82,6 +86,15 @@ export default function WorkoutView() {
     };
   };
 
+  const getNextExerciseLabel = (nextStep) => {
+    if (nextStep.type === 'drop') {
+      const shortName = nextStep.exercise.replace('-ups', '');
+      return `DROP-SET ${shortName}`;
+    }
+    const progInfo = getProgressionInfo(nextStep.exercise, nextStep.setNumber, false);
+    return progInfo?.currentProgression?.name || nextStep.exercise;
+  };
+
   const handleSetComplete = async (value) => {
     setIsLoading(true);
     try {
@@ -129,7 +142,19 @@ export default function WorkoutView() {
 
   const handleModalClose = () => {
     setShowModal(false);
-    window.location.href = '/fitness/';
+    navigate('/');
+  };
+
+  const handleExitWorkout = () => {
+    if (window.confirm('Exit workout? Your progress will not be saved.')) {
+      navigate('/');
+    }
+  };
+
+  const handleWarmupComplete = async (warmupData) => {
+    setIsWarmupComplete(true);
+    // Optional: save warmup to backend
+    // await updateWarmup(currentWorkout.id, warmupData);
   };
 
   if (isLoading || !isInitialized || exercises.length === 0 || !currentWorkout) {
@@ -140,7 +165,28 @@ export default function WorkoutView() {
     );
   }
 
+  if (!isWarmupComplete) {
+    return (
+      <WarmupChecklist onComplete={handleWarmupComplete} />
+    );
+  }
+
   if (showModal && progressionData) {
+    const hasChanges = progressionData.upgrades?.length > 0 || progressionData.downgrades?.length > 0;
+    
+    if (!hasChanges) {
+      return (
+        <div className="workout-complete">
+          <div className="workout-complete-card">
+            <div className="workout-complete-emoji">🎉</div>
+            <h1 className="workout-complete-title">Workout Complete!</h1>
+            <p className="workout-complete-subtitle">Great effort! You're building strength every day.</p>
+            <button className="workout-complete-btn" onClick={handleModalClose}>Back to Home</button>
+          </div>
+        </div>
+      );
+    }
+    
     return (
       <ProgressionModal
         upgrades={progressionData.upgrades || []}
@@ -158,7 +204,7 @@ export default function WorkoutView() {
     return (
       <RestTimer
         seconds={restTime}
-        nextExercise={nextStepInfo.exercise}
+        nextExercise={getNextExerciseLabel(nextStepInfo)}
         setNumber={nextStepInfo.setNumber}
         onComplete={handleRestComplete}
       />
@@ -183,6 +229,13 @@ export default function WorkoutView() {
   return (
     <div className="workout-main">
       <header className="workout-header">
+        <button 
+          className="btn-exit-workout"
+          onClick={handleExitWorkout}
+          title="Exit workout"
+        >
+          ✕
+        </button>
         <div className="workout-header-content">
           <div className="workout-header-info">
             <p className="workout-step">Step {currentStep + 1} of {WORKOUT_STEPS.length}</p>

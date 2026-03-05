@@ -80,13 +80,13 @@ export default function RestTimer({ seconds, nextExercise, setNumber, onComplete
             onClick={() => setIsRunning(!isRunning)}
             className={isRunning ? 'btn-large btn-stop' : 'btn-large btn-play'}
           >
-            {isRunning ? '⏸ Pause' : '▶ Resume'}
+            {isRunning ? 'Pause' : 'Resume'}
           </button>
           <button
             onClick={onComplete}
             className="btn-large btn-plus"
           >
-            ⏭ Skip
+            Skip
           </button>
         </div>
       </div>

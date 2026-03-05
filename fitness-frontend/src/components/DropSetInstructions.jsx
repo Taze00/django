@@ -20,19 +20,7 @@ export default function DropSetInstructions({ exercise, progressions, onComplete
       <div className="workout-card">
         {/* Header */}
         <div className="drop-set-header" style={{ animation: 'fadeIn 0.5s ease-out' }}>
-          <p className="drop-set-emoji">🔥</p>
-          <h2 className="workout-title" style={{ fontSize: '2.5rem' }}>DROP-SET</h2>
-          <p className="workout-subtitle">Maximum effort until failure</p>
-        </div>
-
-        {/* Warning Card */}
-        <div className="drop-set-warning" style={{ animation: 'slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)' }}>
-          <p className="drop-set-warning-title">
-            <span>⚠️</span> NO REST between drops!
-          </p>
-          <p className="drop-set-warning-text">
-            Go immediately from one to the next until complete exhaustion. Don't hold back!
-          </p>
+          <h2 className="workout-title" style={{ fontSize: '1.8rem' }}>🔥 DROP-SET 🔥</h2>
         </div>
 
         {/* Progression Sequence */}
@@ -62,7 +50,7 @@ export default function DropSetInstructions({ exercise, progressions, onComplete
           onClick={handleComplete}
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Saving...' : '✓ Drop-Set Complete'}
+          {isSubmitting ? 'Saving...' : 'Drop-Set Complete'}
         </button>
       </div>
     </div>

@@ -37,9 +37,6 @@ export default function TimerInput({ setNumber, exerciseName, progressionName, t
       <div className="workout-bg-orb workout-bg-orb-2"></div>
 
       <div className="workout-card">
-        <div className="badge" style={{ animation: 'slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)' }}>
-          Set {setNumber} of 3
-        </div>
 
         <h2 className="workout-title">{exerciseName}</h2>
         <p className="workout-subtitle">{progressionName}</p>
