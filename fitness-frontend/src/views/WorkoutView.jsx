@@ -182,7 +182,7 @@ export default function WorkoutView() {
         {step.type === 'drop' ? (
           <DropSetInstructions
             exercise={progInfo.exercise}
-            progressions={progInfo.nextProgressions.concat(progInfo.currentProgression)}
+            progressions={[progInfo.currentProgression].concat(progInfo.nextProgressions.reverse())}
             onComplete={() => handleSetComplete(0)}
           />
         ) : progInfo.currentProgression.target_type === 'reps' ? (
