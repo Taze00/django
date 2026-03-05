@@ -55,7 +55,6 @@ export default function HomeView() {
         ) : (
           <>
             <div className="week-plan">
-              <h2 className="section-title">This Week</h2>
               <div className="week-grid-inline">
                 {WORKOUT_DAYS.map(day => (
                   <div key={day} className={weekStatus[day] ? 'week-day completed' : 'week-day pending'}>
@@ -73,7 +72,6 @@ export default function HomeView() {
             </div>
 
             <div className="progression-section">
-              <h2 className="section-title">Current Level</h2>
               <div className="progression-grid-compact">
                 <div className="progression-card-compact progression-push">
                   <div className="progression-icon-compact">🚀</div>
@@ -104,7 +102,6 @@ export default function HomeView() {
             </div>
 
             <div className="performance-section">
-              <h2 className="section-title">7-Day Performance</h2>
               <div className="performance-chart">
                 <div className="chart-bars">
                   {WORKOUT_DAYS.concat(REST_DAYS).map((day, idx) => {
