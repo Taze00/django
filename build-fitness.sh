@@ -21,9 +21,9 @@ echo -e "${GREEN}✅ Build successful${NC}"
 echo -e "${YELLOW}📦 Deploying to static/fitness/...${NC}"
 docker compose exec -T django-dev bash -c "rm -rf /code/static/fitness && cp -r /code/fitness-frontend/dist /code/static/fitness"
 
-# Extract hashes
-SCRIPT_HASH=$(docker compose exec -T django-dev bash -c "grep -oP 'src=\"/assets/index-[a-zA-Z0-9]+\.js\"' /code/fitness-frontend/dist/index.html | grep -oP 'index-[a-zA-Z0-9]+\.js'" || echo "")
-CSS_HASH=$(docker compose exec -T django-dev bash -c "grep -oP 'href=\"/assets/index-[a-zA-Z0-9]+\.css\"' /code/fitness-frontend/dist/index.html | grep -oP 'index-[a-zA-Z0-9]+\.css'" || echo "")
+# Extract hashes (handle underscores and dashes in hash)
+SCRIPT_HASH=$(docker compose exec -T django-dev bash -c "grep -oP 'src=\"/assets/index-[a-zA-Z0-9_-]+\.js\"' /code/fitness-frontend/dist/index.html | grep -oP 'index-[a-zA-Z0-9_-]+\.js'" || echo "")
+CSS_HASH=$(docker compose exec -T django-dev bash -c "grep -oP 'href=\"/assets/index-[a-zA-Z0-9_-]+\.css\"' /code/fitness-frontend/dist/index.html | grep -oP 'index-[a-zA-Z0-9_-]+\.css'" || echo "")
 
 if [ -z "$SCRIPT_HASH" ] || [ -z "$CSS_HASH" ]; then
     echo -e "${RED}❌ Could not extract asset hashes!${NC}"
@@ -45,13 +45,13 @@ with open('/code/templates/fitness.html', 'r') as f:
     content = f.read()
 
 content = re.sub(
-    r'<script type=\"module\" src=\"/static/fitness/assets/index-[a-zA-Z0-9]+\.js\"></script>',
+    r'<script type=\"module\" src=\"/static/fitness/assets/index-[a-zA-Z0-9_-]+\.js\"></script>',
     f'<script type=\"module\" src=\"/static/fitness/assets/{script_hash}\"></script>',
     content
 )
 
 content = re.sub(
-    r'<link rel=\"stylesheet\" href=\"/static/fitness/assets/index-[a-zA-Z0-9]+\.css\">',
+    r'<link rel=\"stylesheet\" href=\"/static/fitness/assets/index-[a-zA-Z0-9_-]+\.css\">',
     f'<link rel=\"stylesheet\" href=\"/static/fitness/assets/{css_hash}\">',
     content
 )
