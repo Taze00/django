@@ -206,7 +206,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
                         upgrades.append({
                             'exercise': exercise.name,
                             'is_max_level': True,
-                            'message': f'You've reached the maximum level for {exercise.name}! Keep crushing it! 💪',
+                            'message': f'You have reached the maximum level for {exercise.name}! Keep crushing it!',
                         })
                 else:
                     user_prog.save()
