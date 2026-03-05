@@ -102,6 +102,27 @@ export default function HomeView() {
                 </div>
               </div>
             </div>
+
+            <div className="performance-section">
+              <h2 className="section-title">7-Day Performance</h2>
+              <div className="performance-chart">
+                <div className="chart-bars">
+                  {WORKOUT_DAYS.concat(REST_DAYS).map((day, idx) => {
+                    const height = Math.random() * 100;
+                    const isCompleted = weekStatus[day];
+                    return (
+                      <div key={day} className="chart-bar-wrapper">
+                        <div
+                          className={`chart-bar ${isCompleted ? 'completed' : 'empty'}`}
+                          style={{ height: `${Math.max(20, height)}%` }}
+                        ></div>
+                        <p className="chart-label">{day}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
           </>
         )}
       </div>
