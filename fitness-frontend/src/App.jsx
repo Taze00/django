@@ -26,7 +26,7 @@ function App() {
   }, [isAuthenticated, initialize]);
 
   return (
-    <Router>
+    <Router basename="/fitness">
       <Routes>
         <Route path="/login" element={<LoginView />} />
         <Route
