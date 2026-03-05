@@ -4,7 +4,6 @@ import { useWorkoutStore } from '../stores/workoutStore';
 
 export default function HomeView() {
   const navigate = useNavigate();
-  const user = useAuthStore(state => state.user);
   const logout = useAuthStore(state => state.logout);
   const exercises = useWorkoutStore(state => state.exercises);
   const userProgressions = useWorkoutStore(state => state.userProgressions);
@@ -21,10 +20,7 @@ export default function HomeView() {
       <div className="header">
         <div className="header-content">
           <h1 className="header-title">Calisthenics</h1>
-          <div className="header-user">
-            <span className="header-username">{user?.username}</span>
-            <button className="btn-logout" onClick={handleLogout} title="Logout">🚪</button>
-          </div>
+          <button className="btn-logout" onClick={handleLogout}>Logout</button>
         </div>
       </div>
 
