@@ -102,6 +102,7 @@ export default function HomeView() {
             </div>
 
             <div className="performance-section">
+              <h2 className="section-title">Performance Chart</h2>
               <div className="performance-chart">
                 <div className="chart-bars">
                   {WORKOUT_DAYS.concat(REST_DAYS).map((day, idx) => {
