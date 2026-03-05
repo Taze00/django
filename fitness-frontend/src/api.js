@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE = 'http://localhost:8000/api';
+// Use relative path so it works on any domain
+const API_BASE = '/api/fitness';
 
 const api = axios.create({
   baseURL: API_BASE,
@@ -25,7 +26,7 @@ api.interceptors.response.use(
       const refresh = localStorage.getItem('refresh_token');
       if (refresh) {
         try {
-          const res = await axios.post(`${API_BASE}/token/refresh/`, { refresh });
+          const res = await axios.post(`/api/token/refresh/`, { refresh });
           localStorage.setItem('access_token', res.data.access);
           api.defaults.headers.Authorization = `Bearer ${res.data.access}`;
           return api(original);
