@@ -16,8 +16,8 @@ export const useWorkoutStore = create((set, get) => ({
     set({ isLoading: true });
     try {
       const [exRes, progRes] = await Promise.all([
-        api.get('/fitness/exercises/'),
-        api.get('/fitness/user-progressions/'),
+        api.get('/exercises/'),
+        api.get('/user-progressions/'),
       ]);
       
       const progressionsMap = {};
@@ -40,7 +40,7 @@ export const useWorkoutStore = create((set, get) => ({
   getCurrentWorkout: async () => {
     set({ isLoading: true });
     try {
-      const res = await api.get('/fitness/workouts/current/');
+      const res = await api.get('/workouts/current/');
       set({ currentWorkout: res.data, isLoading: false });
       return res.data;
     } catch (error) {
@@ -51,7 +51,7 @@ export const useWorkoutStore = create((set, get) => ({
 
   addSet: async (workoutId, exerciseId, progressionId, setNumber, reps, seconds, restTime, isDropSet) => {
     try {
-      const res = await api.post(`/fitness/workouts/${workoutId}/add_set/`, {
+      const res = await api.post(`/workouts/${workoutId}/add_set/`, {
         exercise: exerciseId,
         progression: progressionId,
         set_number: setNumber,
@@ -68,7 +68,7 @@ export const useWorkoutStore = create((set, get) => ({
 
   completeWorkout: async (workoutId) => {
     try {
-      const res = await api.post(`/fitness/workouts/${workoutId}/complete/`);
+      const res = await api.post(`/workouts/${workoutId}/complete/`);
       return res.data;
     } catch (error) {
       throw error;
@@ -77,7 +77,7 @@ export const useWorkoutStore = create((set, get) => ({
 
   getLastPerformance: async () => {
     try {
-      const res = await api.get('/fitness/last_performance/');
+      const res = await api.get('/last_performance/');
       set({ lastPerformance: res.data });
       return res.data;
     } catch (error) {
