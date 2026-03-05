@@ -179,26 +179,35 @@ class WorkoutViewSet(viewsets.ModelViewSet):
                 user_prog.sessions_at_target += 1
 
                 if user_prog.sessions_at_target >= user_prog.current_progression.sessions_required:
-                    next_progression = Progression.objects.filter(
-                        exercise=exercise,
-                        level=user_prog.current_progression.level + 1
-                    ).first()
+                    # Only upgrade if not at max level (7)
+                    if user_prog.current_progression.level < 7:
+                        next_progression = Progression.objects.filter(
+                            exercise=exercise,
+                            level=user_prog.current_progression.level + 1
+                        ).first()
 
-                    if next_progression:
-                        user_prog.current_progression = next_progression
-                        user_prog.sessions_at_target = 0
-                        user_prog.custom_target = None
-                        user_prog.is_first_session = True
+                        if next_progression:
+                            user_prog.current_progression = next_progression
+                            user_prog.sessions_at_target = 0
+                            user_prog.custom_target = None
+                            user_prog.is_first_session = True
+                            user_prog.save()
+
+                            upgrades.append({
+                                'exercise': exercise.name,
+                                'from_level': user_prog.current_progression.level - 1,
+                                'to_level': next_progression.level,
+                                'to_progression': next_progression.name,
+                            })
+                    else:
+                        # Already at max level
+                        user_prog.sessions_at_target = 0  # Reset but stay at level
                         user_prog.save()
-
                         upgrades.append({
                             'exercise': exercise.name,
-                            'from_level': user_prog.current_progression.level - 1,
-                            'to_level': next_progression.level,
-                            'to_progression': next_progression.name,
+                            'is_max_level': True,
+                            'message': f'You've reached the maximum level for {exercise.name}! Keep crushing it! 💪',
                         })
-                    else:
-                        user_prog.save()
                 else:
                     user_prog.save()
             else:

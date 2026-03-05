@@ -42,7 +42,18 @@ export default function ProgressionModal({ upgrades, downgrades, onClose }) {
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center">
       <div className="bg-slate-800 rounded-lg p-8 max-w-md w-full mx-4 text-center space-y-6 border border-slate-700">
-        {currentItem.type === 'upgrade' ? (
+        {currentItem.is_max_level ? (
+          <>
+            <div className="text-6xl">👑</div>
+            <h2 className="text-2xl font-bold text-yellow-400">MASTERED!</h2>
+            <p className="text-slate-100 text-lg">
+              You've reached the peak with <span className="font-bold">{currentItem.exercise}</span>!
+            </p>
+            <p className="text-emerald-400 font-semibold text-base">
+              {currentItem.message}
+            </p>
+          </>
+        ) : currentItem.type === 'upgrade' ? (
           <>
             <div className="text-6xl">🎉</div>
             <h2 className="text-2xl font-bold text-emerald-400">LEVEL UP!</h2>
@@ -60,15 +71,17 @@ export default function ProgressionModal({ upgrades, downgrades, onClose }) {
           </>
         )}
 
-        <div className="bg-slate-700/50 rounded-lg p-4">
-          <p className="text-slate-300">
-            <span className="text-slate-400">Next:</span>
-            <br />
-            <span className="text-lg font-bold text-slate-100">
-              {currentItem.to_progression}
-            </span>
-          </p>
-        </div>
+        {!currentItem.is_max_level && (
+          <div className="bg-slate-700/50 rounded-lg p-4">
+            <p className="text-slate-300">
+              <span className="text-slate-400">Next:</span>
+              <br />
+              <span className="text-lg font-bold text-slate-100">
+                {currentItem.to_progression}
+              </span>
+            </p>
+          </div>
+        )}
 
         <button
           onClick={handleNext}
