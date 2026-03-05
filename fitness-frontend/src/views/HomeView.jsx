@@ -56,7 +56,7 @@ export default function HomeView() {
           <>
             <div className="week-plan">
               <h2 className="section-title">This Week</h2>
-              <div className="week-grid-scroll">
+              <div className="week-grid">
                 {WORKOUT_DAYS.map(day => (
                   <div key={day} className={weekStatus[day] ? 'week-day completed' : 'week-day pending'}>
                     <p className="week-day-name">{day}</p>
@@ -76,10 +76,13 @@ export default function HomeView() {
               <h2 className="section-title">Current Level</h2>
               <div className="progression-grid-compact">
                 <div className="progression-card-compact progression-push">
-                  <div className="progression-icon-compact">💪</div>
+                  <div className="progression-icon-compact">⬆️</div>
                   <p className="progression-title-compact">Push</p>
                   {pushProg ? (
-                    <p className="progression-name-compact">{pushProg.name}</p>
+                    <>
+                      <p className="progression-name-compact">{pushProg.name}</p>
+                      <p className="progression-level-number">Level {pushProg.level}</p>
+                    </>
                   ) : (
                     <p className="progression-name-compact">Loading...</p>
                   )}
@@ -89,7 +92,10 @@ export default function HomeView() {
                   <div className="progression-icon-compact">🔥</div>
                   <p className="progression-title-compact">Pull</p>
                   {pullProg ? (
-                    <p className="progression-name-compact">{pullProg.name}</p>
+                    <>
+                      <p className="progression-name-compact">{pullProg.name}</p>
+                      <p className="progression-level-number">Level {pullProg.level}</p>
+                    </>
                   ) : (
                     <p className="progression-name-compact">Loading...</p>
                   )}

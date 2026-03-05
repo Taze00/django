@@ -1111,11 +1111,15 @@ body {
 
 .week-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 12px;
-  margin-top: 20px;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-top: 16px;
 }
 
+.week-grid .week-day {
+  min-width: 0;
+  padding: 12px 6px;
+}
 .week-day {
   background: rgba(51, 65, 85, 0.3);
   border: 1px solid rgba(71, 85, 99, 0.3);
@@ -1250,22 +1254,7 @@ body {
   color: #64748b;
 }
 
-/* Mobile-optimized week grid - horizontal scroll */
-.week-grid-scroll {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  padding: 12px 0;
-  margin-top: 16px;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-}
 
-.week-grid-scroll .week-day {
-  flex: 0 0 13.5%;
-  min-width: 50px;
-  padding: 12px 8px;
-}
 
 /* Compact progression cards */
 .progression-grid-compact {
@@ -1354,4 +1343,13 @@ body {
   .progression-name-compact {
     font-size: 13px;
   }
+}
+
+.progression-level-number {
+  font-size: 11px;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
 }
