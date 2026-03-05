@@ -87,7 +87,7 @@ export default function TimerInput({ setNumber, exerciseName, progressionName, t
           onClick={handleSubmit}
           disabled={isSubmitting || seconds === 0}
         >
-          {isSubmitting ? 'Saving...' : 'Complete Set →'}
+          {isSubmitting ? 'Saving...' : 'Complete Set'}
         </button>
       </div>
     </div>

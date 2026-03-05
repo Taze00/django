@@ -62,7 +62,7 @@ export default function DropSetInstructions({ exercise, progressions, onComplete
           onClick={handleComplete}
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Saving...' : '✓ Drop-Set Complete →'}
+          {isSubmitting ? 'Saving...' : '✓ Drop-Set Complete'}
         </button>
       </div>
     </div>

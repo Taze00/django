@@ -65,7 +65,7 @@ export default function LoginView() {
           {error && <div className="error-message">⚠️ {error}</div>}
 
           <button type="submit" className="btn-submit" disabled={isLoading}>
-            {isLoading ? 'Logging in...' : 'Enter →'}
+            {isLoading ? 'Logging in...' : 'Enter'}
           </button>
         </form>
 

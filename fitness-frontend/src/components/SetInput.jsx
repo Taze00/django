@@ -63,7 +63,7 @@ export default function SetInput({ setNumber, exerciseName, progressionName, las
           onClick={handleSubmit}
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Saving...' : 'Complete Set →'}
+          {isSubmitting ? 'Saving...' : 'Complete Set'}
         </button>
       </div>
     </div>
