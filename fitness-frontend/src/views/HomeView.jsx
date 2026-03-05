@@ -76,7 +76,7 @@ export default function HomeView() {
               <h2 className="section-title">Current Level</h2>
               <div className="progression-grid-compact">
                 <div className="progression-card-compact progression-push">
-                  <div className="progression-icon-compact">📍</div>
+                  <div className="progression-icon-compact">🚀</div>
                   <p className="progression-title-compact">Push</p>
                   {pushProg ? (
                     <>
