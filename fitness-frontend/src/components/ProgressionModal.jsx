@@ -48,7 +48,7 @@ export default function ProgressionModal({ upgrades, downgrades, onClose }) {
             <h1 className="progression-complete-title">LEVEL UP!</h1>
             <p className="progression-complete-subtitle">You've mastered {currentItem.exercise}!</p>
             <div className="progression-info">
-              <p className="progression-label">⬆️ Next Level</p>
+              <p className="progression-label">Next Level</p>
               <p className="progression-value">{currentItem.to_progression}</p>
             </div>
           </>
@@ -58,7 +58,7 @@ export default function ProgressionModal({ upgrades, downgrades, onClose }) {
             <h1 className="progression-complete-title">Keep Building</h1>
             <p className="progression-complete-subtitle">Let's master {currentItem.exercise} more!</p>
             <div className="progression-info">
-              <p className="progression-label">⬇️ Current Level</p>
+              <p className="progression-label">Current Level</p>
               <p className="progression-value">{currentItem.to_progression}</p>
             </div>
           </>
