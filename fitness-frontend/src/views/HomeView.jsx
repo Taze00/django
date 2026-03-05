@@ -2,7 +2,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { useWorkoutStore } from '../stores/workoutStore';
 
-const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+const WORKOUT_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+const REST_DAYS = ['Sat', 'Sun'];
 
 export default function HomeView() {
   const navigate = useNavigate();
@@ -56,10 +57,16 @@ export default function HomeView() {
             <div className="week-plan">
               <h2 className="section-title">This Week</h2>
               <div className="week-grid">
-                {DAYS.map(day => (
+                {WORKOUT_DAYS.map(day => (
                   <div key={day} className={weekStatus[day] ? 'week-day completed' : 'week-day pending'}>
                     <p className="week-day-name">{day}</p>
                     <p className="week-day-status">{weekStatus[day] ? '✓' : '○'}</p>
+                  </div>
+                ))}
+                {REST_DAYS.map(day => (
+                  <div key={day} className="week-day rest-day">
+                    <p className="week-day-name">{day}</p>
+                    <p className="week-day-status">🌙</p>
                   </div>
                 ))}
               </div>
