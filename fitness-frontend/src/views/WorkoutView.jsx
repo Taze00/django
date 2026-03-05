@@ -16,8 +16,8 @@ const WORKOUT_STEPS = [
 ];
 
 const REST_TIMES = {
-  normal: 180, // 3 min
-  afterDrop: 300, // 5 min
+  normal: 180,
+  afterDrop: 300,
 };
 
 export default function WorkoutView() {
@@ -36,7 +36,6 @@ export default function WorkoutView() {
   const completeWorkout = useWorkoutStore(state => state.completeWorkout);
 
   useEffect(() => {
-    // Wait for exercises to be loaded before initializing workout
     if (isInitialized && exercises.length > 0) {
       initializeWorkout();
     }
@@ -61,64 +60,42 @@ export default function WorkoutView() {
     const exercise = getExerciseById(exerciseName);
     if (!exercise) {
       console.warn(`Exercise not found: ${exerciseName}`);
-      console.log('Available exercises:', exercises.map(e => e.name));
       return null;
     }
 
     const userProg = userProgressions[String(exercise.id)];
     if (!userProg) {
-      console.warn(`User progression not found for exercise: ${exerciseName} (id=${exercise.id})`);
-      console.log('Available progressions:', Object.keys(userProgressions));
-      console.log('Full userProgressions:', userProgressions);
+      console.warn(`User progression not found for exercise: ${exerciseName}`);
       return null;
     }
 
     if (!userProg.current_progression) {
       console.warn(`Current progression is null for exercise: ${exerciseName}`);
-      console.log('userProg object:', userProg);
       return null;
     }
 
-    const progInfo = {
+    return {
       exercise,
       userProg,
       currentProgression: userProg.current_progression,
       nextProgressions: exercise.progressions.filter(p => p.level < userProg.current_progression.level),
     };
-    
-    console.log(`getProgressionInfo for ${exerciseName}:`, {
-      exercise: exercise.name,
-      currentProgression: userProg.current_progression.name,
-      level: userProg.current_progression.level,
-      targetType: userProg.current_progression.target_type,
-      target: userProg.current_progression.target_value,
-    });
-    
-    return progInfo;
   };
 
   const handleSetComplete = async (value) => {
-    if (!currentWorkout) return;
-
     setIsLoading(true);
     try {
       const step = WORKOUT_STEPS[currentStep];
-      console.log(`Completing Set: Step ${currentStep}, Exercise: ${step.exercise}, Type: ${step.type}`);
-      
       const progInfo = getProgressionInfo(step.exercise, step.setNumber, step.type === 'drop');
-
+      
       if (!progInfo) {
-        console.error('Could not get progression info for step', step);
-        setIsLoading(false);
+        console.error('Cannot save set: progInfo is null');
         return;
       }
 
       const reps = progInfo.currentProgression.target_type === 'reps' ? value : null;
       const seconds = progInfo.currentProgression.target_type === 'time' ? value : null;
-
       const restTime = step.type === 'drop' ? REST_TIMES.afterDrop : REST_TIMES.normal;
-
-      console.log(`Saving set: reps=${reps}, seconds=${seconds}, drop=${step.type === 'drop'}`);
 
       await addSet(
         currentWorkout.id,
@@ -132,15 +109,10 @@ export default function WorkoutView() {
       );
 
       if (currentStep === WORKOUT_STEPS.length - 1) {
-        // Last step - complete workout
-        console.log('Completing workout...');
         const result = await completeWorkout(currentWorkout.id);
-        console.log('Workout result:', result);
         setProgressionData(result);
         setShowModal(true);
       } else {
-        // Show rest timer
-        console.log(`Rest timer: ${restTime}s`);
         setIsResting(true);
       }
     } catch (error) {
@@ -157,14 +129,13 @@ export default function WorkoutView() {
 
   const handleModalClose = () => {
     setShowModal(false);
-    // Navigate back to home
     window.location.href = '/fitness/';
   };
 
   if (isLoading || !isInitialized || exercises.length === 0 || !currentWorkout) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-900">
-        <p className="text-slate-300">Loading workout...</p>
+      <div className="workout-loading">
+        <p>Loading workout...</p>
       </div>
     );
   }
@@ -179,7 +150,6 @@ export default function WorkoutView() {
     );
   }
 
-  // Only show rest timer if not the last step
   if (isResting && currentStep < WORKOUT_STEPS.length - 1) {
     const currentStepInfo = WORKOUT_STEPS[currentStep];
     const nextStepInfo = WORKOUT_STEPS[currentStep + 1];
@@ -200,40 +170,36 @@ export default function WorkoutView() {
 
   if (!progInfo) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-900">
-        <div className="text-center">
-          <p className="text-red-400 mb-4">Error loading exercise data</p>
-          <p className="text-slate-400 text-sm">Exercise: {step.exercise}</p>
-          <p className="text-slate-400 text-sm">Exercises loaded: {exercises.length}</p>
-          <p className="text-slate-400 text-sm">User progressions: {Object.keys(userProgressions).length}</p>
-          <p className="text-slate-400 text-sm mt-4">Check console for details</p>
+      <div className="workout-error">
+        <div className="error-content">
+          <p className="error-title">Error loading exercise data</p>
+          <p className="error-detail">Exercise: {step.exercise}</p>
+          <p className="error-detail">Check console for details</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-900 pb-40">
-      {/* Header */}
-      <header className="bg-slate-800 border-b border-slate-700 sticky top-0 z-40 p-4">
-        <div className="max-w-2xl mx-auto flex justify-between items-center">
-          <div>
-            <p className="text-slate-400 text-sm">Step {currentStep + 1} of {WORKOUT_STEPS.length}</p>
-            <p className="text-slate-100 font-semibold">
+    <div className="workout-main">
+      <header className="workout-header">
+        <div className="workout-header-content">
+          <div className="workout-header-info">
+            <p className="workout-step">Step {currentStep + 1} of {WORKOUT_STEPS.length}</p>
+            <p className="workout-current">
               {step.type === 'drop' ? '🔥 ' : ''}{step.exercise} Set {step.setNumber}
             </p>
           </div>
-          <div className="w-32 h-1 bg-slate-700 rounded-full overflow-hidden">
+          <div className="workout-progress-bar">
             <div
-              className="h-full bg-emerald-500 transition-all"
+              className="workout-progress-fill"
               style={{ width: `${((currentStep + 1) / WORKOUT_STEPS.length) * 100}%` }}
             />
           </div>
         </div>
       </header>
 
-      {/* Content */}
-      <main className="max-w-2xl mx-auto p-4 mt-6">
+      <main className="workout-content">
         {step.type === 'drop' ? (
           <DropSetInstructions
             exercise={progInfo.exercise}
