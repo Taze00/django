@@ -56,7 +56,7 @@ export default function HomeView() {
           <>
             <div className="week-plan">
               <h2 className="section-title">This Week</h2>
-              <div className="week-grid">
+              <div className="week-grid-scroll">
                 {WORKOUT_DAYS.map(day => (
                   <div key={day} className={weekStatus[day] ? 'week-day completed' : 'week-day pending'}>
                     <p className="week-day-name">{day}</p>
@@ -73,31 +73,25 @@ export default function HomeView() {
             </div>
 
             <div className="progression-section">
-              <h2 className="section-title">Current Progression</h2>
-              <div className="progression-grid">
-                <div className="progression-card progression-push">
-                  <div className="progression-icon">💪</div>
-                  <h3 className="progression-title">Push-ups</h3>
+              <h2 className="section-title">Current Level</h2>
+              <div className="progression-grid-compact">
+                <div className="progression-card-compact progression-push">
+                  <div className="progression-icon-compact">💪</div>
+                  <p className="progression-title-compact">Push</p>
                   {pushProg ? (
-                    <>
-                      <p className="progression-name">{pushProg.name}</p>
-                      <p className="progression-target">Target: {pushProg.target_value}{pushProg.target_type === 'reps' ? ' reps' : 's'}</p>
-                    </>
+                    <p className="progression-name-compact">{pushProg.name}</p>
                   ) : (
-                    <p className="progression-target">Loading...</p>
+                    <p className="progression-name-compact">Loading...</p>
                   )}
                 </div>
 
-                <div className="progression-card progression-pull">
-                  <div className="progression-icon">🔥</div>
-                  <h3 className="progression-title">Pull-ups</h3>
+                <div className="progression-card-compact progression-pull">
+                  <div className="progression-icon-compact">🔥</div>
+                  <p className="progression-title-compact">Pull</p>
                   {pullProg ? (
-                    <>
-                      <p className="progression-name">{pullProg.name}</p>
-                      <p className="progression-target">Target: {pullProg.target_value}{pullProg.target_type === 'reps' ? ' reps' : 's'}</p>
-                    </>
+                    <p className="progression-name-compact">{pullProg.name}</p>
                   ) : (
-                    <p className="progression-target">Loading...</p>
+                    <p className="progression-name-compact">Loading...</p>
                   )}
                 </div>
               </div>

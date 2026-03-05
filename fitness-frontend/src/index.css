@@ -1249,3 +1249,109 @@ body {
 .week-day.rest-day .week-day-status {
   color: #64748b;
 }
+
+/* Mobile-optimized week grid - horizontal scroll */
+.week-grid-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 12px 0;
+  margin-top: 16px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.week-grid-scroll .week-day {
+  flex: 0 0 13.5%;
+  min-width: 50px;
+  padding: 12px 8px;
+}
+
+/* Compact progression cards */
+.progression-grid-compact {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.progression-card-compact {
+  background: rgba(51, 65, 85, 0.2);
+  border: 1px solid rgba(71, 85, 99, 0.3);
+  border-radius: 16px;
+  padding: 20px 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+  animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.progression-card-compact:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.progression-card-compact:hover {
+  transform: translateY(-2px);
+  border-color: rgba(71, 85, 99, 0.5);
+}
+
+.progression-icon-compact {
+  font-size: 36px;
+  margin-bottom: 8px;
+  animation: bounce 1s ease-in-out infinite;
+}
+
+.progression-title-compact {
+  font-size: 13px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+.progression-name-compact {
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.progression-push .progression-name-compact {
+  color: #34d399;
+}
+
+.progression-pull .progression-name-compact {
+  color: #60a5fa;
+}
+
+@media (max-width: 640px) {
+  .week-grid-scroll .week-day {
+    min-width: 48px;
+    padding: 10px 6px;
+  }
+
+  .week-day-name {
+    font-size: 11px;
+  }
+
+  .week-day-status {
+    font-size: 20px;
+  }
+
+  .progression-card-compact {
+    padding: 16px 12px;
+  }
+
+  .progression-icon-compact {
+    font-size: 32px;
+    margin-bottom: 6px;
+  }
+
+  .progression-title-compact {
+    font-size: 12px;
+    margin-bottom: 4px;
+  }
+
+  .progression-name-compact {
+    font-size: 13px;
+  }
+}
