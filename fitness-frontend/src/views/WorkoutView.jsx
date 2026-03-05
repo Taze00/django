@@ -158,7 +158,8 @@ export default function WorkoutView() {
     );
   }
 
-  if (isResting && currentStep < WORKOUT_STEPS.length) {
+  // Only show rest timer if not the last step
+  if (isResting && currentStep < WORKOUT_STEPS.length - 1) {
     const currentStepInfo = WORKOUT_STEPS[currentStep];
     const nextStepInfo = WORKOUT_STEPS[currentStep + 1];
     const restTime = currentStepInfo.type === 'drop' ? REST_TIMES.afterDrop : REST_TIMES.normal;
