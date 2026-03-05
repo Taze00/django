@@ -305,10 +305,17 @@ body {
 }
 
 .section-title {
-  font-size: 36px;
-  font-weight: 900;
+  font-size: 24px;
+  font-weight: 700;
   color: #f1f5f9;
-  margin-bottom: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: linear-gradient(90deg, #34d399 0%, #3b82f6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .section-subtitle {
