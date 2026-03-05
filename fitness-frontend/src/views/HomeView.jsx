@@ -21,13 +21,13 @@ export default function HomeView() {
   };
 
   const getExerciseEmoji = (name) => {
-    return name.includes('Push') ? '📍' : '🔝';
+    return name.includes('Push') ? '💪' : '🔥';
   };
 
   const getProgressionColor = (index) => {
     const colors = [
-      'from-slate-700 to-slate-800',
-      'from-blue-700/40 to-blue-800/40',
+      'from-blue-600/25 to-blue-700/15',
+      'from-emerald-600/25 to-emerald-700/15',
     ];
     return colors[index % colors.length];
   };
@@ -88,13 +88,13 @@ export default function HomeView() {
                 return (
                   <div
                     key={exercise.id}
-                    className={`group bg-gradient-to-br ${getProgressionColor(idx)} border border-slate-600/30 rounded-2xl p-6 backdrop-blur-sm hover:border-slate-500/50 transition-all duration-300 hover:shadow-lg cursor-pointer transform hover:scale-105`}
+                    className={`group bg-gradient-to-br ${getProgressionColor(idx)} border border-slate-600/50 rounded-2xl p-6 backdrop-blur-sm hover:border-slate-500/70 transition-all duration-300 hover:shadow-lg cursor-pointer transform hover:scale-105`}
                     style={{ animationDelay: `${0.2 + idx * 0.1}s` }}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
-                          <span className="text-3xl">{getExerciseEmoji(exercise.name)}</span>
+                          <span className="text-4xl">{getExerciseEmoji(exercise.name)}</span>
                           <div>
                             <h3 className="text-lg font-bold text-slate-100">
                               {exercise.name}
@@ -102,7 +102,7 @@ export default function HomeView() {
                           </div>
                         </div>
                         {prog ? (
-                          <div className="ml-12">
+                          <div className="ml-16">
                             <p className="text-slate-400 text-sm mb-1">Current Level</p>
                             <p className="text-emerald-400 font-bold text-lg">
                               {prog.current_progression.name}
@@ -113,7 +113,7 @@ export default function HomeView() {
                             </p>
                           </div>
                         ) : (
-                          <p className="text-slate-500 text-sm ml-12">Loading...</p>
+                          <p className="text-slate-500 text-sm ml-16">Loading...</p>
                         )}
                       </div>
                       <div className="text-2xl opacity-0 group-hover:opacity-100 transition-opacity">
