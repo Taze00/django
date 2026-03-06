@@ -2818,8 +2818,8 @@ body {
   right: 16px;
   width: 44px;
   height: 44px;
-  background: rgba(51, 65, 85, 0.4);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: transparent;
+  border: none;
   color: #f1f5f9;
   border-radius: 8px;
   font-size: 24px;
@@ -2842,26 +2842,63 @@ body {
   border-top: 1px solid rgba(148, 163, 184, 0.1);
 }
 
-.training-days-recommendation {
+.training-days-count {
   color: #cbd5e1;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.training-days-recommendation {
+  color: #94a3b8;
   font-size: 13px;
   margin-top: 12px;
-  line-height: 1.5;
-  font-weight: 500;
+  line-height: 1.6;
+  font-weight: 400;
+  text-align: center;
+}
+
+/* Move recommendation below save button */
+.training-days-recommendation-bottom {
+  color: #94a3b8;
+  font-size: 12px;
+  margin-top: 16px;
+  line-height: 1.6;
+  font-weight: 400;
+  text-align: center;
 }
 
 /* Week grid inline styling for training days view */
 .training-days-card .week-grid-inline {
   margin-top: 20px;
   margin-bottom: 0;
+  gap: 10px;
 }
 
 .training-days-card .week-day {
-  background: rgba(51, 65, 85, 0.4);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(51, 65, 85, 0.6);
+  border: 2px solid rgba(148, 163, 184, 0.3);
   border-radius: 12px;
-  padding: 12px 8px;
+  padding: 14px 8px;
   transition: all 0.2s ease;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80px;
+}
+
+.training-days-card .week-day-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #cbd5e1;
+  margin-bottom: 6px;
+}
+
+.training-days-card .week-day-status {
+  font-size: 28px;
+  color: #94a3b8;
 }
 
 .training-days-card .week-day.active {
@@ -2870,8 +2907,13 @@ body {
   box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
 }
 
+.training-days-card .week-day.active .week-day-name,
+.training-days-card .week-day.active .week-day-status {
+  color: white;
+}
+
 .training-days-card .week-day.inactive {
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
 .training-days-card .week-day:active {

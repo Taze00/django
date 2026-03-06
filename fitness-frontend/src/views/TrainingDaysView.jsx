@@ -80,9 +80,6 @@ export default function TrainingDaysView() {
             <p className="training-days-count">
               {selectedDays.length} day{selectedDays.length !== 1 ? 's' : ''} selected
             </p>
-            <p className="training-days-recommendation">
-              💡 Recommended: 4-5 days per week for optimal recovery and progress
-            </p>
           </div>
         </div>
 
@@ -93,6 +90,10 @@ export default function TrainingDaysView() {
         >
           {saving ? 'Saving...' : 'Save Changes'}
         </button>
+
+        <p className="training-days-recommendation-bottom">
+          💡 Recommended: 4-5 days per week for optimal recovery and progress
+        </p>
       </div>
     </div>
   );
