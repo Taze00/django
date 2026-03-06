@@ -31,7 +31,7 @@ export default function LoginView() {
       <div className="login-bg-orb login-bg-orb-2"></div>
 
       <div className="login-card">
-        <div className="login-logo">💪</div>
+        <img src="/static/fitness/favicon.png" alt="Logo" className="login-logo-img" />
         <h1 className="login-title">Calisthenics</h1>
         <p className="login-subtitle">Master your bodyweight</p>
 
