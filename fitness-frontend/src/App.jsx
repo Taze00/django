@@ -9,6 +9,7 @@ import WorkoutView from './views/WorkoutView';
 import ExercisesView from './views/ExercisesView';
 import StatisticsView from './views/StatisticsView';
 import ProfileView from './views/ProfileView';
+import TrainingDaysView from './views/TrainingDaysView';
 
 function PrivateRoute({ children }) {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
@@ -92,6 +93,16 @@ function App() {
             <PrivateRoute>
               <PrivateLayout>
                 <ProfileView />
+              </PrivateLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/training-days"
+          element={
+            <PrivateRoute>
+              <PrivateLayout>
+                <TrainingDaysView />
               </PrivateLayout>
             </PrivateRoute>
           }

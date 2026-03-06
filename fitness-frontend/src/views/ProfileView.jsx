@@ -9,14 +9,11 @@ export default function ProfileView() {
   const user = useAuthStore(state => state.user);
   const logout = useAuthStore(state => state.logout);
   const workouts = useWorkoutStore(state => state.workouts);
-  const trainingDays = useWorkoutStore(state => state.trainingDays);
   const getCurrentWorkout = useWorkoutStore(state => state.getCurrentWorkout);
   const resetWorkout = useWorkoutStore(state => state.resetWorkout);
-  const updateTrainingDays = useWorkoutStore(state => state.updateTrainingDays);
   const [uploading, setUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState(user?.profile_picture || null);
   const [resetting, setResetting] = useState(false);
-  const [savingDays, setSavingDays] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -78,19 +75,6 @@ export default function ProfileView() {
     }
   };
 
-  // Calculate stats
-  const totalWorkouts = workouts.length;
-  const totalPushReps = workouts.reduce((sum, w) => {
-    return sum + (w.sets?.reduce((setSum, s) => {
-      return setSum + (s.exercise_name === 'Push-ups' && s.reps ? s.reps : 0);
-    }, 0) || 0);
-  }, 0);
-  const totalPullReps = workouts.reduce((sum, w) => {
-    return sum + (w.sets?.reduce((setSum, s) => {
-      return setSum + (s.exercise_name === 'Pull-ups' && s.reps ? s.reps : 0);
-    }, 0) || 0);
-  }, 0);
-
   const handleResetWorkout = async () => {
     if (!window.confirm('Reset today\'s workout? All sets will be deleted.')) return;
 
@@ -103,20 +87,6 @@ export default function ProfileView() {
       alert('Failed to reset workout');
     } finally {
       setResetting(false);
-    }
-  };
-
-  const handleToggleDay = async (day) => {
-    setSavingDays(true);
-    try {
-      const newDays = trainingDays.includes(day)
-        ? trainingDays.filter(d => d !== day)
-        : [...trainingDays, day].sort((a, b) => a - b);
-      await updateTrainingDays(newDays);
-    } catch (error) {
-      alert('Failed to update training days');
-    } finally {
-      setSavingDays(false);
     }
   };
 
@@ -168,29 +138,16 @@ export default function ProfileView() {
         <div className="profile-section">
           <h3 className="profile-section-title">Settings</h3>
 
-          <div className="profile-setting-item">
+          <button
+            className="profile-setting-nav-btn"
+            onClick={() => navigate('/training-days')}
+          >
             <div>
               <p className="profile-setting-label">Training Days</p>
               <p className="profile-setting-desc">Choose which days to train</p>
             </div>
-            <div className="weekday-grid">
-              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, idx) => {
-                const dayNum = idx + 1;
-                const isActive = trainingDays.includes(dayNum);
-                return (
-                  <button
-                    key={dayNum}
-                    className={`weekday-btn ${isActive ? 'active' : ''}`}
-                    onClick={() => handleToggleDay(dayNum)}
-                    disabled={savingDays}
-                    title={`${isActive ? 'Remove' : 'Add'} ${day}`}
-                  >
-                    {day}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
+            <span className="profile-setting-arrow">›</span>
+          </button>
 
           <div className="profile-settings">
             <div className="profile-setting-item">

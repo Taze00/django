@@ -2679,3 +2679,135 @@ body {
 .weekday-btn:active:not(:disabled) {
   transform: scale(0.95);
 }
+
+/* ===================================== */
+/* TRAINING DAYS VIEW */
+/* ===================================== */
+
+.header-back-btn {
+  position: absolute;
+  left: 16px;
+  width: 44px;
+  height: 44px;
+  background: rgba(51, 65, 85, 0.4);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #f1f5f9;
+  border-radius: 8px;
+  font-size: 24px;
+  font-weight: 300;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-back-btn:active {
+  transform: scale(0.95);
+}
+
+.training-days-card {
+  background: linear-gradient(135deg, rgba(51, 65, 85, 0.3) 0%, rgba(30, 41, 59, 0.3) 100%);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+  backdrop-filter: blur(10px);
+}
+
+.training-days-desc {
+  color: #cbd5e1;
+  font-size: 14px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.training-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.training-day-btn {
+  aspect-ratio: 1;
+  background: rgba(51, 65, 85, 0.4);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  color: #cbd5e1;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.training-day-btn:active {
+  transform: scale(0.95);
+}
+
+.training-day-btn.active {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-color: #10b981;
+  color: white;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+.training-days-count {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.training-days-save-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.training-days-save-btn:active:not(:disabled) {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+}
+
+.training-days-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.profile-setting-nav-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  background: rgba(51, 65, 85, 0.3);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 12px;
+  color: #f1f5f9;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.profile-setting-nav-btn:active {
+  transform: scale(0.98);
+  background: rgba(51, 65, 85, 0.4);
+}
+
+.profile-setting-arrow {
+  font-size: 24px;
+  color: #cbd5e1;
+}
