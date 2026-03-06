@@ -14,12 +14,13 @@ export const useAuthStore = create((set) => ({
       const res = await axios.post('/api/token/', { username, password });
       localStorage.setItem('access_token', res.data.access);
       localStorage.setItem('refresh_token', res.data.refresh);
-      
-      // Get user info - simplified
-      set({ 
-        user: { username }, 
+
+      // Get full user info from API
+      const userRes = await api.get('/user/');
+      set({
+        user: userRes.data,
         isAuthenticated: true,
-        isLoading: false 
+        isLoading: false
       });
       return true;
     } catch (error) {
@@ -40,6 +41,13 @@ export const useAuthStore = create((set) => ({
       set({ isAuthenticated: false });
       return;
     }
-    set({ isAuthenticated: true });
+    try {
+      const userRes = await api.get('/user/');
+      set({ user: userRes.data, isAuthenticated: true });
+    } catch (error) {
+      set({ isAuthenticated: false });
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+    }
   },
 }));

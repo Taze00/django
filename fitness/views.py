@@ -1,12 +1,13 @@
 from rest_framework import viewsets, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from django.db.models import Q
+from django.contrib.auth.models import User
 from fitness.models import Exercise, Progression, UserExerciseProgression, Workout, WorkoutSet, WarmupChecklist
 from fitness.serializers import (
-    ExerciseSerializer, UserProgressionSerializer, WorkoutSerializer, 
+    ExerciseSerializer, UserProgressionSerializer, WorkoutSerializer,
     WorkoutSetSerializer, WarmupChecklistSerializer
 )
 
@@ -261,9 +262,23 @@ class WorkoutViewSet(viewsets.ModelViewSet):
 
         warmup, created = WarmupChecklist.objects.get_or_create(workout=workout)
         serializer = WarmupChecklistSerializer(warmup, data=request.data)
-        
+
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
-        
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def user_detail(request):
+    """Get current user details"""
+    user = request.user
+    return Response({
+        'id': user.id,
+        'username': user.username,
+        'email': user.email,
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+    })
