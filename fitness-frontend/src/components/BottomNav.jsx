@@ -22,13 +22,17 @@ export default function BottomNav() {
           onClick={() => navigate(tab.path)}
           title={tab.label}
         >
-          {tab.isProfile && user?.profile_picture ? (
+          {tab.isProfile ? (
             <>
-              <img
-                src={user.profile_picture}
-                alt="Profile"
-                className="bottom-nav-profile-pic"
-              />
+              {user?.profile_picture ? (
+                <img
+                  src={user.profile_picture}
+                  alt="Profile"
+                  className="bottom-nav-profile-pic"
+                />
+              ) : (
+                <span className="bottom-nav-icon">👤</span>
+              )}
               <span>Profile</span>
             </>
           ) : (
