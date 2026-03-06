@@ -133,18 +133,7 @@ body {
   box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
 }
 
-.login-logo-img {  width: 100px;  height: 100px;  margin: 0 auto 20px;  animation: bounce 1s ease-in-out infinite;  border-radius: 20px;}
-
-.login-title {
-  font-size: 32px;
-  font-weight: 900;
-  background: linear-gradient(90deg, #60a5fa 0%, #34d399 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin-bottom: 8px;
-  text-align: center;
-}
+.login-logo-img {  display: block;  width: 100px;  height: 100px;  margin: 0 auto 20px;  animation: bounce 1s ease-in-out infinite;  border-radius: 20px;  object-fit: cover;}
 
 .login-subtitle {
   font-size: 14px;
