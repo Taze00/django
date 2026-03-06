@@ -9,11 +9,10 @@ export default function ProfileView() {
   const user = useAuthStore(state => state.user);
   const logout = useAuthStore(state => state.logout);
   const workouts = useWorkoutStore(state => state.workouts);
-  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState(user?.profile_picture || null);
 
-  const handleLogoutConfirm = () => {
+  const handleLogout = () => {
     logout();
     navigate('/login');
   };
@@ -153,32 +152,12 @@ export default function ProfileView() {
 
         {/* Logout Button */}
         <div className="profile-section">
-          {!showLogoutConfirm ? (
-            <button
-              className="profile-logout-btn"
-              onClick={() => setShowLogoutConfirm(true)}
-            >
-              Logout
-            </button>
-          ) : (
-            <div className="profile-logout-confirm">
-              <p className="profile-logout-text">Are you sure you want to logout?</p>
-              <div className="profile-logout-buttons">
-                <button
-                  className="profile-logout-cancel"
-                  onClick={() => setShowLogoutConfirm(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="profile-logout-confirm-btn"
-                  onClick={handleLogoutConfirm}
-                >
-                  Logout
-                </button>
-              </div>
-            </div>
-          )}
+          <button
+            className="profile-logout-btn"
+            onClick={handleLogout}
+          >
+            Logout
+          </button>
         </div>
       </div>
     </div>
