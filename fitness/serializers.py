@@ -55,7 +55,7 @@ class WorkoutSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ['id', 'profile_picture']
+        fields = ['id', 'profile_picture', 'training_days']
         extra_kwargs = {
             'profile_picture': {'required': False, 'allow_null': True}
         }

@@ -7,6 +7,7 @@ export const useWorkoutStore = create((set, get) => ({
   workouts: [],
   currentWorkout: null,
   lastPerformance: {},
+  trainingDays: [1, 2, 3, 4, 5], // Mon-Fri default
   isInitialized: false,
   isLoading: false,
 
@@ -16,10 +17,11 @@ export const useWorkoutStore = create((set, get) => ({
 
     set({ isLoading: true });
     try {
-      const [exRes, progRes, workRes] = await Promise.all([
+      const [exRes, progRes, workRes, settRes] = await Promise.all([
         api.get('/exercises/'),
         api.get('/user-progressions/'),
         api.get('/workouts/'),
+        api.get('/profile/settings/').catch(() => ({ data: { training_days: [1, 2, 3, 4, 5] } })),
       ]);
 
       const progressionsMap = {};
@@ -31,6 +33,7 @@ export const useWorkoutStore = create((set, get) => ({
         exercises: exRes.data.results || [],
         userProgressions: progressionsMap,
         workouts: workRes.data.results || [],
+        trainingDays: settRes.data.training_days || [1, 2, 3, 4, 5],
         isInitialized: true,
         isLoading: false,
       });
@@ -94,6 +97,16 @@ export const useWorkoutStore = create((set, get) => ({
       // Refresh current workout after reset
       const state = get();
       const updated = await state.getCurrentWorkout();
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  updateTrainingDays: async (trainingDays) => {
+    try {
+      const res = await api.put('/profile/settings/', { training_days: trainingDays });
+      set({ trainingDays: res.data.training_days || trainingDays });
       return res.data;
     } catch (error) {
       throw error;

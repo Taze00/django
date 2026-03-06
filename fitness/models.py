@@ -6,6 +6,7 @@ from PIL import Image, ImageOps
 import os
 import io
 from django.core.files.base import ContentFile
+from django.db.models import JSONField
 
 
 class Exercise(models.Model):
@@ -55,6 +56,7 @@ class UserExerciseProgression(models.Model):
     sessions_at_target = models.IntegerField(default=0)
     custom_target = models.IntegerField(null=True, blank=True)
     is_first_session = models.BooleanField(default=True)
+    training_days = JSONField(default=list, help_text="Days to train: [1,2,3,4,5] = Mon-Fri")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -107,6 +109,7 @@ class WorkoutSet(models.Model):
     seconds = models.IntegerField(null=True, blank=True)
     is_drop_set = models.BooleanField(default=False)
     rest_time_seconds = models.IntegerField(default=180)
+    training_days = JSONField(default=list, help_text="Days to train: [1,2,3,4,5] = Mon-Fri")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -125,6 +128,7 @@ class UserProfile(models.Model):
         null=True,
         blank=True
     )
+    training_days = JSONField(default=list, help_text="Days to train: [1,2,3,4,5] = Mon-Fri")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

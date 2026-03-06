@@ -9,11 +9,14 @@ export default function ProfileView() {
   const user = useAuthStore(state => state.user);
   const logout = useAuthStore(state => state.logout);
   const workouts = useWorkoutStore(state => state.workouts);
+  const trainingDays = useWorkoutStore(state => state.trainingDays);
   const getCurrentWorkout = useWorkoutStore(state => state.getCurrentWorkout);
   const resetWorkout = useWorkoutStore(state => state.resetWorkout);
+  const updateTrainingDays = useWorkoutStore(state => state.updateTrainingDays);
   const [uploading, setUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState(user?.profile_picture || null);
   const [resetting, setResetting] = useState(false);
+  const [savingDays, setSavingDays] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -103,6 +106,20 @@ export default function ProfileView() {
     }
   };
 
+  const handleToggleDay = async (day) => {
+    setSavingDays(true);
+    try {
+      const newDays = trainingDays.includes(day)
+        ? trainingDays.filter(d => d !== day)
+        : [...trainingDays, day].sort((a, b) => a - b);
+      await updateTrainingDays(newDays);
+    } catch (error) {
+      alert('Failed to update training days');
+    } finally {
+      setSavingDays(false);
+    }
+  };
+
   return (
     <div className="home-container">
       <div className="header">
@@ -150,6 +167,31 @@ export default function ProfileView() {
         {/* Settings Section */}
         <div className="profile-section">
           <h3 className="profile-section-title">Settings</h3>
+
+          <div className="profile-setting-item">
+            <div>
+              <p className="profile-setting-label">Training Days</p>
+              <p className="profile-setting-desc">Choose which days to train</p>
+            </div>
+            <div className="weekday-grid">
+              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, idx) => {
+                const dayNum = idx + 1;
+                const isActive = trainingDays.includes(dayNum);
+                return (
+                  <button
+                    key={dayNum}
+                    className={`weekday-btn ${isActive ? 'active' : ''}`}
+                    onClick={() => handleToggleDay(dayNum)}
+                    disabled={savingDays}
+                    title={`${isActive ? 'Remove' : 'Add'} ${day}`}
+                  >
+                    {day}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <div className="profile-settings">
             <div className="profile-setting-item">
               <div>

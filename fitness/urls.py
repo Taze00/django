@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from fitness.views import ExerciseViewSet, UserProgressionViewSet, WorkoutViewSet, user_detail, upload_profile_picture, delete_profile_picture
+from fitness.views import ExerciseViewSet, UserProgressionViewSet, WorkoutViewSet, user_detail, upload_profile_picture, delete_profile_picture, user_settings
 
 router = DefaultRouter()
 router.register(r'exercises', ExerciseViewSet, basename='exercise')
@@ -12,4 +12,5 @@ urlpatterns = [
     path('user/', user_detail, name='user-detail'),
     path('profile/picture/upload/', upload_profile_picture, name='upload-profile-picture'),
     path('profile/picture/delete/', delete_profile_picture, name='delete-profile-picture'),
+    path('profile/settings/', user_settings, name='user-settings'),
 ]
