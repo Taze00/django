@@ -5,7 +5,7 @@ from fitness.models import Exercise, Progression, UserExerciseProgression, Worko
 class ProgressionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Progression
-        fields = ['id', 'level', 'name', 'target_type', 'target_value', 'user_starts_here']
+        fields = ['id', 'level', 'name', 'target_type', 'target_value', 'sessions_required', 'user_starts_here']
 
 
 class ExerciseSerializer(serializers.ModelSerializer):
