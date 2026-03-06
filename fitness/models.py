@@ -4,6 +4,8 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 from PIL import Image
 import os
+import io
+from django.core.files.base import ContentFile
 
 
 class Exercise(models.Model):
@@ -153,8 +155,17 @@ class UserProfile(models.Model):
             # Resize to 400x400
             img.thumbnail((400, 400), Image.Resampling.LANCZOS)
             
-            # Save with compression
-            img.save(self.profile_picture.path, "JPEG", quality=85, optimize=True)
+            # Save to bytes buffer instead of file
+            img_io = io.BytesIO()
+            img.save(img_io, format="JPEG", quality=85, optimize=True)
+            img_io.seek(0)
+            
+            # Save bytes to field
+            self.profile_picture.save(
+                self.profile_picture.name,
+                ContentFile(img_io.getvalue()),
+                save=False
+            )
 
         super().save(*args, **kwargs)
 
