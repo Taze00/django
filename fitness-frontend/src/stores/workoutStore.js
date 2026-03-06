@@ -75,6 +75,9 @@ export const useWorkoutStore = create((set, get) => ({
   completeWorkout: async (workoutId) => {
     try {
       const res = await api.post(`/workouts/${workoutId}/complete/`);
+      // Refresh workouts list after completing
+      const workRes = await api.get('/workouts/');
+      set({ workouts: workRes.data.results || [] });
       return res.data;
     } catch (error) {
       throw error;
