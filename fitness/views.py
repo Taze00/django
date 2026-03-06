@@ -84,12 +84,9 @@ class WorkoutViewSet(viewsets.ModelViewSet):
 
     @action(detail=True, methods=['post'])
     def reset(self, request, pk=None):
-        """Reset today's workout - delete all sets and reset status"""
+        """Reset today's workout - delete entire workout"""
         workout = self.get_object()
-        workout.sets.all().delete()
-        workout.completed = False
-        workout.completed_at = None
-        workout.save()
+        workout.delete()
         return Response({'status': 'reset'}, status=status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'])
