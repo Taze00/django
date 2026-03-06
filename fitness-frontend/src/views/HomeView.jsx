@@ -2,8 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { useWorkoutStore } from '../stores/workoutStore';
 
-const WORKOUT_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
-const REST_DAYS = ['Sat', 'Sun'];
+const ALL_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 export default function HomeView() {
   const navigate = useNavigate();
@@ -11,6 +10,7 @@ export default function HomeView() {
   const exercises = useWorkoutStore(state => state.exercises);
   const userProgressions = useWorkoutStore(state => state.userProgressions);
   const workouts = useWorkoutStore(state => state.workouts);
+  const trainingDays = useWorkoutStore(state => state.trainingDays);
   const isLoading = useWorkoutStore(state => state.isLoading);
 
   const handleStartWorkout = () => navigate('/workout');
@@ -42,7 +42,10 @@ export default function HomeView() {
     monday.setDate(now.getDate() - (dayIndex === 0 ? 6 : dayIndex - 1));
     monday.setHours(0, 0, 0, 0);
 
-    const status = { Mon: false, Tue: false, Wed: false, Thu: false, Fri: false };
+    const status = {};
+    ALL_DAYS.forEach((day, idx) => {
+      status[day] = false;
+    });
 
     workouts.forEach(workout => {
       const workoutDate = new Date(workout.date);
@@ -51,11 +54,11 @@ export default function HomeView() {
       // Check if workout is in current week
       if (workoutDate >= monday) {
         const dayOfWeek = workoutDate.getDay();
-        if (dayOfWeek === 1) status.Mon = true;
-        else if (dayOfWeek === 2) status.Tue = true;
-        else if (dayOfWeek === 3) status.Wed = true;
-        else if (dayOfWeek === 4) status.Thu = true;
-        else if (dayOfWeek === 5) status.Fri = true;
+        const dayNum = dayOfWeek === 0 ? 7 : dayOfWeek;
+        if (dayNum <= 7) {
+          const dayName = ALL_DAYS[dayNum - 1];
+          status[dayName] = true;
+        }
       }
     });
 
@@ -100,18 +103,27 @@ export default function HomeView() {
             <p className="welcome-text">Welcome, {user?.username || 'Athlete'}</p>
             <div className="week-plan">
               <div className="week-grid-inline">
-                {WORKOUT_DAYS.map(day => (
-                  <div key={day} className={weekStatus[day] ? 'week-day completed' : 'week-day pending'}>
-                    <p className="week-day-name">{day}</p>
-                    <p className="week-day-status">{weekStatus[day] ? '✓' : '○'}</p>
-                  </div>
-                ))}
-                {REST_DAYS.map(day => (
-                  <div key={day} className="week-day rest-day">
-                    <p className="week-day-name">{day}</p>
-                    <p className="week-day-status">🌙</p>
-                  </div>
-                ))}
+                {ALL_DAYS.map((day, idx) => {
+                  const dayNum = idx + 1;
+                  const isTrainingDay = trainingDays.includes(dayNum);
+                  const isCompleted = weekStatus[day];
+
+                  if (isTrainingDay) {
+                    return (
+                      <div key={day} className={isCompleted ? 'week-day completed' : 'week-day pending'}>
+                        <p className="week-day-name">{day}</p>
+                        <p className="week-day-status">{isCompleted ? '✓' : '○'}</p>
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div key={day} className="week-day rest-day">
+                        <p className="week-day-name">{day}</p>
+                        <p className="week-day-status">🌙</p>
+                      </div>
+                    );
+                  }
+                })}
               </div>
             </div>
 
