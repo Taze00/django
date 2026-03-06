@@ -41,9 +41,7 @@ export default function ProfileView() {
       const formData = new FormData();
       formData.append('profile_picture', file);
 
-      const res = await api.put('/profile/picture/upload/', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' }
-      });
+      const res = await api.put('/profile/picture/upload/', formData);
 
       // Update user in auth store
       useAuthStore.setState(state => ({
