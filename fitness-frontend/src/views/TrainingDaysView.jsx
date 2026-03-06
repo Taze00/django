@@ -43,14 +43,14 @@ export default function TrainingDaysView() {
     <div className="home-container">
       <div className="header">
         <div className="header-content">
-          <button
-            className="header-back-btn"
-            onClick={() => navigate('/profile')}
-            title="Back"
-          >
-            ‹
-          </button>
           <h1 className="header-title">Training Days</h1>
+          <button
+            className="header-close-btn"
+            onClick={() => navigate('/profile')}
+            title="Close"
+          >
+            ✕
+          </button>
         </div>
       </div>
 
@@ -58,26 +58,32 @@ export default function TrainingDaysView() {
         <div className="training-days-card">
           <p className="training-days-desc">Select which days you want to train</p>
 
-          <div className="training-days-grid">
+          <div className="week-grid-inline">
             {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, idx) => {
               const dayNum = idx + 1;
               const isActive = selectedDays.includes(dayNum);
               return (
                 <button
                   key={dayNum}
-                  className={`training-day-btn ${isActive ? 'active' : ''}`}
+                  className={`week-day ${isActive ? 'active' : 'inactive'}`}
                   onClick={() => handleToggleDay(dayNum)}
                   title={`${isActive ? 'Remove' : 'Add'} ${day}`}
                 >
-                  {day}
+                  <p className="week-day-name">{day}</p>
+                  <p className="week-day-status">{isActive ? '✓' : '○'}</p>
                 </button>
               );
             })}
           </div>
 
-          <p className="training-days-count">
-            {selectedDays.length} day{selectedDays.length !== 1 ? 's' : ''} selected
-          </p>
+          <div className="training-days-info">
+            <p className="training-days-count">
+              {selectedDays.length} day{selectedDays.length !== 1 ? 's' : ''} selected
+            </p>
+            <p className="training-days-recommendation">
+              💡 Recommended: 4-5 days per week for optimal recovery and progress
+            </p>
+          </div>
         </div>
 
         <button
