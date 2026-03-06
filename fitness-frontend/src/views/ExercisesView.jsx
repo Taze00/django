@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import { useWorkoutStore } from '../stores/workoutStore';
+import { EXERCISE_INFO } from '../data/exerciseInfo';
 
 export default function ExercisesView() {
+  const [infoModal, setInfoModal] = useState(null);
   const exercises = useWorkoutStore(state => state.exercises);
   const userProgressions = useWorkoutStore(state => state.userProgressions);
 
@@ -42,6 +45,15 @@ export default function ExercisesView() {
               >
                 <span className="exercise-ladder-icon">{icon}</span>
                 <span className="exercise-ladder-name">{prog.name}</span>
+                {EXERCISE_INFO[prog.name] && (
+                  <button
+                    className="exercise-info-btn"
+                    onClick={() => setInfoModal(prog.name)}
+                    title="View exercise details"
+                  >
+                    ℹ
+                  </button>
+                )}
               </div>
             );
           })}
@@ -65,6 +77,25 @@ export default function ExercisesView() {
         {pushExercise && renderExercise(pushExercise, 'exercise-push')}
         {pullExercise && renderExercise(pullExercise, 'exercise-pull')}
       </div>
+
+      {/* Info Modal */}
+      {infoModal && EXERCISE_INFO[infoModal] && (
+        <div className="modal-overlay" onClick={() => setInfoModal(null)}>
+          <div className="info-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={() => setInfoModal(null)}>✕</button>
+            <h2 className="info-modal-title">{infoModal}</h2>
+            <p className="info-modal-desc">{EXERCISE_INFO[infoModal].desc}</p>
+            <a
+              href={EXERCISE_INFO[infoModal].youtube}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="info-modal-link"
+            >
+              Watch on YouTube →
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
