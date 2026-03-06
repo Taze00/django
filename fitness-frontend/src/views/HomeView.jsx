@@ -1,3 +1,4 @@
+import { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { useWorkoutStore } from '../stores/workoutStore';
@@ -65,24 +66,28 @@ export default function HomeView() {
     return status;
   };
 
-  const weekStatus = getWeekStatus();
+  const weekStatus = useMemo(() => getWeekStatus(), [trainingDays, workouts]);
 
   // Calculate total reps and workout count
-  const stats = {
-    pushReps: 0,
-    pullReps: 0,
-    totalWorkouts: workouts.length
-  };
+  const stats = useMemo(() => {
+    const result = {
+      pushReps: 0,
+      pullReps: 0,
+      totalWorkouts: workouts.length
+    };
 
-  workouts.forEach(workout => {
-    workout.sets?.forEach(set => {
-      if (set.exercise_name === 'Push-ups' && set.reps) {
-        stats.pushReps += set.reps;
-      } else if (set.exercise_name === 'Pull-ups' && set.reps) {
-        stats.pullReps += set.reps;
-      }
+    workouts.forEach(workout => {
+      workout.sets?.forEach(set => {
+        if (set.exercise_name === 'Push-ups' && set.reps) {
+          result.pushReps += set.reps;
+        } else if (set.exercise_name === 'Pull-ups' && set.reps) {
+          result.pullReps += set.reps;
+        }
+      });
     });
-  });
+
+    return result;
+  }, [workouts]);
 
   return (
     <div className="home-container">

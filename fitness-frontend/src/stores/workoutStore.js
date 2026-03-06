@@ -106,7 +106,8 @@ export const useWorkoutStore = create((set, get) => ({
   updateTrainingDays: async (trainingDays) => {
     try {
       const res = await api.put('/profile/settings/', { training_days: trainingDays });
-      set({ trainingDays: res.data.training_days || trainingDays });
+      const updatedDays = res.data.training_days || trainingDays;
+      set({ trainingDays: updatedDays });
       return res.data;
     } catch (error) {
       throw error;
