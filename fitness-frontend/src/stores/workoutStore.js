@@ -97,9 +97,9 @@ export const useWorkoutStore = create((set, get) => ({
   resetWorkout: async (workoutId) => {
     try {
       const res = await api.post(`/workouts/${workoutId}/reset/`);
-      // Refresh current workout after reset
-      const state = get();
-      const updated = await state.getCurrentWorkout();
+      // Refresh workouts list after reset (workout is deleted)
+      const workRes = await api.get('/workouts/');
+      set({ workouts: workRes.data.results || [] });
       return res.data;
     } catch (error) {
       throw error;
