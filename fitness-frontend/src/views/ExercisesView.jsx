@@ -1,7 +1,57 @@
-import { useNavigate } from 'react-router-dom';
+import { useWorkoutStore } from '../stores/workoutStore';
 
 export default function ExercisesView() {
-  const navigate = useNavigate();
+  const exercises = useWorkoutStore(state => state.exercises);
+  const userProgressions = useWorkoutStore(state => state.userProgressions);
+
+  const renderExercise = (exercise, colorClass) => {
+    const userProg = userProgressions[String(exercise.id)];
+    const currentProg = userProg?.current_progression;
+    const sessionsAtTarget = userProg?.sessions_at_target || 0;
+    const sessionsRequired = currentProg?.sessions_required || 3;
+    const nextProgLevel = (currentProg?.level || 0) + 1;
+    const nextProg = exercise.progressions.find(p => p.level === nextProgLevel);
+
+    return (
+      <div key={exercise.id} className="exercise-section">
+        <h2 className={`exercise-section-title ${colorClass}`}>{exercise.name.toUpperCase()}</h2>
+
+        {/* Current Level Card */}
+        <div className={`exercise-current-card ${colorClass}`}>
+          <p className="exercise-current-name">{currentProg?.name || 'Loading...'}</p>
+        </div>
+
+        {/* Progression Ladder */}
+        <div className="exercise-ladder">
+          {exercise.progressions.map(prog => {
+            let status = 'future';
+            let icon = prog.level;
+
+            if (prog.level < currentProg?.level) {
+              status = 'completed';
+              icon = '✓';
+            } else if (prog.level === currentProg?.level) {
+              status = 'current';
+              icon = '★';
+            }
+
+            return (
+              <div
+                key={prog.id}
+                className={`exercise-ladder-item ${status} ${colorClass}`}
+              >
+                <span className="exercise-ladder-icon">{icon}</span>
+                <span className="exercise-ladder-name">{prog.name}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
+  const pushExercise = exercises.find(e => e.name === 'Push-ups');
+  const pullExercise = exercises.find(e => e.name === 'Pull-ups');
 
   return (
     <div className="home-container">
@@ -12,11 +62,8 @@ export default function ExercisesView() {
       </div>
 
       <div className="main-content">
-        <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>🏋️</div>
-          <h2 style={{ fontSize: '24px', marginBottom: '8px', color: '#f1f5f9' }}>Exercises</h2>
-          <p style={{ color: '#94a3b8' }}>Coming Soon...</p>
-        </div>
+        {pushExercise && renderExercise(pushExercise, 'exercise-push')}
+        {pullExercise && renderExercise(pullExercise, 'exercise-pull')}
       </div>
     </div>
   );

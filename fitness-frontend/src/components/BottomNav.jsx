@@ -7,7 +7,7 @@ export default function BottomNav() {
   const user = useAuthStore(state => state.user);
 
   const tabs = [
-    { label: 'Home', icon: '🏠', path: '/' },
+    { label: 'Home', icon: '📱', path: '/' },
     { label: 'Exercises', icon: '🏋️', path: '/exercises' },
     { label: 'Statistics', icon: '📊', path: '/statistics' },
     { label: 'Profile', icon: null, path: '/profile', isProfile: true }

@@ -1,7 +1,114 @@
-import { useNavigate } from 'react-router-dom';
+import { useWorkoutStore } from '../stores/workoutStore';
 
 export default function StatisticsView() {
-  const navigate = useNavigate();
+  const workouts = useWorkoutStore(state => state.workouts);
+
+  // Helper: format date YYYY-MM-DD to comparable format
+  const formatDate = (date) => {
+    return date.toISOString().split('T')[0];
+  };
+
+  // Get all completed workout dates
+  const trainedDates = new Set(
+    workouts.filter(w => w.completed).map(w => w.date)
+  );
+
+  // Calculate current streak
+  const calculateCurrentStreak = () => {
+    let streak = 0;
+    const today = new Date();
+
+    for (let i = 0; i < 365; i++) {
+      const checkDate = new Date(today);
+      checkDate.setDate(checkDate.getDate() - i);
+      const dateStr = formatDate(checkDate);
+
+      if (trainedDates.has(dateStr)) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+    return streak;
+  };
+
+  // Calculate longest streak
+  const calculateLongestStreak = () => {
+    let maxStreak = 0;
+    let currentStreak = 0;
+    const sortedDates = Array.from(trainedDates).sort();
+
+    if (sortedDates.length === 0) return 0;
+
+    let lastDate = null;
+    for (const dateStr of sortedDates) {
+      const currentDate = new Date(dateStr);
+      if (lastDate === null) {
+        currentStreak = 1;
+      } else {
+        const lastDateObj = new Date(lastDate);
+        const dayDiff = Math.floor((currentDate - lastDateObj) / (1000 * 60 * 60 * 24));
+        if (dayDiff === 1) {
+          currentStreak++;
+        } else {
+          maxStreak = Math.max(maxStreak, currentStreak);
+          currentStreak = 1;
+        }
+      }
+      lastDate = dateStr;
+    }
+    maxStreak = Math.max(maxStreak, currentStreak);
+    return maxStreak;
+  };
+
+  // Generate heatmap data for last 12 weeks (84 days)
+  const generateHeatmapData = () => {
+    const data = [];
+    const today = new Date();
+
+    for (let i = 83; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const dateStr = formatDate(date);
+      const dayOfWeek = date.getDay(); // 0=Sunday, 1=Monday, etc.
+
+      data.push({
+        date: dateStr,
+        dayOfWeek: dayOfWeek === 0 ? 6 : dayOfWeek - 1, // Mon=0, Sun=6
+        trained: trainedDates.has(dateStr),
+        displayDate: date
+      });
+    }
+
+    return data;
+  };
+
+  // Get month labels for heatmap
+  const getMonthLabels = () => {
+    const today = new Date();
+    const labels = [];
+    const seen = new Set();
+
+    for (let i = 83; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const monthYear = `${date.getMonth() + 1}/${date.getFullYear()}`;
+
+      if (!seen.has(monthYear)) {
+        seen.add(monthYear);
+        labels.push({
+          monthYear,
+          label: date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' })
+        });
+      }
+    }
+
+    return labels;
+  };
+
+  const currentStreak = calculateCurrentStreak();
+  const longestStreak = calculateLongestStreak();
+  const heatmapData = generateHeatmapData();
 
   return (
     <div className="home-container">
@@ -12,10 +119,30 @@ export default function StatisticsView() {
       </div>
 
       <div className="main-content">
-        <div style={{ textAlign: 'center', padding: '60px 20px' }}>
-          <div style={{ fontSize: '48px', marginBottom: '16px' }}>📊</div>
-          <h2 style={{ fontSize: '24px', marginBottom: '8px', color: '#f1f5f9' }}>Statistics</h2>
-          <p style={{ color: '#94a3b8' }}>Coming Soon...</p>
+        {/* Streak Cards */}
+        <div className="stats-streak-grid">
+          <div className="stats-streak-card">
+            <div className="stats-streak-number">{currentStreak}</div>
+            <div className="stats-streak-label">Current Streak</div>
+          </div>
+          <div className="stats-streak-card">
+            <div className="stats-streak-number">{longestStreak}</div>
+            <div className="stats-streak-label">Longest Streak</div>
+          </div>
+        </div>
+
+        {/* Heatmap Section */}
+        <div className="stats-heatmap-section">
+          <h2 className="stats-heatmap-title">Last 12 Weeks</h2>
+          <div className="stats-heatmap-grid">
+            {heatmapData.map((day, idx) => (
+              <div
+                key={idx}
+                className={`stats-heatmap-cell ${day.trained ? 'trained' : 'empty'}`}
+                title={`${day.date}: ${day.trained ? 'Trained' : 'Rest'}`}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>

@@ -43,9 +43,10 @@ export default function ProfileView() {
 
       const res = await api.put('/profile/picture/upload/', formData);
 
-      // Update user in auth store
+      // Update user in auth store with cache-buster timestamp
+      const pictureWithCache = res.data.profile_picture ? `${res.data.profile_picture}?t=${Date.now()}` : null;
       useAuthStore.setState(state => ({
-        user: { ...state.user, profile_picture: res.data.profile_picture }
+        user: { ...state.user, profile_picture: pictureWithCache }
       }));
     } catch (error) {
       alert('Failed to upload image');
@@ -125,7 +126,7 @@ export default function ProfileView() {
           </div>
           <p className="profile-username">{user?.username || 'Athlete'}</p>
           <p className="profile-email">{user?.email || 'No email'}</p>
-          <p className="profile-upload-hint">Tap image to change (max 2MB)</p>
+          <p className="profile-upload-hint">Tap the image to upload a photo (max 2MB)</p>
         </div>
 
 
