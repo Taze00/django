@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { useWorkoutStore } from '../stores/workoutStore';
 
 export default function StatisticsView() {
   const workouts = useWorkoutStore(state => state.workouts);
+  const [expandedDate, setExpandedDate] = useState(null);
 
   // Helper: format date YYYY-MM-DD to comparable format
   const formatDate = (date) => {
@@ -110,6 +112,32 @@ export default function StatisticsView() {
   const longestStreak = calculateLongestStreak();
   const heatmapData = generateHeatmapData();
 
+  // Get completed workouts sorted by date (newest first)
+  const completedWorkouts = workouts
+    .filter(w => w.completed)
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  // Helper to format date like "Thu, Mar 6"
+  const formatWorkoutDate = (dateStr) => {
+    const date = new Date(dateStr);
+    const day = date.toLocaleDateString('en-US', { weekday: 'short' });
+    const month = date.toLocaleDateString('en-US', { month: 'short' });
+    const dayNum = date.getDate();
+    return `${day}, ${month} ${dayNum}`;
+  };
+
+  // Helper to group sets by exercise
+  const getSetsGrouped = (workout) => {
+    const grouped = {};
+    (workout.sets || []).forEach(set => {
+      if (!grouped[set.exercise_name]) {
+        grouped[set.exercise_name] = [];
+      }
+      grouped[set.exercise_name].push(set);
+    });
+    return grouped;
+  };
+
   return (
     <div className="home-container">
       <div className="header">
@@ -144,6 +172,41 @@ export default function StatisticsView() {
             ))}
           </div>
         </div>
+
+        {/* Workout History Section */}
+        {completedWorkouts.length > 0 && (
+          <div className="history-section">
+            <h2 className="stats-heatmap-title">Workout History</h2>
+            {completedWorkouts.map(workout => (
+              <div key={workout.id} className="history-item">
+                <button
+                  className="history-header"
+                  onClick={() => setExpandedDate(expandedDate === workout.date ? null : workout.date)}
+                >
+                  <span className="history-date">{formatWorkoutDate(workout.date)}</span>
+                  <span className="history-toggle">
+                    {expandedDate === workout.date ? '▼' : '▶'}
+                  </span>
+                </button>
+
+                {expandedDate === workout.date && (
+                  <div className="history-content">
+                    {Object.entries(getSetsGrouped(workout)).map(([exerciseName, sets]) => (
+                      <div key={exerciseName} className="history-exercise-row">
+                        <span className="history-exercise-name">{exerciseName}:</span>
+                        {sets.map((set, idx) => (
+                          <span key={idx} className="history-set-badge">
+                            {set.set_number === 3 && set.is_drop_set ? 'Drop ✓' : `Set${set.set_number} ${set.reps ? `${set.reps}r` : `${set.seconds}s`}`}
+                          </span>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

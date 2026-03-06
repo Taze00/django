@@ -2458,3 +2458,79 @@ body {
     height: 12px;
   }
 }
+
+/* Workout History */
+.history-section {
+  margin-top: 32px;
+}
+
+.history-item {
+  background: rgba(51, 65, 85, 0.4);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 12px;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.history-header {
+  width: 100%;
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.history-header:active {
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.history-date {
+  font-size: 16px;
+  font-weight: 600;
+  color: #e2e8f0;
+  text-align: left;
+}
+
+.history-toggle {
+  font-size: 12px;
+  color: #94a3b8;
+  transition: transform 0.3s ease;
+}
+
+.history-content {
+  padding: 12px 20px 16px;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  background: rgba(15, 23, 42, 0.5);
+}
+
+.history-exercise-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #cbd5e1;
+}
+
+.history-exercise-row:last-child {
+  margin-bottom: 0;
+}
+
+.history-exercise-name {
+  font-weight: 600;
+  color: #f1f5f9;
+  min-width: 80px;
+}
+
+.history-set-badge {
+  padding: 4px 8px;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 6px;
+  font-size: 12px;
+  color: #6ee7b7;
+}
