@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
@@ -27,10 +27,12 @@ urlpatterns = [
     path('', views.index, name='index'),
     path("schubi/", views.freundin_page, name="schubi_page"),
     path('impressum/', views.impressum, name='impressum'),
-    path('fitness/', views.fitness_page, name='fitness_page'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/fitness/', include('fitness.urls')),
+    # Fitness routes (React frontend)
+    path('fitness/', views.fitness_page, name='fitness_page'),
+    re_path(r'^fitness/.*$', views.fitness_page, name='fitness_catch_all'),
 ]
 
 # Serve media files in development

@@ -83,6 +83,16 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
 
     @action(detail=True, methods=['post'])
+    def reset(self, request, pk=None):
+        """Reset today's workout - delete all sets and reset status"""
+        workout = self.get_object()
+        workout.sets.all().delete()
+        workout.completed = False
+        workout.completed_at = None
+        workout.save()
+        return Response({'status': 'reset'}, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['post'])
     def complete(self, request, pk=None):
         """Complete workout and check for upgrades/downgrades"""
         workout = self.get_object()

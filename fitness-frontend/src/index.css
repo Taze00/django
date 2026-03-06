@@ -1968,6 +1968,29 @@ body {
   cursor: not-allowed;
 }
 
+.profile-reset-btn {
+  width: 100%;
+  padding: 16px 24px;
+  background: linear-gradient(90deg, #f97316 0%, #ea580c 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 25px rgba(249, 115, 22, 0.2);
+}
+
+.profile-reset-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.profile-reset-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
 .profile-logout-btn {
   width: 100%;
   padding: 16px 24px;

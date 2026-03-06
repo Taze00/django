@@ -87,4 +87,16 @@ export const useWorkoutStore = create((set, get) => ({
       throw error;
     }
   },
+
+  resetWorkout: async (workoutId) => {
+    try {
+      const res = await api.post(`/workouts/${workoutId}/reset/`);
+      // Refresh current workout after reset
+      const state = get();
+      const updated = await state.getCurrentWorkout();
+      return res.data;
+    } catch (error) {
+      throw error;
+    }
+  },
 }));

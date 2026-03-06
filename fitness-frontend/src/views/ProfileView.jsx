@@ -9,8 +9,11 @@ export default function ProfileView() {
   const user = useAuthStore(state => state.user);
   const logout = useAuthStore(state => state.logout);
   const workouts = useWorkoutStore(state => state.workouts);
+  const getCurrentWorkout = useWorkoutStore(state => state.getCurrentWorkout);
+  const resetWorkout = useWorkoutStore(state => state.resetWorkout);
   const [uploading, setUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState(user?.profile_picture || null);
+  const [resetting, setResetting] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -85,6 +88,21 @@ export default function ProfileView() {
     }, 0) || 0);
   }, 0);
 
+  const handleResetWorkout = async () => {
+    if (!window.confirm('Reset today\'s workout? All sets will be deleted.')) return;
+
+    setResetting(true);
+    try {
+      const workout = await getCurrentWorkout();
+      await resetWorkout(workout.id);
+      alert('Workout reset successfully');
+    } catch (error) {
+      alert('Failed to reset workout');
+    } finally {
+      setResetting(false);
+    }
+  };
+
   return (
     <div className="home-container">
       <div className="header">
@@ -148,6 +166,18 @@ export default function ProfileView() {
               <input type="checkbox" className="profile-toggle" checked disabled />
             </div>
           </div>
+        </div>
+
+        {/* Reset Workout */}
+        <div className="profile-section">
+          <h3 className="profile-section-title">Danger Zone</h3>
+          <button
+            className="profile-reset-btn"
+            onClick={handleResetWorkout}
+            disabled={resetting}
+          >
+            {resetting ? 'Resetting...' : 'Reset Today\'s Workout'}
+          </button>
         </div>
 
         {/* Logout Button */}
