@@ -1,0 +1,25 @@
+{
+  "name": "Calisthenics Fitness",
+  "short_name": "Calisthenics",
+  "description": "Track your calisthenics workouts and progressions",
+  "start_url": "/fitness/",
+  "scope": "/fitness/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#10b981",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/static/fitness/favicon.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/fitness/favicon.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
