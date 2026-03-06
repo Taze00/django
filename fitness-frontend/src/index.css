@@ -2148,11 +2148,11 @@ body {
 /* ===================================== */
 
 .bottom-nav-profile-pic {
-  width: 32px;
-  height: 32px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #34d399;
+  border: 1.5px solid #34d399;
 }
 
 .bottom-nav-item.active .bottom-nav-profile-pic {
@@ -2162,7 +2162,7 @@ body {
 
 @media (max-width: 640px) {
   .bottom-nav-profile-pic {
-    width: 28px;
-    height: 28px;
+    width: 34px;
+    height: 34px;
   }
 }

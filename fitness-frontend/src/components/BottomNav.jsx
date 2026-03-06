@@ -23,11 +23,14 @@ export default function BottomNav() {
           title={tab.label}
         >
           {tab.isProfile && user?.profile_picture ? (
-            <img
-              src={user.profile_picture}
-              alt="Profile"
-              className="bottom-nav-profile-pic"
-            />
+            <>
+              <img
+                src={user.profile_picture}
+                alt="Profile"
+                className="bottom-nav-profile-pic"
+              />
+              <span>Profile</span>
+            </>
           ) : (
             <>
               <span className="bottom-nav-icon">{tab.icon}</span>
