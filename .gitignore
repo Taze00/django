@@ -34,6 +34,9 @@ media/
 fitness-frontend/node_modules/
 fitness-frontend/dist/
 
+# User uploaded profile pictures
+media/profile_pictures/
+
 # Media and Images (server-only, not versioned)
 static/css/images/movie/
 static/css/images/gallery/
