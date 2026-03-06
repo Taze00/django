@@ -306,7 +306,11 @@ def upload_profile_picture(request):
     # Get or create profile
     profile, created = UserProfile.objects.get_or_create(user=request.user)
 
-    # Save new picture (old one is deleted automatically)
+    # Delete old picture explicitly if it exists
+    if profile.profile_picture:
+        profile.profile_picture.delete()
+
+    # Save new picture
     profile.profile_picture = file
     profile.save()
 
