@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from fitness.models import Exercise, Progression, UserExerciseProgression, Workout, WorkoutSet, WarmupChecklist
+from fitness.models import Exercise, Progression, UserExerciseProgression, Workout, WorkoutSet, WarmupChecklist, UserProfile
 
 
 class ProgressionSerializer(serializers.ModelSerializer):
@@ -50,3 +50,12 @@ class WorkoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = Workout
         fields = ['id', 'date', 'completed', 'completed_at', 'duration_seconds', 'sets', 'warmup_checklist']
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ['id', 'profile_picture']
+        extra_kwargs = {
+            'profile_picture': {'required': False, 'allow_null': True}
+        }

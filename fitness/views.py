@@ -5,10 +5,10 @@ from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from django.db.models import Q
 from django.contrib.auth.models import User
-from fitness.models import Exercise, Progression, UserExerciseProgression, Workout, WorkoutSet, WarmupChecklist
+from fitness.models import Exercise, Progression, UserExerciseProgression, Workout, WorkoutSet, WarmupChecklist, UserProfile
 from fitness.serializers import (
     ExerciseSerializer, UserProgressionSerializer, WorkoutSerializer,
-    WorkoutSetSerializer, WarmupChecklistSerializer
+    WorkoutSetSerializer, WarmupChecklistSerializer, UserProfileSerializer
 )
 
 
@@ -275,10 +275,54 @@ class WorkoutViewSet(viewsets.ModelViewSet):
 def user_detail(request):
     """Get current user details"""
     user = request.user
+    profile = UserProfile.objects.filter(user=user).first()
     return Response({
         'id': user.id,
         'username': user.username,
         'email': user.email,
         'first_name': user.first_name,
         'last_name': user.last_name,
+        'profile_picture': profile.profile_picture.url if profile and profile.profile_picture else None,
     })
+
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def upload_profile_picture(request):
+    """Upload/update user profile picture - max 2MB"""
+    if 'profile_picture' not in request.FILES:
+        return Response({'error': 'No file provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+    file = request.FILES['profile_picture']
+
+    # Check file size (max 2MB)
+    if file.size > 2 * 1024 * 1024:
+        return Response({'error': 'File size exceeds 2MB limit'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Check file type
+    if not file.content_type.startswith('image/'):
+        return Response({'error': 'File must be an image'}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Get or create profile
+    profile, created = UserProfile.objects.get_or_create(user=request.user)
+
+    # Save new picture (old one is deleted automatically)
+    profile.profile_picture = file
+    profile.save()
+
+    serializer = UserProfileSerializer(profile)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_profile_picture(request):
+    """Delete user profile picture"""
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+        profile.profile_picture.delete()
+        profile.profile_picture = None
+        profile.save()
+        return Response({'status': 'deleted'}, status=status.HTTP_204_NO_CONTENT)
+    except UserProfile.DoesNotExist:
+        return Response({'error': 'Profile not found'}, status=status.HTTP_404_NOT_FOUND)

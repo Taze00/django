@@ -1,5 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+from PIL import Image
+import os
 
 
 class Exercise(models.Model):
@@ -109,3 +113,55 @@ class WorkoutSet(models.Model):
 
     def __str__(self):
         return f"{self.workout} - {self.exercise.name} Set {self.set_number}"
+
+
+class UserProfile(models.Model):
+    """User profile with optional profile picture"""
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
+    profile_picture = models.ImageField(
+        upload_to="profile_pictures/",
+        null=True,
+        blank=True
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Profile for {self.user.username}"
+
+    def save(self, *args, **kwargs):
+        # Delete old image if new one is uploaded
+        if self.pk:
+            try:
+                old = UserProfile.objects.get(pk=self.pk)
+                if old.profile_picture and old.profile_picture != self.profile_picture:
+                    if os.path.exists(old.profile_picture.path):
+                        os.remove(old.profile_picture.path)
+            except UserProfile.DoesNotExist:
+                pass
+
+        # Compress and resize image if uploaded
+        if self.profile_picture:
+            img = Image.open(self.profile_picture)
+            
+            # Convert RGBA to RGB
+            if img.mode in ("RGBA", "LA", "P"):
+                rgb_img = Image.new("RGB", img.size, (255, 255, 255))
+                rgb_img.paste(img, mask=img.split()[-1] if img.mode == "RGBA" else None)
+                img = rgb_img
+
+            # Resize to 400x400
+            img.thumbnail((400, 400), Image.Resampling.LANCZOS)
+            
+            # Save with compression
+            img.save(self.profile_picture.path, "JPEG", quality=85, optimize=True)
+
+        super().save(*args, **kwargs)
+
+
+@receiver(post_delete, sender=UserProfile)
+def delete_profile_picture(sender, instance, **kwargs):
+    """Delete profile picture file when UserProfile is deleted"""
+    if instance.profile_picture:
+        if os.path.exists(instance.profile_picture.path):
+            os.remove(instance.profile_picture.path)

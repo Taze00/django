@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { useWorkoutStore } from '../stores/workoutStore';
+import api from '../api';
 
 export default function ProfileView() {
   const navigate = useNavigate();
@@ -9,10 +10,68 @@ export default function ProfileView() {
   const logout = useAuthStore(state => state.logout);
   const workouts = useWorkoutStore(state => state.workouts);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [previewImage, setPreviewImage] = useState(user?.profile_picture || null);
 
   const handleLogoutConfirm = () => {
     logout();
     navigate('/login');
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Check file size
+    if (file.size > 2 * 1024 * 1024) {
+      alert('File size exceeds 2MB limit');
+      return;
+    }
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setPreviewImage(event.target.result);
+    };
+    reader.readAsDataURL(file);
+
+    // Upload file
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('profile_picture', file);
+
+      const res = await api.put('/profile/picture/upload/', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+
+      // Update user in auth store
+      useAuthStore.setState(state => ({
+        user: { ...state.user, profile_picture: res.data.profile_picture }
+      }));
+    } catch (error) {
+      alert('Failed to upload image');
+      setPreviewImage(user?.profile_picture || null);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDeletePicture = async () => {
+    if (!window.confirm('Delete profile picture?')) return;
+
+    setUploading(true);
+    try {
+      await api.delete('/profile/picture/delete/');
+      setPreviewImage(null);
+      useAuthStore.setState(state => ({
+        user: { ...state.user, profile_picture: null }
+      }));
+    } catch (error) {
+      alert('Failed to delete image');
+    } finally {
+      setUploading(false);
+    }
   };
 
   // Calculate stats
@@ -39,29 +98,38 @@ export default function ProfileView() {
       <div className="main-content">
         {/* User Card */}
         <div className="profile-card">
-          <div className="profile-avatar">👤</div>
+          <div className="profile-avatar-container">
+            {previewImage ? (
+              <img src={previewImage} alt="Profile" className="profile-avatar-image" />
+            ) : (
+              <div className="profile-avatar">👤</div>
+            )}
+            <label className="profile-upload-overlay" style={{ opacity: uploading ? 0.5 : 1 }}>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                disabled={uploading}
+                style={{ display: 'none' }}
+              />
+              <span className="profile-upload-icon">📷</span>
+            </label>
+            {previewImage && (
+              <button
+                className="profile-delete-picture"
+                onClick={handleDeletePicture}
+                disabled={uploading}
+                title="Delete picture"
+              >
+                ✕
+              </button>
+            )}
+          </div>
           <p className="profile-username">{user?.username || 'Athlete'}</p>
           <p className="profile-email">{user?.email || 'No email'}</p>
+          <p className="profile-upload-hint">Tap image to change (max 2MB)</p>
         </div>
 
-        {/* Stats Section */}
-        <div className="profile-section">
-          <h3 className="profile-section-title">Stats</h3>
-          <div className="profile-stats-grid">
-            <div className="profile-stat-item">
-              <p className="profile-stat-label">Total Workouts</p>
-              <p className="profile-stat-value">{totalWorkouts}</p>
-            </div>
-            <div className="profile-stat-item">
-              <p className="profile-stat-label">Push-ups</p>
-              <p className="profile-stat-value">{totalPushReps}</p>
-            </div>
-            <div className="profile-stat-item">
-              <p className="profile-stat-label">Pull-ups</p>
-              <p className="profile-stat-value">{totalPullReps}</p>
-            </div>
-          </div>
-        </div>
 
         {/* Settings Section */}
         <div className="profile-section">
