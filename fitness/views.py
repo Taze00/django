@@ -320,9 +320,10 @@ def delete_profile_picture(request):
     """Delete user profile picture"""
     try:
         profile = UserProfile.objects.get(user=request.user)
-        profile.profile_picture.delete()
+        if profile.profile_picture:
+            profile.profile_picture.delete()
         profile.profile_picture = None
         profile.save()
-        return Response({'status': 'deleted'}, status=status.HTTP_204_NO_CONTENT)
+        return Response({'status': 'deleted', 'profile_picture': None}, status=status.HTTP_200_OK)
     except UserProfile.DoesNotExist:
         return Response({'error': 'Profile not found'}, status=status.HTTP_404_NOT_FOUND)
