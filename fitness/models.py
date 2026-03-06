@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
-from PIL import Image
+from PIL import Image, ImageOps
 import os
 import io
 from django.core.files.base import ContentFile
