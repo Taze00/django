@@ -164,11 +164,11 @@ class UserProfile(models.Model):
             img.save(img_io, format="JPEG", quality=85, optimize=True)
             img_io.seek(0)
             
-            # Save bytes to field
+            # Save bytes to field - use only filename to prevent duplication
             import os
             filename = os.path.basename(self.profile_picture.name)
             self.profile_picture.save(
-                self.profile_picture.name,
+                filename,
                 ContentFile(img_io.getvalue()),
                 save=False
             )
