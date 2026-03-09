@@ -68,6 +68,7 @@ export default function SetProgressionView() {
 
       // Refresh data
       const state = useWorkoutStore.getState();
+      useWorkoutStore.setState({ isInitialized: false });
       await state.initialize();
       
       alert('Progression levels updated successfully');
