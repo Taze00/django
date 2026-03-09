@@ -31,8 +31,13 @@ class UserProgressionViewSet(viewsets.ModelViewSet):
         """Update current progression level"""
         progression = self.get_object()
         if 'current_progression' in request.data:
-            progression.current_progression = request.data['current_progression']
-            progression.save()
+            try:
+                prog_id = request.data['current_progression']
+                progression_obj = Progression.objects.get(id=prog_id)
+                progression.current_progression = progression_obj
+                progression.save()
+            except Progression.DoesNotExist:
+                return Response({'error': 'Invalid progression'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(UserProgressionSerializer(progression).data)
 
 
