@@ -10,19 +10,26 @@ export default function SetProgressionView() {
   const [saving, setSaving] = useState(false);
   const [progressions, setProgressions] = useState({});
   const [isLoading, setIsLoading] = useState(true);
+  const [exerciseDetails, setExerciseDetails] = useState({});
 
   useEffect(() => {
     // Initialize progressions state from store
     if (exercises && exercises.length > 0) {
       const initialProgressions = {};
+      const details = {};
+
       exercises.forEach(exercise => {
         const key = String(exercise.id);
         const prog = userProgressions[key];
+        details[key] = exercise.progressions || [];
+        
         if (prog) {
           initialProgressions[key] = prog.current_progression;
         }
       });
+      
       setProgressions(initialProgressions);
+      setExerciseDetails(details);
       setIsLoading(false);
     } else {
       setIsLoading(false);
@@ -130,8 +137,16 @@ export default function SetProgressionView() {
           <p className="progression-settings-desc">Choose your current level for each exercise</p>
 
           {exercises.map(exercise => {
-            const prog = userProgressions[String(exercise.id)];
-            if (!prog) return null;
+            const key = String(exercise.id);
+            const prog = userProgressions[key];
+            const progressionsList = exerciseDetails[key] || exercise.progressions || [];
+            
+            if (!prog || !progressionsList || progressionsList.length === 0) {
+              return null;
+            }
+
+            const currentProgId = progressions[key];
+            const currentProgName = progressionsList.find(p => p.id === currentProgId)?.name || 'Not set';
 
             return (
               <div key={exercise.id} className="progression-setting-item">
@@ -143,10 +158,10 @@ export default function SetProgressionView() {
                 </div>
 
                 <div className="progression-levels-grid">
-                  {prog.progressions && prog.progressions.map((progressionLevel, idx) => (
+                  {progressionsList.map((progressionLevel, idx) => (
                     <button
-                      key={idx}
-                      className={`progression-level-btn ${progressions[String(exercise.id)] === progressionLevel.id ? 'active' : ''}`}
+                      key={progressionLevel.id}
+                      className={`progression-level-btn ${currentProgId === progressionLevel.id ? 'active' : ''}`}
                       onClick={() => handleProgressionChange(exercise.id, progressionLevel.id)}
                       title={progressionLevel.name}
                     >
@@ -157,7 +172,7 @@ export default function SetProgressionView() {
                 </div>
 
                 <p className="progression-setting-current">
-                  Current: {prog.progressions && prog.progressions.find(p => p.id === progressions[String(exercise.id)])?.name || 'Not set'}
+                  Current: {currentProgName}
                 </p>
               </div>
             );
