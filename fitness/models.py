@@ -165,6 +165,8 @@ class UserProfile(models.Model):
             img_io.seek(0)
             
             # Save bytes to field
+            import os
+            filename = os.path.basename(self.profile_picture.name)
             self.profile_picture.save(
                 self.profile_picture.name,
                 ContentFile(img_io.getvalue()),
