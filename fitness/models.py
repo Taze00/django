@@ -136,18 +136,25 @@ class UserProfile(models.Model):
         return f"Profile for {self.user.username}"
 
     def save(self, *args, **kwargs):
+        # Track if profile picture is being changed
+        picture_changed = False
+
         # Delete old image if new one is uploaded
         if self.pk:
             try:
                 old = UserProfile.objects.get(pk=self.pk)
                 if old.profile_picture and old.profile_picture != self.profile_picture:
+                    picture_changed = True
                     if os.path.exists(old.profile_picture.path):
                         os.remove(old.profile_picture.path)
             except UserProfile.DoesNotExist:
-                pass
+                picture_changed = True
+        else:
+            # New profile being created
+            picture_changed = True
 
-        # Compress and resize image if uploaded
-        if self.profile_picture and (not self.pk or self.profile_picture.name != UserProfile.objects.get(pk=self.pk).profile_picture.name):
+        # Compress and resize image ONLY if it was actually changed
+        if self.profile_picture and picture_changed:
             img = Image.open(self.profile_picture)
             
             # Convert RGBA to RGB
