@@ -1,25 +1,32 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWorkoutStore } from '../stores/workoutStore';
+import api from '../api';
 
 export default function SetProgressionView() {
   const navigate = useNavigate();
-  const exercises = useWorkoutStore(state => state.exercises);
-  const userProgressions = useWorkoutStore(state => state.userProgressions);
+  const exercises = useWorkoutStore(state => state.exercises) || [];
+  const userProgressions = useWorkoutStore(state => state.userProgressions) || {};
   const [saving, setSaving] = useState(false);
   const [progressions, setProgressions] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Initialize progressions state from store
-    const initialProgressions = {};
-    exercises.forEach(exercise => {
-      const key = String(exercise.id);
-      const prog = userProgressions[key];
-      if (prog) {
-        initialProgressions[key] = prog.current_progression;
-      }
-    });
-    setProgressions(initialProgressions);
+    if (exercises && exercises.length > 0) {
+      const initialProgressions = {};
+      exercises.forEach(exercise => {
+        const key = String(exercise.id);
+        const prog = userProgressions[key];
+        if (prog) {
+          initialProgressions[key] = prog.current_progression;
+        }
+      });
+      setProgressions(initialProgressions);
+      setIsLoading(false);
+    } else {
+      setIsLoading(false);
+    }
   }, [exercises, userProgressions]);
 
   const handleProgressionChange = (exerciseId, newProgression) => {
@@ -47,13 +54,8 @@ export default function SetProgressionView() {
 
       // Call API to update progressions
       for (const update of updates) {
-        await fetch(`/api/user-progressions/${update.exerciseId}/`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-          },
-          body: JSON.stringify({ current_progression: update.progression })
+        await api.patch(`/user-progressions/${update.exerciseId}/`, {
+          current_progression: update.progression
         });
       }
 
@@ -70,6 +72,43 @@ export default function SetProgressionView() {
       setSaving(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="home-container">
+        <div className="header">
+          <div className="header-content">
+            <h1 className="header-title">Set Levels</h1>
+          </div>
+        </div>
+        <div className="main-content" style={{ textAlign: 'center', padding: '60px 20px' }}>
+          <p style={{ color: '#94a3b8' }}>Loading exercises...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!exercises || exercises.length === 0) {
+    return (
+      <div className="home-container">
+        <div className="header">
+          <div className="header-content">
+            <h1 className="header-title">Set Levels</h1>
+            <button
+              className="header-close-btn"
+              onClick={() => navigate('/profile')}
+              title="Close"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+        <div className="main-content" style={{ textAlign: 'center', padding: '60px 20px' }}>
+          <p style={{ color: '#94a3b8' }}>No exercises found</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="home-container">
@@ -104,7 +143,7 @@ export default function SetProgressionView() {
                 </div>
 
                 <div className="progression-levels-grid">
-                  {prog.progressions.map((progressionLevel, idx) => (
+                  {prog.progressions && prog.progressions.map((progressionLevel, idx) => (
                     <button
                       key={idx}
                       className={`progression-level-btn ${progressions[String(exercise.id)] === progressionLevel.id ? 'active' : ''}`}
@@ -118,7 +157,7 @@ export default function SetProgressionView() {
                 </div>
 
                 <p className="progression-setting-current">
-                  Current: {prog.progressions.find(p => p.id === progressions[String(exercise.id)])?.name || 'Not set'}
+                  Current: {prog.progressions && prog.progressions.find(p => p.id === progressions[String(exercise.id)])?.name || 'Not set'}
                 </p>
               </div>
             );
