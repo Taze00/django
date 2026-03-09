@@ -147,7 +147,7 @@ class UserProfile(models.Model):
                 pass
 
         # Compress and resize image if uploaded
-        if self.profile_picture:
+        if self.profile_picture and (not self.pk or self.profile_picture.name != UserProfile.objects.get(pk=self.pk).profile_picture.name):
             img = Image.open(self.profile_picture)
             
             # Convert RGBA to RGB
