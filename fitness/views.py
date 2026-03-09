@@ -19,13 +19,21 @@ class ExerciseViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = []
 
 
-class UserProgressionViewSet(viewsets.ReadOnlyModelViewSet):
+class UserProgressionViewSet(viewsets.ModelViewSet):
     """User's current progression levels"""
     serializer_class = UserProgressionSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return UserExerciseProgression.objects.filter(user=self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        """Update current progression level"""
+        progression = self.get_object()
+        if 'current_progression' in request.data:
+            progression.current_progression = request.data['current_progression']
+            progression.save()
+        return Response(UserProgressionSerializer(progression).data)
 
 
 class WorkoutViewSet(viewsets.ModelViewSet):
