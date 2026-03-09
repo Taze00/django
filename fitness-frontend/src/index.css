@@ -2919,3 +2919,148 @@ body {
 .training-days-card .week-day:active {
   transform: scale(0.95);
 }
+
+/* ===================================== */
+/* SET PROGRESSION VIEW */
+/* ===================================== */
+
+.progression-settings-card {
+  background: linear-gradient(135deg, rgba(51, 65, 85, 0.3) 0%, rgba(30, 41, 59, 0.3) 100%);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+  backdrop-filter: blur(10px);
+}
+
+.progression-settings-desc {
+  color: #cbd5e1;
+  font-size: 14px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.progression-setting-item {
+  margin-bottom: 32px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.progression-setting-item:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.progression-setting-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.progression-setting-icon {
+  font-size: 24px;
+}
+
+.progression-setting-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #f1f5f9;
+  margin: 0;
+}
+
+.progression-levels-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+@media (max-width: 480px) {
+  .progression-levels-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.progression-level-btn {
+  background: rgba(51, 65, 85, 0.4);
+  border: 2px solid rgba(148, 163, 184, 0.2);
+  border-radius: 12px;
+  padding: 12px;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.progression-level-number {
+  font-size: 12px;
+  font-weight: 700;
+  color: #94a3b8;
+  margin: 0 0 4px 0;
+  text-transform: uppercase;
+}
+
+.progression-level-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #cbd5e1;
+  margin: 0;
+  word-break: break-word;
+}
+
+.progression-level-btn.active {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-color: #10b981;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+.progression-level-btn.active .progression-level-number,
+.progression-level-btn.active .progression-level-name {
+  color: white;
+}
+
+.progression-level-btn:active {
+  transform: scale(0.95);
+}
+
+.progression-setting-current {
+  font-size: 12px;
+  color: #94a3b8;
+  text-align: center;
+  margin: 0;
+}
+
+.progression-save-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  margin-bottom: 16px;
+}
+
+.progression-save-btn:active:not(:disabled) {
+  transform: scale(0.98);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+}
+
+.progression-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.progression-setting-info {
+  color: #94a3b8;
+  font-size: 12px;
+  margin: 0;
+  line-height: 1.6;
+  text-align: center;
+}

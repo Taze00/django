@@ -10,6 +10,7 @@ import ExercisesView from './views/ExercisesView';
 import StatisticsView from './views/StatisticsView';
 import ProfileView from './views/ProfileView';
 import TrainingDaysView from './views/TrainingDaysView';
+import SetProgressionView from './views/SetProgressionView';
 
 function PrivateRoute({ children }) {
   const isAuthenticated = useAuthStore(state => state.isAuthenticated);
@@ -103,6 +104,16 @@ function App() {
             <PrivateRoute>
               <PrivateLayout>
                 <TrainingDaysView />
+              </PrivateLayout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/set-progression"
+          element={
+            <PrivateRoute>
+              <PrivateLayout>
+                <SetProgressionView />
               </PrivateLayout>
             </PrivateRoute>
           }

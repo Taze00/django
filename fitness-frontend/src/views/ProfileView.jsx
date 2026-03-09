@@ -140,6 +140,17 @@ export default function ProfileView() {
 
           <button
             className="profile-setting-nav-btn"
+            onClick={() => navigate('/set-progression')}
+          >
+            <div>
+              <p className="profile-setting-label">Set Your Levels</p>
+              <p className="profile-setting-desc">Choose your starting progression</p>
+            </div>
+            <span className="profile-setting-arrow">›</span>
+          </button>
+
+          <button
+            className="profile-setting-nav-btn"
             onClick={() => navigate('/training-days')}
           >
             <div>
