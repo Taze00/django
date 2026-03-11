@@ -1060,7 +1060,7 @@ body {
 /* RESPONSIVE */
 /* ===================================== */
 
-@media (max-width: 480px) {
+@media (max-width: 360px) {
   .section-title {
     font-size: 28px;
   }
@@ -1393,7 +1393,7 @@ body {
   font-weight: 500;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 360px) {
   .week-grid {
     grid-template-columns: repeat(5, 1fr);
   }
@@ -1491,7 +1491,7 @@ body {
   color: #f59e0b;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 360px) {
   .week-grid-scroll .week-day {
     min-width: 48px;
     padding: 10px 6px;
@@ -2092,7 +2092,7 @@ body {
   box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
 }
 
-@media (max-width: 480px) {
+@media (max-width: 360px) {
   .profile-stats-grid {
     grid-template-columns: 1fr;
   }
@@ -2214,7 +2214,7 @@ body {
   box-shadow: 0 0 8px rgba(52, 211, 153, 0.5);
 }
 
-@media (max-width: 480px) {
+@media (max-width: 360px) {
   .bottom-nav-profile-pic {
     width: 34px;
     height: 34px;
@@ -2482,7 +2482,7 @@ body {
   transform: scale(1.1);
 }
 
-@media (max-width: 480px) {
+@media (max-width: 360px) {
   .stats-streak-grid {
     grid-template-columns: 1fr;
   }
@@ -3012,7 +3012,7 @@ body {
   margin-bottom: 12px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 360px) {
   .progression-levels-grid {
     grid-template-columns: 1fr;
   }
