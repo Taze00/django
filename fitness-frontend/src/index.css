@@ -3099,3 +3099,26 @@ body {
   line-height: 1.6;
   text-align: center;
 }
+
+.streak-emoji {
+  font-size: 24px;
+  margin-left: 4px;
+  display: inline-block;
+  animation: flameFlicker 1.5s ease-in-out infinite;
+}
+
+@keyframes flameFlicker {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  25% {
+    transform: scale(1.1) rotate(-2deg);
+  }
+  50% {
+    transform: scale(0.95) rotate(2deg);
+  }
+  75% {
+    transform: scale(1.05) rotate(-1deg);
+  }
+}

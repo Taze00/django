@@ -190,11 +190,11 @@ export default function StatisticsView() {
         {/* Streak Cards */}
         <div className="stats-streak-grid">
           <div className="stats-streak-card">
-            <div className="stats-streak-number">{currentStreak} 🔥</div>
+            <div className="stats-streak-number">{currentStreak}<span className="streak-emoji">🔥</span></div>
             <div className="stats-streak-label">Current Streak</div>
           </div>
           <div className="stats-streak-card">
-            <div className="stats-streak-number">{longestStreak} 🔥</div>
+            <div className="stats-streak-number">{longestStreak}<span className="streak-emoji">🔥</span></div>
             <div className="stats-streak-label">Longest Streak</div>
           </div>
         </div>
