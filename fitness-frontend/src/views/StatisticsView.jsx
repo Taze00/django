@@ -118,13 +118,13 @@ export default function StatisticsView() {
     .filter(w => w.sets && w.sets.length > 0)
     .sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  // Helper to format date like "11 March Wednesday"
+  // Helper to format date like "11.March Wednesday"
   const formatWorkoutDate = (dateStr) => {
     const date = new Date(dateStr);
     const day = date.toLocaleDateString('en-US', { weekday: 'long' });
     const month = date.toLocaleDateString('en-US', { month: 'long' });
     const dayNum = date.getDate();
-    return `${dayNum} ${month} ${day}`;
+    return `${dayNum}.${month} ${day}`;
   };
 
   // Helper to group sets by exercise
