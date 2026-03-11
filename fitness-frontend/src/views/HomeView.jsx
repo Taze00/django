@@ -151,7 +151,7 @@ export default function HomeView() {
                     return (
                       <div key={day} className="week-day rest-day">
                         <p className="week-day-name">{day}</p>
-                        <p className="week-day-status">🌙</p>
+                        <p className="week-day-status">😴</p>
                       </div>
                     );
                   }
@@ -209,7 +209,6 @@ export default function HomeView() {
             </div>
 
 <button className="btn-start-inline" onClick={handleStartWorkout}>
-              <span className="btn-start-emoji">💪</span>
               Start Workout
             </button>
           </>
