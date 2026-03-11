@@ -270,7 +270,7 @@ body {
 }
 
 .header-title {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 900;
   background: linear-gradient(90deg, #34d399 0%, #60a5fa 100%);
   -webkit-background-clip: text;
@@ -314,7 +314,7 @@ body {
 }
 
 .section-title {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
   color: #f1f5f9;
   margin-bottom: 20px;
@@ -422,7 +422,7 @@ body {
 }
 
 .exercise-arrow {
-  font-size: 24px;
+  font-size: 28px;
   opacity: 0;
   transition: all 0.3s ease;
   transform: translateX(-8px);
@@ -716,7 +716,7 @@ body {
 }
 
 .btn-start-emoji {
-  font-size: 24px;
+  font-size: 28px;
 }
 
 .btn-start-inline {
@@ -793,7 +793,7 @@ body {
 }
 
 .bottom-nav-icon {
-  font-size: 24px;
+  font-size: 28px;
 }
 
 /* ===================================== */
@@ -908,7 +908,7 @@ body {
 }
 
 .rest-timer-title {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 900;
   color: #f1f5f9;
   text-transform: uppercase;
@@ -1263,7 +1263,7 @@ body {
 }
 
 .week-day-status {
-  font-size: 24px;
+  font-size: 28px;
   color: #34d399;
   font-weight: 900;
 }
@@ -1590,7 +1590,7 @@ body {
   border: none;
   background: transparent;
   color: #f1f5f9;
-  font-size: 24px;
+  font-size: 28px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1707,7 +1707,7 @@ body {
 }
 
 .warmup-emoji {
-  font-size: 24px;
+  font-size: 28px;
   flex-shrink: 0;
 }
 
@@ -2624,7 +2624,7 @@ body {
   background: transparent;
   border: none;
   color: #94a3b8;
-  font-size: 24px;
+  font-size: 28px;
   cursor: pointer;
   width: 36px;
   height: 36px;
@@ -2638,7 +2638,7 @@ body {
 }
 
 .info-modal-title {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
   color: #f1f5f9;
   margin-bottom: 16px;
@@ -2727,7 +2727,7 @@ body {
   border: 1px solid rgba(148, 163, 184, 0.2);
   color: #f1f5f9;
   border-radius: 8px;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 300;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -2842,7 +2842,7 @@ body {
 }
 
 .profile-setting-arrow {
-  font-size: 24px;
+  font-size: 28px;
   color: #cbd5e1;
 }
 
@@ -2856,7 +2856,7 @@ body {
   border: none;
   color: #f1f5f9;
   border-radius: 8px;
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 300;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -2995,7 +2995,7 @@ body {
 }
 
 .progression-setting-icon {
-  font-size: 24px;
+  font-size: 28px;
 }
 
 .progression-setting-name {
@@ -3101,8 +3101,8 @@ body {
 }
 
 .streak-emoji {
-  font-size: 24px;
-  margin-left: 4px;
+  font-size: 28px;
+  margin-left: 2px;
   display: inline-block;
   animation: flameFlicker 1.5s ease-in-out infinite;
 }
