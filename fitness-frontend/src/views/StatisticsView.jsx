@@ -118,11 +118,11 @@ export default function StatisticsView() {
     .filter(w => w.sets && w.sets.length > 0)
     .sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  // Helper to format date like "Thu, Mar 6"
+  // Helper to format date like "Thursday, March 6"
   const formatWorkoutDate = (dateStr) => {
     const date = new Date(dateStr);
-    const day = date.toLocaleDateString('en-US', { weekday: 'short' });
-    const month = date.toLocaleDateString('en-US', { month: 'short' });
+    const day = date.toLocaleDateString('en-US', { weekday: 'long' });
+    const month = date.toLocaleDateString('en-US', { month: 'long' });
     const dayNum = date.getDate();
     return `${day}, ${month} ${dayNum}`;
   };
@@ -229,12 +229,12 @@ export default function StatisticsView() {
                         </div>
                         <div className="history-sets-container">
                           {sets.map((set, idx) => (
-                            <div key={idx} className={`history-set-item ${set.set_number === 3 ? 'drop-set' : ''}`}>
+                            <div key={idx} className={`history-set-item ${set.set_number === 3 && set.is_drop_set ? 'drop-set' : ''}`}>
                               <span className="set-label">
-                                {set.set_number === 3 && set.is_drop_set ? '🔥 Drop' : `Set ${set.set_number}`}
+                                {set.set_number === 3 && set.is_drop_set ? 'Drop' : `Set ${set.set_number}`}
                               </span>
-                              <span className="set-value">
-                                {set.reps ? `${set.reps}r` : `${set.seconds}s`}
+                              <span className={`set-value ${set.set_number === 3 && set.is_drop_set ? 'drop-value' : ''}`}>
+                                {set.set_number === 3 && set.is_drop_set ? '✓' : (set.reps ? `${set.reps}` : `${set.seconds}s`)}
                               </span>
                             </div>
                           ))}
