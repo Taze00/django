@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useWorkoutStore } from '../stores/workoutStore';
 
 export default function StatisticsView() {
@@ -10,9 +10,9 @@ export default function StatisticsView() {
     return date.toISOString().split('T')[0];
   };
 
-  // Get all completed workout dates
+  // Get all trained dates (workouts with sets)
   const trainedDates = new Set(
-    workouts.filter(w => w.completed).map(w => w.date)
+    workouts.filter(w => w.sets && w.sets.length > 0).map(w => w.date)
   );
 
   // Calculate current streak
@@ -113,8 +113,9 @@ export default function StatisticsView() {
   const heatmapData = generateHeatmapData();
 
   // Get completed workouts sorted by date (newest first)
+  // Show all workouts that have sets (whether fully completed or not)
   const completedWorkouts = workouts
-    .filter(w => w.completed)
+    .filter(w => w.sets && w.sets.length > 0)
     .sort((a, b) => new Date(b.date) - new Date(a.date));
 
   // Helper to format date like "Thu, Mar 6"
@@ -138,6 +139,29 @@ export default function StatisticsView() {
     return grouped;
   };
 
+  // Calculate total reps and time
+  const stats = useMemo(() => {
+    const result = {
+      pushReps: 0,
+      pullReps: 0,
+      plankSeconds: 0,
+    };
+
+    workouts.forEach(workout => {
+      workout.sets?.forEach(set => {
+        if (set.exercise_name === 'Push-ups' && set.reps) {
+          result.pushReps += set.reps;
+        } else if (set.exercise_name === 'Pull-ups' && set.reps) {
+          result.pullReps += set.reps;
+        } else if (set.exercise_name === 'Planks' && set.seconds) {
+          result.plankSeconds += set.seconds;
+        }
+      });
+    });
+
+    return result;
+  }, [workouts]);
+
   return (
     <div className="home-container">
       <div className="header">
@@ -147,29 +171,31 @@ export default function StatisticsView() {
       </div>
 
       <div className="main-content">
-        {/* Streak Cards */}
-        <div className="stats-streak-grid">
-          <div className="stats-streak-card">
-            <div className="stats-streak-number">{currentStreak}</div>
-            <div className="stats-streak-label">Current Streak</div>
+        {/* Total Stats */}
+        <div className="stats-summary">
+          <div className="stat-item">
+            <p className="stat-label">Push-ups</p>
+            <p className="stat-value">{stats.pushReps}</p>
           </div>
-          <div className="stats-streak-card">
-            <div className="stats-streak-number">{longestStreak}</div>
-            <div className="stats-streak-label">Longest Streak</div>
+          <div className="stat-item">
+            <p className="stat-label">Pull-ups</p>
+            <p className="stat-value">{stats.pullReps}</p>
+          </div>
+          <div className="stat-item">
+            <p className="stat-label">Core Time</p>
+            <p className="stat-value">{Math.floor(stats.plankSeconds / 60)}m</p>
           </div>
         </div>
 
-        {/* Heatmap Section */}
-        <div className="stats-heatmap-section">
-          <h2 className="stats-heatmap-title">Last 12 Weeks</h2>
-          <div className="stats-heatmap-grid">
-            {heatmapData.map((day, idx) => (
-              <div
-                key={idx}
-                className={`stats-heatmap-cell ${day.trained ? 'trained' : 'empty'}`}
-                title={`${day.date}: ${day.trained ? 'Trained' : 'Rest'}`}
-              />
-            ))}
+        {/* Streak Cards */}
+        <div className="stats-streak-grid">
+          <div className="stats-streak-card">
+            <div className="stats-streak-number">{currentStreak} 🔥</div>
+            <div className="stats-streak-label">Current Streak</div>
+          </div>
+          <div className="stats-streak-card">
+            <div className="stats-streak-number">{longestStreak} 🔥</div>
+            <div className="stats-streak-label">Longest Streak</div>
           </div>
         </div>
 
