@@ -4,6 +4,9 @@ export default function TimerInput({ setNumber, exerciseName, progressionName, t
   const [seconds, setSeconds] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [countdownActive, setCountdownActive] = useState(false);
+  const [countdown, setCountdown] = useState(3);
+  const isPullups = exerciseName === 'Pull-ups';
 
   useEffect(() => {
     if (!isRunning) return;
@@ -14,6 +17,28 @@ export default function TimerInput({ setNumber, exerciseName, progressionName, t
 
     return () => clearInterval(interval);
   }, [isRunning]);
+
+  // Handle countdown before timer start
+  const handleStartCountdown = () => {
+    setCountdownActive(true);
+    setCountdown(3);
+  };
+
+  useEffect(() => {
+    if (!countdownActive || countdown <= 0) return;
+
+    const interval = setInterval(() => {
+      setCountdown(c => {
+        if (c - 1 === 0) {
+          setCountdownActive(false);
+          setIsRunning(true);
+        }
+        return c - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [countdownActive, countdown]);
 
   const handleSubmit = async () => {
     setIsRunning(false);
@@ -43,7 +68,7 @@ export default function TimerInput({ setNumber, exerciseName, progressionName, t
 
         {/* Info Cards */}
         <div className="info-grid" style={{ animation: 'slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both' }}>
-          {targetSeconds && (
+          {targetSeconds && !isPullups && (
             <div className="info-card info-card-emerald">
               <p className="info-label">Target</p>
               <p className="info-value">{targetSeconds}s</p>
@@ -52,26 +77,38 @@ export default function TimerInput({ setNumber, exerciseName, progressionName, t
           {lastTime && (
             <div className="info-card info-card-blue">
               <p className="info-label">Last time</p>
-              <p className="info-value">{formatTime(lastTime)}s</p>
+              <p className="info-value">{formatTime(lastTime)}</p>
             </div>
           )}
         </div>
 
         {/* Timer Display */}
         <div className="timer-display" style={{ animation: 'scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)' }}>
-          <p className="counter-label">Time held</p>
-          <p className="timer-value">{formatTime(seconds)}</p>
+          <p className="counter-label">{countdownActive ? 'Get ready...' : 'Time held'}</p>
+          <p className="timer-value" style={{
+            fontSize: countdownActive ? '96px' : undefined,
+            color: countdownActive ? '#3b82f6' : undefined,
+            animation: countdownActive ? 'pulse 1s infinite' : undefined
+          }}>
+            {countdownActive ? countdown : formatTime(seconds)}
+          </p>
 
           {/* Control Buttons */}
           <div className="button-group" style={{ marginTop: '24px' }}>
             <button
-              onClick={() => setIsRunning(!isRunning)}
+              onClick={() => !isRunning ? handleStartCountdown() : setIsRunning(!isRunning)}
               className={isRunning ? 'btn-large btn-stop' : 'btn-large btn-play'}
+              disabled={countdownActive}
             >
-              {isRunning ? '⏸ Stop' : '▶ Start'}
+              {isRunning ? '⏸ Pause' : '▶ Start'}
             </button>
             <button
-              onClick={() => setSeconds(0)}
+              onClick={() => {
+                setSeconds(0);
+                setCountdownActive(false);
+                setCountdown(3);
+                setIsRunning(false);
+              }}
               className="btn-large btn-reset"
             >
               ↻ Reset

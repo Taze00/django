@@ -13,6 +13,7 @@ class Exercise(models.Model):
     CATEGORY_CHOICES = [
         ("PUSH", "Push"),
         ("PULL", "Pull"),
+        ("CORE", "Core"),
     ]
 
     name = models.CharField(max_length=100)
@@ -108,6 +109,7 @@ class WorkoutSet(models.Model):
     reps = models.IntegerField(null=True, blank=True)
     seconds = models.IntegerField(null=True, blank=True)
     is_drop_set = models.BooleanField(default=False)
+    drop_set_completed = models.BooleanField(default=False, help_text="Whether drop set was completed")
     rest_time_seconds = models.IntegerField(default=180)
     training_days = JSONField(default=list, help_text="Days to train: [1,2,3,4,5] = Mon-Fri")
     created_at = models.DateTimeField(auto_now_add=True)

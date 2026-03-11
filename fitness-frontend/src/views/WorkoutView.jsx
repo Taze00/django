@@ -10,15 +10,18 @@ import ProgressionModal from '../components/ProgressionModal';
 
 const WORKOUT_STEPS = [
   { exercise: 'Push-ups', setNumber: 1, type: 'set' },
+  { exercise: 'Planks', setNumber: 1, type: 'set' },
   { exercise: 'Pull-ups', setNumber: 1, type: 'set' },
   { exercise: 'Push-ups', setNumber: 2, type: 'set' },
+  { exercise: 'Planks', setNumber: 2, type: 'set' },
   { exercise: 'Pull-ups', setNumber: 2, type: 'set' },
   { exercise: 'Push-ups', setNumber: 3, type: 'drop' },
+  { exercise: 'Planks', setNumber: 3, type: 'drop' },
   { exercise: 'Pull-ups', setNumber: 3, type: 'drop' },
 ];
 
 const REST_TIMES = {
-  normal: 180,
+  normal: 120,
   afterDrop: 300,
 };
 
@@ -35,9 +38,11 @@ export default function WorkoutView() {
   const exercises = useWorkoutStore(state => state.exercises);
   const userProgressions = useWorkoutStore(state => state.userProgressions);
   const isInitialized = useWorkoutStore(state => state.isInitialized);
+  const lastPerformance = useWorkoutStore(state => state.lastPerformance);
   const getCurrentWorkout = useWorkoutStore(state => state.getCurrentWorkout);
   const addSet = useWorkoutStore(state => state.addSet);
   const completeWorkout = useWorkoutStore(state => state.completeWorkout);
+  const getLastPerformance = useWorkoutStore(state => state.getLastPerformance);
 
   useEffect(() => {
     if (isInitialized && exercises.length > 0) {
@@ -49,11 +54,22 @@ export default function WorkoutView() {
     try {
       const workout = await getCurrentWorkout();
       setCurrentWorkout(workout);
+      try {
+        await getLastPerformance();
+      } catch (e) {
+        console.warn('Could not fetch last performance:', e);
+      }
       setIsLoading(false);
     } catch (error) {
       console.error('Error starting workout:', error);
       setIsLoading(false);
     }
+  };
+
+  const getLastTime = (exerciseName, setNumber) => {
+    const perf = lastPerformance?.[exerciseName];
+    if (!perf) return null;
+    return perf[`set${setNumber}`] ?? null;
   };
 
   const getExerciseById = (name) => {
@@ -95,11 +111,15 @@ export default function WorkoutView() {
     return progInfo?.currentProgression?.name || nextStep.exercise;
   };
 
-  const handleSetComplete = async (value) => {
+  const handleSetComplete = async (valueOrDropSetCompleted = null) => {
     setIsLoading(true);
     try {
       const step = WORKOUT_STEPS[currentStep];
-      const progInfo = getProgressionInfo(step.exercise, step.setNumber, step.type === 'drop');
+      const isDropSet = step.type === 'drop';
+      const dropSetCompleted = isDropSet && valueOrDropSetCompleted !== false;
+      const value = !isDropSet ? valueOrDropSetCompleted : null;
+      
+      const progInfo = getProgressionInfo(step.exercise, step.setNumber, isDropSet);
       
       if (!progInfo) {
         console.error('Cannot save set: progInfo is null');
@@ -108,7 +128,7 @@ export default function WorkoutView() {
 
       const reps = progInfo.currentProgression.target_type === 'reps' ? value : null;
       const seconds = progInfo.currentProgression.target_type === 'time' ? value : null;
-      const restTime = step.type === 'drop' ? REST_TIMES.afterDrop : REST_TIMES.normal;
+      const restTime = isDropSet ? REST_TIMES.afterDrop : REST_TIMES.normal;
 
       await addSet(
         currentWorkout.id,
@@ -118,7 +138,8 @@ export default function WorkoutView() {
         reps,
         seconds,
         restTime,
-        step.type === 'drop'
+        isDropSet,
+        dropSetCompleted
       );
 
       if (currentStep === WORKOUT_STEPS.length - 1) {
@@ -212,7 +233,7 @@ export default function WorkoutView() {
   }
 
   const step = WORKOUT_STEPS[currentStep];
-  const progInfo = getProgressionInfo(step.exercise, step.setNumber, step.type === 'drop');
+  const progInfo = getProgressionInfo(step.exercise, step.setNumber, step.type === "drop" && dropSetCompleted);
 
   if (!progInfo) {
     return (
@@ -240,7 +261,7 @@ export default function WorkoutView() {
           <div className="workout-header-info">
             <p className="workout-step">Step {currentStep + 1} of {WORKOUT_STEPS.length}</p>
             <p className="workout-current">
-              {step.type === 'drop' ? '🔥 ' : ''}{step.exercise} Set {step.setNumber}
+              {step.type === "drop" && dropSetCompleted ? '🔥 ' : ''}{step.exercise} Set {step.setNumber}
             </p>
           </div>
           <div className="workout-progress-bar">
@@ -253,17 +274,18 @@ export default function WorkoutView() {
       </header>
 
       <main className="workout-content">
-        {step.type === 'drop' ? (
+        {step.type === "drop" && dropSetCompleted ? (
           <DropSetInstructions
             exercise={progInfo.exercise}
             progressions={[progInfo.currentProgression].concat(progInfo.nextProgressions.reverse())}
-            onComplete={() => handleSetComplete(0)}
+            onComplete={(completed) => handleSetComplete(completed)}
           />
         ) : progInfo.currentProgression.target_type === 'reps' ? (
           <SetInput
             setNumber={step.setNumber}
             exerciseName={step.exercise}
             progressionName={progInfo.currentProgression.name}
+            lastTime={getLastTime(step.exercise, step.setNumber)}
             onComplete={handleSetComplete}
           />
         ) : (
@@ -272,6 +294,7 @@ export default function WorkoutView() {
             exerciseName={step.exercise}
             progressionName={progInfo.currentProgression.name}
             targetSeconds={progInfo.currentProgression.target_value}
+            lastTime={getLastTime(step.exercise, step.setNumber)}
             onComplete={handleSetComplete}
           />
         )}

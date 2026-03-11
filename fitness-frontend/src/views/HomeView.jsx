@@ -30,8 +30,16 @@ export default function HomeView() {
     return prog ? prog.current_progression : null;
   };
 
+  const getPlankProgress = () => {
+    const plankExercise = exercises.find(e => e.name === 'Planks');
+    if (!plankExercise) return null;
+    const prog = userProgressions[String(plankExercise.id)];
+    return prog ? prog.current_progression : null;
+  };
+
   const pushProg = getPushProgress();
   const pullProg = getPullProgress();
+  const plankProg = getPlankProgress();
 
   // Calculate week status based on actual workouts
   const getWeekStatus = () => {
@@ -68,11 +76,23 @@ export default function HomeView() {
 
   const weekStatus = useMemo(() => getWeekStatus(), [trainingDays, workouts]);
 
+  // Get today's day name for highlighting
+  const getTodayDayName = () => {
+    const today = new Date();
+    const dayIndex = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    const dayNum = dayIndex === 0 ? 7 : dayIndex;
+    return ALL_DAYS[dayNum - 1];
+  };
+
+  const todayDayName = useMemo(() => getTodayDayName(), []);
+
   // Calculate total reps and workout count
   const stats = useMemo(() => {
     const result = {
       pushReps: 0,
       pullReps: 0,
+      pullSeconds: 0,
+      plankSeconds: 0,
       totalWorkouts: workouts.length
     };
 
@@ -80,8 +100,15 @@ export default function HomeView() {
       workout.sets?.forEach(set => {
         if (set.exercise_name === 'Push-ups' && set.reps) {
           result.pushReps += set.reps;
-        } else if (set.exercise_name === 'Pull-ups' && set.reps) {
-          result.pullReps += set.reps;
+        } else if (set.exercise_name === 'Pull-ups') {
+          if (set.reps) {
+            result.pullReps += set.reps;
+          }
+          if (set.seconds) {
+            result.pullSeconds += set.seconds;
+          }
+        } else if (set.exercise_name === 'Planks' && set.seconds) {
+          result.plankSeconds += set.seconds;
         }
       });
     });
@@ -105,17 +132,17 @@ export default function HomeView() {
           </div>
         ) : (
           <>
-            <p className="welcome-text">Welcome, {user?.username || 'Athlete'}</p>
             <div className="week-plan">
               <div className="week-grid-inline">
                 {ALL_DAYS.map((day, idx) => {
                   const dayNum = idx + 1;
                   const isTrainingDay = trainingDays.includes(dayNum);
                   const isCompleted = weekStatus[day];
+                  const isToday = day === todayDayName;
 
                   if (isTrainingDay) {
                     return (
-                      <div key={day} className={isCompleted ? 'week-day completed' : 'week-day pending'}>
+                      <div key={day} className={`week-day ${isCompleted ? 'completed' : 'pending'} ${isToday ? 'today' : ''}`}>
                         <p className="week-day-name">{day}</p>
                         <p className="week-day-status">{isCompleted ? '✓' : '○'}</p>
                       </div>
@@ -159,25 +186,23 @@ export default function HomeView() {
                     <p className="progression-name-compact">Loading...</p>
                   )}
                 </div>
+
+                <div className="progression-card-compact progression-core">
+                  <div className="progression-icon-compact">🔳</div>
+                  <p className="progression-title-compact">Core</p>
+                  {plankProg ? (
+                    <>
+                      <p className="progression-name-compact">{plankProg.name}</p>
+                      <p className="progression-level-number">Level {plankProg.level}</p>
+                    </>
+                  ) : (
+                    <p className="progression-name-compact">Loading...</p>
+                  )}
+                </div>
               </div>
             </div>
 
-            <div className="stats-summary">
-              <div className="stat-item">
-                <p className="stat-label">Push-ups</p>
-                <p className="stat-value">{stats.pushReps}</p>
-              </div>
-              <div className="stat-item">
-                <p className="stat-label">Pull-ups</p>
-                <p className="stat-value">{stats.pullReps}</p>
-              </div>
-              <div className="stat-item">
-                <p className="stat-label">Workouts</p>
-                <p className="stat-value">{stats.totalWorkouts}</p>
-              </div>
-            </div>
-
-            <button className="btn-start-inline" onClick={handleStartWorkout}>
+<button className="btn-start-inline" onClick={handleStartWorkout}>
               <span className="btn-start-emoji">💪</span>
               Start Workout
             </button>

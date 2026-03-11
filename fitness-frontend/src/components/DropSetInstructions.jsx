@@ -2,11 +2,12 @@ import { useState } from 'react';
 
 export default function DropSetInstructions({ exercise, progressions, onComplete }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dropSetStatus, setDropSetStatus] = useState(null); // 'completed' or 'skipped'
 
-  const handleComplete = async () => {
+  const handleComplete = async (completed) => {
     setIsSubmitting(true);
     try {
-      await onComplete();
+      await onComplete(completed);
     } finally {
       setIsSubmitting(false);
     }
@@ -44,14 +45,23 @@ export default function DropSetInstructions({ exercise, progressions, onComplete
           ))}
         </div>
 
-        {/* Complete Button */}
-        <button
-          className="btn-submit-workout"
-          onClick={handleComplete}
-          disabled={isSubmitting}
-        >
-          {isSubmitting ? 'Saving...' : 'Drop-Set Complete'}
-        </button>
+        {/* Complete Buttons */}
+        <div className="button-group">
+          <button
+            className="btn-large btn-plus"
+            onClick={() => handleComplete(true)}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? 'Saving...' : '✓ Completed'}
+          </button>
+          <button
+            className="btn-large btn-stop"
+            onClick={() => handleComplete(false)}
+            disabled={isSubmitting}
+          >
+            ✗ Skipped
+          </button>
+        </div>
       </div>
     </div>
   );

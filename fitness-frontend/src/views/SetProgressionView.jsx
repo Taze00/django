@@ -8,6 +8,7 @@ export default function SetProgressionView() {
   const exercises = useWorkoutStore(state => state.exercises) || [];
   const userProgressions = useWorkoutStore(state => state.userProgressions) || {};
   const [saving, setSaving] = useState(false);
+  const [feedback, setFeedback] = useState(null);
   const [progressions, setProgressions] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const [exerciseDetails, setExerciseDetails] = useState({});
@@ -46,12 +47,15 @@ export default function SetProgressionView() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      // Save each progression
+      // Find only changed progressions
       const updates = [];
       exercises.forEach(exercise => {
         const key = String(exercise.id);
         const newProg = progressions[key];
-        if (newProg && userProgressions[key]) {
+        const currentProg = userProgressions[key]?.current_progression;
+
+        // Only add to updates if the progression actually changed
+        if (newProg && newProg !== currentProg) {
           updates.push({
             exerciseId: exercise.id,
             progression: newProg
@@ -59,7 +63,13 @@ export default function SetProgressionView() {
         }
       });
 
-      // Call API to update progressions
+      if (updates.length === 0) {
+        setFeedback({ type: 'info', msg: 'No changes made.' });
+        setSaving(false);
+        return;
+      }
+
+      // Call API to update only changed progressions
       for (const update of updates) {
         await api.patch(`/user-progressions/${update.exerciseId}/`, {
           current_progression: update.progression
@@ -70,12 +80,12 @@ export default function SetProgressionView() {
       const state = useWorkoutStore.getState();
       useWorkoutStore.setState({ isInitialized: false });
       await state.initialize();
-      
-      alert('Progression levels updated successfully');
-      navigate('/profile');
+
+      setFeedback({ type: 'success', msg: 'Levels updated successfully!' });
+      setTimeout(() => navigate('/profile'), 1500);
     } catch (error) {
       console.error('Error saving progressions:', error);
-      alert('Failed to update progression levels');
+      setFeedback({ type: 'error', msg: 'Failed to update levels. Try again.' });
     } finally {
       setSaving(false);
     }
@@ -132,6 +142,21 @@ export default function SetProgressionView() {
           </button>
         </div>
       </div>
+
+        {feedback && (
+          <div style={{
+            padding: '12px 16px',
+            margin: '12px 16px 0',
+            borderRadius: '8px',
+            backgroundColor: feedback.type === 'success' ? 'rgba(16, 185, 129, 0.15)' : feedback.type === 'error' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(59, 130, 246, 0.15)',
+            borderLeft: `4px solid ${feedback.type === 'success' ? '#10b981' : feedback.type === 'error' ? '#ef4444' : '#3b82f6'}`,
+            color: feedback.type === 'success' ? '#10b981' : feedback.type === 'error' ? '#ef4444' : '#3b82f6',
+            fontSize: '14px',
+            fontWeight: '500'
+          }}>
+            {feedback.msg}
+          </div>
+        )}
 
       <div className="main-content">
         <div className="progression-settings-card">

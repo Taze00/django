@@ -229,12 +229,12 @@ export default function StatisticsView() {
                         </div>
                         <div className="history-sets-container">
                           {sets.map((set, idx) => (
-                            <div key={idx} className={`history-set-item ${set.set_number === 3 && set.is_drop_set ? 'drop-set' : ''}`}>
+                            <div key={idx} className={`history-set-item ${set.set_number === 3 && set.is_drop_set ? (set.drop_set_completed ? 'drop-set completed' : 'drop-set') : ''}`}>
                               <span className="set-label">
                                 {set.set_number === 3 && set.is_drop_set ? 'Drop' : `Set ${set.set_number}`}
                               </span>
                               <span className={`set-value ${set.set_number === 3 && set.is_drop_set ? 'drop-value' : ''}`}>
-                                {set.set_number === 3 && set.is_drop_set ? '✓' : (set.reps ? `${set.reps}` : `${set.seconds}s`)}
+                                {set.set_number === 3 && set.is_drop_set ? (set.drop_set_completed ? '✓' : '✗') : (set.reps ? `${set.reps}` : `${set.seconds}s`)}
                               </span>
                             </div>
                           ))}

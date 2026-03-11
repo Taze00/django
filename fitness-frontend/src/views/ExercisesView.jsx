@@ -64,6 +64,7 @@ export default function ExercisesView() {
 
   const pushExercise = exercises.find(e => e.name === 'Push-ups');
   const pullExercise = exercises.find(e => e.name === 'Pull-ups');
+  const plankExercise = exercises.find(e => e.name === 'Planks');
 
   return (
     <div className="home-container">
@@ -76,6 +77,7 @@ export default function ExercisesView() {
       <div className="main-content">
         {pushExercise && renderExercise(pushExercise, 'exercise-push')}
         {pullExercise && renderExercise(pullExercise, 'exercise-pull')}
+        {plankExercise && renderExercise(plankExercise, 'exercise-core')}
       </div>
 
       {/* Info Modal */}

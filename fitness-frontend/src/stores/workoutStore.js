@@ -55,7 +55,7 @@ export const useWorkoutStore = create((set, get) => ({
     }
   },
 
-  addSet: async (workoutId, exerciseId, progressionId, setNumber, reps, seconds, restTime, isDropSet) => {
+  addSet: async (workoutId, exerciseId, progressionId, setNumber, reps, seconds, restTime, isDropSet, dropSetCompleted) => {
     try {
       const res = await api.post(`/workouts/${workoutId}/add_set/`, {
         exercise: exerciseId,
@@ -65,6 +65,7 @@ export const useWorkoutStore = create((set, get) => ({
         seconds,
         rest_time_seconds: restTime,
         is_drop_set: isDropSet,
+        drop_set_completed: dropSetCompleted,
       });
       return res.data;
     } catch (error) {
@@ -86,7 +87,7 @@ export const useWorkoutStore = create((set, get) => ({
 
   getLastPerformance: async () => {
     try {
-      const res = await api.get('/last_performance/');
+      const res = await api.get('/workouts/last_performance/');
       set({ lastPerformance: res.data });
       return res.data;
     } catch (error) {

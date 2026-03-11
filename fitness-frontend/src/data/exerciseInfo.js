@@ -23,7 +23,7 @@ export const EXERCISE_INFO = {
     desc: 'Place your feet on an elevated surface while your hands are on the ground. Your head should be lower than your feet. Lower yourself and push back up. This increases the difficulty significantly.',
     youtube: 'https://www.youtube.com/results?search_query=decline+push+ups+tutorial'
   },
-  'Pseudo Planche': {
+  'Pseudo Planche Push-ups': {
     desc: 'Start in a plank position but lean forward so your shoulders are well past your wrists. Lower yourself while maintaining this forward lean. This builds extreme strength and control.',
     youtube: 'https://www.youtube.com/results?search_query=pseudo+planche+push+ups+tutorial'
   },
@@ -43,7 +43,7 @@ export const EXERCISE_INFO = {
     desc: 'Jump or use assistance to reach the top of a pull-up position with your chin above the bar. Lower yourself slowly and controlled for 3-5 seconds. This builds pulling strength progressively.',
     youtube: 'https://www.youtube.com/results?search_query=pull+up+negatives+tutorial'
   },
-  'Band-Assisted': {
+  'Band-Assisted Pull-ups': {
     desc: 'Loop a resistance band under your feet and over the pull-up bar. The band assists your movement, making the pull-up easier. Grip the bar and pull your chin over the bar.',
     youtube: 'https://www.youtube.com/results?search_query=band+assisted+pull+ups+tutorial'
   },
