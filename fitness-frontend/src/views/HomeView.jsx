@@ -188,7 +188,7 @@ export default function HomeView() {
                 </div>
 
                 <div className="progression-card-compact progression-core">
-                  <div className="progression-icon-compact">🔳</div>
+                  <div className="progression-icon-compact">💪</div>
                   <p className="progression-title-compact">Core</p>
                   {plankProg ? (
                     <>
@@ -198,6 +198,12 @@ export default function HomeView() {
                   ) : (
                     <p className="progression-name-compact">Loading...</p>
                   )}
+                </div>
+
+                <div className="progression-card-compact progression-cardio">
+                  <div className="progression-icon-compact">🏃</div>
+                  <p className="progression-title-compact">Cardio</p>
+                  <p className="progression-name-compact">Coming Soon</p>
                 </div>
               </div>
             </div>
