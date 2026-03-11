@@ -234,7 +234,7 @@ export default function StatisticsView() {
                                 {set.set_number === 3 && set.is_drop_set ? 'Drop' : `Set ${set.set_number}`}
                               </span>
                               <span className={`set-value ${set.set_number === 3 && set.is_drop_set ? 'drop-value' : ''}`}>
-                                {set.set_number === 3 && set.is_drop_set ? (set.drop_set_completed ? '✓' : '✗') : (set.reps ? `${set.reps}` : `${set.seconds}s`)}
+                                {set.set_number === 3 && set.is_drop_set ? (set.drop_set_completed ? '✓' : '') : (set.reps ? `${set.reps}` : `${set.seconds}s`)}
                               </span>
                             </div>
                           ))}
