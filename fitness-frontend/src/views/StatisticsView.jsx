@@ -204,27 +204,41 @@ export default function StatisticsView() {
           <div className="history-section">
             <h2 className="stats-heatmap-title">Workout History</h2>
             {completedWorkouts.map(workout => (
-              <div key={workout.id} className="history-item">
+              <div key={workout.id} className="history-card">
                 <button
-                  className="history-header"
+                  className="history-card-header"
                   onClick={() => setExpandedDate(expandedDate === workout.date ? null : workout.date)}
                 >
-                  <span className="history-date">{formatWorkoutDate(workout.date)}</span>
-                  <span className="history-toggle">
-                    {expandedDate === workout.date ? '▼' : '▶'}
+                  <div className="history-card-date-wrapper">
+                    <span className="history-card-date">{formatWorkoutDate(workout.date)}</span>
+                  </div>
+                  <span className="history-card-toggle">
+                    {expandedDate === workout.date ? '−' : '+'}
                   </span>
                 </button>
 
                 {expandedDate === workout.date && (
-                  <div className="history-content">
+                  <div className="history-card-content">
                     {Object.entries(getSetsGrouped(workout)).map(([exerciseName, sets]) => (
-                      <div key={exerciseName} className="history-exercise-row">
-                        <span className="history-exercise-name">{exerciseName}:</span>
-                        {sets.map((set, idx) => (
-                          <span key={idx} className="history-set-badge">
-                            {set.set_number === 3 && set.is_drop_set ? 'Drop ✓' : `Set${set.set_number} ${set.reps ? `${set.reps}r` : `${set.seconds}s`}`}
+                      <div key={exerciseName} className="history-exercise-group">
+                        <div className="history-exercise-header">
+                          <span className="history-exercise-icon">
+                            {exerciseName === 'Push-ups' ? '🚀' : exerciseName === 'Pull-ups' ? '🔥' : '🔳'}
                           </span>
-                        ))}
+                          <span className="history-exercise-title">{exerciseName}</span>
+                        </div>
+                        <div className="history-sets-container">
+                          {sets.map((set, idx) => (
+                            <div key={idx} className={`history-set-item ${set.set_number === 3 ? 'drop-set' : ''}`}>
+                              <span className="set-label">
+                                {set.set_number === 3 && set.is_drop_set ? '🔥 Drop' : `Set ${set.set_number}`}
+                              </span>
+                              <span className="set-value">
+                                {set.reps ? `${set.reps}r` : `${set.seconds}s`}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     ))}
                   </div>
