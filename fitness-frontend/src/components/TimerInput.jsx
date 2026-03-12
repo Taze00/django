@@ -61,66 +61,49 @@ export default function TimerInput({ setNumber, exerciseName, progressionName, t
       <div className="workout-bg-orb workout-bg-orb-1"></div>
       <div className="workout-bg-orb workout-bg-orb-2"></div>
 
-      <div className="workout-card">
-
+      <div className="workout-card timer-card">
         <h2 className="workout-title">{exerciseName}</h2>
         <p className="workout-subtitle">{progressionName}</p>
 
-        {/* Info Cards */}
-        <div className="info-grid" style={{ animation: 'slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s both' }}>
-          {targetSeconds && !isPullups && (
-            <div className="info-card info-card-emerald">
-              <p className="info-label">Target</p>
-              <p className="info-value">{targetSeconds}s</p>
-            </div>
-          )}
-          {lastTime && (
-            <div className="info-card info-card-blue">
-              <p className="info-label">Last time</p>
-              <p className="info-value">{formatTime(lastTime)}</p>
-            </div>
-          )}
-        </div>
+        {/* Last Time Info */}
+        {lastTime && (
+          <div className="timer-info">
+            <p className="timer-info-label">Last time</p>
+            <p className="timer-info-value">{formatTime(lastTime)}</p>
+          </div>
+        )}
 
         {/* Timer Display */}
-        <div className="timer-display" style={{ animation: 'scaleIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)' }}>
-          <p className="counter-label">{countdownActive ? 'Get ready...' : 'Time held'}</p>
-          <p className="timer-value" style={{
-            fontSize: countdownActive ? '96px' : undefined,
-            color: countdownActive ? '#3b82f6' : undefined,
-            animation: countdownActive ? 'pulse 1s infinite' : undefined
-          }}>
+        <div className="timer-display-centered">
+          <p className="timer-label">{countdownActive ? 'Get ready...' : 'Time'}</p>
+          <p className="timer-main-value" style={{animation: countdownActive ? 'pulse 1s infinite' : undefined}}>
             {countdownActive ? countdown : formatTime(seconds)}
           </p>
-
-          {/* Control Buttons */}
-          <div className="button-group" style={{ marginTop: '24px' }}>
-            <button
-              onClick={() => !isRunning ? handleStartCountdown() : setIsRunning(!isRunning)}
-              className={isRunning ? 'btn-large btn-stop' : 'btn-large btn-play'}
-              disabled={countdownActive}
-            >
-              {isRunning ? '⏸ Pause' : '▶ Start'}
-            </button>
-            <button
-              onClick={() => {
-                setSeconds(0);
-                setCountdownActive(false);
-                setCountdown(3);
-                setIsRunning(false);
-              }}
-              className="btn-large btn-reset"
-            >
-              ↻ Reset
-            </button>
-          </div>
         </div>
 
-        <button
-          className="btn-submit-workout"
-          onClick={handleSubmit}
-          disabled={isSubmitting || seconds === 0}
-        >
+        {/* Control Buttons */}
+        <div className="timer-button-group">
+          <button
+            onClick={() => !isRunning ? handleStartCountdown() : setIsRunning(!isRunning)}
+            className={`timer-btn ${isRunning ? 'timer-btn-stop' : 'timer-btn-start'}`}
+            disabled={countdownActive}
+          >
+            {isRunning ? '⏸' : '▶'}
+          </button>
+          <button
+            onClick={() => {
+              setSeconds(0);
+              setCountdownActive(false);
+              setCountdown(3);
+              setIsRunning(false);
+            }}
+            className="timer-btn timer-btn-reset"
+          >
+            ↻
+          </button>
+        </div>
+
+        <button className="btn-submit-workout" onClick={handleSubmit} disabled={isSubmitting || seconds === 0}>
           {isSubmitting ? 'Saving...' : 'Complete Set'}
         </button>
       </div>
