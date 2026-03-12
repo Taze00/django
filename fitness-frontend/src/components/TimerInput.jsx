@@ -73,10 +73,10 @@ export default function TimerInput({ setNumber, exerciseName, progressionName, t
           </div>
         )}
 
-        {/* Timer Display */}
-        <div className="timer-display-centered">
-          <p className="timer-label">{countdownActive ? 'Get ready...' : 'Time'}</p>
-          <p className="timer-main-value" style={{animation: countdownActive ? 'pulse 1s infinite' : undefined}}>
+        {/* Timer Display - Highlighted Card */}
+        <div className="timer-highlight-card">
+          <p className="counter-label">{countdownActive ? 'Get ready...' : 'Time'}</p>
+          <p className="timer-value" style={{animation: countdownActive ? 'pulse 1s infinite' : undefined}}>
             {countdownActive ? countdown : formatTime(seconds)}
           </p>
         </div>
