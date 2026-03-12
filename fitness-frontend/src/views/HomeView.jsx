@@ -151,7 +151,7 @@ export default function HomeView() {
                     return (
                       <div key={day} className={`week-day rest-day ${isCompleted ? 'trained-on-rest' : ''}`}>
                         <p className="week-day-name">{day}</p>
-                        <p className="week-day-status">{isCompleted ? '✓' : '😴'}</p>
+                        <p className="week-day-status">😴</p>
                       </div>
                     );
                   }
