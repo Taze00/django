@@ -15,9 +15,9 @@ const WORKOUT_STEPS = [
   { exercise: 'Push-ups', setNumber: 2, type: 'set' },
   { exercise: 'Planks', setNumber: 2, type: 'set' },
   { exercise: 'Pull-ups', setNumber: 2, type: 'set' },
-  { exercise: 'Push-ups', setNumber: 2, type: 'drop' },
-  { exercise: 'Planks', setNumber: 2, type: 'drop' },
-  { exercise: 'Pull-ups', setNumber: 2, type: 'drop' },
+  { exercise: 'Push-ups', setNumber: 3, type: 'drop' },
+  { exercise: 'Planks', setNumber: 3, type: 'drop' },
+  { exercise: 'Pull-ups', setNumber: 3, type: 'drop' },
 ];
 
 const REST_TIMES = {
