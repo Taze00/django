@@ -59,7 +59,7 @@ export default function DropSetInstructions({ exercise, progressions, onComplete
             onClick={() => handleComplete(false)}
             disabled={isSubmitting}
           >
-            ✗ Skipped
+            Skipped
           </button>
         </div>
       </div>
