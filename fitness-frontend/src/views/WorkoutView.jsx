@@ -118,7 +118,7 @@ export default function WorkoutView() {
       const step = WORKOUT_STEPS[currentStep];
       const isDropSet = step.type === 'drop';
       
-      // For drop sets, show instructions first (trigger on first click)
+      // For drop sets, trigger instructions on first click
       if (isDropSet && !dropSetCompleted) {
         setDropSetCompleted(true);
         setIsLoading(false);
@@ -182,7 +182,7 @@ export default function WorkoutView() {
     }
   };
 
-  const handleWarmupComplete = async (warmupData) => {
+  const handleWarmupComplete = () => {
     setIsWarmupComplete(true);
   };
 
@@ -195,16 +195,12 @@ export default function WorkoutView() {
   }
 
   if (!isWarmupComplete) {
-    return (
-      <WarmupChecklist onComplete={handleWarmupComplete} />
-    );
+    return <WarmupChecklist onComplete={handleWarmupComplete} />;
   }
 
   if (isResting) {
     const step = WORKOUT_STEPS[currentStep];
     const nextStep = WORKOUT_STEPS[currentStep + 1];
-    const progInfo = getProgressionInfo(step.exercise, step.setNumber, step.type === "drop");
-    
     const restTime = step.type === 'drop' ? REST_TIMES.afterDrop : REST_TIMES.normal;
     const nextLabel = nextStep ? getNextExerciseLabel(nextStep) : 'Complete!';
 
@@ -232,30 +228,19 @@ export default function WorkoutView() {
     );
   }
 
-  // For drop-sets without instructions shown yet, trigger instructions
-  if (step.type === "drop" && !dropSetCompleted) {
+  // Drop-set: show instructions immediately when type is "drop"
+  if (step.type === 'drop') {
     return (
       <div className="workout-main">
         <header className="workout-header">
-          <button 
-            className="btn-exit-workout"
-            onClick={handleExitWorkout}
-            title="Exit workout"
-          >
-            ✕
-          </button>
+          <button className="btn-exit-workout" onClick={handleExitWorkout} title="Exit workout">✕</button>
           <div className="workout-header-content">
             <div className="workout-header-info">
               <p className="workout-step">Step {currentStep + 1} of {WORKOUT_STEPS.length}</p>
-              <p className="workout-current">
-                {step.exercise} Drop
-              </p>
+              <p className="workout-current">{step.exercise} Drop</p>
             </div>
             <div className="workout-progress-bar">
-              <div
-                className="workout-progress-fill"
-                style={{ width: `${((currentStep + 1) / WORKOUT_STEPS.length) * 100}%` }}
-              />
+              <div className="workout-progress-fill" style={{ width: `${((currentStep + 1) / WORKOUT_STEPS.length) * 100}%` }} />
             </div>
           </div>
         </header>
@@ -267,32 +252,30 @@ export default function WorkoutView() {
             onComplete={(completed) => handleSetComplete(completed)}
           />
         </main>
+
+        {showModal && (
+          <ProgressionModal
+            upgrades={progressionData?.upgrades || []}
+            downgrades={progressionData?.downgrades || []}
+            onClose={handleModalClose}
+          />
+        )}
       </div>
     );
   }
 
+  // Normal sets: show input
   return (
     <div className="workout-main">
       <header className="workout-header">
-        <button 
-          className="btn-exit-workout"
-          onClick={handleExitWorkout}
-          title="Exit workout"
-        >
-          ✕
-        </button>
+        <button className="btn-exit-workout" onClick={handleExitWorkout} title="Exit workout">✕</button>
         <div className="workout-header-content">
           <div className="workout-header-info">
             <p className="workout-step">Step {currentStep + 1} of {WORKOUT_STEPS.length}</p>
-            <p className="workout-current">
-              {step.exercise} Set {step.setNumber}
-            </p>
+            <p className="workout-current">{step.exercise} Set {step.setNumber}</p>
           </div>
           <div className="workout-progress-bar">
-            <div
-              className="workout-progress-fill"
-              style={{ width: `${((currentStep + 1) / WORKOUT_STEPS.length) * 100}%` }}
-            />
+            <div className="workout-progress-fill" style={{ width: `${((currentStep + 1) / WORKOUT_STEPS.length) * 100}%` }} />
           </div>
         </div>
       </header>
