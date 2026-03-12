@@ -1487,13 +1487,9 @@ body {
   color: #60a5fa;
 }
 
-.progression-core .progression-title-compact {
-  color: #f59e0b;
-}
 
-.progression-core .progression-name-compact {
-  color: #f59e0b;
-}
+
+
 
 @media (max-width: 360px) {
   .week-grid-scroll .week-day {
@@ -3263,10 +3259,16 @@ body {
   font-size: 20px;
 }
 
-.progression-cardio .progression-title-compact {
-  color: #8b5cf6;
+
+
+
+
+.week-day.rest-day.trained-on-rest {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+  opacity: 1;
 }
 
-.progression-cardio .progression-name-compact {
-  color: #8b5cf6;
+.week-day.rest-day.trained-on-rest .week-day-status {
+  color: #34d399;
 }
