@@ -1247,7 +1247,18 @@ body {
   box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
 }
 
+.week-day.completed.today {
+  background: rgba(59, 130, 246, 0.25);
+  border: 2px solid #3b82f6;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+}
+
 .week-day.today .week-day-name {
+  color: #60a5fa;
+  font-weight: 700;
+}
+
+.week-day.completed.today .week-day-name {
   color: #60a5fa;
   font-weight: 700;
 }
