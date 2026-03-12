@@ -289,7 +289,7 @@ export default function WorkoutView() {
 
       {showModal && (
         <ProgressionModal
-          data={progressionData}
+          upgrades={progressionData?.upgrades || []} downgrades={progressionData?.downgrades || []}
           onClose={handleModalClose}
         />
       )}
