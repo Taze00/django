@@ -134,7 +134,6 @@ export default function RestTimer({ seconds, nextExercise, setNumber, onComplete
           {/* Timer Text */}
           <div className="rest-timer-text">
             <p className="rest-timer-time">{formatTime(timeLeft)}</p>
-            <p class="rest-timer-label">Rest time</p>
           </div>
         </div>
 
