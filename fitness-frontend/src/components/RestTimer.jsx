@@ -1,104 +1,36 @@
 import { useState, useEffect, useRef } from 'react';
 
-// Create audio context for notification sound
-const playNotificationSound = () => {
-  try {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const now = audioContext.currentTime;
-    
-    // Create a simple beep: 2 beeps
-    const oscillator1 = audioContext.createOscillator();
-    const gain1 = audioContext.createGain();
-    
-    oscillator1.connect(gain1);
-    gain1.connect(audioContext.destination);
-    
-    oscillator1.frequency.value = 800;
-    oscillator1.type = 'sine';
-    
-    gain1.gain.setValueAtTime(0.3, now);
-    gain1.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-    
-    oscillator1.start(now);
-    oscillator1.stop(now + 0.2);
-    
-    // Second beep
-    const oscillator2 = audioContext.createOscillator();
-    const gain2 = audioContext.createGain();
-    
-    oscillator2.connect(gain2);
-    gain2.connect(audioContext.destination);
-    
-    oscillator2.frequency.value = 1000;
-    oscillator2.type = 'sine';
-    
-    gain2.gain.setValueAtTime(0.3, now + 0.25);
-    gain2.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
-    
-    oscillator2.start(now + 0.25);
-    oscillator2.stop(now + 0.45);
-  } catch (e) {
-    console.log('Audio notification not available');
-  }
-};
-
-// Show browser notification - works in background!
-const showNotification = (message) => {
-  if ('Notification' in window) {
-    if (Notification.permission === 'granted') {
-      new Notification('Rest Timer Complete', {
-        body: message,
-        icon: '🏋️',
-        tag: 'rest-timer-complete',
-        requireInteraction: true  // Keep notification until user clicks it
-      });
-    }
-  }
-};
-
 export default function RestTimer({ seconds, nextExercise, setNumber, onComplete }) {
   const [timeLeft, setTimeLeft] = useState(seconds);
   const [isRunning, setIsRunning] = useState(true);
   const startTimeRef = useRef(Date.now());
   const totalSecondsRef = useRef(seconds);
-  const hasNotifiedRef = useRef(false);
 
   // Update timeLeft when seconds prop changes
   useEffect(() => {
     setTimeLeft(seconds);
     totalSecondsRef.current = seconds;
     startTimeRef.current = Date.now();
-    hasNotifiedRef.current = false;
   }, [seconds]);
 
   useEffect(() => {
     if (!isRunning) return;
 
-    // Use frequent updates to catch the exact moment timer ends
+    // Use timestamp-based timing - works even if app pauses
     const checkTimer = () => {
       const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
       const remaining = Math.max(0, totalSecondsRef.current - elapsed);
       
       setTimeLeft(remaining);
 
-      if (remaining === 0 && !hasNotifiedRef.current) {
-        hasNotifiedRef.current = true;
+      if (remaining === 0) {
         setIsRunning(false);
-        
-        // Try audio if tab is visible
-        if (!document.hidden) {
-          playNotificationSound();
-        }
-        
-        // Show notification
-        showNotification('Rest time is over! Get ready for the next set.');
-        
         setTimeout(() => {
           onComplete();
         }, 500);
       } else if (remaining > 0) {
-        // Check every 50ms for faster response
-        setTimeout(checkTimer, 50);
+        // Check every 100ms for smooth updates
+        setTimeout(checkTimer, 100);
       }
     };
 
@@ -108,31 +40,16 @@ export default function RestTimer({ seconds, nextExercise, setNumber, onComplete
   // When app comes back to focus, recalculate timer based on actual elapsed time
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.hidden) {
-        // App is hidden - timer is paused, nothing to do
-        return;
-      }
+      if (document.hidden || !isRunning) return;
       
       // App is now visible - recalculate based on real elapsed time
-      if (!isRunning) return; // Already finished
-      
       const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
       const remaining = Math.max(0, totalSecondsRef.current - elapsed);
       
       setTimeLeft(remaining);
       
-      // Check if time is up NOW (but don't show notification again if already shown)
-      if (remaining === 0 && !hasNotifiedRef.current) {
-        hasNotifiedRef.current = true;
-        setIsRunning(false);
-        playNotificationSound();
-        showNotification('Rest time is over! Get ready for the next set.');
-        
-        setTimeout(() => {
-          onComplete();
-        }, 500);
-      } else if (remaining === 0 && hasNotifiedRef.current) {
-        // Time was already up, just auto-advance
+      // Auto-advance if time is up
+      if (remaining === 0) {
         setIsRunning(false);
         setTimeout(() => {
           onComplete();
@@ -151,13 +68,6 @@ export default function RestTimer({ seconds, nextExercise, setNumber, onComplete
   };
 
   const progress = ((totalSecondsRef.current - timeLeft) / totalSecondsRef.current) * 100;
-
-  useEffect(() => {
-    // Request notification permission if not already granted
-    if ('Notification' in window && Notification.permission === 'default') {
-      Notification.requestPermission();
-    }
-  }, []);
 
   return (
     <div className="rest-timer-overlay">
