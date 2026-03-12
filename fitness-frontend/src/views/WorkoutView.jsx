@@ -15,9 +15,9 @@ const WORKOUT_STEPS = [
   { exercise: 'Push-ups', setNumber: 2, type: 'set' },
   { exercise: 'Planks', setNumber: 2, type: 'set' },
   { exercise: 'Pull-ups', setNumber: 2, type: 'set' },
-  { exercise: 'Push-ups', setNumber: 3, type: 'drop' },
-  { exercise: 'Planks', setNumber: 3, type: 'drop' },
-  { exercise: 'Pull-ups', setNumber: 3, type: 'drop' },
+  { exercise: 'Push-ups', setNumber: 2, type: 'drop' },
+  { exercise: 'Planks', setNumber: 2, type: 'drop' },
+  { exercise: 'Pull-ups', setNumber: 2, type: 'drop' },
 ];
 
 const REST_TIMES = {
@@ -184,8 +184,6 @@ export default function WorkoutView() {
 
   const handleWarmupComplete = async (warmupData) => {
     setIsWarmupComplete(true);
-    // Optional: save warmup to backend
-    // await updateWarmup(currentWorkout.id, warmupData);
   };
 
   if (isLoading || !isInitialized || exercises.length === 0 || !currentWorkout) {
@@ -248,7 +246,7 @@ export default function WorkoutView() {
           <div className="workout-header-info">
             <p className="workout-step">Step {currentStep + 1} of {WORKOUT_STEPS.length}</p>
             <p className="workout-current">
-              {step.type === "drop" && dropSetCompleted ? '🔥 ' : ''}{step.exercise} Set {step.setNumber}
+              {step.type === "drop" && dropSetCompleted ? '🔥 ' : ''}{step.exercise} {step.type === "drop" ? 'Drop' : `Set ${step.setNumber}`}
             </p>
           </div>
           <div className="workout-progress-bar">
@@ -289,7 +287,8 @@ export default function WorkoutView() {
 
       {showModal && (
         <ProgressionModal
-          upgrades={progressionData?.upgrades || []} downgrades={progressionData?.downgrades || []}
+          upgrades={progressionData?.upgrades || []}
+          downgrades={progressionData?.downgrades || []}
           onClose={handleModalClose}
         />
       )}
