@@ -42,13 +42,15 @@ const playNotificationSound = () => {
   }
 };
 
-// Show browser notification
+// Show browser notification - works in background!
 const showNotification = (message) => {
   if ('Notification' in window) {
     if (Notification.permission === 'granted') {
       new Notification('Rest Timer Complete', {
         body: message,
-        icon: '🏋️'
+        icon: '🏋️',
+        tag: 'rest-timer-complete',
+        requireInteraction: true  // Keep notification until user clicks it
       });
     }
   }
@@ -72,8 +74,7 @@ export default function RestTimer({ seconds, nextExercise, setNumber, onComplete
   useEffect(() => {
     if (!isRunning) return;
 
-    // Use timestamp-based timing instead of intervals
-    // This works even if tab is in background
+    // Use frequent updates to catch the exact moment timer ends
     const checkTimer = () => {
       const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
       const remaining = Math.max(0, totalSecondsRef.current - elapsed);
@@ -83,52 +84,39 @@ export default function RestTimer({ seconds, nextExercise, setNumber, onComplete
       if (remaining === 0 && !hasNotifiedRef.current) {
         hasNotifiedRef.current = true;
         setIsRunning(false);
-        playNotificationSound();
+        
+        // Try audio if tab is visible
+        if (!document.hidden) {
+          playNotificationSound();
+        }
+        
+        // Notification works even in background!
         showNotification('Rest time is over! Get ready for the next set.');
         
         setTimeout(() => {
           onComplete();
         }, 500);
       } else if (remaining > 0) {
-        // Check every 100ms for smooth updates
-        setTimeout(checkTimer, 100);
+        // Check every 50ms for faster response
+        setTimeout(checkTimer, 50);
       }
     };
 
     checkTimer();
   }, [isRunning, onComplete]);
 
-  // Handle tab visibility change - when user comes back, check if time is up
+  // When tab becomes visible, play sound if we just finished
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.hidden) {
-        // Tab is hidden - nothing to do
-        return;
-      }
-      
-      // Tab is now visible - check if timer finished while we were away
-      if (!isRunning) return;
-      
-      const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
-      const remaining = Math.max(0, totalSecondsRef.current - elapsed);
-      
-      setTimeLeft(remaining);
-      
-      if (remaining === 0 && !hasNotifiedRef.current) {
-        hasNotifiedRef.current = true;
-        setIsRunning(false);
+      if (!document.hidden && isRunning === false && hasNotifiedRef.current) {
+        // Tab is now visible and timer finished - play sound
         playNotificationSound();
-        showNotification('Rest time is over! Get ready for the next set.');
-        
-        setTimeout(() => {
-          onComplete();
-        }, 500);
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [isRunning, onComplete]);
+  }, [isRunning]);
 
   const formatTime = (s) => {
     const mins = Math.floor(s / 60);
