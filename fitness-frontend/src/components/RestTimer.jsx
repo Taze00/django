@@ -101,7 +101,7 @@ export default function RestTimer({ seconds, nextExercise, setNumber, onComplete
   return (
     <div className="rest-timer-overlay">
       <div className="rest-timer-modal">
-        <h2 className="rest-timer-title">Rest & Recover</h2>
+        <h2 className="rest-timer-title">Rest</h2>
 
         {/* Circular Progress Timer */}
         <div className="rest-timer-circle-container">
