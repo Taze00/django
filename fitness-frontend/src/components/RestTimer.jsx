@@ -90,7 +90,7 @@ export default function RestTimer({ seconds, nextExercise, setNumber, onComplete
           playNotificationSound();
         }
         
-        // Notification works even in background!
+        // Show notification
         showNotification('Rest time is over! Get ready for the next set.');
         
         setTimeout(() => {
@@ -121,13 +121,19 @@ export default function RestTimer({ seconds, nextExercise, setNumber, onComplete
       
       setTimeLeft(remaining);
       
-      // Check if time is up
+      // Check if time is up NOW (but don't show notification again if already shown)
       if (remaining === 0 && !hasNotifiedRef.current) {
         hasNotifiedRef.current = true;
         setIsRunning(false);
         playNotificationSound();
         showNotification('Rest time is over! Get ready for the next set.');
         
+        setTimeout(() => {
+          onComplete();
+        }, 500);
+      } else if (remaining === 0 && hasNotifiedRef.current) {
+        // Time was already up, just auto-advance
+        setIsRunning(false);
         setTimeout(() => {
           onComplete();
         }, 500);
