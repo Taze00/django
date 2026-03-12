@@ -130,7 +130,7 @@ export default function WorkoutView() {
         return;
       }
 
-      const reps = progInfo.currentProgression.target_type === 'reps' || step.exercise === 'Planks' ? value : null;
+      const reps = progInfo.currentProgression.target_type === 'reps' ? value : null;
       const seconds = progInfo.currentProgression.target_type === 'time' ? value : null;
       const restTime = isDropSet ? REST_TIMES.afterDrop : REST_TIMES.normal;
 
@@ -276,7 +276,7 @@ export default function WorkoutView() {
       </header>
 
       <main className="workout-content">
-        {progInfo.currentProgression.target_type === 'reps' || step.exercise === 'Planks' ? (
+        {progInfo.currentProgression.target_type === 'reps' ? (
           <SetInput
             setNumber={step.setNumber}
             exerciseName={step.exercise}
