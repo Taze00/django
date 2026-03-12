@@ -112,19 +112,13 @@ export default function WorkoutView() {
     return progInfo?.currentProgression?.name || nextStep.exercise;
   };
 
-  const handleSetComplete = async (valueOrDropSetCompleted = null) => {
+    const handleSetComplete = async (valueOrDropSetCompleted = null) => {
     setIsLoading(true);
     try {
       const step = WORKOUT_STEPS[currentStep];
       const isDropSet = step.type === 'drop';
       
-      // For drop sets, trigger instructions on first click
-      if (isDropSet && !dropSetCompleted) {
-        setDropSetCompleted(true);
-        setIsLoading(false);
-        return;
-      }
-      
+      // For drop sets, valueOrDropSetCompleted is the completion status from DropSetInstructions
       const value = !isDropSet ? valueOrDropSetCompleted : null;
       const actualDropSetCompleted = isDropSet && valueOrDropSetCompleted !== false;
       
@@ -132,6 +126,7 @@ export default function WorkoutView() {
       
       if (!progInfo) {
         console.error('Cannot save set: progInfo is null');
+        setIsLoading(false);
         return;
       }
 
