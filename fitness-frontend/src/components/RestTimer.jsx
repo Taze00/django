@@ -59,12 +59,14 @@ export default function RestTimer({ seconds, nextExercise, setNumber, onComplete
   const [isRunning, setIsRunning] = useState(true);
   const startTimeRef = useRef(Date.now());
   const totalSecondsRef = useRef(seconds);
+  const hasNotifiedRef = useRef(false);
 
   // Update timeLeft when seconds prop changes
   useEffect(() => {
     setTimeLeft(seconds);
     totalSecondsRef.current = seconds;
     startTimeRef.current = Date.now();
+    hasNotifiedRef.current = false;
   }, [seconds]);
 
   useEffect(() => {
@@ -78,7 +80,8 @@ export default function RestTimer({ seconds, nextExercise, setNumber, onComplete
       
       setTimeLeft(remaining);
 
-      if (remaining === 0) {
+      if (remaining === 0 && !hasNotifiedRef.current) {
+        hasNotifiedRef.current = true;
         setIsRunning(false);
         playNotificationSound();
         showNotification('Rest time is over! Get ready for the next set.');
@@ -86,13 +89,45 @@ export default function RestTimer({ seconds, nextExercise, setNumber, onComplete
         setTimeout(() => {
           onComplete();
         }, 500);
-      } else {
+      } else if (remaining > 0) {
         // Check every 100ms for smooth updates
         setTimeout(checkTimer, 100);
       }
     };
 
     checkTimer();
+  }, [isRunning, onComplete]);
+
+  // Handle tab visibility change - when user comes back, check if time is up
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // Tab is hidden - nothing to do
+        return;
+      }
+      
+      // Tab is now visible - check if timer finished while we were away
+      if (!isRunning) return;
+      
+      const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
+      const remaining = Math.max(0, totalSecondsRef.current - elapsed);
+      
+      setTimeLeft(remaining);
+      
+      if (remaining === 0 && !hasNotifiedRef.current) {
+        hasNotifiedRef.current = true;
+        setIsRunning(false);
+        playNotificationSound();
+        showNotification('Rest time is over! Get ready for the next set.');
+        
+        setTimeout(() => {
+          onComplete();
+        }, 500);
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [isRunning, onComplete]);
 
   const formatTime = (s) => {
