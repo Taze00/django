@@ -105,18 +105,38 @@ export default function RestTimer({ seconds, nextExercise, setNumber, onComplete
     checkTimer();
   }, [isRunning, onComplete]);
 
-  // When tab becomes visible, play sound if we just finished
+  // When app comes back to focus, recalculate timer based on actual elapsed time
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (!document.hidden && isRunning === false && hasNotifiedRef.current) {
-        // Tab is now visible and timer finished - play sound
+      if (document.hidden) {
+        // App is hidden - timer is paused, nothing to do
+        return;
+      }
+      
+      // App is now visible - recalculate based on real elapsed time
+      if (!isRunning) return; // Already finished
+      
+      const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
+      const remaining = Math.max(0, totalSecondsRef.current - elapsed);
+      
+      setTimeLeft(remaining);
+      
+      // Check if time is up
+      if (remaining === 0 && !hasNotifiedRef.current) {
+        hasNotifiedRef.current = true;
+        setIsRunning(false);
         playNotificationSound();
+        showNotification('Rest time is over! Get ready for the next set.');
+        
+        setTimeout(() => {
+          onComplete();
+        }, 500);
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [isRunning]);
+  }, [isRunning, onComplete]);
 
   const formatTime = (s) => {
     const mins = Math.floor(s / 60);
