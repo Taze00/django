@@ -270,7 +270,7 @@ body {
 }
 
 .header-title {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 900;
   background: linear-gradient(90deg, #34d399 0%, #60a5fa 100%);
   -webkit-background-clip: text;
@@ -306,7 +306,7 @@ body {
 }
 
 .welcome-text {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
   color: #f1f5f9;
   margin-bottom: 32px;
@@ -314,7 +314,7 @@ body {
 }
 
 .section-title {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
   color: #f1f5f9;
   margin-bottom: 20px;
@@ -422,7 +422,7 @@ body {
 }
 
 .exercise-arrow {
-  font-size: 28px;
+  font-size: 32px;
   opacity: 0;
   transition: all 0.3s ease;
   transform: translateX(-8px);
@@ -592,6 +592,9 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 16px;
 }
 
@@ -716,7 +719,7 @@ body {
 }
 
 .btn-start-emoji {
-  font-size: 28px;
+  font-size: 32px;
 }
 
 .btn-start-inline {
@@ -793,7 +796,7 @@ body {
 }
 
 .bottom-nav-icon {
-  font-size: 28px;
+  font-size: 32px;
 }
 
 /* ===================================== */
@@ -817,6 +820,9 @@ body {
   -webkit-text-fill-color: transparent;
   background-clip: text;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 16px;
   font-family: 'Monaco', 'Menlo', monospace;
 }
@@ -908,7 +914,7 @@ body {
 }
 
 .rest-timer-title {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 900;
   color: #f1f5f9;
   text-transform: uppercase;
@@ -949,6 +955,9 @@ body {
   color: #f1f5f9;
   font-family: 'Monaco', 'Menlo', monospace;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .rest-timer-label {
@@ -1062,7 +1071,7 @@ body {
 
 @media (max-width: 360px) {
   .section-title {
-    font-size: 28px;
+    font-size: 32px;
   }
 
   .workout-title {
@@ -1085,7 +1094,7 @@ body {
   .exercise-icon {
     width: 56px;
     height: 56px;
-    font-size: 28px;
+    font-size: 32px;
   }
 }
 
@@ -1263,10 +1272,13 @@ body {
 }
 
 .week-day-status {
-  font-size: 28px;
+  font-size: 32px;
   color: #34d399;
   font-weight: 900;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1564,7 +1576,7 @@ body {
 }
 
 .stat-value {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
   color: #34d399;
 }
@@ -1590,7 +1602,7 @@ body {
   border: none;
   background: transparent;
   color: #f1f5f9;
-  font-size: 28px;
+  font-size: 32px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -1707,7 +1719,7 @@ body {
 }
 
 .warmup-emoji {
-  font-size: 28px;
+  font-size: 32px;
   flex-shrink: 0;
 }
 
@@ -1843,7 +1855,7 @@ body {
 }
 
 .profile-username {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
   color: #f1f5f9;
   margin-bottom: 8px;
@@ -1914,7 +1926,7 @@ body {
 }
 
 .profile-stat-value {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
   color: #34d399;
 }
@@ -2427,6 +2439,9 @@ body {
   color: #10b981;
   margin-bottom: 8px;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .stats-streak-label {
@@ -2624,7 +2639,7 @@ body {
   background: transparent;
   border: none;
   color: #94a3b8;
-  font-size: 28px;
+  font-size: 32px;
   cursor: pointer;
   width: 36px;
   height: 36px;
@@ -2638,7 +2653,7 @@ body {
 }
 
 .info-modal-title {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 700;
   color: #f1f5f9;
   margin-bottom: 16px;
@@ -2727,7 +2742,7 @@ body {
   border: 1px solid rgba(148, 163, 184, 0.2);
   color: #f1f5f9;
   border-radius: 8px;
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 300;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -2842,7 +2857,7 @@ body {
 }
 
 .profile-setting-arrow {
-  font-size: 28px;
+  font-size: 32px;
   color: #cbd5e1;
 }
 
@@ -2856,7 +2871,7 @@ body {
   border: none;
   color: #f1f5f9;
   border-radius: 8px;
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 300;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -2932,7 +2947,7 @@ body {
 }
 
 .training-days-card .week-day-status {
-  font-size: 28px;
+  font-size: 32px;
   color: #94a3b8;
 }
 
@@ -2995,7 +3010,7 @@ body {
 }
 
 .progression-setting-icon {
-  font-size: 28px;
+  font-size: 32px;
 }
 
 .progression-setting-name {
@@ -3101,7 +3116,7 @@ body {
 }
 
 .streak-emoji {
-  font-size: 28px;
+  font-size: 32px;
   margin-left: 2px;
   display: inline-block;
   animation: flameFlicker 1.5s ease-in-out infinite;
@@ -3326,6 +3341,9 @@ body {
   font-weight: 700;
   color: #3b82f6;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: 0;
 }
 
@@ -3424,24 +3442,27 @@ body {
   font-weight: 900;
   color: #3b82f6;
   line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 16px;
 }
 
 .timer-button-group {
   display: flex;
-  gap: 16px;
+  gap: 75px;
   justify-content: center;
   margin: 28px 0;
 }
 
 .timer-btn {
-  width: 64px;
-  height: 64px;
+  width: 75px;
+  height: 75px;
   border-radius: 50%;
   border: 2px solid #475569;
   background: rgba(51, 65, 85, 0.3);
   color: #f1f5f9;
-  font-size: 28px;
+  font-size: 32px;
   cursor: pointer;
   display: flex;
   align-items: center;
