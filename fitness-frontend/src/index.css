@@ -3272,3 +3272,11 @@ body {
 .week-day.rest-day.trained-on-rest .week-day-status {
   color: #34d399;
 }
+
+.progression-core .progression-name-compact {
+  color: #f59e0b;
+}
+
+.progression-cardio .progression-name-compact {
+  color: #8b5cf6;
+}
