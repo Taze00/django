@@ -231,7 +231,7 @@ export default function StatisticsView() {
                       <div key={exerciseName} className="history-exercise-group">
                         <div className="history-exercise-header">
                           <span className="history-exercise-icon">
-                            {exerciseName === 'Push-ups' ? '🚀' : exerciseName === 'Pull-ups' ? '🔥' : '🔳'}
+                            {exerciseName === 'Push-ups' ? '🚀' : exerciseName === 'Pull-ups' ? '🔥' : '💪'}
                           </span>
                           <span className="history-exercise-title">{exerciseName}</span>
                         </div>

@@ -34,7 +34,7 @@ class WorkoutSetSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorkoutSet
         fields = ['id', 'exercise', 'exercise_name', 'progression', 'progression_name', 
-                  'set_number', 'reps', 'seconds', 'is_drop_set', 'rest_time_seconds']
+                  'set_number', 'reps', 'seconds', 'is_drop_set', 'drop_set_completed', 'rest_time_seconds']
 
 
 class WarmupChecklistSerializer(serializers.ModelSerializer):
