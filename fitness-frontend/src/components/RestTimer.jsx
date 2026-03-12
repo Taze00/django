@@ -58,6 +58,11 @@ export default function RestTimer({ seconds, nextExercise, setNumber, onComplete
   const [timeLeft, setTimeLeft] = useState(seconds);
   const [isRunning, setIsRunning] = useState(true);
 
+  // Update timeLeft when seconds prop changes
+  useEffect(() => {
+    setTimeLeft(seconds);
+  }, [seconds]);
+
   useEffect(() => {
     if (!isRunning || timeLeft <= 0) return;
 
