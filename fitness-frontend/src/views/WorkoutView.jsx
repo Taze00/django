@@ -34,6 +34,7 @@ export default function WorkoutView() {
   const [progressionData, setProgressionData] = useState(null);
   const [isWarmupComplete, setIsWarmupComplete] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [dropSetCompleted, setDropSetCompleted] = useState(false);
 
   const exercises = useWorkoutStore(state => state.exercises);
   const userProgressions = useWorkoutStore(state => state.userProgressions);
@@ -116,8 +117,16 @@ export default function WorkoutView() {
     try {
       const step = WORKOUT_STEPS[currentStep];
       const isDropSet = step.type === 'drop';
-      const dropSetCompleted = isDropSet && valueOrDropSetCompleted !== false;
+      
+      // For drop sets, show instructions first
+      if (isDropSet && !dropSetCompleted) {
+        setDropSetCompleted(true);
+        setIsLoading(false);
+        return;
+      }
+      
       const value = !isDropSet ? valueOrDropSetCompleted : null;
+      const actualDropSetCompleted = isDropSet && valueOrDropSetCompleted !== false;
       
       const progInfo = getProgressionInfo(step.exercise, step.setNumber, isDropSet);
       
@@ -139,7 +148,7 @@ export default function WorkoutView() {
         seconds,
         restTime,
         isDropSet,
-        dropSetCompleted
+        actualDropSetCompleted
       );
 
       if (currentStep === WORKOUT_STEPS.length - 1) {
@@ -148,6 +157,7 @@ export default function WorkoutView() {
         setShowModal(true);
       } else {
         setIsResting(true);
+        setDropSetCompleted(false);
       }
     } catch (error) {
       console.error('Error saving set:', error);
@@ -192,41 +202,18 @@ export default function WorkoutView() {
     );
   }
 
-  if (showModal && progressionData) {
-    const hasChanges = progressionData.upgrades?.length > 0 || progressionData.downgrades?.length > 0;
+  if (isResting) {
+    const step = WORKOUT_STEPS[currentStep];
+    const nextStep = WORKOUT_STEPS[currentStep + 1];
+    const progInfo = getProgressionInfo(step.exercise, step.setNumber, step.type === "drop");
     
-    if (!hasChanges) {
-      return (
-        <div className="workout-complete">
-          <div className="workout-complete-card">
-            <div className="workout-complete-emoji">🎉</div>
-            <h1 className="workout-complete-title">Workout Complete!</h1>
-            <p className="workout-complete-subtitle">Great effort! You're building strength every day.</p>
-            <button className="workout-complete-btn" onClick={handleModalClose}>Back to Home</button>
-          </div>
-        </div>
-      );
-    }
-    
-    return (
-      <ProgressionModal
-        upgrades={progressionData.upgrades || []}
-        downgrades={progressionData.downgrades || []}
-        onClose={handleModalClose}
-      />
-    );
-  }
+    const restTime = step.type === 'drop' ? REST_TIMES.afterDrop : REST_TIMES.normal;
+    const nextLabel = nextStep ? getNextExerciseLabel(nextStep) : 'Complete!';
 
-  if (isResting && currentStep < WORKOUT_STEPS.length - 1) {
-    const currentStepInfo = WORKOUT_STEPS[currentStep];
-    const nextStepInfo = WORKOUT_STEPS[currentStep + 1];
-    const restTime = currentStepInfo.type === 'drop' ? REST_TIMES.afterDrop : REST_TIMES.normal;
-    
     return (
       <RestTimer
-        seconds={restTime}
-        nextExercise={getNextExerciseLabel(nextStepInfo)}
-        setNumber={nextStepInfo.setNumber}
+        restTime={restTime}
+        nextExercise={nextLabel}
         onComplete={handleRestComplete}
       />
     );
@@ -299,6 +286,13 @@ export default function WorkoutView() {
           />
         )}
       </main>
+
+      {showModal && (
+        <ProgressionModal
+          data={progressionData}
+          onClose={handleModalClose}
+        />
+      )}
     </div>
   );
 }
