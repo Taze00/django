@@ -118,7 +118,7 @@ export default function WorkoutView() {
       const step = WORKOUT_STEPS[currentStep];
       const isDropSet = step.type === 'drop';
       
-      // For drop sets, show instructions first
+      // For drop sets, show instructions first (trigger on first click)
       if (isDropSet && !dropSetCompleted) {
         setDropSetCompleted(true);
         setIsLoading(false);
@@ -218,7 +218,7 @@ export default function WorkoutView() {
   }
 
   const step = WORKOUT_STEPS[currentStep];
-  const progInfo = getProgressionInfo(step.exercise, step.setNumber, step.type === "drop" && dropSetCompleted);
+  const progInfo = getProgressionInfo(step.exercise, step.setNumber, step.type === "drop");
 
   if (!progInfo) {
     return (
@@ -228,6 +228,45 @@ export default function WorkoutView() {
           <p className="error-detail">Exercise: {step.exercise}</p>
           <p className="error-detail">Check console for details</p>
         </div>
+      </div>
+    );
+  }
+
+  // For drop-sets without instructions shown yet, trigger instructions
+  if (step.type === "drop" && !dropSetCompleted) {
+    return (
+      <div className="workout-main">
+        <header className="workout-header">
+          <button 
+            className="btn-exit-workout"
+            onClick={handleExitWorkout}
+            title="Exit workout"
+          >
+            ✕
+          </button>
+          <div className="workout-header-content">
+            <div className="workout-header-info">
+              <p className="workout-step">Step {currentStep + 1} of {WORKOUT_STEPS.length}</p>
+              <p className="workout-current">
+                {step.exercise} Drop
+              </p>
+            </div>
+            <div className="workout-progress-bar">
+              <div
+                className="workout-progress-fill"
+                style={{ width: `${((currentStep + 1) / WORKOUT_STEPS.length) * 100}%` }}
+              />
+            </div>
+          </div>
+        </header>
+
+        <main className="workout-content">
+          <DropSetInstructions
+            exercise={progInfo.exercise}
+            progressions={[progInfo.currentProgression].concat(progInfo.nextProgressions.reverse())}
+            onComplete={(completed) => handleSetComplete(completed)}
+          />
+        </main>
       </div>
     );
   }
@@ -246,7 +285,7 @@ export default function WorkoutView() {
           <div className="workout-header-info">
             <p className="workout-step">Step {currentStep + 1} of {WORKOUT_STEPS.length}</p>
             <p className="workout-current">
-              {step.type === "drop" && dropSetCompleted ? '🔥 ' : ''}{step.exercise} {step.type === "drop" ? 'Drop' : `Set ${step.setNumber}`}
+              {step.exercise} Set {step.setNumber}
             </p>
           </div>
           <div className="workout-progress-bar">
@@ -259,13 +298,7 @@ export default function WorkoutView() {
       </header>
 
       <main className="workout-content">
-        {step.type === "drop" && dropSetCompleted ? (
-          <DropSetInstructions
-            exercise={progInfo.exercise}
-            progressions={[progInfo.currentProgression].concat(progInfo.nextProgressions.reverse())}
-            onComplete={(completed) => handleSetComplete(completed)}
-          />
-        ) : progInfo.currentProgression.target_type === 'reps' || step.exercise === 'Planks' ? (
+        {progInfo.currentProgression.target_type === 'reps' || step.exercise === 'Planks' ? (
           <SetInput
             setNumber={step.setNumber}
             exerciseName={step.exercise}
