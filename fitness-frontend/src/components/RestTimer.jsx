@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 // Create audio context for notification sound
 const playNotificationSound = () => {
@@ -57,36 +57,43 @@ const showNotification = (message) => {
 export default function RestTimer({ seconds, nextExercise, setNumber, onComplete }) {
   const [timeLeft, setTimeLeft] = useState(seconds);
   const [isRunning, setIsRunning] = useState(true);
+  const startTimeRef = useRef(Date.now());
+  const totalSecondsRef = useRef(seconds);
 
   // Update timeLeft when seconds prop changes
   useEffect(() => {
     setTimeLeft(seconds);
+    totalSecondsRef.current = seconds;
+    startTimeRef.current = Date.now();
   }, [seconds]);
 
   useEffect(() => {
-    if (!isRunning || timeLeft <= 0) return;
+    if (!isRunning) return;
 
-    const interval = setInterval(() => {
-      setTimeLeft(t => t - 1);
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, [isRunning, timeLeft]);
-
-  useEffect(() => {
-    if (timeLeft === 0 && isRunning) {
-      setIsRunning(false);
-      // Play sound and show notification
-      playNotificationSound();
-      showNotification('Rest time is over! Get ready for the next set.');
+    // Use timestamp-based timing instead of intervals
+    // This works even if tab is in background
+    const checkTimer = () => {
+      const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
+      const remaining = Math.max(0, totalSecondsRef.current - elapsed);
       
-      // Auto-advance immediately
-      const timeout = setTimeout(() => {
-        onComplete();
-      }, 500);
-      return () => clearTimeout(timeout);
-    }
-  }, [timeLeft, isRunning, onComplete]);
+      setTimeLeft(remaining);
+
+      if (remaining === 0) {
+        setIsRunning(false);
+        playNotificationSound();
+        showNotification('Rest time is over! Get ready for the next set.');
+        
+        setTimeout(() => {
+          onComplete();
+        }, 500);
+      } else {
+        // Check every 100ms for smooth updates
+        setTimeout(checkTimer, 100);
+      }
+    };
+
+    checkTimer();
+  }, [isRunning, onComplete]);
 
   const formatTime = (s) => {
     const mins = Math.floor(s / 60);
@@ -94,7 +101,7 @@ export default function RestTimer({ seconds, nextExercise, setNumber, onComplete
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const progress = ((seconds - timeLeft) / seconds) * 100;
+  const progress = ((totalSecondsRef.current - timeLeft) / totalSecondsRef.current) * 100;
 
   useEffect(() => {
     // Request notification permission if not already granted
