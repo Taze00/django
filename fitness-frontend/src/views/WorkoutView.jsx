@@ -212,7 +212,7 @@ export default function WorkoutView() {
 
     return (
       <RestTimer
-        restTime={restTime}
+        seconds={restTime}
         nextExercise={nextLabel}
         onComplete={handleRestComplete}
       />
