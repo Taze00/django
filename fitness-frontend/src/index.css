@@ -587,10 +587,7 @@ body {
 .counter-value {
   font-size: 96px;
   font-weight: 900;
-  background: linear-gradient(90deg, #34d399 0%, #60a5fa 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #3b82f6;
   line-height: 1;
   display: flex;
   align-items: center;
