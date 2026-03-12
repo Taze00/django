@@ -15,19 +15,25 @@ export default function StatisticsView() {
     workouts.filter(w => w.sets && w.sets.length > 0).map(w => w.date)
   );
 
-  // Calculate current streak (from most recent trained date backwards)
+  // Calculate current streak (from yesterday backwards if today not trained)
   const calculateCurrentStreak = () => {
     if (trainedDates.size === 0) return 0;
 
-    const sortedDates = Array.from(trainedDates).sort().reverse(); // newest first
-    let streak = 1;
+    const today = new Date();
+    let startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - 1); // Start from yesterday
+    const startDateStr = formatDate(startDate);
 
-    for (let i = 1; i < sortedDates.length; i++) {
-      const prevDate = new Date(sortedDates[i]);
-      const currDate = new Date(sortedDates[i - 1]);
-      const dayDiff = Math.floor((currDate - prevDate) / (1000 * 60 * 60 * 24));
+    // Only count streak if yesterday was trained
+    if (!trainedDates.has(startDateStr)) return 0;
 
-      if (dayDiff === 1) {
+    let streak = 0;
+    for (let i = 0; i < 365; i++) {
+      const checkDate = new Date(startDate);
+      checkDate.setDate(checkDate.getDate() - i);
+      const dateStr = formatDate(checkDate);
+
+      if (trainedDates.has(dateStr)) {
         streak++;
       } else {
         break;
