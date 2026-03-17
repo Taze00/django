@@ -1455,6 +1455,14 @@ function initRankings() {
             updatePosition(scrollIndex);
             updateButtonStates();
         }, 10);
+
+        // Listen for viewport changes (F12 toggle, orientation change, etc.)
+        const resizeObserver = new ResizeObserver(() => {
+            measureCard();
+            updatePosition(scrollIndex);
+            updateButtonStates();
+        });
+        resizeObserver.observe(track);
     }
 
     tabs.forEach(tab => {
