@@ -1387,10 +1387,15 @@ function initRankings() {
 
         function measureCard() {
             const firstCard = track.querySelector('.recommendation-card');
+            const carousel = document.getElementById('recommendations-carousel');
             if (firstCard && firstCard.offsetWidth > 0) {
                 cardWidth = firstCard.offsetWidth;
                 const computedGap = window.getComputedStyle(track).gap;
                 gap = parseFloat(computedGap) || 32;
+
+                const containerWidth = carousel.offsetWidth;
+                const cardsPerView = Math.round(containerWidth / (cardWidth + gap));
+                console.log(`Container: ${containerWidth}px, cardWidth: ${cardWidth}px, gap: ${gap}px, cardsPerView: ${cardsPerView}`);
             }
         }
 
