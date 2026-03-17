@@ -1400,6 +1400,8 @@ function initRankings() {
                 // Berechne wie viele Karten in den Container passen
                 const containerWidth = carousel.offsetWidth;
                 cardsPerView = Math.floor(containerWidth / (cardWidth + gap));
+
+                console.log(`Measured: containerWidth=${containerWidth}, cardWidth=${cardWidth}, gap=${gap}, cardsPerView=${cardsPerView}`);
             }
         }
 
