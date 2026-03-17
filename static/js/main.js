@@ -1380,7 +1380,7 @@ function initRankings() {
         const newPrevBtn = document.getElementById('carousel-prev-btn');
         const newNextBtn = document.getElementById('carousel-next-btn');
 
-        let displayIndex = 0; // Das was der User sieht (0 - itemCount-1)
+        let scrollIndex = 0; // Unlimited index - kann negativ oder > itemCount sein
         let isAnimating = false;
         let cardWidth = 160;
         let gap = 32;
@@ -1394,8 +1394,15 @@ function initRankings() {
             }
         }
 
+        function getVisualIndex(index) {
+            // Wrap index zu 0-itemCount-1 für Anzeige
+            return ((index % itemCount) + itemCount) % itemCount;
+        }
+
         function updatePosition(index) {
-            const offset = -(index * (cardWidth + gap));
+            // Nutze visual index für welche Karte angezeigt wird
+            const visualIndex = getVisualIndex(index);
+            const offset = -(visualIndex * (cardWidth + gap));
             track.style.transform = `translateX(${offset}px)`;
         }
 
@@ -1404,13 +1411,13 @@ function initRankings() {
             isAnimating = true;
 
             if (direction === 'next') {
-                displayIndex = (displayIndex + 1) % itemCount;
+                scrollIndex++;
             } else {
-                displayIndex = (displayIndex - 1 + itemCount) % itemCount;
+                scrollIndex--;
             }
 
             track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-            updatePosition(displayIndex);
+            updatePosition(scrollIndex);
 
             isAnimating = false;
         }
@@ -1419,7 +1426,7 @@ function initRankings() {
         newPrevBtn.addEventListener('click', () => scroll('prev'));
 
         measureCard();
-        updatePosition(displayIndex);
+        updatePosition(scrollIndex);
     }
 
     tabs.forEach(tab => {
