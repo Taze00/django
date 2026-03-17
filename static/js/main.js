@@ -1380,17 +1380,23 @@ function initRankings() {
         const newPrevBtn = document.getElementById('carousel-prev-btn');
         const newNextBtn = document.getElementById('carousel-next-btn');
 
-        let scrollIndex = 0; // Unlimited index - kann negativ oder > itemCount sein
+        let scrollIndex = 0;
         let isAnimating = false;
         let cardWidth = 160;
         let gap = 32;
+        let cardsPerView = 4; // Wie viele Karten passen in den Container
 
         function measureCard() {
             const firstCard = track.querySelector('.recommendation-card');
+            const carousel = document.getElementById('recommendations-carousel');
             if (firstCard && firstCard.offsetWidth > 0) {
                 cardWidth = firstCard.offsetWidth;
                 const computedGap = window.getComputedStyle(track).gap;
                 gap = parseFloat(computedGap) || 32;
+
+                // Berechne wie viele Karten in den Container passen
+                const containerWidth = carousel.offsetWidth;
+                cardsPerView = Math.floor(containerWidth / (cardWidth + gap));
             }
         }
 
@@ -1400,9 +1406,11 @@ function initRankings() {
         }
 
         function updateButtonStates() {
-            // Deaktiviere buttons wenn am Anfang/Ende
+            // Prev: deaktivieren wenn am Anfang
             newPrevBtn.disabled = scrollIndex === 0;
-            newNextBtn.disabled = scrollIndex >= itemCount - 1;
+            // Next: deaktivieren wenn nicht genug Items übrig sind
+            const itemsRemaining = itemCount - scrollIndex;
+            newNextBtn.disabled = itemsRemaining <= cardsPerView;
         }
 
         function scroll(direction) {
