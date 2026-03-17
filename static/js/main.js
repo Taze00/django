@@ -1403,6 +1403,7 @@ function initRankings() {
             // Nutze visual index für welche Karte angezeigt wird
             const visualIndex = getVisualIndex(index);
             const offset = -(visualIndex * (cardWidth + gap));
+            console.log(`updatePosition: visualIndex=${visualIndex}, offset=${offset}px, cardWidth=${cardWidth}, gap=${gap}`);
             track.style.transform = `translateX(${offset}px)`;
         }
 
