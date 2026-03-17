@@ -1408,11 +1408,10 @@ function initRankings() {
             return ((index % itemCount) + itemCount) % itemCount;
         }
 
-        function updatePosition(index) {
-            // Nutze visual index für welche Karte angezeigt wird
-            const visualIndex = getVisualIndex(index);
-            const offset = -(visualIndex * (cardWidth + gap));
-            console.log(`updatePosition: visualIndex=${visualIndex}, offset=${offset}px, cardWidth=${cardWidth}, gap=${gap}`);
+        function updatePosition(index, useDirectOffset = false) {
+            // Nutze den direkten index für die Animation (nicht visual index!)
+            const offset = -(index * (cardWidth + gap));
+            console.log(`updatePosition: index=${index}, offset=${offset}px`);
             track.style.transform = `translateX(${offset}px)`;
         }
 
