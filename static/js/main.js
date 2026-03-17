@@ -1358,21 +1358,16 @@ function initRankings() {
                 </div>
             `;
 
-            // Render alle Karten + mehrfach dupliziert für infinite loop
-            let cardsHTML = recommendations.map(createCardHTML).join('');
-            // Dupliziere genug mal damit seamless looping funktioniert
-            for (let i = 0; i < 2; i++) {
-                cardsHTML += recommendations.map(createCardHTML).join('');
-            }
-
+            // Render alle Karten (kein Duplizieren nötig - modulares wrapping)
+            const cardsHTML = recommendations.map(createCardHTML).join('');
             carouselTrack.innerHTML = cardsHTML;
 
             // Initialize infinite carousel with buttons
-            initInfiniteCarousel(carouselTrack, recommendations.length);
+            initInfiniteCarousel(carouselTrack, recommendations, recommendations.length);
         }
     }
 
-    function initInfiniteCarousel(track, itemCount) {
+    function initInfiniteCarousel(track, items, itemCount) {
         const prevBtn = document.getElementById('carousel-prev-btn');
         const nextBtn = document.getElementById('carousel-next-btn');
 
@@ -1417,24 +1412,13 @@ function initRankings() {
             track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             updatePosition();
 
-            // Check if we need to wrap
-            if (currentIndex >= itemCount * 3) {
-                setTimeout(() => {
-                    track.style.transition = 'none';
-                    currentIndex = itemCount;
-                    updatePosition();
-                    isAnimating = false;
-                }, 500);
-            } else if (currentIndex < 0) {
-                setTimeout(() => {
-                    track.style.transition = 'none';
-                    currentIndex = itemCount * 2 - 1;
-                    updatePosition();
-                    isAnimating = false;
-                }, 500);
-            } else {
+            // Use modulo to wrap infinitely
+            setTimeout(() => {
+                track.style.transition = 'none';
+                currentIndex = ((currentIndex % itemCount) + itemCount) % itemCount;
+                updatePosition();
                 isAnimating = false;
-            }
+            }, 500);
         }
 
         newNextBtn.addEventListener('click', () => scroll('next'));
