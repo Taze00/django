@@ -1422,8 +1422,7 @@ function initRankings() {
             // Prev: deaktivieren wenn am Anfang
             newPrevBtn.disabled = scrollIndex === 0;
             // Next: deaktivieren wenn das letzte Item sichtbar ist
-            // Wenn scrollIndex + cardsPerView > itemCount, sehen wir das letzte Item
-            newNextBtn.disabled = (scrollIndex + cardsPerView) >= itemCount;
+            newNextBtn.disabled = (scrollIndex + cardsPerView) > itemCount - 1;
         }
 
         function scroll(direction) {
