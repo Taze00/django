@@ -2106,7 +2106,7 @@ footer {
 .carousel-track {
     display: flex;
     gap: 2rem;
-    animation: carouselScroll 40s linear infinite;
+    animation: carouselScroll 25s linear infinite;
 }
 
 .carousel-track:hover {
