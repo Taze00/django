@@ -1380,7 +1380,7 @@ function initRankings() {
         const newPrevBtn = document.getElementById('carousel-prev-btn');
         const newNextBtn = document.getElementById('carousel-next-btn');
 
-        let currentIndex = 0;
+        let displayIndex = 0; // Das was der User sieht (0 - itemCount-1)
         let isAnimating = false;
         let cardWidth = 160;
         let gap = 32;
@@ -1394,8 +1394,8 @@ function initRankings() {
             }
         }
 
-        function updatePosition() {
-            const offset = -(currentIndex * (cardWidth + gap));
+        function updatePosition(index) {
+            const offset = -(index * (cardWidth + gap));
             track.style.transform = `translateX(${offset}px)`;
         }
 
@@ -1404,28 +1404,22 @@ function initRankings() {
             isAnimating = true;
 
             if (direction === 'next') {
-                currentIndex++;
+                displayIndex = (displayIndex + 1) % itemCount;
             } else {
-                currentIndex--;
+                displayIndex = (displayIndex - 1 + itemCount) % itemCount;
             }
 
             track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-            updatePosition();
+            updatePosition(displayIndex);
 
-            // Use modulo to wrap infinitely
-            setTimeout(() => {
-                track.style.transition = 'none';
-                currentIndex = ((currentIndex % itemCount) + itemCount) % itemCount;
-                updatePosition();
-                isAnimating = false;
-            }, 500);
+            isAnimating = false;
         }
 
         newNextBtn.addEventListener('click', () => scroll('next'));
         newPrevBtn.addEventListener('click', () => scroll('prev'));
 
         measureCard();
-        updatePosition();
+        updatePosition(displayIndex);
     }
 
     tabs.forEach(tab => {
