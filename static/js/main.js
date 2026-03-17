@@ -1358,110 +1358,12 @@ function initRankings() {
                 </div>
             `;
 
-            // Render alle Karten + Klone am Anfang und Ende für infinite loop
+            // Render alle Karten + dupliziert am Ende für infinite loop (CSS animation)
             const cardsHTML = recommendations.map(createCardHTML).join('');
+            const cardsHTMLDuplicate = recommendations.map(createCardHTML).join('');
 
-            // Klone: letzte 3 am Anfang, erste 3 am Ende für infinite effect
-            const lastThreeCards = recommendations.slice(-3).map(createCardHTML).join('');
-            const firstThreeCards = recommendations.slice(0, 3).map(createCardHTML).join('');
-
-            carouselTrack.innerHTML = lastThreeCards + cardsHTML + firstThreeCards;
-
-            // Initialize Button Navigation (Start bei echten Items, Index 3)
-            // Wait a tick for DOM to render before measuring
-            setTimeout(() => {
-                initCarouselButtonNavigation(carouselTrack, recommendations.length, 3);
-            }, 0);
+            carouselTrack.innerHTML = cardsHTML + cardsHTMLDuplicate;
         }
-    }
-
-    function initCarouselButtonNavigation(track, itemCount, startIndex) {
-        const prevBtn = document.getElementById('carousel-prev-btn');
-        const nextBtn = document.getElementById('carousel-next-btn');
-
-        if (!prevBtn || !nextBtn || !track) return;
-
-        // Remove old listeners to avoid duplicates
-        prevBtn.replaceWith(prevBtn.cloneNode(true));
-        nextBtn.replaceWith(nextBtn.cloneNode(true));
-
-        const newPrevBtn = document.getElementById('carousel-prev-btn');
-        const newNextBtn = document.getElementById('carousel-next-btn');
-
-        let currentIndex = startIndex; // Start at index 3 (first real card after clones)
-        let isAnimating = false;
-        let cardWithGap = 192; // Default: 160px card + 32px gap
-
-        function measureCardSize() {
-            const firstCard = track.querySelector('.recommendation-card');
-            if (firstCard) {
-                const cardWidth = firstCard.offsetWidth;
-                if (cardWidth > 0) {
-                    const computedGap = window.getComputedStyle(track).gap;
-                    const gap = parseFloat(computedGap) || 32;
-                    cardWithGap = cardWidth + gap;
-                } else {
-                    // If width is 0, try again after a short delay
-                    setTimeout(measureCardSize, 50);
-                }
-            }
-        }
-
-        function updateCarouselPosition() {
-            const translateX = -currentIndex * cardWithGap;
-            track.style.transform = `translateX(${translateX}px)`;
-        }
-
-        function scrollByCards(direction) {
-            if (isAnimating) return;
-
-            isAnimating = true;
-
-            if (direction === 'next') {
-                currentIndex++;
-            } else {
-                currentIndex--;
-            }
-
-            // Check if we need to wrap BEFORE animation
-            const maxRealIndex = startIndex + itemCount - 1;
-            let shouldWrap = false;
-            let wrapTarget = currentIndex;
-
-            if (currentIndex > maxRealIndex) {
-                shouldWrap = true;
-                wrapTarget = startIndex;
-            } else if (currentIndex < startIndex) {
-                shouldWrap = true;
-                wrapTarget = maxRealIndex;
-            }
-
-            // Apply transition and move
-            track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-            updateCarouselPosition();
-
-            if (shouldWrap) {
-                // After animation completes, jump to the wrapped position instantly
-                setTimeout(() => {
-                    track.style.transition = 'none';
-                    currentIndex = wrapTarget;
-                    updateCarouselPosition();
-                    // Small delay to ensure DOM has updated before allowing next click
-                    setTimeout(() => {
-                        isAnimating = false;
-                    }, 10);
-                }, 500);
-            } else {
-                isAnimating = false;
-            }
-        }
-
-        newNextBtn.addEventListener('click', () => scrollByCards('next'));
-        newPrevBtn.addEventListener('click', () => scrollByCards('prev'));
-
-        // Measure actual card size and initialize position
-        measureCardSize();
-        updateCarouselPosition();
     }
 
     tabs.forEach(tab => {
