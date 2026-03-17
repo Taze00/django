@@ -1417,15 +1417,17 @@ function initRankings() {
             updatePosition(scrollIndex);
 
             setTimeout(() => {
-                // Smart wrap: wenn wir über itemCount*2 hinaus sind, springe zurück zu itemCount
-                // Das ist unsichtbar weil die Animation fertig ist
-                if (scrollIndex >= itemCount * 2) {
+                // Smart wrap: cycling zwischen den 3 gruppen
+                // Wenn wir über Gruppe 3 hinaus sind (über index 11), jump zu Gruppe 1 start (index 4)
+                if (scrollIndex > itemCount * 3 - 1) {
                     track.style.transition = 'none';
                     scrollIndex = itemCount;
                     updatePosition(scrollIndex);
-                } else if (scrollIndex < itemCount) {
+                }
+                // Wenn wir vor Gruppe 1 sind (vor index 4), jump zu Gruppe 2 ende (index 11)
+                else if (scrollIndex < itemCount) {
                     track.style.transition = 'none';
-                    scrollIndex = itemCount * 2;
+                    scrollIndex = itemCount * 3 - 1;
                     updatePosition(scrollIndex);
                 }
                 isAnimating = false;
