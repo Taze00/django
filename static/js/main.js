@@ -1414,9 +1414,12 @@ function initRankings() {
 
             // Prev: deaktivieren wenn am Anfang
             newPrevBtn.disabled = scrollIndex === 0;
-            // Next: deaktivieren wenn nicht genug Items übrig sind
+            // Next: deaktivieren wenn nicht genug Items übrig sind um zu scrollen
             const itemsRemaining = itemCount - scrollIndex;
-            newNextBtn.disabled = itemsRemaining <= cardsPerView;
+            const canScroll = itemsRemaining > cardsPerView;
+            newNextBtn.disabled = !canScroll;
+
+            console.log(`Button states: scrollIndex=${scrollIndex}, itemCount=${itemCount}, cardsPerView=${cardsPerView}, itemsRemaining=${itemsRemaining}, canScroll=${canScroll}`);
         }
 
         function scroll(direction) {
