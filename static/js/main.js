@@ -1397,11 +1397,16 @@ function initRankings() {
                 const computedGap = window.getComputedStyle(track).gap;
                 gap = parseFloat(computedGap) || 32;
 
-                // Berechne wie viele Karten in den Container passen
+                // Berechne wie viele Karten VOLLSTÄNDIG in den Container passen
                 const containerWidth = carousel.offsetWidth;
-                cardsPerView = Math.floor(containerWidth / (cardWidth + gap));
+                // Berechne wie viel Platz EINE Karte + Gap braucht
+                const spacePerCard = cardWidth + gap;
+                // Die letzte Karte braucht kein Gap danach, also:
+                // containerWidth = cardsPerView * cardWidth + (cardsPerView - 1) * gap
+                // cardsPerView = (containerWidth + gap) / spacePerCard
+                cardsPerView = Math.floor((containerWidth + gap) / spacePerCard);
 
-                console.log(`Measured: containerWidth=${containerWidth}, cardWidth=${cardWidth}, gap=${gap}, cardsPerView=${cardsPerView}`);
+                console.log(`Measured: containerWidth=${containerWidth}, cardWidth=${cardWidth}, gap=${gap}, spacePerCard=${spacePerCard}, cardsPerView=${cardsPerView}`);
             }
         }
 
