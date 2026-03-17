@@ -1430,15 +1430,14 @@ function initRankings() {
 
             // Nach Animation wrappen wenn nötig
             setTimeout(() => {
-                const visualIdx = getVisualIndex(scrollIndex);
-                // Wenn wir über die 4x Kopien hinaus sind, jump zurück
-                if (scrollIndex >= itemCount * 4) {
+                // Wenn wir am Ende der duplizierten Items sind, jump zurück zum Start
+                if (scrollIndex >= itemCount) {
                     track.style.transition = 'none';
-                    scrollIndex = itemCount;
+                    scrollIndex = 0;
                     updatePosition(scrollIndex);
                 } else if (scrollIndex < 0) {
                     track.style.transition = 'none';
-                    scrollIndex = itemCount * 3;
+                    scrollIndex = itemCount - 1;
                     updatePosition(scrollIndex);
                 }
                 isAnimating = false;
