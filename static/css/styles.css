@@ -2119,7 +2119,7 @@ footer {
         transform: translateX(0);
     }
     100% {
-        transform: translateX(calc(-50% - 2rem));
+        transform: translateX(-50%);
     }
 }
 
