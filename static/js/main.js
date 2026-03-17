@@ -1408,30 +1408,28 @@ function initRankings() {
                 currentIndex--;
             }
 
-            // Check for wrapping at clone boundaries
-            const totalItemsWithClones = itemCount + startIndex * 2; // itemCount + 3 + 3
+            updateCarouselPosition();
 
-            // If we've scrolled past the real items into the end clones, jump back
-            if (currentIndex > itemCount + startIndex - 1) {
-                // Schedule position jump after animation completes
+            // Check for wrapping at clone boundaries after animation
+            const maxRealIndex = startIndex + itemCount - 1; // Last real item index
+
+            if (currentIndex > maxRealIndex) {
+                // We've hit the end clones, jump back to start after animation
                 setTimeout(() => {
                     track.style.transition = 'none';
                     currentIndex = startIndex;
                     updateCarouselPosition();
                     isAnimating = false;
                 }, 500);
-            }
-            // If we've scrolled before the real items into the start clones, jump ahead
-            else if (currentIndex < startIndex) {
-                // Schedule position jump after animation completes
+            } else if (currentIndex < startIndex) {
+                // We've hit the start clones, jump to end after animation
                 setTimeout(() => {
                     track.style.transition = 'none';
-                    currentIndex = itemCount + startIndex - 1;
+                    currentIndex = maxRealIndex;
                     updateCarouselPosition();
                     isAnimating = false;
                 }, 500);
             } else {
-                updateCarouselPosition();
                 isAnimating = false;
             }
         }
