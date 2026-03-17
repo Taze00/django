@@ -2149,7 +2149,7 @@ footer {
 
 .recommendation-card {
     flex-shrink: 0;
-    width: 160px;
+    width: clamp(80px, 25vw, 160px);
     transition: transform 0.3s ease;
 }
 
