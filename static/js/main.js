@@ -1358,10 +1358,11 @@ function initRankings() {
                 </div>
             `;
 
-            // Render alle Karten + 2 Duplikate am Ende für seamless loop
+            // Render alle Karten + 4 Duplikate am Ende für seamless loop
             let cardsHTML = recommendations.map(createCardHTML).join('');
-            // Addiere die ersten 2 Items nochmal am Ende damit der Container immer gefüllt ist
-            cardsHTML += recommendations.slice(0, 2).map(createCardHTML).join('');
+            // Addiere die ersten 4 Items (oder weniger wenn weniger da sind) am Ende
+            const duplicateCount = Math.min(4, recommendations.length);
+            cardsHTML += recommendations.slice(0, duplicateCount).map(createCardHTML).join('');
             carouselTrack.innerHTML = cardsHTML;
 
             // Initialize infinite carousel with buttons
