@@ -1419,14 +1419,23 @@ function initRankings() {
             track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             updatePosition(scrollIndex);
 
-            isAnimating = false;
+            const visualIdx = getVisualIndex(scrollIndex);
+            console.log(`Scrolled: scrollIndex=${scrollIndex}, visualIndex=${visualIdx}, offset=${-(visualIdx * (cardWidth + gap))}px`);
+
+            setTimeout(() => {
+                isAnimating = false;
+            }, 500);
         }
 
         newNextBtn.addEventListener('click', () => scroll('next'));
         newPrevBtn.addEventListener('click', () => scroll('prev'));
 
-        measureCard();
-        updatePosition(scrollIndex);
+        // Measure card size after a tick to ensure DOM is ready
+        setTimeout(() => {
+            measureCard();
+            console.log(`Measured: cardWidth=${cardWidth}, gap=${gap}, cardWithGap=${cardWidth + gap}`);
+            updatePosition(scrollIndex);
+        }, 10);
     }
 
     tabs.forEach(tab => {
