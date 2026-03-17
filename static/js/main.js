@@ -1358,11 +1358,8 @@ function initRankings() {
                 </div>
             `;
 
-            // Render alle Karten + 4 Duplikate am Ende für seamless loop
-            let cardsHTML = recommendations.map(createCardHTML).join('');
-            // Addiere die ersten 4 Items (oder weniger wenn weniger da sind) am Ende
-            const duplicateCount = Math.min(4, recommendations.length);
-            cardsHTML += recommendations.slice(0, duplicateCount).map(createCardHTML).join('');
+            // Render alle Karten - keine Duplikate nötig mit Modulo!
+            const cardsHTML = recommendations.map(createCardHTML).join('');
             carouselTrack.innerHTML = cardsHTML;
 
             // Initialize infinite carousel with buttons
