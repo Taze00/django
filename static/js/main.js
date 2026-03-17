@@ -1408,7 +1408,6 @@ function initRankings() {
             if (isAnimating) return;
 
             isAnimating = true;
-            track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
 
             if (direction === 'next') {
                 currentIndex++;
@@ -1416,26 +1415,33 @@ function initRankings() {
                 currentIndex--;
             }
 
-            updateCarouselPosition();
-
-            // Check for wrapping at clone boundaries after animation
-            const maxRealIndex = startIndex + itemCount - 1; // Last real item index
+            // Check if we need to wrap BEFORE animation
+            const maxRealIndex = startIndex + itemCount - 1;
+            let shouldWrap = false;
+            let wrapTarget = currentIndex;
 
             if (currentIndex > maxRealIndex) {
-                // We've hit the end clones, jump back to start after animation
-                setTimeout(() => {
-                    track.style.transition = 'none';
-                    currentIndex = startIndex;
-                    updateCarouselPosition();
-                    isAnimating = false;
-                }, 500);
+                shouldWrap = true;
+                wrapTarget = startIndex;
             } else if (currentIndex < startIndex) {
-                // We've hit the start clones, jump to end after animation
+                shouldWrap = true;
+                wrapTarget = maxRealIndex;
+            }
+
+            // Apply transition and move
+            track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            updateCarouselPosition();
+
+            if (shouldWrap) {
+                // After animation completes, jump to the wrapped position instantly
                 setTimeout(() => {
                     track.style.transition = 'none';
-                    currentIndex = maxRealIndex;
+                    currentIndex = wrapTarget;
                     updateCarouselPosition();
-                    isAnimating = false;
+                    // Small delay to ensure DOM has updated before allowing next click
+                    setTimeout(() => {
+                        isAnimating = false;
+                    }, 10);
                 }, 500);
             } else {
                 isAnimating = false;
