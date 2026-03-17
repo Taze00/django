@@ -1406,7 +1406,7 @@ function initRankings() {
             if (isAnimating) return;
             isAnimating = true;
 
-            // Einfach weiterzählen, kein Modulo!
+            // Einfach weiterzählen
             if (direction === 'next') {
                 scrollIndex++;
             } else {
@@ -1417,6 +1417,17 @@ function initRankings() {
             updatePosition(scrollIndex);
 
             setTimeout(() => {
+                // Smart wrap: wenn wir über itemCount*2 hinaus sind, springe zurück zu itemCount
+                // Das ist unsichtbar weil die Animation fertig ist
+                if (scrollIndex >= itemCount * 2) {
+                    track.style.transition = 'none';
+                    scrollIndex = itemCount;
+                    updatePosition(scrollIndex);
+                } else if (scrollIndex < itemCount) {
+                    track.style.transition = 'none';
+                    scrollIndex = itemCount * 2;
+                    updatePosition(scrollIndex);
+                }
                 isAnimating = false;
             }, 500);
         }
