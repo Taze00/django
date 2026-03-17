@@ -1385,11 +1385,19 @@ function initRankings() {
         const newPrevBtn = document.getElementById('carousel-prev-btn');
         const newNextBtn = document.getElementById('carousel-next-btn');
 
-        const cardWidth = 160; // px
-        const cardGap = 32; // 2rem = 32px
-        const cardWithGap = cardWidth + cardGap;
         let currentIndex = startIndex; // Start at index 3 (first real card after clones)
         let isAnimating = false;
+        let cardWithGap = 192; // Default: 160px card + 32px gap
+
+        function measureCardSize() {
+            const firstCard = track.querySelector('.recommendation-card');
+            if (firstCard) {
+                const cardWidth = firstCard.offsetWidth;
+                const computedGap = window.getComputedStyle(track).gap;
+                const gap = parseFloat(computedGap) || 32;
+                cardWithGap = cardWidth + gap;
+            }
+        }
 
         function updateCarouselPosition() {
             const translateX = -currentIndex * cardWithGap;
@@ -1437,7 +1445,8 @@ function initRankings() {
         newNextBtn.addEventListener('click', () => scrollByCards('next'));
         newPrevBtn.addEventListener('click', () => scrollByCards('prev'));
 
-        // Initialize position
+        // Measure actual card size and initialize position
+        measureCardSize();
         updateCarouselPosition();
     }
 
