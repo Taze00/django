@@ -1358,12 +1358,90 @@ function initRankings() {
                 </div>
             `;
 
-            // Render alle Karten + dupliziert am Ende für infinite loop (CSS animation)
-            const cardsHTML = recommendations.map(createCardHTML).join('');
-            const cardsHTMLDuplicate = recommendations.map(createCardHTML).join('');
+            // Render alle Karten + mehrfach dupliziert für infinite loop
+            let cardsHTML = recommendations.map(createCardHTML).join('');
+            // Dupliziere genug mal damit seamless looping funktioniert
+            for (let i = 0; i < 2; i++) {
+                cardsHTML += recommendations.map(createCardHTML).join('');
+            }
 
-            carouselTrack.innerHTML = cardsHTML + cardsHTMLDuplicate;
+            carouselTrack.innerHTML = cardsHTML;
+
+            // Initialize infinite carousel with buttons
+            initInfiniteCarousel(carouselTrack, recommendations.length);
         }
+    }
+
+    function initInfiniteCarousel(track, itemCount) {
+        const prevBtn = document.getElementById('carousel-prev-btn');
+        const nextBtn = document.getElementById('carousel-next-btn');
+
+        if (!prevBtn || !nextBtn || !track) return;
+
+        // Remove old listeners
+        prevBtn.replaceWith(prevBtn.cloneNode(true));
+        nextBtn.replaceWith(nextBtn.cloneNode(true));
+
+        const newPrevBtn = document.getElementById('carousel-prev-btn');
+        const newNextBtn = document.getElementById('carousel-next-btn');
+
+        let currentIndex = 0;
+        let isAnimating = false;
+        let cardWidth = 160;
+        let gap = 32;
+
+        function measureCard() {
+            const firstCard = track.querySelector('.recommendation-card');
+            if (firstCard && firstCard.offsetWidth > 0) {
+                cardWidth = firstCard.offsetWidth;
+                const computedGap = window.getComputedStyle(track).gap;
+                gap = parseFloat(computedGap) || 32;
+            }
+        }
+
+        function updatePosition() {
+            const offset = -(currentIndex * (cardWidth + gap));
+            track.style.transform = `translateX(${offset}px)`;
+        }
+
+        function scroll(direction) {
+            if (isAnimating) return;
+            isAnimating = true;
+
+            if (direction === 'next') {
+                currentIndex++;
+            } else {
+                currentIndex--;
+            }
+
+            track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            updatePosition();
+
+            // Check if we need to wrap
+            if (currentIndex >= itemCount * 3) {
+                setTimeout(() => {
+                    track.style.transition = 'none';
+                    currentIndex = itemCount;
+                    updatePosition();
+                    isAnimating = false;
+                }, 500);
+            } else if (currentIndex < 0) {
+                setTimeout(() => {
+                    track.style.transition = 'none';
+                    currentIndex = itemCount * 2 - 1;
+                    updatePosition();
+                    isAnimating = false;
+                }, 500);
+            } else {
+                isAnimating = false;
+            }
+        }
+
+        newNextBtn.addEventListener('click', () => scroll('next'));
+        newPrevBtn.addEventListener('click', () => scroll('prev'));
+
+        measureCard();
+        updatePosition();
     }
 
     tabs.forEach(tab => {
