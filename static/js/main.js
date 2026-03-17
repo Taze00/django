@@ -1358,8 +1358,11 @@ function initRankings() {
                 </div>
             `;
 
-            // Render alle Karten - keine Duplikate nötig mit Modulo!
-            const cardsHTML = recommendations.map(createCardHTML).join('');
+            // Render alle Karten 3x dupliziert für echtes endloses Scrolling
+            let cardsHTML = '';
+            for (let i = 0; i < 3; i++) {
+                cardsHTML += recommendations.map(createCardHTML).join('');
+            }
             carouselTrack.innerHTML = cardsHTML;
 
             // Initialize infinite carousel with buttons
@@ -1403,10 +1406,11 @@ function initRankings() {
             if (isAnimating) return;
             isAnimating = true;
 
+            // Einfach weiterzählen, kein Modulo!
             if (direction === 'next') {
-                scrollIndex = (scrollIndex + 1) % itemCount;
+                scrollIndex++;
             } else {
-                scrollIndex = (scrollIndex - 1 + itemCount) % itemCount;
+                scrollIndex--;
             }
 
             track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
