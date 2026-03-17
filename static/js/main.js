@@ -1362,6 +1362,9 @@ function initRankings() {
             const cardsHTML = recommendations.map(createCardHTML).join('');
             carouselTrack.innerHTML = cardsHTML;
 
+            // Reset carousel position when switching categories
+            scrollIndex = 0;
+
             // Initialize infinite carousel with buttons
             initInfiniteCarousel(carouselTrack, recommendations, recommendations.length);
         }
@@ -1406,6 +1409,9 @@ function initRankings() {
         }
 
         function updateButtonStates() {
+            // Re-measure in case viewport changed
+            measureCard();
+
             // Prev: deaktivieren wenn am Anfang
             newPrevBtn.disabled = scrollIndex === 0;
             // Next: deaktivieren wenn nicht genug Items übrig sind
