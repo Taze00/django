@@ -1358,12 +1358,11 @@ function initRankings() {
                 </div>
             `;
 
-            // Render alle Karten mehrfach dupliziert für seamless looping
+            // Render alle Karten + 2 leere Placeholder am Ende
             let cardsHTML = recommendations.map(createCardHTML).join('');
-            // Dupliziere genug mal damit der Container immer gefüllt ist
-            for (let i = 0; i < 3; i++) {
-                cardsHTML += recommendations.map(createCardHTML).join('');
-            }
+            // Addiere 2 leere Platzhalter damit der Container gefüllt ist
+            cardsHTML += '<div class="recommendation-card" style="visibility: hidden;"></div>';
+            cardsHTML += '<div class="recommendation-card" style="visibility: hidden;"></div>';
             carouselTrack.innerHTML = cardsHTML;
 
             // Initialize infinite carousel with buttons
@@ -1391,27 +1390,15 @@ function initRankings() {
 
         function measureCard() {
             const firstCard = track.querySelector('.recommendation-card');
-            const carousel = document.getElementById('recommendations-carousel');
             if (firstCard && firstCard.offsetWidth > 0) {
                 cardWidth = firstCard.offsetWidth;
                 const computedGap = window.getComputedStyle(track).gap;
                 gap = parseFloat(computedGap) || 32;
-
-                const containerWidth = carousel.offsetWidth;
-                const cardsPerView = Math.round(containerWidth / (cardWidth + gap));
-                console.log(`Container: ${containerWidth}px, cardWidth: ${cardWidth}px, gap: ${gap}px, cardsPerView: ${cardsPerView}`);
             }
         }
 
-        function getVisualIndex(index) {
-            // Wrap index zu 0-itemCount-1 für Anzeige
-            return ((index % itemCount) + itemCount) % itemCount;
-        }
-
-        function updatePosition(index, useDirectOffset = false) {
-            // Nutze den direkten index für die Animation (nicht visual index!)
+        function updatePosition(index) {
             const offset = -(index * (cardWidth + gap));
-            console.log(`updatePosition: index=${index}, offset=${offset}px`);
             track.style.transform = `translateX(${offset}px)`;
         }
 
@@ -1420,26 +1407,15 @@ function initRankings() {
             isAnimating = true;
 
             if (direction === 'next') {
-                scrollIndex++;
+                scrollIndex = (scrollIndex + 1) % itemCount;
             } else {
-                scrollIndex--;
+                scrollIndex = (scrollIndex - 1 + itemCount) % itemCount;
             }
 
             track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             updatePosition(scrollIndex);
 
-            // Nach Animation wrappen wenn nötig
             setTimeout(() => {
-                // Wenn wir am Ende der duplizierten Items sind, jump zurück zum Start
-                if (scrollIndex >= itemCount) {
-                    track.style.transition = 'none';
-                    scrollIndex = 0;
-                    updatePosition(scrollIndex);
-                } else if (scrollIndex < 0) {
-                    track.style.transition = 'none';
-                    scrollIndex = itemCount - 1;
-                    updatePosition(scrollIndex);
-                }
                 isAnimating = false;
             }, 500);
         }
@@ -1450,7 +1426,6 @@ function initRankings() {
         // Measure card size after a tick to ensure DOM is ready
         setTimeout(() => {
             measureCard();
-            console.log(`Measured: cardWidth=${cardWidth}, gap=${gap}, cardWithGap=${cardWidth + gap}`);
             updatePosition(scrollIndex);
         }, 10);
     }
