@@ -17,8 +17,11 @@ const RANKINGS = {
         { rank: 2, title: 'Fight Club', year: 1999, rating: '9.2', length: '139min', genre: 'Thriller', description: 'Tiefgründige Fragen aufs Leben mit David Fincher, der zum Denken anregt.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt0137523/', poster: '/static/css/images/movie/fightclub.png' },
         { rank: 3, title: 'Prisoners', year: 2013, rating: '9.1', length: '153min', genre: 'Thriller', description: 'Meisterhafte Darstellungen, unfassbar wie echte Eltern reagieren.', platform: 'Netflix', imdb: 'https://www.imdb.com/title/tt1392214/', poster: '/static/css/images/movie/prisoners.png' },
         { rank: 4, title: 'The Green Mile', year: 1999, rating: '9.0', length: '189min', genre: 'Drama', description: 'Emotional und tiefgründig, ein Film, der einen nicht mehr loslässt.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt0120689/', poster: '/static/css/images/movie/thegreenmile.png' },
-        { rank: 5, title: 'Interstellar', year: 2014, rating: '8.7', length: '169min', genre: 'Sci-Fi', description: 'Visuelle Wucht kombiniert mit emotionalem Storytelling und der besten Filmmusik.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt0816692/', poster: '/static/css/images/movie/interstellar.png' },
-        { rank: 6, title: 'Train Dreams', year: 2023, rating: '8.5', length: '127min', genre: 'Drama', description: 'Tiefgründig über Träume und Verlust, emotional überwältigend.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt29768334/', poster: '/static/css/images/movie/traindreams.png' }
+        { rank: 5, title: 'Das Streben nach Glück', year: 2006, rating: '8.8', length: '117min', genre: 'Drama', description: 'Inspirierend und emotional, eine wahre Geschichte über Hoffnung und Durchhaltevermögen.', platform: 'Netflix', imdb: 'https://www.imdb.com/title/tt0454921/', poster: '/static/css/images/movie/das_streben_nach_glück.png' },
+        { rank: 6, title: 'Interstellar', year: 2014, rating: '8.7', length: '169min', genre: 'Sci-Fi', description: 'Visuelle Wucht kombiniert mit emotionalem Storytelling und der besten Filmmusik.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt0816692/', poster: '/static/css/images/movie/interstellar.png' },
+        { rank: 7, title: 'In Time', year: 2011, rating: '8.0', length: '109min', genre: 'Sci-Fi', description: 'Spannender Plot mit interessantem Konzept, Zeit als Währung.', platform: 'Disney+ / Prime', imdb: 'https://www.imdb.com/title/tt1637688/', poster: '/static/css/images/movie/InTime.png' },
+        { rank: 8, title: 'The Prestige', year: 2006, rating: '8.5', length: '130min', genre: 'Mystery', description: 'Meisterhafter Thriller über zwei Magier und ihren obsessiven Wettkampf.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt0482571/', poster: '/static/css/images/movie/thePrestige.png', isFavorite: true },
+        { rank: 9, title: 'Train Dreams', year: 2023, rating: '8.5', length: '127min', genre: 'Drama', description: 'Tiefgründig über Träume und Verlust, emotional überwältigend.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt29768334/', poster: '/static/css/images/movie/traindreams.png' }
     ],
     series: [
         { rank: 1, title: 'Prison Break', year: 2005, rating: '9.4', length: '5 Staffeln', genre: 'Thriller', description: 'Durchgehend spannend, echtes Meisterwerk der Serienwelt.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt0455275/', poster: '/static/css/images/movie/prisonbreak.png' },
@@ -26,15 +29,23 @@ const RANKINGS = {
         { rank: 3, title: 'From', year: 2022, rating: '9.0', length: '3 Staffeln', genre: 'Mystery', description: 'Mysteriös und atmosphärisch, ständig neue Fragen.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt9813792/', poster: '/static/css/images/movie/from.png' },
         { rank: 4, title: 'The Watcher', year: 2022, rating: '8.7', length: '1 Staffel', genre: 'Thriller', description: 'Ryan Murphy Thriller über Obsession und Paranoia mit einem verrückten Ende.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt14852808/', poster: '/static/css/images/movie/the-watcher_cover.png' },
         { rank: 5, title: 'Solange wir lügen', year: 2024, rating: '8.5', length: '8 Episoden', genre: 'Drama', description: 'Spannend über Geheimnisse und Verrat, überraschend.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/de/title/tt3914054/', poster: '/static/css/images/movie/solangewirlügen.png' },
-        { rank: 6, title: 'Discounter', year: 2022, rating: '8.0', length: '2 Staffeln', genre: 'Comedy', description: 'Mal was Anderes, echt lustig mit genau meinem Humor.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/de/title/tt16463942/', poster: '/static/css/images/movie/Discounter.png' }
+        { rank: 6, title: 'Discounter', year: 2022, rating: '8.0', length: '2 Staffeln', genre: 'Comedy', description: 'Mal was Anderes, echt lustig mit genau meinem Humor.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/de/title/tt16463942/', poster: '/static/css/images/movie/Discounter.png' },
+        { rank: 7, title: 'Sons of Anarchy', year: 2008, rating: '8.6', length: '7 Staffeln', genre: 'Crime Drama', description: 'Düstere, fesselnde Serie über Motorrad-Gangs mit starken Charakteren.', platform: 'Disney+', imdb: 'https://www.imdb.com/title/tt1124373/', poster: '/static/css/images/movie/SonsofAnarchy.png' },
+        { rank: 8, title: 'Stranger Things', year: 2016, rating: '8.4', length: '4 Staffeln', genre: 'Sci-Fi Horror', description: 'Nostalgisch, spannend und atmosphärisch mit großartigen Charakteren.', platform: 'Netflix', imdb: 'https://www.imdb.com/title/tt4574334/', poster: '/static/css/images/movie/StrangerThings.png' },
+        { rank: 9, title: 'Black Mirror', year: 2011, rating: '8.8', length: '6 Staffeln', genre: 'Sci-Fi Thriller', description: 'Dystopische Episoden über Technologie und ihre Auswirkungen auf die Gesellschaft.', platform: 'Netflix', imdb: 'https://www.imdb.com/title/tt2085059/', poster: '/static/css/images/movie/BlackMirror.png' },
+        { rank: 10, title: 'Das Damen Gambit', year: 2020, rating: '8.4', length: '1 Staffel', genre: 'Drama', description: 'Fesselnde Serie über eine junge Schachspielerin und ihren Aufstieg.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt10048342/?ref_=nv_sr_srsg_0_tt_2_nm_0_in_0_q_Das%20Damengamb', poster: '/static/css/images/movie/DasDamengambit.png' },
+        { rank: 11, title: 'Sie weiß von dir', year: 2023, rating: '8.2', length: '8 Episoden', genre: 'Thriller', description: 'Psychologischer Thriller über Obsession und gefährliche Lügen.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt9698442/?ref_=nv_sr_srsg_0_tt_5_nm_3_in_0_q_Sie%20weis%20von%20dir', poster: '/static/css/images/movie/Siewiesvondir.png' },
+        { rank: 12, title: 'Sherlock', year: 2010, rating: '9.1', length: '4 Staffeln', genre: 'Crime Drama', description: 'Moderner Detektiv Sherlock Holmes mit brillanten Wendungen und scharfsinnigen Fällen.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt1475582/?ref_=nv_sr_srsg_3_tt_8_nm_0_in_0_q_Sherlock', poster: '/static/css/images/movie/Sherlock.png', isFavorite: true }
     ],
     anime: [
         { rank: 1, title: 'Attack on Titan', year: 2013, rating: '9.9', length: '4 Staffeln', genre: 'Action', description: 'Immer spannend, unglaubliche Plottwists, absolutes Meisterwerk.', platform: 'Crunchyroll', imdb: 'https://www.imdb.com/title/tt2560140/', poster: '/static/css/images/movie/attackontitan.png' },
         { rank: 2, title: 'Hunter x Hunter', year: 2011, rating: '9.4', length: '6 Staffeln', genre: 'Adventure', description: 'Sehr cool, macht dich wach, willst was Großes erreichen.', platform: 'Crunchyroll', imdb: 'https://www.imdb.com/title/tt2098220/', poster: '/static/css/images/movie/hunterxhunter.png' },
         { rank: 3, title: 'Death Note', year: 2006, rating: '9.0', length: '2 Staffeln', genre: 'Thriller', description: 'Hin und her mit Tricks, pure Spannung auf höchstem Niveau.', platform: 'Netflix', imdb: 'https://www.imdb.com/title/tt0877057/', poster: '/static/css/images/movie/DEATH_NOTE.png' },
-        { rank: 4, title: '7 Deadly Sins', year: 2014, rating: '8.2', length: '5 Staffeln', genre: 'Fantasy', description: 'Ich feier die Charaktere und die Story, einfach solid durchzuschauen.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt3909224/', poster: '/static/css/images/movie/7deadlysins.png' },
-        { rank: 5, title: 'Demon Slayer', year: 2019, rating: '7.8', length: '4 Staffeln', genre: 'Action', description: 'Wahnsinn Animationen, emotional, unforgettable Kämpfe.', platform: 'Netflix', imdb: 'https://www.imdb.com/title/tt9335498/', poster: '/static/css/images/movie/DemonSlayer.png' },
-        { rank: 6, title: 'My Hero Academia', year: 2016, rating: '7.6', length: '7 Staffeln', genre: 'Action', description: 'Viele Charaktere und die sind alle wichtig, gute Story mit guter Action.', platform: 'Crunchyroll', imdb: 'https://www.imdb.com/title/tt5626028/', poster: '/static/css/images/movie/myheroacademia.png' }
+        { rank: 4, title: 'Vinland Saga', year: 2019, rating: '8.9', length: '2 Staffeln', genre: 'Action', description: 'Wikinger-Epos mit beeindruckender Charakterentwicklung und dem besten Antagonisten. Fesselndes Storytelling vom Anfang bis zum Ende.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt10233448/?ref_=nv_sr_srsg_0_tt_8_nm_0_in_0_q_Vinland%20Saga', poster: '/static/css/images/movie/VinlandSaga.png' },
+        { rank: 5, title: '7 Deadly Sins', year: 2014, rating: '8.2', length: '5 Staffeln', genre: 'Fantasy', description: 'Ich feier die Charaktere und die Story, einfach solid durchzuschauen.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt3909224/', poster: '/static/css/images/movie/7deadlysins.png' },
+        { rank: 6, title: 'Demon Slayer', year: 2019, rating: '7.8', length: '4 Staffeln', genre: 'Action', description: 'Wahnsinn Animationen, emotional, unforgettable Kämpfe.', platform: 'Netflix', imdb: 'https://www.imdb.com/title/tt9335498/', poster: '/static/css/images/movie/DemonSlayer.png' },
+        { rank: 7, title: 'My Hero Academia', year: 2016, rating: '7.6', length: '7 Staffeln', genre: 'Action', description: 'Viele Charaktere und die sind alle wichtig, gute Story mit guter Action.', platform: 'Crunchyroll', imdb: 'https://www.imdb.com/title/tt5626028/', poster: '/static/css/images/movie/myheroacademia.png' },
+        { rank: 8, title: 'Fullmetal Alchemist: Brotherhood', year: 2009, rating: '9.1', length: '5 Staffeln', genre: 'Action', description: 'Meisterwerk über zwei Brüder und ihre Reise zur Wiedererlangung ihres Körpers.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt1355642/?ref_=nv_sr_srsg_0_tt_8_nm_0_in_0_q_Fullmetal', poster: '/static/css/images/movie/FullmetalAlchimistBrotherhood.png', isFavorite: true }
     ]
 };
 
@@ -1293,7 +1304,17 @@ function initRankings() {
 
     function renderRankings(category) {
         const items = RANKINGS[category];
-        container.innerHTML = items.map(item => `
+        const top5 = items.slice(0, 5);
+        const allRecommendations = items.slice(5);
+        // Sort recommendations so favorites appear first
+        const recommendations = allRecommendations.sort((a, b) => {
+            if (a.isFavorite && !b.isFavorite) return -1;
+            if (!a.isFavorite && b.isFavorite) return 1;
+            return 0;
+        });
+
+        // Render Top 5
+        container.innerHTML = top5.map(item => `
             <div class="ranking-item">
                 <div class="ranking-rank">${String(item.rank).padStart(2, '0')}</div>
                 <div class="ranking-poster">
@@ -1312,6 +1333,114 @@ function initRankings() {
                 </div>
             </div>
         `).join('');
+
+        // Render Recommendations Carousel with infinite scrolling
+        const carouselTrack = document.getElementById('carousel-track');
+        if (carouselTrack && recommendations.length > 0) {
+            // Create card HTML function
+            const createCardHTML = (item) => `
+                <div class="recommendation-card${item.isFavorite ? ' favorite' : ''}">
+                    <div class="recommendation-poster">
+                        <img src="${item.poster}" alt="${item.title}" loading="lazy">
+                        ${item.isFavorite ? '<div class="favorite-star"><i class="fas fa-star"></i></div>' : ''}
+                        <div class="recommendation-overlay">
+                            <a href="${item.imdb}" target="_blank" rel="noopener noreferrer" class="recommendation-link">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="recommendation-info">
+                        <h4 class="recommendation-title">${item.title}</h4>
+                        <div class="recommendation-platform">
+                            <i class="fas fa-play-circle"></i> ${item.platform}
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Render alle Karten + Klone am Anfang und Ende für infinite loop
+            const cardsHTML = recommendations.map(createCardHTML).join('');
+
+            // Klone: letzte 3 am Anfang, erste 3 am Ende für infinite effect
+            const lastThreeCards = recommendations.slice(-3).map(createCardHTML).join('');
+            const firstThreeCards = recommendations.slice(0, 3).map(createCardHTML).join('');
+
+            carouselTrack.innerHTML = lastThreeCards + cardsHTML + firstThreeCards;
+
+            // Initialize Button Navigation (Start bei echten Items, Index 3)
+            initCarouselButtonNavigation(carouselTrack, recommendations.length, 3);
+        }
+    }
+
+    function initCarouselButtonNavigation(track, itemCount, startIndex) {
+        const prevBtn = document.getElementById('carousel-prev-btn');
+        const nextBtn = document.getElementById('carousel-next-btn');
+
+        if (!prevBtn || !nextBtn || !track) return;
+
+        // Remove old listeners to avoid duplicates
+        prevBtn.replaceWith(prevBtn.cloneNode(true));
+        nextBtn.replaceWith(nextBtn.cloneNode(true));
+
+        const newPrevBtn = document.getElementById('carousel-prev-btn');
+        const newNextBtn = document.getElementById('carousel-next-btn');
+
+        const cardWidth = 160; // px
+        const cardGap = 32; // 2rem = 32px
+        const cardWithGap = cardWidth + cardGap;
+        let currentIndex = startIndex; // Start at index 3 (first real card after clones)
+        let isAnimating = false;
+
+        function updateCarouselPosition() {
+            const translateX = -currentIndex * cardWithGap;
+            track.style.transform = `translateX(${translateX}px)`;
+        }
+
+        function scrollByCards(direction) {
+            if (isAnimating) return;
+
+            isAnimating = true;
+            track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+
+            if (direction === 'next') {
+                currentIndex++;
+            } else {
+                currentIndex--;
+            }
+
+            // Check for wrapping at clone boundaries
+            const totalItemsWithClones = itemCount + startIndex * 2; // itemCount + 3 + 3
+
+            // If we've scrolled past the real items into the end clones, jump back
+            if (currentIndex > itemCount + startIndex - 1) {
+                // Schedule position jump after animation completes
+                setTimeout(() => {
+                    track.style.transition = 'none';
+                    currentIndex = startIndex;
+                    updateCarouselPosition();
+                    isAnimating = false;
+                }, 500);
+            }
+            // If we've scrolled before the real items into the start clones, jump ahead
+            else if (currentIndex < startIndex) {
+                // Schedule position jump after animation completes
+                setTimeout(() => {
+                    track.style.transition = 'none';
+                    currentIndex = itemCount + startIndex - 1;
+                    updateCarouselPosition();
+                    isAnimating = false;
+                }, 500);
+            } else {
+                updateCarouselPosition();
+                isAnimating = false;
+            }
+        }
+
+        newNextBtn.addEventListener('click', () => scrollByCards('next'));
+        newPrevBtn.addEventListener('click', () => scrollByCards('prev'));
+
+        // Initialize position
+        updateCarouselPosition();
     }
 
     tabs.forEach(tab => {
