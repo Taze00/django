@@ -2172,17 +2172,31 @@ footer {
 
 @media (max-width: 480px) {
     .recommendation-card {
-        width: 120px;
+        width: 100px;
     }
 
     .carousel-btn {
-        width: 36px;
-        height: 36px;
-        font-size: 0.75rem;
+        width: 32px;
+        height: 32px;
+        font-size: 0.65rem;
     }
 
     .recommendations-title {
         font-size: 1.2rem;
+    }
+
+    .carousel-wrapper {
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 390px) {
+    .recommendation-card {
+        width: 90px;
+    }
+
+    .carousel-track {
+        gap: 1rem;
     }
 }
 
