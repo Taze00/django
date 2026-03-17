@@ -1358,11 +1358,8 @@ function initRankings() {
                 </div>
             `;
 
-            // Render alle Karten 3x dupliziert für echtes endloses Scrolling
-            let cardsHTML = '';
-            for (let i = 0; i < 3; i++) {
-                cardsHTML += recommendations.map(createCardHTML).join('');
-            }
+            // Render alle Karten - keine Duplikate nötig!
+            const cardsHTML = recommendations.map(createCardHTML).join('');
             carouselTrack.innerHTML = cardsHTML;
 
             // Initialize infinite carousel with buttons
