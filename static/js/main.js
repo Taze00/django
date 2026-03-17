@@ -1368,7 +1368,10 @@ function initRankings() {
             carouselTrack.innerHTML = lastThreeCards + cardsHTML + firstThreeCards;
 
             // Initialize Button Navigation (Start bei echten Items, Index 3)
-            initCarouselButtonNavigation(carouselTrack, recommendations.length, 3);
+            // Wait a tick for DOM to render before measuring
+            setTimeout(() => {
+                initCarouselButtonNavigation(carouselTrack, recommendations.length, 3);
+            }, 0);
         }
     }
 
@@ -1393,9 +1396,14 @@ function initRankings() {
             const firstCard = track.querySelector('.recommendation-card');
             if (firstCard) {
                 const cardWidth = firstCard.offsetWidth;
-                const computedGap = window.getComputedStyle(track).gap;
-                const gap = parseFloat(computedGap) || 32;
-                cardWithGap = cardWidth + gap;
+                if (cardWidth > 0) {
+                    const computedGap = window.getComputedStyle(track).gap;
+                    const gap = parseFloat(computedGap) || 32;
+                    cardWithGap = cardWidth + gap;
+                } else {
+                    // If width is 0, try again after a short delay
+                    setTimeout(measureCardSize, 50);
+                }
             }
         }
 
