@@ -1358,8 +1358,12 @@ function initRankings() {
                 </div>
             `;
 
-            // Render alle Karten (kein Duplizieren nötig - modulares wrapping)
-            const cardsHTML = recommendations.map(createCardHTML).join('');
+            // Render alle Karten mehrfach dupliziert für seamless looping
+            let cardsHTML = recommendations.map(createCardHTML).join('');
+            // Dupliziere genug mal damit der Container immer gefüllt ist
+            for (let i = 0; i < 3; i++) {
+                cardsHTML += recommendations.map(createCardHTML).join('');
+            }
             carouselTrack.innerHTML = cardsHTML;
 
             // Initialize infinite carousel with buttons
@@ -1425,10 +1429,19 @@ function initRankings() {
             track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
             updatePosition(scrollIndex);
 
-            const visualIdx = getVisualIndex(scrollIndex);
-            console.log(`Scrolled: scrollIndex=${scrollIndex}, visualIndex=${visualIdx}, offset=${-(visualIdx * (cardWidth + gap))}px`);
-
+            // Nach Animation wrappen wenn nötig
             setTimeout(() => {
+                const visualIdx = getVisualIndex(scrollIndex);
+                // Wenn wir über die 4x Kopien hinaus sind, jump zurück
+                if (scrollIndex >= itemCount * 4) {
+                    track.style.transition = 'none';
+                    scrollIndex = itemCount;
+                    updatePosition(scrollIndex);
+                } else if (scrollIndex < 0) {
+                    track.style.transition = 'none';
+                    scrollIndex = itemCount * 3;
+                    updatePosition(scrollIndex);
+                }
                 isAnimating = false;
             }, 500);
         }
