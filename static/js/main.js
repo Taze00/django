@@ -1402,6 +1402,12 @@ function initRankings() {
             track.style.transform = `translateX(${offset}px)`;
         }
 
+        function updateButtonStates() {
+            // Deaktiviere buttons wenn am Anfang/Ende
+            newPrevBtn.disabled = scrollIndex === 0;
+            newNextBtn.disabled = scrollIndex >= itemCount - 1;
+        }
+
         function scroll(direction) {
             if (isAnimating) return;
             isAnimating = true;
@@ -1417,19 +1423,7 @@ function initRankings() {
             updatePosition(scrollIndex);
 
             setTimeout(() => {
-                // Smart wrap: cycling zwischen den 3 gruppen
-                // Wenn wir über Gruppe 3 hinaus sind (über index 11), jump zu Gruppe 1 start (index 4)
-                if (scrollIndex > itemCount * 3 - 1) {
-                    track.style.transition = 'none';
-                    scrollIndex = itemCount;
-                    updatePosition(scrollIndex);
-                }
-                // Wenn wir vor Gruppe 1 sind (vor index 4), jump zu Gruppe 2 ende (index 11)
-                else if (scrollIndex < itemCount) {
-                    track.style.transition = 'none';
-                    scrollIndex = itemCount * 3 - 1;
-                    updatePosition(scrollIndex);
-                }
+                updateButtonStates();
                 isAnimating = false;
             }, 500);
         }
@@ -1441,6 +1435,7 @@ function initRankings() {
         setTimeout(() => {
             measureCard();
             updatePosition(scrollIndex);
+            updateButtonStates();
         }, 10);
     }
 

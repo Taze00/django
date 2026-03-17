@@ -2134,10 +2134,17 @@ footer {
     transition: all 0.3s ease;
 }
 
-.carousel-btn:hover {
+.carousel-btn:hover:not(:disabled) {
     background: var(--primary);
     color: var(--darker);
     box-shadow: 0 0 15px rgba(59, 130, 246, 0.3);
+}
+
+.carousel-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    border-color: gray;
+    color: gray;
 }
 
 .recommendation-card {
