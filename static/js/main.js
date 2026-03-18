@@ -21,7 +21,9 @@ const RANKINGS = {
         { rank: 6, title: 'Interstellar', year: 2014, rating: '8.7', length: '169min', genre: 'Sci-Fi', description: 'Visuelle Wucht kombiniert mit emotionalem Storytelling und der besten Filmmusik.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt0816692/', poster: '/static/css/images/movie/interstellar.png' },
         { rank: 7, title: 'In Time', year: 2011, rating: '8.0', length: '109min', genre: 'Sci-Fi', description: 'Spannender Plot mit interessantem Konzept, Zeit als Währung.', platform: 'Disney+ / Prime', imdb: 'https://www.imdb.com/title/tt1637688/', poster: '/static/css/images/movie/InTime.png' },
         { rank: 8, title: 'The Prestige', year: 2006, rating: '8.5', length: '130min', genre: 'Mystery', description: 'Meisterhafter Thriller über zwei Magier und ihren obsessiven Wettkampf.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt0482571/', poster: '/static/css/images/movie/thePrestige.png', isFavorite: true },
-        { rank: 9, title: 'Train Dreams', year: 2023, rating: '8.5', length: '127min', genre: 'Drama', description: 'Tiefgründig über Träume und Verlust, emotional überwältigend.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt29768334/', poster: '/static/css/images/movie/traindreams.png' }
+        { rank: 9, title: 'Train Dreams', year: 2023, rating: '8.5', length: '127min', genre: 'Drama', description: 'Tiefgründig über Träume und Verlust, emotional überwältigend.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt29768334/', poster: '/static/css/images/movie/traindreams.png' },
+        { rank: 10, title: 'Pulp Fiction', year: 1994, rating: '8.9', length: '154min', genre: 'Crime', description: 'Kultiger Tarantino Klassiker mit unvergesslichen Szenen und perfektem Soundtrack.', platform: 'Netflix', imdb: 'https://www.imdb.com/title/tt0110912/', poster: '/static/css/images/movie/PulpFiction.png' },
+        { rank: 11, title: 'Die Verurteilten', year: 1994, rating: '9.3', length: '142min', genre: 'Drama', description: 'Masterpiece über Hoffnung und Freundschaft im Gefängnis, absolut fesselnd.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt0111161/', poster: '/static/css/images/movie/DieVerurteilten.png' }
     ],
     series: [
         { rank: 1, title: 'Prison Break', year: 2005, rating: '9.4', length: '5 Staffeln', genre: 'Thriller', description: 'Durchgehend spannend, echtes Meisterwerk der Serienwelt.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt0455275/', poster: '/static/css/images/movie/prisonbreak.png' },
@@ -109,7 +111,7 @@ const galleryItems = [
     },
     {
         id: 7,
-        image: '/static/css/images/gallery/alex6.jpeg',
+        image: '/static/css/images/gallery/alex6.JPG',
         title: 'Ready machen für Berlin',
         category: 'clubs'
     },
@@ -161,6 +163,18 @@ const galleryItems = [
         id: 15,
         image: '/static/css/images/gallery/alex15.jpeg',
         title: 'Aftern nach Geburtstag',
+        category: 'clubs'
+    },
+    {
+        id: 16,
+        image: '/static/css/images/gallery/alex16.jpeg',
+        title: 'Berlin Moment',
+        category: 'clubs'
+    },
+    {
+        id: 17,
+        image: '/static/css/images/gallery/alex11.jpeg',
+        title: 'Berlin Nacht',
         category: 'clubs'
     }
 
@@ -848,6 +862,13 @@ class ImprovedGallery {
             this.modalMedia.style.display = 'block';
             this.modalMedia.src = item.image || item.source;
             this.modalMedia.alt = item.title;
+
+            // Spezial-Positioning für alex6.jpg - nach unten verschieben
+            if (item.image && item.image.includes('alex6')) {
+                this.modalMedia.style.objectPosition = 'center bottom';
+            } else {
+                this.modalMedia.style.objectPosition = 'center center';
+            }
         }
     }
 
@@ -1269,6 +1290,57 @@ class TinderGallery {
     }
 }
 
+// ===== 3D TILT EFFECT FOR RANKING POSTERS =====
+function init3DTilt() {
+    const rankingPosters = document.querySelectorAll('.ranking-poster');
+    const recommendationPosters = document.querySelectorAll('.recommendation-poster');
+
+    // 3D Tilt nur für Ranking Posters - nur Rotation + Shadow, kein Lift
+    rankingPosters.forEach(poster => {
+        poster.addEventListener('mousemove', (e) => {
+            const rect = poster.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // Berechne Position im Element (0-1)
+            const xPercent = x / rect.width;
+            const yPercent = y / rect.height;
+
+            // Berechne Rotation basierend auf Maus-Position
+            const rotateY = (xPercent - 0.5) * 25; // -12.5 bis +12.5 Grad
+            const rotateX = (0.5 - yPercent) * 25;  // -12.5 bis +12.5 Grad
+
+            // Berechne Shadow-Intensität basierend auf Maus-Position
+            const distance = Math.sqrt(Math.pow(xPercent - 0.5, 2) + Math.pow(yPercent - 0.5, 2));
+            const shadowIntensity = Math.max(0.6, 1 - distance * 0.3);
+            const shadowX = (xPercent - 0.5) * 30;
+            const shadowY = (yPercent - 0.5) * 30 + 30;
+
+            poster.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+            poster.style.boxShadow = `
+                ${shadowX}px ${shadowY}px 50px rgba(0, 217, 255, ${0.25 * shadowIntensity}),
+                0 12px 30px rgba(0, 0, 0, 0.5)
+            `;
+        });
+
+        poster.addEventListener('mouseleave', () => {
+            poster.style.transform = 'rotateX(0) rotateY(0)';
+            poster.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.4)';
+        });
+    });
+
+    // Border Hover-Effekt für Recommendation Posters
+    recommendationPosters.forEach(poster => {
+        poster.addEventListener('mouseenter', () => {
+            poster.style.borderColor = 'rgba(0, 217, 255, 0.6)';
+        });
+
+        poster.addEventListener('mouseleave', () => {
+            poster.style.borderColor = 'rgba(0, 217, 255, 0)';
+        });
+    });
+}
+
 // ===== RANKINGS INITIALIZATION =====
 function initRankings() {
     const container = document.getElementById('rankings-container');
@@ -1340,15 +1412,10 @@ function initRankings() {
         if (carouselTrack && recommendations.length > 0) {
             // Create card HTML function
             const createCardHTML = (item) => `
-                <div class="recommendation-card${item.isFavorite ? ' favorite' : ''}">
+                <a href="${item.imdb}" target="_blank" rel="noopener noreferrer" class="recommendation-card${item.isFavorite ? ' favorite' : ''}">
                     <div class="recommendation-poster">
                         <img src="${item.poster}" alt="${item.title}" loading="lazy">
                         ${item.isFavorite ? '<div class="favorite-star"><i class="fas fa-star"></i></div>' : ''}
-                        <div class="recommendation-overlay">
-                            <a href="${item.imdb}" target="_blank" rel="noopener noreferrer" class="recommendation-link">
-                                <i class="fas fa-external-link-alt"></i>
-                            </a>
-                        </div>
                     </div>
                     <div class="recommendation-info">
                         <h4 class="recommendation-title">${item.title}</h4>
@@ -1356,7 +1423,7 @@ function initRankings() {
                             <i class="fas fa-play-circle"></i> ${item.platform}
                         </div>
                     </div>
-                </div>
+                </a>
             `;
 
             // Render alle Karten - keine Duplikate nötig!
@@ -1472,6 +1539,10 @@ function initRankings() {
             if (rankingCategory) {
                 rankingCategory.textContent = categoryLabels[currentCategory];
             }
+            // Reinit 3D Tilt Effects nach Tab-Wechsel
+            setTimeout(() => {
+                init3DTilt();
+            }, 50);
         });
     });
 
@@ -1493,6 +1564,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupCarouselNavigation();
     createClubCards();
     initRankings();
+    init3DTilt();
 
     // NEU: Tinder Gallery für Mobile
     setTimeout(() => {
