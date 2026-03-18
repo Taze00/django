@@ -5,7 +5,15 @@ export const useWorkoutStore = create((set, get) => ({
   exercises: [],
   userProgressions: {},
   workouts: [],
-  currentWorkout: null,
+  currentWorkout: (() => {
+    // Restore currentWorkout from localStorage if it exists
+    try {
+      const saved = localStorage.getItem('currentWorkout');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }
+  })(),
   lastPerformance: {},
   trainingDays: [1, 2, 3, 4, 5], // Mon-Fri default
   isInitialized: false,
@@ -48,6 +56,8 @@ export const useWorkoutStore = create((set, get) => ({
     try {
       const res = await api.get('/workouts/current/');
       set({ currentWorkout: res.data, isLoading: false });
+      // Save to localStorage so it persists if app closes
+      localStorage.setItem('currentWorkout', JSON.stringify(res.data));
       return res.data;
     } catch (error) {
       set({ isLoading: false });
@@ -78,7 +88,9 @@ export const useWorkoutStore = create((set, get) => ({
       const res = await api.post(`/workouts/${workoutId}/complete/`);
       // Refresh workouts list after completing
       const workRes = await api.get('/workouts/');
-      set({ workouts: workRes.data.results || [] });
+      set({ workouts: workRes.data.results || [], currentWorkout: null });
+      // Clear localStorage when workout is done
+      localStorage.removeItem('currentWorkout');
       return res.data;
     } catch (error) {
       throw error;
