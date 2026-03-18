@@ -2321,9 +2321,15 @@ footer {
     height: 3px;
     background: rgba(0, 217, 255, 0.1);
     border-radius: 2px;
-    margin: 0.8rem auto 0;
+    margin: 1.2rem auto 0;
     overflow: hidden;
     display: block;
+}
+
+@media (min-width: 769px) {
+    .carousel-progress-bar {
+        width: 85%;
+    }
 }
 
 .carousel-progress-fill {
