@@ -73,6 +73,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         rest_time_seconds = request.data.get('rest_time_seconds', 180)
         is_drop_set = request.data.get('is_drop_set', False)
         drop_set_completed = request.data.get('drop_set_completed', False)
+        print(f'DEBUG: drop_set_completed={drop_set_completed}, is_drop_set={is_drop_set}')
 
         try:
             exercise = Exercise.objects.get(id=exercise_id)

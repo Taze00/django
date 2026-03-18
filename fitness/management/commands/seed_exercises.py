@@ -62,6 +62,49 @@ class Command(BaseCommand):
                 }
             )
 
+
+        planks, _ = Exercise.objects.get_or_create(
+            name="Planks",
+            defaults={"category": "CORE", "order": 3}
+        )
+
+        planks_progressions = [
+            (1, "Knee Plank", "time", 30, True),
+            (2, "Incline Plank", "time", 45, False),
+            (3, "Standard Plank", "time", 60, False),
+            (4, "Feet-Elevated Plank", "time", 60, False),
+            (5, "Extended Plank", "time", 45, False),
+            (6, "RKC Plank", "time", 30, False),
+            (7, "One-Arm Plank", "time", 20, False),
+        ]
+
+        for level, name, target_type, target_value, user_starts in planks_progressions:
+            Progression.objects.get_or_create(
+                exercise=planks,
+                level=level,
+                defaults={
+                    "name": name,
+                    "target_type": target_type,
+                    "target_value": target_value,
+                    "user_starts_here": user_starts,
+                    "sessions_required": 3,
+                }
+            )
+
+        # UserExerciseProgression für alle bestehenden User anlegen
+        from django.contrib.auth.models import User as DjangoUser
+        from fitness.models import UserExerciseProgression
+        
+        for user in DjangoUser.objects.all():
+            for exercise in Exercise.objects.all():
+                starts_here = exercise.progressions.filter(user_starts_here=True).first()
+                if starts_here:
+                    UserExerciseProgression.objects.get_or_create(
+                        user=user,
+                        exercise=exercise,
+                        defaults={"current_progression": starts_here}
+                    )
+
         self.stdout.write(
             self.style.SUCCESS("✅ Successfully seeded exercises!")
         )
