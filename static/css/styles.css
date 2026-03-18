@@ -25,6 +25,11 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    overflow-y: scroll;
 }
 
 body {
@@ -35,6 +40,7 @@ body {
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
     position: relative;
+    touch-action: manipulation;
 }
 
 
@@ -166,6 +172,22 @@ section {
 .section-header {
     text-align: center;
     margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+}
+
+@media (max-width: 480px) {
+    .section-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .section-header h2 {
+        font-size: clamp(1.5rem, 5vw, 2rem);
+        margin-bottom: 0.25rem;
+    }
+
+    .section-header p {
+        margin: 0.8rem auto 0;
+        font-size: 0.9rem;
+    }
 }
 
 .section-header h2 {
@@ -1301,11 +1323,25 @@ footer {
         padding: 1rem;
     }
 
+    @media (max-width: 480px) {
+        .tinder-gallery-mobile {
+            margin: 1rem auto;
+            padding: 0.75rem;
+            height: clamp(350px, 55vh, 500px);
+        }
+    }
+
     /* Kartenstapel */
     .tinder-card-stack {
         position: relative;
         width: 100%;
         height: 100%;
+    }
+
+    @media (max-width: 480px) {
+        .tinder-card-stack {
+            margin-bottom: 0.5rem;
+        }
     }
 
     /* Einzelne Karte */
@@ -1337,14 +1373,14 @@ footer {
 
     .tinder-card:nth-child(2) {
         z-index: 90;
-        transform: scale(0.93) translateY(12px);
-        opacity: 0.15;
+        transform: scale(0.95) translateY(8px);
+        opacity: 0.8;
     }
 
     .tinder-card:nth-child(3) {
         z-index: 80;
-        transform: scale(0.86) translateY(24px);
-        opacity: 0.05;
+        transform: scale(0.90) translateY(16px);
+        opacity: 0;
     }
 
     .tinder-card:nth-child(n+4) {
@@ -1423,14 +1459,14 @@ footer {
     }
 
     .tinder-action-btn {
-        width: 75px;
-        height: 75px;
+        width: 55px;
+        height: 55px;
         border-radius: 50%;
         border: none;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.8rem;
+        font-size: 1.5rem;
         cursor: pointer;
         transition: all 0.3s ease;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
@@ -1453,9 +1489,62 @@ footer {
     .tinder-action-btn.undo {
         background: rgba(255, 255, 255, 0.1);
         color: white;
-        width: 65px;
-        height: 65px;
-        font-size: 1.4rem;
+        width: 55px;
+        height: 55px;
+        font-size: 1.5rem;
+    }
+
+    @media (max-width: 480px) {
+        .tinder-actions {
+            gap: 1.2rem;
+            margin-top: 1.2rem;
+        }
+
+        .tinder-action-btn {
+            width: 50px;
+            height: 50px;
+            font-size: 1.3rem;
+        }
+
+        .tinder-action-btn.undo {
+            width: 50px;
+            height: 50px;
+        }
+    }
+
+    /* Restart Button für End Screen */
+    .tinder-restart-btn {
+        background: linear-gradient(135deg, rgba(0, 217, 255, 0.2), rgba(0, 217, 255, 0.05)) !important;
+        border: 2px solid rgba(0, 217, 255, 0.4) !important;
+        color: var(--primary) !important;
+        padding: 0.625rem !important;
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
+        border-radius: 50px !important;
+        cursor: pointer !important;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+        font-family: var(--font-display) !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.6px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 0.4rem !important;
+        min-height: auto !important;
+        min-width: auto !important;
+    }
+
+    .tinder-restart-btn:hover {
+        background: linear-gradient(135deg, rgba(0, 217, 255, 0.3), rgba(0, 217, 255, 0.1)) !important;
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 20px rgba(0, 217, 255, 0.25) !important;
+    }
+
+    .tinder-restart-btn i {
+        font-size: 1rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        line-height: 1 !important;
     }
 
     /* Animation für ausgeswiped Karten */
@@ -1956,7 +2045,7 @@ footer {
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 195px;
+    width: 150px;
     height: 3px;
     background: linear-gradient(90deg, transparent, var(--primary), transparent);
     box-shadow: 0 0 20px rgba(0, 217, 255, 0.4);
@@ -2225,6 +2314,24 @@ footer {
     color: rgba(100, 100, 100, 0.3);
 }
 
+/* Progress Bar für Carousel */
+.carousel-progress-bar {
+    width: 100%;
+    height: 3px;
+    background: rgba(0, 217, 255, 0.1);
+    border-radius: 2px;
+    margin-top: 0.8rem;
+    overflow: hidden;
+}
+
+.carousel-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00d9ff, #0099ff);
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
 .recommendation-card {
     flex-shrink: 0;
     width: clamp(80px, 25vw, 160px);
@@ -2278,6 +2385,61 @@ footer {
 
     .carousel-track {
         gap: 1rem;
+    }
+}
+
+/* ===== MOBILE GALLERY OPTIMIZATION ===== */
+@media (max-width: 768px) {
+    .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin: 30px 0;
+    }
+
+    .gallery-item {
+        border-radius: 10px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .gallery-item:hover {
+        transform: translateY(-3px) scale(1.01);
+        box-shadow: 0 12px 30px rgba(0, 217, 255, 0.15);
+    }
+}
+
+@media (max-width: 600px) {
+    .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin: 25px 0;
+    }
+
+    .gallery-item {
+        border-radius: 8px;
+        border: 1px solid rgba(0, 217, 255, 0.15);
+    }
+
+    .gallery-item:hover {
+        transform: translateY(-2px) scale(1.01);
+        box-shadow: 0 10px 25px rgba(0, 217, 255, 0.1);
+    }
+}
+
+@media (max-width: 480px) {
+    .gallery-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        margin: 20px 0;
+    }
+
+    .gallery-item {
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .gallery-item:hover {
+        transform: translateY(-1px) scale(1.01);
+        box-shadow: 0 8px 20px rgba(0, 217, 255, 0.1);
     }
 }
 
@@ -2410,7 +2572,7 @@ footer {
     }
 
     #rankings-section h2::before {
-        width: 80px;
+        width: 150px;
     }
 
     .rankings-tabs {

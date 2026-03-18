@@ -991,8 +991,8 @@ class TinderGallery {
                 <i class="fas fa-check-circle"></i>
                 <h3>Alle Bilder gesehen!</h3>
                 <p>Du hast alle Erinnerungen durchgeschaut</p>
-                <button class="btn" onclick="window.tinderGallery.restart()">
-                    <i class="fas fa-redo"></i> Nochmal
+                <button class="tinder-restart-btn" onclick="window.tinderGallery.restart()">
+                    Nochmal
                 </button>
             </div>
         `;
@@ -1352,7 +1352,7 @@ function initRankings() {
     let currentCategory = 'movies';
 
     const categoryLabels = {
-        movies: 'Film',
+        movies: 'Filme',
         series: 'Serien',
         anime: 'Anime'
     };
@@ -1489,6 +1489,13 @@ function initRankings() {
             newPrevBtn.disabled = scrollIndex === 0;
             // Next: deaktivieren wenn das letzte Item sichtbar ist
             newNextBtn.disabled = (scrollIndex + cardsPerView) > itemCount - 1;
+
+            // Update Progress Bar
+            const progressFill = document.getElementById('carousel-progress-fill');
+            if (progressFill) {
+                const progress = Math.min(((scrollIndex + cardsPerView) / itemCount) * 100, 100);
+                progressFill.style.width = progress + '%';
+            }
         }
 
         function scroll(direction) {

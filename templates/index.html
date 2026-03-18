@@ -3,7 +3,7 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Alex Volkmann | Berlin Club Culture</title>
 
     <link rel="icon" href="{% static 'css/images/favicon.ico' %}" type="image/x-icon">
@@ -44,7 +44,7 @@
                 <div class="about-text fade-in">
                     <h2>Über <span class="text-gradient">Mich</span></h2>
                     <p>Hi, ich bin Alex und das ist meine Website, die eigentlich nie fertig wird.</p>
-                    <p>Ich bin 25, lebe in Werder und habe meinen Bachelor in Wirtschaftsinformatik abgeschlossen. In meiner Freizeit arbeite ich gerne an Webprojekten und probiere neue Technologien aus. Ich interessiere mich ziemlich schnell für neue Themen, am liebsten würde ich alle zwei Wochen was Neues lernen, was natürlich komplett unrealistisch ist, aber das Interesse ist da.</p>
+                    <p>Ich bin 26, lebe in Werder und habe meinen Bachelor in Wirtschaftsinformatik abgeschlossen. In meiner Freizeit arbeite ich gerne an Webprojekten und probiere neue Technologien aus. Ich interessiere mich ziemlich schnell für neue Themen, am liebsten würde ich alle zwei Wochen was Neues lernen, was natürlich komplett unrealistisch ist, aber das Interesse ist da.</p>
                     <p>Am Wochenende bin ich meistens in Berlin unterwegs. Clubs, Bars mit Freunden und den Fernsehturm bestaunen. Manche Momente davon landen dann hier auf der Seite, als Foto, als Gedanke oder als Club-Review, den ich nachts in mein Handy getippt habe.</p>
                     <p>Diese Seite ist mein digitales Sammelsurium. Kein durchdachtes Portfolio mit Mission Statement, eher ein Ort für alles, was mir durch den Kopf geht und was ich nicht vergessen will.</p>
                     <div class="button-group">
@@ -120,7 +120,7 @@
     <!-- Rankings Section -->
     <section id="rankings-section" class="rankings-section">
         <div class="container">
-            <h2 class="fade-in" id="ranking-title"><span id="ranking-category">Film</span> <span class="text-gradient">Top 5</span></h2>
+            <h2 class="fade-in" id="ranking-title">Meine <span class="text-gradient">Top 5</span> <span id="ranking-category">Filme</span></h2>
 
             <div class="rankings-tabs fade-in">
                 <button class="rankings-tab-btn active" data-category="movies">Filme</button>
@@ -143,6 +143,9 @@
                     <button class="carousel-btn carousel-btn-next" id="carousel-next-btn" aria-label="Nächster Film">
                         <i class="fas fa-chevron-right"></i>
                     </button>
+                </div>
+                <div class="carousel-progress-bar">
+                    <div class="carousel-progress-fill" id="carousel-progress-fill"></div>
                 </div>
             </div>
         </div>
