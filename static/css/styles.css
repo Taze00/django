@@ -2318,18 +2318,20 @@ footer {
 /* Progress Bar für Carousel */
 .carousel-progress-bar {
     width: 100%;
-    height: 2px;
-    background: rgba(0, 217, 255, 0.08);
-    border-radius: 1px;
+    height: 3px;
+    background: rgba(0, 217, 255, 0.1);
+    border-radius: 2px;
     margin-top: 0.8rem;
-    overflow: hidden;
+    overflow: visible;
+    display: flex;
+    justify-content: center;
 }
 
 .carousel-progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, rgba(0, 217, 255, 0.5), rgba(0, 153, 255, 0.4));
-    border-radius: 1px;
-    width: 0%;
+    background: linear-gradient(90deg, #00d9ff, #0099ff);
+    border-radius: 2px;
+    width: 70%;
     transition: width 0.3s ease;
 }
 
