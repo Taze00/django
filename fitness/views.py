@@ -395,6 +395,10 @@ def complete_onboarding(request):
     except UserProfile.DoesNotExist:
         profile = UserProfile.objects.create(user=request.user)
 
+    # Get training days from existing progressions (set during onboarding)
+    first_progression = UserExerciseProgression.objects.filter(user=request.user).first()
+    training_days = first_progression.training_days if first_progression else [1, 2, 3, 4, 5]
+
     # Ensure all exercise progressions exist for the user
     for exercise in Exercise.objects.all():
         start_progression = exercise.progressions.filter(user_starts_here=True).first()
@@ -404,10 +408,12 @@ def complete_onboarding(request):
                 exercise=exercise,
                 defaults={
                     'current_progression': start_progression,
-                    'training_days': [1, 2, 3, 4, 5],
+                    'training_days': training_days,
                 }
             )
 
+    # Update profile with training days from progressions
+    profile.training_days = training_days
     profile.onboarding_completed = True
     profile.save()
 
