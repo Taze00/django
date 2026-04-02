@@ -30,6 +30,7 @@ class UserProgressionViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         """Update current progression level and training days"""
         progression = self.get_object()
+        print(f"DEBUG UPDATE: request.data = {request.data}")
 
         # Update progression if provided
         if 'current_progression' in request.data:
@@ -45,8 +46,11 @@ class UserProgressionViewSet(viewsets.ModelViewSet):
         if 'training_days' in request.data:
             progression.training_days = request.data['training_days']
             print(f"DEBUG: Updated training days to {request.data['training_days']}")
+        else:
+            print(f"DEBUG: No training_days in request.data!")
 
         progression.save()
+        print(f"DEBUG: After save - training_days = {progression.training_days}")
         return Response(UserProgressionSerializer(progression).data)
 
 
