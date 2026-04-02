@@ -66,6 +66,7 @@ export default function OnboardingView() {
   const handlePrev = () => {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
+      setError('');
     }
   };
 
@@ -82,28 +83,32 @@ export default function OnboardingView() {
     setError('');
 
     try {
-      console.log('Starting onboarding save...');
+      console.log('=== Starting onboarding save ===');
       console.log('Push Level:', pushLevel);
       console.log('Pull Level:', pullLevel);
       console.log('Plank Level:', plankLevel);
       console.log('Selected Days:', selectedDays);
 
-      // Get all user progressions to find the correct IDs
+      // Step 1: Get all user progressions
+      console.log('Step 1: Fetching user progressions...');
       const progressionsRes = await api.get('/user-progressions/');
       const progressions = progressionsRes.data.results || progressionsRes.data;
       
-      console.log('Current progressions:', progressions);
+      console.log('Found progressions:', progressions);
 
-      // Find progression IDs by exercise
+      // Step 2: Find progression IDs by exercise
       const pushProg = progressions.find(p => p.exercise === 1); // Push-ups
       const pullProg = progressions.find(p => p.exercise === 2); // Pull-ups
       const plankProg = progressions.find(p => p.exercise === 3); // Planks
+
+      console.log('Progression IDs:', { pushProg: pushProg?.id, pullProg: pullProg?.id, plankProg: plankProg?.id });
 
       if (!pushProg || !pullProg || !plankProg) {
         throw new Error('Could not find user progressions. Please refresh and try again.');
       }
 
-      // Update user progressions with correct IDs
+      // Step 3: Update progressions
+      console.log('Step 2: Updating progressions...');
       const updatePush = api.patch(`/user-progressions/${pushProg.id}/`, {
         current_progression: pushLevel,
       });
@@ -117,16 +122,26 @@ export default function OnboardingView() {
       });
 
       const results = await Promise.all([updatePush, updatePull, updatePlank]);
-      console.log('Updated progressions:', results);
+      console.log('Progressions updated:', results);
 
-      // Mark onboarding as complete
+      // Step 4: Mark onboarding as complete
+      console.log('Step 3: Marking onboarding as complete...');
       const completeResult = await api.post('/onboarding/complete/', {});
       console.log('Onboarding marked complete:', completeResult);
 
-      // Navigate to home
-      navigate('/');
+      // Step 5: Update auth store to reflect onboarding completion
+      const currentUser = useAuthStore.getState().user;
+      useAuthStore.setState(state => ({
+        user: { ...state.user, onboarding_completed: true }
+      }));
+
+      console.log('=== Onboarding save successful! Navigating home... ===');
+      
+      // Step 6: Navigate to home
+      setTimeout(() => navigate('/'), 500);
     } catch (err) {
-      console.error('Onboarding error:', err);
+      console.error('=== Onboarding error ===');
+      console.error('Error:', err);
       console.error('Error response:', err.response?.data);
       console.error('Error status:', err.response?.status);
       
@@ -135,7 +150,6 @@ export default function OnboardingView() {
                       err.message || 
                       'Failed to save onboarding. Please try again.';
       setError(errorMsg);
-    } finally {
       setIsLoading(false);
     }
   };
@@ -331,7 +345,7 @@ export default function OnboardingView() {
             {error && <div className="error-message">⚠️ {error}</div>}
 
             <div className="onboarding-buttons">
-              <button onClick={handlePrev} className="btn-onboarding-prev">← Back</button>
+              <button onClick={handlePrev} className="btn-onboarding-prev" disabled={isLoading}>← Back</button>
               <button 
                 onClick={handleComplete} 
                 className="btn-onboarding-complete"
