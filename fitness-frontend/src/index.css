@@ -3870,11 +3870,11 @@ body {
 
 /* Buttons */
 .onboarding-buttons {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
   margin-top: 2rem;
-  justify-content: space-between;
-  flex-wrap: wrap;
+  width: 100%;
 }
 
 .btn-onboarding-next,
@@ -3888,8 +3888,7 @@ body {
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   letter-spacing: 0.3px;
-  flex: 1;
-  min-width: 120px;
+  width: 100%;
 }
 
 .btn-onboarding-next,
@@ -3920,6 +3919,12 @@ body {
 
 .btn-onboarding-complete:active:not(:disabled) {
   transform: translateY(-1px);
+}
+
+.btn-onboarding-complete:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
 }
 
 
