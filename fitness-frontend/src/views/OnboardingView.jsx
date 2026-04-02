@@ -128,7 +128,10 @@ export default function OnboardingView() {
                   checked={trainingDays === 3}
                   onChange={(e) => setTrainingDays(Number(e.target.value))}
                 />
-                <span className="onboarding-label">3 days (minimum effective)</span>
+                <div className="onboarding-option-content">
+                  <span className="onboarding-label">3 days</span>
+                  <span className="onboarding-option-desc">Minimum effective</span>
+                </div>
               </label>
               <label className="onboarding-radio">
                 <input
@@ -137,7 +140,10 @@ export default function OnboardingView() {
                   checked={trainingDays === 4}
                   onChange={(e) => setTrainingDays(Number(e.target.value))}
                 />
-                <span className="onboarding-label">4 days <strong>(recommended)</strong></span>
+                <div className="onboarding-option-content">
+                  <span className="onboarding-label">4 days</span>
+                  <span className="onboarding-option-desc"><strong style={{color: '#10b981'}}>Recommended</strong></span>
+                </div>
               </label>
               <label className="onboarding-radio">
                 <input
@@ -146,7 +152,10 @@ export default function OnboardingView() {
                   checked={trainingDays === 5}
                   onChange={(e) => setTrainingDays(Number(e.target.value))}
                 />
-                <span className="onboarding-label">5 days (advanced)</span>
+                <div className="onboarding-option-content">
+                  <span className="onboarding-label">5 days</span>
+                  <span className="onboarding-option-desc">Advanced training</span>
+                </div>
               </label>
             </div>
 

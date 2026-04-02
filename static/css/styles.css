@@ -2783,13 +2783,14 @@ footer {
 
 .onboarding-radio {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     cursor: pointer;
-    padding: 0.95rem 1rem;
+    padding: 1.1rem 1.2rem;
     border-radius: 10px;
     transition: all 0.3s ease;
     border: 2px solid rgba(51, 112, 255, 0.2);
     background: rgba(51, 112, 255, 0.05);
+    gap: 1rem;
 }
 
 .onboarding-radio:hover {
@@ -2806,13 +2807,14 @@ footer {
     -webkit-appearance: none;
     width: 22px;
     height: 22px;
+    min-width: 22px;
     border: 2.5px solid #3b82f6;
     border-radius: 50%;
-    margin-right: 1rem;
     cursor: pointer;
     flex-shrink: 0;
     transition: all 0.25s ease;
     background: transparent;
+    margin-top: 0.15rem;
 }
 
 .onboarding-radio input[type="radio"]:hover {
@@ -2829,8 +2831,9 @@ footer {
 .onboarding-label {
     color: #e2e8f0;
     font-size: clamp(0.95rem, 2vw, 1.05rem);
-    font-weight: 500;
+    font-weight: 600;
     line-height: 1.4;
+    margin: 0;
 }
 
 .onboarding-label strong {
