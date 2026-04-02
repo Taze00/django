@@ -14,6 +14,8 @@ export default function ProfileView() {
   const [uploading, setUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState(user?.profile_picture || null);
   const [resetting, setResetting] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [confirmText, setConfirmText] = useState('');
 
   const handleLogout = () => {
     logout();
@@ -72,6 +74,25 @@ export default function ProfileView() {
       alert('Failed to delete image');
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleResetOnboarding = async () => {
+    setResetting(true);
+    try {
+      await api.post('/onboarding/reset/', {});
+      // Update user profile and redirect
+      useAuthStore.setState(state => ({
+        user: { ...state.user, onboarding_completed: false }
+      }));
+      setShowResetModal(false);
+      setConfirmText('');
+      navigate('/onboarding');
+    } catch (error) {
+      alert('Failed to reset onboarding');
+      console.error(error);
+    } finally {
+      setResetting(false);
     }
   };
 
@@ -200,6 +221,59 @@ export default function ProfileView() {
           </button>
         </div>
       </div>
+
+      {/* Reset Onboarding Modal */}
+      {showResetModal && (
+        <div className="modal-overlay" onClick={() => !resetting && setShowResetModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <h2 className="modal-title">⚠️ Reset Onboarding?</h2>
+            
+            <div className="modal-warning">
+              <p className="modal-warning-text">
+                This will <strong>delete all your progress</strong> and reset your account to the beginning:
+              </p>
+              <ul className="modal-warning-list">
+                <li>✗ All workouts will be deleted</li>
+                <li>✗ All exercise progressions reset to Level 1</li>
+                <li>✗ You'll need to complete onboarding again</li>
+              </ul>
+            </div>
+
+            <p className="modal-instruction">
+              Type <strong>"RESET"</strong> below to confirm:
+            </p>
+            
+            <input
+              type="text"
+              className="modal-input"
+              placeholder='Type "RESET" to confirm'
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+              disabled={resetting}
+            />
+
+            <div className="modal-buttons">
+              <button
+                className="modal-btn modal-btn-cancel"
+                onClick={() => {
+                  setShowResetModal(false);
+                  setConfirmText('');
+                }}
+                disabled={resetting}
+              >
+                Cancel
+              </button>
+              <button
+                className="modal-btn modal-btn-danger"
+                onClick={handleResetOnboarding}
+                disabled={resetting || confirmText !== 'RESET'}
+              >
+                {resetting ? 'Resetting...' : 'Confirm Reset'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
