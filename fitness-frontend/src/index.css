@@ -3653,6 +3653,44 @@ body {
   margin-bottom: 1.75rem;
 }
 
+.onboarding-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.6rem;
+  margin-bottom: 1.75rem;
+}
+
+.onboarding-day-btn {
+  padding: 0.85rem 0.5rem;
+  border: 2px solid rgba(51, 112, 255, 0.2);
+  background: rgba(51, 112, 255, 0.05);
+  color: #cbd5e1;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.onboarding-day-btn:hover {
+  border-color: rgba(51, 112, 255, 0.5);
+  background: rgba(51, 112, 255, 0.12);
+}
+
+.onboarding-day-btn.active {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-color: #3b82f6;
+  color: #f1f5f9;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+.onboarding-day-btn.active:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  transform: translateY(-2px);
+}
+
+
 .onboarding-radio {
   display: flex;
   align-items: flex-start;
@@ -3867,6 +3905,23 @@ body {
   transform: translateY(-3px);
   box-shadow: 0 12px 24px rgba(59, 130, 246, 0.4);
 }
+
+.btn-onboarding-complete {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #f1f5f9;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+}
+
+.btn-onboarding-complete:hover:not(:disabled) {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 24px rgba(16, 185, 129, 0.4);
+}
+
+.btn-onboarding-complete:active:not(:disabled) {
+  transform: translateY(-1px);
+}
+
 
 .btn-onboarding-next:active:not(:disabled),
 .btn-onboarding-start:active:not(:disabled) {

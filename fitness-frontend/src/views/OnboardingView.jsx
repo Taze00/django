@@ -11,39 +11,49 @@ export default function OnboardingView() {
   const [error, setError] = useState('');
 
   // Form state
-  const [trainingDays, setTrainingDays] = useState(4);
+  const [selectedDays, setSelectedDays] = useState([1, 2, 3, 4, 5]); // Mon-Fri by default
   const [pushLevel, setPushLevel] = useState(3);
   const [pullLevel, setPullLevel] = useState(1);
   const [plankLevel, setPlankLevel] = useState(1);
 
+  const weekDays = [
+    { num: 1, name: 'Mon' },
+    { num: 2, name: 'Tue' },
+    { num: 3, name: 'Wed' },
+    { num: 4, name: 'Thu' },
+    { num: 5, name: 'Fri' },
+    { num: 6, name: 'Sat' },
+    { num: 7, name: 'Sun' },
+  ];
+
   const pushOptions = [
-    { level: 1, name: 'Wall Push-ups', desc: 'Hands on wall, body straight. Easiest.' },
-    { level: 2, name: 'Incline Push-ups', desc: 'Hands on bench/table.' },
-    { level: 3, name: 'Knee Push-ups', desc: 'On your knees. Medium difficulty. Min 4-5 reps' },
-    { level: 4, name: 'Standard Push-ups', desc: 'Full body weight. Classic. Min 4-5 reps' },
-    { level: 5, name: 'Diamond Push-ups', desc: 'Hands close together. Hard on triceps. Min 4-5 reps' },
-    { level: 6, name: 'Decline Push-ups', desc: 'Feet elevated. Very hard. Min 4-5 reps' },
-    { level: 7, name: 'Pseudo Planche', desc: 'Advanced strength. Super hard. Min 4-5 reps' },
+    { level: 1, name: 'Wall Push-ups', desc: 'Level 1: Hands on wall, body straight. Easiest.' },
+    { level: 2, name: 'Incline Push-ups', desc: 'Level 2: Hands on bench/table.' },
+    { level: 3, name: 'Knee Push-ups', desc: 'Level 3: On your knees. Medium difficulty. Min 4-5 reps' },
+    { level: 4, name: 'Standard Push-ups', desc: 'Level 4: Full body weight. Classic. Min 4-5 reps' },
+    { level: 5, name: 'Diamond Push-ups', desc: 'Level 5: Hands close together. Hard on triceps. Min 4-5 reps' },
+    { level: 6, name: 'Decline Push-ups', desc: 'Level 6: Feet elevated. Very hard. Min 4-5 reps' },
+    { level: 7, name: 'Pseudo Planche', desc: 'Level 7: Advanced strength. Super hard. Min 4-5 reps' },
   ];
 
   const pullOptions = [
-    { level: 1, name: 'Dead Hang', desc: 'Just hang from the bar. Hold 10-15 seconds minimum' },
-    { level: 2, name: 'Scapular Shrugs', desc: 'Hang with shoulder engagement. 10+ reps' },
-    { level: 3, name: 'Active Hang', desc: 'Engaged hang. Hold 10-15 seconds' },
-    { level: 4, name: 'Pull-up Negatives', desc: 'Jump up, lower yourself. Min 1-2 controlled reps' },
-    { level: 5, name: 'Band-Assisted Pull-ups', desc: 'Use a resistance band. Min 1-2 reps' },
-    { level: 6, name: 'Standard Pull-ups', desc: 'Full pull-up. Min 1-2 reps' },
-    { level: 7, name: 'Chest-to-Bar', desc: 'Advanced pull-up. Min 1 rep' },
+    { level: 1, name: 'Dead Hang', desc: 'Level 1: Just hang from the bar. Hold 10-15 seconds minimum' },
+    { level: 2, name: 'Scapular Shrugs', desc: 'Level 2: Hang with shoulder engagement. 10+ reps' },
+    { level: 3, name: 'Active Hang', desc: 'Level 3: Engaged hang. Hold 10-15 seconds' },
+    { level: 4, name: 'Pull-up Negatives', desc: 'Level 4: Jump up, lower yourself. Min 1-2 controlled reps' },
+    { level: 5, name: 'Band-Assisted Pull-ups', desc: 'Level 5: Use a resistance band. Min 1-2 reps' },
+    { level: 6, name: 'Standard Pull-ups', desc: 'Level 6: Full pull-up. Min 1-2 reps' },
+    { level: 7, name: 'Chest-to-Bar', desc: 'Level 7: Advanced pull-up. Min 1 rep' },
   ];
 
   const plankOptions = [
-    { level: 1, name: 'Knee Plank', desc: 'On your knees. Easier version. Hold 20-30 seconds' },
-    { level: 2, name: 'Incline Plank', desc: 'Hands on elevated surface. Hold 30-45 seconds' },
-    { level: 3, name: 'Standard Plank', desc: 'Full body weight, straight line. Hold 45-60 seconds' },
-    { level: 4, name: 'Feet-Elevated Plank', desc: 'Feet on bench. Hold 45-60 seconds' },
-    { level: 5, name: 'Extended Plank', desc: 'Arms extended forward. Hold 30-45 seconds' },
-    { level: 6, name: 'RKC Plank', desc: 'Maximum tension, shorter hold. Hold 20-30 seconds' },
-    { level: 7, name: 'One-Arm Plank', desc: 'Advanced strength. Hold 15-20 seconds' },
+    { level: 1, name: 'Knee Plank', desc: 'Level 1: On your knees. Easier version. Hold 20-30 seconds' },
+    { level: 2, name: 'Incline Plank', desc: 'Level 2: Hands on elevated surface. Hold 30-45 seconds' },
+    { level: 3, name: 'Standard Plank', desc: 'Level 3: Full body weight, straight line. Hold 45-60 seconds' },
+    { level: 4, name: 'Feet-Elevated Plank', desc: 'Level 4: Feet on bench. Hold 45-60 seconds' },
+    { level: 5, name: 'Extended Plank', desc: 'Level 5: Arms extended forward. Hold 30-45 seconds' },
+    { level: 6, name: 'RKC Plank', desc: 'Level 6: Maximum tension, shorter hold. Hold 20-30 seconds' },
+    { level: 7, name: 'One-Arm Plank', desc: 'Level 7: Advanced strength. Hold 15-20 seconds' },
   ];
 
   const handleNext = () => {
@@ -59,6 +69,14 @@ export default function OnboardingView() {
     }
   };
 
+  const toggleDay = (dayNum) => {
+    setSelectedDays(prev =>
+      prev.includes(dayNum)
+        ? prev.filter(d => d !== dayNum)
+        : [...prev, dayNum].sort()
+    );
+  };
+
   const handleComplete = async () => {
     setIsLoading(true);
     setError('');
@@ -67,12 +85,15 @@ export default function OnboardingView() {
       // Update user progressions
       await api.patch('/user-progressions/1/', {
         current_progression: pushLevel,
+        training_days: selectedDays,
       });
       await api.patch('/user-progressions/2/', {
         current_progression: pullLevel,
+        training_days: selectedDays,
       });
       await api.patch('/user-progressions/3/', {
         current_progression: plankLevel,
+        training_days: selectedDays,
       });
 
       // Mark onboarding as complete
@@ -113,50 +134,22 @@ export default function OnboardingView() {
           <>
             <h2 className="onboarding-step-title">Training Days 📅</h2>
             <p className="onboarding-question">
-              How many days per week do you want to train?
+              Which days do you want to train?
             </p>
             <div className="onboarding-hint">
-              💡 Most people train 4-5 days with rest days in between for better recovery.
-              Pick what works for you!
+              💡 Click the days you want to train. Rest days are the ones you don't select. You can change this later in the app!
             </div>
 
-            <div className="onboarding-options">
-              <label className="onboarding-radio">
-                <input
-                  type="radio"
-                  value={3}
-                  checked={trainingDays === 3}
-                  onChange={(e) => setTrainingDays(Number(e.target.value))}
-                />
-                <div className="onboarding-option-content">
-                  <span className="onboarding-label">3 days</span>
-                  <span className="onboarding-option-desc">Minimum effective</span>
-                </div>
-              </label>
-              <label className="onboarding-radio">
-                <input
-                  type="radio"
-                  value={4}
-                  checked={trainingDays === 4}
-                  onChange={(e) => setTrainingDays(Number(e.target.value))}
-                />
-                <div className="onboarding-option-content">
-                  <span className="onboarding-label">4 days</span>
-                  <span className="onboarding-option-desc"><strong style={{color: '#10b981'}}>Recommended</strong></span>
-                </div>
-              </label>
-              <label className="onboarding-radio">
-                <input
-                  type="radio"
-                  value={5}
-                  checked={trainingDays === 5}
-                  onChange={(e) => setTrainingDays(Number(e.target.value))}
-                />
-                <div className="onboarding-option-content">
-                  <span className="onboarding-label">5 days</span>
-                  <span className="onboarding-option-desc">Advanced training</span>
-                </div>
-              </label>
+            <div className="onboarding-days-grid">
+              {weekDays.map((day) => (
+                <button
+                  key={day.num}
+                  className={`onboarding-day-btn ${selectedDays.includes(day.num) ? 'active' : ''}`}
+                  onClick={() => toggleDay(day.num)}
+                >
+                  {day.name}
+                </button>
+              ))}
             </div>
 
             <div className="onboarding-buttons">
@@ -310,10 +303,10 @@ export default function OnboardingView() {
               <button onClick={handlePrev} className="btn-onboarding-prev">← Back</button>
               <button 
                 onClick={handleComplete} 
-                className="btn-onboarding-start"
+                className="btn-onboarding-complete"
                 disabled={isLoading}
               >
-                {isLoading ? 'Setting up...' : 'Start Your First Workout 🚀'}
+                {isLoading ? 'Setting up...' : 'Complete Setup'}
               </button>
             </div>
           </>
