@@ -3955,7 +3955,7 @@ body {
 
 .btn-onboarding-prev {
   padding: 0.85rem 1.5rem;
-  border: 2px solid #10b981;
+  border: 2px solid #3b82f6;
   border-radius: 10px;
   font-weight: 600;
   font-size: 1.05rem;
@@ -3964,15 +3964,15 @@ body {
   letter-spacing: 0.3px;
   width: 100%;
   background: transparent;
-  color: #10b981;
+  color: #3b82f6;
   box-shadow: none;
 }
 
 .btn-onboarding-prev:hover:not(:disabled) {
-  background: rgba(16, 185, 129, 0.15);
-  border-color: #34d399;
+  background: rgba(59, 130, 246, 0.15);
+  border-color: #60a5fa;
   transform: translateY(-3px);
-  box-shadow: 0 8px 16px rgba(16, 185, 129, 0.2);
+  box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);
 }
 
 .btn-onboarding-next:disabled,

@@ -28,16 +28,25 @@ class UserProgressionViewSet(viewsets.ModelViewSet):
         return UserExerciseProgression.objects.filter(user=self.request.user)
 
     def update(self, request, *args, **kwargs):
-        """Update current progression level"""
+        """Update current progression level and training days"""
         progression = self.get_object()
+
+        # Update progression if provided
         if 'current_progression' in request.data:
             try:
                 prog_id = request.data['current_progression']
                 progression_obj = Progression.objects.get(id=prog_id)
                 progression.current_progression = progression_obj
-                progression.save()
+                print(f"DEBUG: Updated {progression.exercise.name} to progression {prog_id}")
             except Progression.DoesNotExist:
                 return Response({'error': 'Invalid progression'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Update training days if provided
+        if 'training_days' in request.data:
+            progression.training_days = request.data['training_days']
+            print(f"DEBUG: Updated training days to {request.data['training_days']}")
+
+        progression.save()
         return Response(UserProgressionSerializer(progression).data)
 
 
