@@ -3909,8 +3909,7 @@ body {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   color: #f1f5f9;
   box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
-  width: 100%;
-  display: block;
+  border-radius: 10px;
   font-weight: 600;
   font-size: 1.05rem;
 }
@@ -3952,6 +3951,7 @@ body {
   background: transparent;
   color: #3b82f6;
   border: 2px solid #3b82f6;
+  border-radius: 10px;
   box-shadow: none;
 }
 
