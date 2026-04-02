@@ -82,28 +82,44 @@ export default function OnboardingView() {
     setError('');
 
     try {
-      // Update user progressions
-      await api.patch('/user-progressions/1/', {
+      console.log('Starting onboarding save...');
+      console.log('Push Level:', pushLevel);
+      console.log('Pull Level:', pullLevel);
+      console.log('Plank Level:', plankLevel);
+      console.log('Selected Days:', selectedDays);
+
+      // Update user progressions with progression IDs
+      const updatePush = api.patch('/user-progressions/1/', {
         current_progression: pushLevel,
-        training_days: selectedDays,
       });
-      await api.patch('/user-progressions/2/', {
+      
+      const updatePull = api.patch('/user-progressions/2/', {
         current_progression: pullLevel,
-        training_days: selectedDays,
       });
-      await api.patch('/user-progressions/3/', {
+      
+      const updatePlank = api.patch('/user-progressions/3/', {
         current_progression: plankLevel,
-        training_days: selectedDays,
       });
 
+      const results = await Promise.all([updatePush, updatePull, updatePlank]);
+      console.log('Updated progressions:', results);
+
       // Mark onboarding as complete
-      await api.post('/onboarding/complete/', {});
+      const completeResult = await api.post('/onboarding/complete/', {});
+      console.log('Onboarding marked complete:', completeResult);
 
       // Navigate to home
       navigate('/');
     } catch (err) {
-      setError('Failed to save onboarding. Please try again.');
-      console.error(err);
+      console.error('Onboarding error:', err);
+      console.error('Error response:', err.response?.data);
+      console.error('Error status:', err.response?.status);
+      
+      const errorMsg = err.response?.data?.detail || 
+                      err.response?.data?.error || 
+                      err.message || 
+                      'Failed to save onboarding. Please try again.';
+      setError(errorMsg);
     } finally {
       setIsLoading(false);
     }
