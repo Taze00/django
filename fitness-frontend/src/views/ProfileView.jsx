@@ -209,6 +209,14 @@ export default function ProfileView() {
           >
             {resetting ? 'Resetting...' : 'Reset Today\'s Workout'}
           </button>
+
+          <button
+            className="profile-reset-btn profile-reset-onboarding-btn"
+            onClick={() => setShowResetModal(true)}
+            disabled={resetting}
+          >
+            Reset Onboarding
+          </button>
         </div>
 
         {/* Logout Button */}
