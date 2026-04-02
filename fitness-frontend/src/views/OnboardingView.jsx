@@ -88,16 +88,31 @@ export default function OnboardingView() {
       console.log('Plank Level:', plankLevel);
       console.log('Selected Days:', selectedDays);
 
-      // Update user progressions with progression IDs
-      const updatePush = api.patch('/user-progressions/1/', {
+      // Get all user progressions to find the correct IDs
+      const progressionsRes = await api.get('/user-progressions/');
+      const progressions = progressionsRes.data.results || progressionsRes.data;
+      
+      console.log('Current progressions:', progressions);
+
+      // Find progression IDs by exercise
+      const pushProg = progressions.find(p => p.exercise === 1); // Push-ups
+      const pullProg = progressions.find(p => p.exercise === 2); // Pull-ups
+      const plankProg = progressions.find(p => p.exercise === 3); // Planks
+
+      if (!pushProg || !pullProg || !plankProg) {
+        throw new Error('Could not find user progressions. Please refresh and try again.');
+      }
+
+      // Update user progressions with correct IDs
+      const updatePush = api.patch(`/user-progressions/${pushProg.id}/`, {
         current_progression: pushLevel,
       });
       
-      const updatePull = api.patch('/user-progressions/2/', {
+      const updatePull = api.patch(`/user-progressions/${pullProg.id}/`, {
         current_progression: pullLevel,
       });
       
-      const updatePlank = api.patch('/user-progressions/3/', {
+      const updatePlank = api.patch(`/user-progressions/${plankProg.id}/`, {
         current_progression: plankLevel,
       });
 
