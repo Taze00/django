@@ -132,14 +132,14 @@ export default function OnboardingView() {
       const completeResult = await api.post('/onboarding/complete/', {});
       console.log('Onboarding marked complete:', completeResult);
 
-      // Step 5: Update auth store to reflect onboarding completion
-      const currentUser = useAuthStore.getState().user;
-      useAuthStore.setState(state => ({
-        user: { ...state.user, onboarding_completed: true }
-      }));
+      // Step 5: Reload user data from backend to get updated onboarding_completed flag
+      console.log('Step 4: Reloading user data...');
+      const userRes = await api.get('/user/');
+      useAuthStore.setState({ user: userRes.data });
+      console.log('User data reloaded:', userRes.data);
 
       console.log('=== Onboarding save successful! Navigating home... ===');
-      
+
       // Step 6: Navigate to home
       setTimeout(() => navigate('/'), 500);
     } catch (err) {

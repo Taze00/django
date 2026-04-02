@@ -390,6 +390,7 @@ def user_settings(request):
 @permission_classes([IsAuthenticated])
 def complete_onboarding(request):
     """Mark onboarding as complete and ensure all progressions exist"""
+    print(f"DEBUG: complete_onboarding called for user {request.user.username}")
     try:
         profile = UserProfile.objects.get(user=request.user)
     except UserProfile.DoesNotExist:
@@ -398,8 +399,9 @@ def complete_onboarding(request):
     # Get training days from existing progressions (set during onboarding)
     first_progression = UserExerciseProgression.objects.filter(user=request.user).first()
     training_days = first_progression.training_days if first_progression else [1, 2, 3, 4, 5]
+    print(f"DEBUG: Training days found: {training_days}")
 
-    # Ensure all exercise progressions exist for the user
+    # Ensure all exercise progressions exist for the user (but don't overwrite existing ones)
     for exercise in Exercise.objects.all():
         start_progression = exercise.progressions.filter(user_starts_here=True).first()
         if start_progression:
@@ -416,6 +418,7 @@ def complete_onboarding(request):
     profile.training_days = training_days
     profile.onboarding_completed = True
     profile.save()
+    print(f"DEBUG: Profile saved. training_days={profile.training_days}, onboarding_completed={profile.onboarding_completed}")
 
     serializer = UserProfileSerializer(profile)
     return Response(serializer.data, status=status.HTTP_200_OK)
