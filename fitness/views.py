@@ -428,9 +428,10 @@ def reset_onboarding(request):
     user = request.user
 
     try:
-        # Mark onboarding as incomplete
+        # Mark onboarding as incomplete and reset training days
         profile = UserProfile.objects.get(user=user)
         profile.onboarding_completed = False
+        profile.training_days = []
         profile.save()
 
         # Reset all exercise progressions to starting level
@@ -450,6 +451,7 @@ def reset_onboarding(request):
                     user_prog.sessions_at_target = 0
                     user_prog.custom_target = None
                     user_prog.is_first_session = True
+                    user_prog.training_days = []
                     user_prog.save()
 
         # Delete all workouts
