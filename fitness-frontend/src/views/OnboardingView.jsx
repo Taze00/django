@@ -111,14 +111,17 @@ export default function OnboardingView() {
       console.log('Step 2: Updating progressions...');
       const updatePush = api.patch(`/user-progressions/${pushProg.id}/`, {
         current_progression: pushLevel,
+        training_days: selectedDays,
       });
       
       const updatePull = api.patch(`/user-progressions/${pullProg.id}/`, {
         current_progression: pullLevel,
+        training_days: selectedDays,
       });
       
       const updatePlank = api.patch(`/user-progressions/${plankProg.id}/`, {
         current_progression: plankLevel,
+        training_days: selectedDays,
       });
 
       const results = await Promise.all([updatePush, updatePull, updatePlank]);
