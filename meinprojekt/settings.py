@@ -178,3 +178,6 @@ SIMPLE_JWT = {
 }
 
 print(BASE_DIR)
+# Registration Secret Key - Keep this secure!
+# Share this only with people you trust for registration
+REGISTRATION_SECRET_KEY = os.getenv('REGISTRATION_SECRET_KEY', 'change-me-in-production')

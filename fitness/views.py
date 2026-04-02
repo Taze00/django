@@ -374,3 +374,106 @@ def user_settings(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([])
+def register(request):
+    """
+    Register a new user with a secret registration key.
+
+    Request body:
+    {
+        "username": "newuser",
+        "password": "secure_password",
+        "email": "user@example.com",
+        "registration_key": "your_secret_key"
+    }
+    """
+    from django.conf import settings
+
+    # Get the secret key from request
+    provided_key = request.data.get('registration_key', '')
+    secret_key = settings.REGISTRATION_SECRET_KEY
+
+    # Check if registration key is correct
+    if provided_key != secret_key:
+        return Response(
+            {'error': 'Invalid registration key'},
+            status=status.HTTP_403_FORBIDDEN
+        )
+
+    # Get user data
+    username = request.data.get('username', '').strip()
+    password = request.data.get('password', '')
+    email = request.data.get('email', '').strip()
+
+    # Validation
+    if not username or not password:
+        return Response(
+            {'error': 'Username and password are required'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if len(username) < 3:
+        return Response(
+            {'error': 'Username must be at least 3 characters'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if len(password) < 8:
+        return Response(
+            {'error': 'Password must be at least 8 characters'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Check if user already exists
+    if User.objects.filter(username=username).exists():
+        return Response(
+            {'error': 'Username already taken'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if email and User.objects.filter(email=email).exists():
+        return Response(
+            {'error': 'Email already registered'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    # Create user
+    try:
+        user = User.objects.create_user(
+            username=username,
+            password=password,
+            email=email
+        )
+
+        # Create UserProfile for fitness app
+        UserProfile.objects.create(user=user)
+
+        # Initialize exercise progressions for new user
+        for exercise in Exercise.objects.all():
+            start_progression = exercise.progressions.filter(user_starts_here=True).first()
+            if start_progression:
+                UserExerciseProgression.objects.create(
+                    user=user,
+                    exercise=exercise,
+                    current_progression=start_progression,
+                    training_days=[1, 2, 3, 4, 5]  # Mon-Fri default
+                )
+
+        return Response(
+            {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'message': 'User created successfully! You can now login.'
+            },
+            status=status.HTTP_201_CREATED
+        )
+
+    except Exception as e:
+        return Response(
+            {'error': f'Registration failed: {str(e)}'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
