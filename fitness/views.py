@@ -380,11 +380,24 @@ def user_settings(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def complete_onboarding(request):
-    """Mark onboarding as complete for the current user"""
+    """Mark onboarding as complete and ensure all progressions exist"""
     try:
         profile = UserProfile.objects.get(user=request.user)
     except UserProfile.DoesNotExist:
         profile = UserProfile.objects.create(user=request.user)
+
+    # Ensure all exercise progressions exist for the user
+    for exercise in Exercise.objects.all():
+        start_progression = exercise.progressions.filter(user_starts_here=True).first()
+        if start_progression:
+            UserExerciseProgression.objects.get_or_create(
+                user=request.user,
+                exercise=exercise,
+                defaults={
+                    'current_progression': start_progression,
+                    'training_days': [1, 2, 3, 4, 5],
+                }
+            )
 
     profile.onboarding_completed = True
     profile.save()
