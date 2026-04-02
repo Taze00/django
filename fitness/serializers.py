@@ -24,7 +24,7 @@ class UserProgressionSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserExerciseProgression
         fields = ['id', 'exercise', 'exercise_name', 'current_progression', 'sessions_at_target', 
-                  'custom_target', 'is_first_session', 'effective_target']
+                  'custom_target', 'is_first_session', 'effective_target', 'training_days']
 
 
 class WorkoutSetSerializer(serializers.ModelSerializer):
