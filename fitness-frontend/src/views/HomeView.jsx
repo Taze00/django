@@ -8,6 +8,13 @@ const ALL_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 export default function HomeView() {
   const navigate = useNavigate();
   const user = useAuthStore(state => state.user);
+
+  useEffect(() => {
+    // Check if user has completed onboarding
+    if (user && user.onboarding_completed === false) {
+      navigate('/onboarding');
+    }
+  }, [user, navigate]);
   const exercises = useWorkoutStore(state => state.exercises);
   const userProgressions = useWorkoutStore(state => state.userProgressions);
   const workouts = useWorkoutStore(state => state.workouts);

@@ -69,7 +69,9 @@ export default function LoginView() {
           </button>
         </form>
 
-        <p className="login-footer">Push your limits every day</p>
+        <p className="login-footer">
+          Don't have an account? <a href="/fitness/register" style={{ color: '#3b82f6', cursor: 'pointer' }}>Register here</a>
+        </p>
       </div>
     </div>
   );

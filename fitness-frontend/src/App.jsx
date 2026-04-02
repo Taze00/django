@@ -4,6 +4,8 @@ import { useAuthStore } from './stores/authStore';
 import { useWorkoutStore } from './stores/workoutStore';
 import BottomNav from './components/BottomNav';
 import LoginView from './views/LoginView';
+import RegisterView from './views/RegisterView';
+import OnboardingView from './views/OnboardingView';
 import HomeView from './views/HomeView';
 import WorkoutView from './views/WorkoutView';
 import ExercisesView from './views/ExercisesView';
@@ -50,6 +52,8 @@ function App() {
     <Router basename="/fitness">
       <Routes>
         <Route path="/login" element={<LoginView />} />
+        <Route path="/register" element={<RegisterView />} />
+        <Route path="/onboarding" element={<OnboardingView />} />
         <Route
           path="/"
           element={

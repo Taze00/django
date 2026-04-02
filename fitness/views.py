@@ -306,6 +306,7 @@ def user_detail(request):
         'first_name': user.first_name,
         'last_name': user.last_name,
         'profile_picture': profile.profile_picture.url if profile and profile.profile_picture else None,
+        'onboarding_completed': profile.onboarding_completed if profile else False,
     })
 
 
@@ -374,6 +375,22 @@ def user_settings(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def complete_onboarding(request):
+    """Mark onboarding as complete for the current user"""
+    try:
+        profile = UserProfile.objects.get(user=request.user)
+    except UserProfile.DoesNotExist:
+        profile = UserProfile.objects.create(user=request.user)
+
+    profile.onboarding_completed = True
+    profile.save()
+
+    serializer = UserProfileSerializer(profile)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])

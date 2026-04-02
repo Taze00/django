@@ -112,6 +112,7 @@ class WorkoutSet(models.Model):
     drop_set_completed = models.BooleanField(default=False, help_text="Whether drop set was completed")
     rest_time_seconds = models.IntegerField(default=180)
     training_days = JSONField(default=list, help_text="Days to train: [1,2,3,4,5] = Mon-Fri")
+    onboarding_completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -131,6 +132,7 @@ class UserProfile(models.Model):
         blank=True
     )
     training_days = JSONField(default=list, help_text="Days to train: [1,2,3,4,5] = Mon-Fri")
+    onboarding_completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

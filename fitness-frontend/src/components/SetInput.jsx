@@ -3,6 +3,15 @@ import { useState } from 'react';
 export default function SetInput({ setNumber, exerciseName, progressionName, lastTime, onComplete }) {
   const [reps, setReps] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const MAX_REPS = 99;
+
+  const handleDecrement = () => {
+    setReps(Math.max(0, reps - 1));
+  };
+
+  const handleIncrement = () => {
+    setReps(Math.min(MAX_REPS, reps + 1));
+  };
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -38,14 +47,15 @@ export default function SetInput({ setNumber, exerciseName, progressionName, las
         <div className="button-group">
           <button
             className="btn-large btn-minus"
-            onClick={() => setReps(Math.max(0, reps - 1))}
+            onClick={handleDecrement}
             disabled={reps === 0}
           >
             −
           </button>
           <button
             className="btn-large btn-plus"
-            onClick={() => setReps(reps + 1)}
+            onClick={handleIncrement}
+            disabled={reps >= MAX_REPS}
           >
             +
           </button>
