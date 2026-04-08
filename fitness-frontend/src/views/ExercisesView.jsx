@@ -17,11 +17,14 @@ export default function ExercisesView() {
 
     return (
       <div key={exercise.id} className="exercise-section">
-        <h2 className={`exercise-section-title ${colorClass}`}>{exercise.name.toUpperCase()}</h2>
+        <div className="exercise-header">
+          <h2 className={`exercise-title ${colorClass}`}>{exercise.name}</h2>
+        </div>
 
-        {/* Current Level Card */}
-        <div className={`exercise-current-card ${colorClass}`}>
-          <p className="exercise-current-name">{currentProg?.name || 'Loading...'}</p>
+        {/* Progress Indicator */}
+        <div className="exercise-progress-info">
+          <span className="progress-label">Level {currentProg?.level || 0}</span>
+          <span className="progress-sessions">{sessionsAtTarget}/{sessionsRequired} sessions</span>
         </div>
 
         {/* Progression Ladder */}
@@ -41,9 +44,9 @@ export default function ExercisesView() {
             return (
               <div
                 key={prog.id}
-                className={`exercise-ladder-item ${status} ${colorClass}`}
+                className={`exercise-ladder-item ${status}`}
               >
-                <span className="exercise-ladder-icon">{icon}</span>
+                <span className={`exercise-ladder-icon ${colorClass}`}>{icon}</span>
                 <span className="exercise-ladder-name">{prog.name}</span>
                 {EXERCISE_INFO[prog.name] && (
                   <button

@@ -11,19 +11,19 @@ export default function OnboardingView() {
   const [error, setError] = useState('');
 
   // Form state
-  const [selectedDays, setSelectedDays] = useState([1, 2, 3, 4, 5]); // Mon-Fri by default
-  const [pushLevel, setPushLevel] = useState(3);
+  const [selectedDays, setSelectedDays] = useState([1, 2, 4, 5, 6]); // Mon, Tue, Thu, Fri, Sat // Mon-Fri by default
+  const [pushLevel, setPushLevel] = useState(4);
   const [pullLevel, setPullLevel] = useState(1);
-  const [plankLevel, setPlankLevel] = useState(1);
+  const [plankLevel, setPlankLevel] = useState(3);
 
   const weekDays = [
-    { num: 1, name: 'Mon' },
-    { num: 2, name: 'Tue' },
-    { num: 3, name: 'Wed' },
-    { num: 4, name: 'Thu' },
-    { num: 5, name: 'Fri' },
-    { num: 6, name: 'Sat' },
-    { num: 7, name: 'Sun' },
+    { num: 1, name: 'Monday' },
+    { num: 2, name: 'Tuesday' },
+    { num: 3, name: 'Wednesday' },
+    { num: 4, name: 'Thursday' },
+    { num: 5, name: 'Friday' },
+    { num: 6, name: 'Saturday' },
+    { num: 7, name: 'Sunday' },
   ];
 
   const pushOptions = [
@@ -184,18 +184,16 @@ export default function OnboardingView() {
             <p className="onboarding-question">
               Which days do you want to train?
             </p>
-            <div className="onboarding-hint">
-              💡 Click the days you want to train. Rest days are the ones you don't select. You can change this later in the app!
-            </div>
 
-            <div className="onboarding-days-grid">
+            <div className="onboarding-days-list">
               {weekDays.map((day) => (
                 <button
                   key={day.num}
                   className={`onboarding-day-btn ${selectedDays.includes(day.num) ? 'active' : ''}`}
                   onClick={() => toggleDay(day.num)}
                 >
-                  {day.name}
+                  <span>{day.name}</span>
+                  <span className="day-status">{selectedDays.includes(day.num) ? '✓ Training' : '○ Rest'}</span>
                 </button>
               ))}
             </div>
@@ -214,9 +212,6 @@ export default function OnboardingView() {
             <p className="onboarding-question">
               Which push-up variation can you do?
             </p>
-            <div className="onboarding-hint">
-              💡 You should be able to do at least 4-5 reps to start at that level
-            </div>
 
             <div className="onboarding-options">
               {pushOptions.map((opt) => (
@@ -229,7 +224,6 @@ export default function OnboardingView() {
                   />
                   <div className="onboarding-option-content">
                     <span className="onboarding-option-name">{opt.name}</span>
-                    <span className="onboarding-option-desc">{opt.desc}</span>
                   </div>
                 </label>
               ))}
@@ -249,9 +243,6 @@ export default function OnboardingView() {
             <p className="onboarding-question">
               What's your pull-up level?
             </p>
-            <div className="onboarding-hint">
-              💡 Pull-ups are harder than push-ups! Pick what you can do for at least 10-15 seconds or 1-2 good reps
-            </div>
 
             <div className="onboarding-options">
               {pullOptions.map((opt) => (
@@ -264,7 +255,6 @@ export default function OnboardingView() {
                   />
                   <div className="onboarding-option-content">
                     <span className="onboarding-option-name">{opt.name}</span>
-                    <span className="onboarding-option-desc">{opt.desc}</span>
                   </div>
                 </label>
               ))}
@@ -284,9 +274,6 @@ export default function OnboardingView() {
             <p className="onboarding-question">
               What's your plank level?
             </p>
-            <div className="onboarding-hint">
-              💡 For planks, we measure by TIME, not reps. Pick a level where you can hold 20-30 seconds
-            </div>
 
             <div className="onboarding-options">
               {plankOptions.map((opt) => (
@@ -299,7 +286,6 @@ export default function OnboardingView() {
                   />
                   <div className="onboarding-option-content">
                     <span className="onboarding-option-name">{opt.name}</span>
-                    <span className="onboarding-option-desc">{opt.desc}</span>
                   </div>
                 </label>
               ))}
@@ -321,29 +307,29 @@ export default function OnboardingView() {
             <div className="onboarding-how-it-works">
               <div className="onboarding-point">
                 <span className="onboarding-check">✓</span>
-                <span>3 exercises: Push • Pull • Core</span>
+                <span>3 exercises per session: Push • Pull • Core</span>
               </div>
               <div className="onboarding-point">
                 <span className="onboarding-check">✓</span>
-                <span>Your current level is your starting point</span>
+                <span>Complete all sets → progress tracked automatically</span>
               </div>
               <div className="onboarding-point">
                 <span className="onboarding-check">✓</span>
-                <span>After 3 perfect workouts, you level up automatically</span>
+                <span>After 3 successful sessions → you level up!</span>
               </div>
               <div className="onboarding-point">
                 <span className="onboarding-check">✓</span>
-                <span>If a level is too hard, we'll adjust</span>
+                <span>Can't finish a set? We add a drop-set to build strength</span>
               </div>
               <div className="onboarding-point">
                 <span className="onboarding-check">✓</span>
-                <span>Rest 3 min between sets, 5 min after drop-sets</span>
+                <span>Rest: 3 min between sets | 5 min after drop-sets</span>
+              </div>
+              <div className="onboarding-point">
+                <span className="onboarding-check">✓</span>
+                <span>Too hard? We'll scale back and adjust your level</span>
               </div>
             </div>
-
-            <p className="onboarding-final-text">
-              "You don't track numbers—just do your best!"
-            </p>
 
             {error && <div className="error-message">⚠️ {error}</div>}
 

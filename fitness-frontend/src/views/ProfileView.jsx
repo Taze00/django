@@ -199,8 +199,8 @@ export default function ProfileView() {
           </div>
         </div>
 
-        {/* Reset Workout */}
-        <div className="profile-section">
+        {/* Danger Zone */}
+        <div className="profile-section danger-zone">
           <h3 className="profile-section-title">Danger Zone</h3>
           <button
             className="profile-reset-btn"
@@ -211,16 +211,13 @@ export default function ProfileView() {
           </button>
 
           <button
-            className="profile-reset-btn profile-reset-onboarding-btn"
+            className="profile-reset-btn"
             onClick={() => setShowResetModal(true)}
             disabled={resetting}
           >
             Reset Onboarding
           </button>
-        </div>
 
-        {/* Logout Button */}
-        <div className="profile-section">
           <button
             className="profile-logout-btn"
             onClick={handleLogout}
