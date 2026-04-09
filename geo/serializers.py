@@ -20,19 +20,20 @@ class CountrySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Country
-        fields = ['id', 'name', 'slug', 'flag_emoji', 'drive_side', 'drive_side_display',
-                  'difficulty', 'difficulty_display', 'short_summary', 'order',
+        fields = ['id', 'name', 'name_de', 'slug', 'flag_emoji', 'drive_side', 'drive_side_display',
+                  'difficulty', 'difficulty_display', 'short_summary', 'map_image', 'domain', 'order',
                   'clues', 'clue_count']
 
 
 class CountryListSerializer(serializers.ModelSerializer):
     difficulty_display = serializers.CharField(source='get_difficulty_display', read_only=True)
     clue_count = serializers.IntegerField(source='clues.count', read_only=True)
+    continent_slug = serializers.CharField(source='continent.slug', read_only=True)
 
     class Meta:
         model = Country
-        fields = ['id', 'name', 'slug', 'flag_emoji', 'drive_side',
-                  'difficulty', 'difficulty_display', 'short_summary', 'clue_count']
+        fields = ['id', 'name', 'name_de', 'slug', 'flag_emoji', 'drive_side',
+                  'difficulty', 'difficulty_display', 'short_summary', 'map_image', 'domain', 'continent_slug', 'clue_count']
 
 
 class ContinentSerializer(serializers.ModelSerializer):
@@ -41,7 +42,7 @@ class ContinentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Continent
-        fields = ['id', 'name', 'slug', 'description', 'cover_image',
+        fields = ['id', 'name', 'name_de', 'slug', 'description', 'cover_image',
                   'drive_side_note', 'order', 'countries', 'country_count']
 
 
@@ -50,7 +51,7 @@ class ContinentListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Continent
-        fields = ['id', 'name', 'slug', 'description', 'cover_image',
+        fields = ['id', 'name', 'name_de', 'slug', 'description', 'cover_image',
                   'drive_side_note', 'order', 'country_count']
 
 
@@ -64,14 +65,24 @@ class UserProgressSerializer(serializers.ModelSerializer):
 class CourseSerializer(serializers.ModelSerializer):
     difficulty_display = serializers.CharField(source='get_difficulty_display', read_only=True)
     clue_count = serializers.IntegerField(source='clues.count', read_only=True)
+    continent_name = serializers.CharField(source='continent.name', read_only=True)
+    continent_name_de = serializers.CharField(source='continent.name_de', read_only=True)
+    continent_slug = serializers.CharField(source='continent.slug', read_only=True)
+    country_count = serializers.SerializerMethodField()
+
+    def get_country_count(self, obj):
+        if obj.course_type in ('flags', 'domains', 'capitals'):
+            return obj.continent.countries.count()
+        return obj.clues.count()
 
     class Meta:
         model = Course
-        fields = ['id', 'name', 'description', 'difficulty', 'difficulty_display', 'clue_count', 'order']
+        fields = ['id', 'name', 'description', 'difficulty', 'difficulty_display', 'clue_count', 'country_count', 'course_type', 'order', 'continent_name', 'continent_name_de', 'continent_slug']
 
 
 class CoursePracticeClueSerializer(serializers.ModelSerializer):
     country_name = serializers.CharField(source='country.name', read_only=True)
+    country_name_de = serializers.CharField(source='country.name_de', read_only=True)
     country_id = serializers.IntegerField(source='country.id', read_only=True)
     category_display = serializers.CharField(source='get_category_display', read_only=True)
     importance_display = serializers.CharField(source='get_importance_display', read_only=True)
@@ -80,4 +91,4 @@ class CoursePracticeClueSerializer(serializers.ModelSerializer):
         model = Clue
         fields = ['id', 'title', 'category', 'category_display', 'description',
                   'image', 'importance', 'importance_display', 'order',
-                  'country_name', 'country_id']
+                  'country_name', 'country_name_de', 'country_id']

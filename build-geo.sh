@@ -37,9 +37,10 @@ content = '''<!DOCTYPE html>
 <head>
     <meta charset=\"UTF-8\">
     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-    <title>GeoGuessr Trainer</title>
-    <link rel=\"icon\" type=\"image/png\" href=\"/static/fitness/favicon.png\">
-    <meta name=\"theme-color\" content=\"#3b82f6\">
+    <title>ClueLess</title>
+    <link rel=\"icon\" type=\"image/svg+xml\" href=\"/static/geo/favicon.svg\">
+    <link rel=\"apple-touch-icon\" href=\"/static/geo/apple-touch-icon.png\">
+    <meta name=\"theme-color\" content=\"#030712\">
     <link rel=\"stylesheet\" href=\"/static/geo/assets/''' + css_file + '''\">
 </head>
 <body>

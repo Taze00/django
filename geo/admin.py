@@ -42,7 +42,7 @@ class CountryAdmin(admin.ModelAdmin):
             'fields': ('continent', 'name', 'slug', 'flag_emoji', 'order')
         }),
         ('Details', {
-            'fields': ('drive_side', 'difficulty', 'short_summary')
+            'fields': ('drive_side', 'difficulty', 'short_summary', 'map_image')
         }),
     )
 

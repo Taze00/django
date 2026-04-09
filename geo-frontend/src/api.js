@@ -26,6 +26,11 @@ async function apiFetch(path, options = {}) {
         return fetch(`${BASE_URL}${path}`, { ...options, headers })
       }
     }
+    // Refresh failed or no token — clear storage and redirect to login
+    localStorage.removeItem('access_token')
+    localStorage.removeItem('refresh_token')
+    window.location.href = '/geo/'
+    return res
   }
   return res
 }
@@ -35,6 +40,7 @@ export const api = {
   getContinent: (slug) => apiFetch(`/continents/${slug}/`),
   getCourses: (continentSlug) => apiFetch(`/continents/${continentSlug}/courses/`),
   getCountry: (slug) => apiFetch(`/countries/${slug}/`),
+  getCountryCourses: (slug) => apiFetch(`/countries/${slug}/courses/`),
   getCourseAllClues: (courseId) => apiFetch(`/practice/course/${courseId}/all/`),
   getPracticeClue: (params = {}) => {
     const qs = new URLSearchParams(params).toString()
@@ -46,4 +52,12 @@ export const api = {
     body: JSON.stringify({ clue: clueId, known }),
   }),
   getProgress: () => apiFetch('/progress/'),
+  getAllCourses: () => apiFetch('/courses/'),
+  getCourseProgress: (courseId) => apiFetch(`/course-progress/${courseId}/`),
+  saveCourseCardProgress: (courseId, countryId, stage, streak, learned) => apiFetch(`/course-progress/${courseId}/`, {
+    method: 'POST',
+    body: JSON.stringify({ country_id: countryId, stage, streak, learned }),
+  }),
+  search: (q) => apiFetch(`/search/?q=${encodeURIComponent(q)}`),
+  searchDomain: (q) => apiFetch(`/domain-search/?q=${encodeURIComponent(q)}`),
 }
