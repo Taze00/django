@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Continent, Country, Clue, UserProgress, Course
+from .models import Continent, Country, Clue, UserProgress, Course, Region
 
 
 class ClueSerializer(serializers.ModelSerializer):
@@ -65,9 +65,9 @@ class UserProgressSerializer(serializers.ModelSerializer):
 class CourseSerializer(serializers.ModelSerializer):
     difficulty_display = serializers.CharField(source='get_difficulty_display', read_only=True)
     clue_count = serializers.IntegerField(source='clues.count', read_only=True)
-    continent_name = serializers.CharField(source='continent.name', read_only=True)
-    continent_name_de = serializers.CharField(source='continent.name_de', read_only=True)
-    continent_slug = serializers.CharField(source='continent.slug', read_only=True)
+    continent_name = serializers.CharField(source='continent.name', read_only=True, default=None)
+    continent_name_de = serializers.CharField(source='continent.name_de', read_only=True, default=None)
+    continent_slug = serializers.CharField(source='continent.slug', read_only=True, default=None)
     country_count = serializers.SerializerMethodField()
 
     def get_country_count(self, obj):
@@ -86,9 +86,13 @@ class CoursePracticeClueSerializer(serializers.ModelSerializer):
     country_id = serializers.IntegerField(source='country.id', read_only=True)
     category_display = serializers.CharField(source='get_category_display', read_only=True)
     importance_display = serializers.CharField(source='get_importance_display', read_only=True)
+    region_id = serializers.IntegerField(source='region.id', read_only=True, default=None)
+    region_name = serializers.CharField(source='region.name', read_only=True, default=None)
+    region_map_image = serializers.ImageField(source='region.map_image', read_only=True, default=None)
 
     class Meta:
         model = Clue
         fields = ['id', 'title', 'category', 'category_display', 'description',
                   'image', 'importance', 'importance_display', 'order',
-                  'country_name', 'country_name_de', 'country_id']
+                  'country_name', 'country_name_de', 'country_id', 'question',
+                  'region_id', 'region_name', 'region_map_image']

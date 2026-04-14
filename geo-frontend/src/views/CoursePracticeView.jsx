@@ -16,11 +16,8 @@ function flagUrl(val) {
 
 function generateMcOptions(card, courseNames, continentNames, isCapital, lang) {
   const correct = isCapital ? card.capital : (lang === 'de' && card.country_name_de ? card.country_name_de : card.country_name)
-  let pool = courseNames.filter(n => n !== correct)
-  if (pool.length < 3) {
-    const extra = continentNames.filter(n => n !== correct && !pool.includes(n))
-    pool = [...pool, ...extra]
-  }
+  // Deduplicate pool and exclude correct answer
+  let pool = [...new Set([...courseNames, ...continentNames])].filter(n => n !== correct)
   const shuffled = [...pool].sort(() => Math.random() - 0.5)
   const options = [...shuffled.slice(0, 3), correct].sort(() => Math.random() - 0.5)
   return options
@@ -30,9 +27,24 @@ function freshMcOptions(card, courseNames, continentNames, isCapital, lang) {
   return generateMcOptions(card, courseNames, continentNames, isCapital, lang)
 }
 
-function advanceCard(card, rating) {
+// For regions course: pick 3 wrong region cards + 1 correct, all as {id, name, map_image}
+function generateRegionOptions(card, allCards) {
+  const correctRegionId = card.region_id
+  const pool = allCards.filter(c => c.region_id && c.region_id !== correctRegionId)
+  const seen = new Set()
+  const unique = pool.filter(c => { if (seen.has(c.region_id)) return false; seen.add(c.region_id); return true })
+  const shuffled = [...unique].sort(() => Math.random() - 0.5).slice(0, 3)
+  const correct = { id: card.region_id, name: card.region_name, map_image: card.region_map_image }
+  return [...shuffled.map(c => ({ id: c.region_id, name: c.region_name, map_image: c.region_map_image })), correct].sort(() => Math.random() - 0.5)
+}
+
+function advanceCard(card, rating, courseType) {
   if (rating === 'wrong') return { ...card, stage: 1, streak: 0 }
   const newStreak = card.streak + 1
+  if (courseType === 'regions') {
+    if (newStreak >= 5) return { ...card, stage: 'learned', streak: 0 }
+    return { ...card, streak: newStreak }
+  }
   const thresholds = { 1: 2, 2: 3 }
   if (newStreak >= thresholds[card.stage]) {
     const nextStage = card.stage === 2 ? 'learned' : card.stage + 1
@@ -108,9 +120,10 @@ function TextInput({ allSuggestions, altSuggestions, value, onChange, onSubmit, 
   }, [])
   const q = normalizeSearch(value)
   const filtered = q.length > 0 && allSuggestions.length > 0
-    ? allSuggestions.filter((n, i) => {
+    ? allSuggestions.filter(n => {
         const match = normalizeSearch(n).includes(q)
-        const altMatch = altSuggestions && altSuggestions[i] && normalizeSearch(altSuggestions[i]).includes(q)
+        const alt = altSuggestions && altSuggestions[n]
+        const altMatch = alt && normalizeSearch(alt).includes(q)
         return match || altMatch
       })
     : []
@@ -188,38 +201,44 @@ function CardVisual({ card, courseType, revealed, t, lang }) {
     )
   }
 
-  // Default: clue image
+  // Default: clue image or question
   if (revealed) {
     return (
-      <div className="w-full flex flex-col md:flex-row gap-5 mb-5 md:h-72">
-        <div className="w-full md:flex-1 md:min-w-0 rounded-xl overflow-hidden">
-          {card.image ? (
-            <img src={card.image} alt="Clue" className="w-full md:h-full object-cover" />
-          ) : (
-            <div className="w-full h-56 md:h-full bg-gray-800 border border-gray-700 flex items-center justify-center">
-              <span className="text-gray-600 text-sm">{t.noImage}</span>
-            </div>
-          )}
-        </div>
-        <div className="w-full md:w-80 md:shrink-0 bg-gray-800 rounded-xl p-4 border border-gray-700 flex flex-col overflow-y-auto md:max-h-none" style={{maxHeight: '16rem'}}>
-          <div className="font-bold text-xl mb-2">{cardDisplayName(card, lang)}</div>
+      <div className="w-full mb-4">
+        {card.question ? (
+          <div className="w-full rounded-xl bg-gray-800 border border-gray-700 flex items-center justify-center px-6 py-10 mb-3">
+            <p className="text-xl font-semibold text-white text-center">{card.question}</p>
+          </div>
+        ) : card.image ? (
+          <img src={card.image} alt="Clue" className="w-full rounded-xl object-contain max-h-72" />
+        ) : (
+          <div className="w-full h-40 rounded-xl bg-gray-800 border border-gray-700 flex items-center justify-center mb-3">
+            <span className="text-gray-600 text-sm">{t.noImage}</span>
+          </div>
+        )}
+        <div className="mt-3 bg-gray-800 rounded-xl p-3 border border-gray-700">
+          <div className="font-bold text-sm mb-1">{cardDisplayName(card, lang)}</div>
           {card.description && (
-            <p className="text-gray-400 text-sm leading-relaxed">{card.description}</p>
+            <p className="text-gray-400 text-xs leading-relaxed">{card.description}</p>
           )}
         </div>
       </div>
     )
   }
   return (
-    card.image ? (
-      <div className="w-full rounded-xl overflow-hidden mb-6">
-        <img src={card.image} alt="Clue" className="w-full max-h-80 object-cover" />
-      </div>
-    ) : (
-      <div className="w-full h-48 rounded-xl bg-gray-800 border border-gray-700 flex items-center justify-center mb-6">
-        <span className="text-gray-600 text-sm">{t.noImage}</span>
-      </div>
-    )
+    <div className="w-full mb-4">
+      {card.question ? (
+        <div className="w-full rounded-xl bg-gray-800 border border-gray-700 flex items-center justify-center px-6 py-12">
+          <p className="text-2xl font-semibold text-white text-center">{card.question}</p>
+        </div>
+      ) : card.image ? (
+        <img src={card.image} alt="Clue" className="w-full rounded-xl object-contain max-h-56" />
+      ) : (
+        <div className="w-full h-48 rounded-xl bg-gray-800 border border-gray-700 flex items-center justify-center">
+          <span className="text-gray-600 text-sm">{t.noImage}</span>
+        </div>
+      )}
+    </div>
   )
 }
 
@@ -232,7 +251,7 @@ export default function CoursePracticeView() {
   const [courseType, setCourseType] = useState('clues')
   const [cards, setCards] = useState([])
   const [allCountryNames, setAllCountryNames] = useState([])
-  const [allCountryNamesAlt, setAllCountryNamesAlt] = useState([])
+  const [allCountryNamesAlt, setAllCountryNamesAlt] = useState({})
   const [courseCountryNames, setCourseCountryNames] = useState([])
   const [continentCountryNames, setContinentCountryNames] = useState([])
   const [continentCapitalNames, setContinentCapitalNames] = useState([])
@@ -242,6 +261,7 @@ export default function CoursePracticeView() {
   const [inputValue, setInputValue] = useState('')
   const [selectedOption, setSelectedOption] = useState(null)
   const [currentMcOptions, setCurrentMcOptions] = useState([])
+  const [currentRegionOptions, setCurrentRegionOptions] = useState([])
   const [isCorrect, setIsCorrect] = useState(null)
   const [stats, setStats] = useState({ learned: 0, total: 0 })
   const [loading, setLoading] = useState(true)
@@ -293,11 +313,15 @@ export default function CoursePracticeView() {
       const continentNames = useDe ? (data.continent_country_names_de || data.continent_country_names) : data.continent_country_names
       const combined = [...new Set([...courseNames, ...continentNames])].sort()
       setAllCountryNames(combined)
-      // Alt names (the other language) for cross-language search
-      const courseNamesAlt = useDe ? data.course_country_names : (data.course_country_names_de || [])
-      const continentNamesAlt = useDe ? data.continent_country_names : (data.continent_country_names_de || [])
-      const combinedAlt = [...new Set([...courseNamesAlt, ...continentNamesAlt])].sort()
-      setAllCountryNamesAlt(combinedAlt)
+      // Build a map: primary name → alt name (for cross-language search)
+      const courseNamesEn = data.course_country_names || []
+      const courseNamesDe = data.course_country_names_de || []
+      const continentNamesEn = data.continent_country_names || []
+      const continentNamesDe = data.continent_country_names_de || []
+      const altMap = {}
+      courseNamesEn.forEach((en, i) => { if (courseNamesDe[i]) { altMap[useDe ? courseNamesDe[i] : en] = useDe ? en : courseNamesDe[i] } })
+      continentNamesEn.forEach((en, i) => { if (continentNamesDe[i]) { altMap[useDe ? continentNamesDe[i] : en] = useDe ? en : continentNamesDe[i] } })
+      setAllCountryNamesAlt(altMap)
 
       const hasAnyProgress = ct === 'clues'
         ? data.clues.some(c => knownIds.has(c.id))
@@ -344,6 +368,7 @@ export default function CoursePracticeView() {
     const mcPool = isCapital ? (clues.continent_capital_names || []) : (useDe ? (clues.continent_country_names_de || clues.continent_country_names) : clues.continent_country_names)
     const mcCourse = isCapital ? clues.clues.map(c => c.capital) : (useDe ? clues.clues.map(c => c.country_name_de || c.country_name) : clues.course_country_names)
     setCurrentMcOptions(freshMcOptions(shuffled[firstIndex], mcCourse, mcPool, isCapital, lang))
+    if (ct === 'regions') setCurrentRegionOptions(generateRegionOptions(shuffled[firstIndex], shuffled))
     setPhase('answering')
     setInputValue('')
     setSelectedOption(null)
@@ -369,10 +394,11 @@ export default function CoursePracticeView() {
     const mcPool = isCapital ? continentCapitalNames : continentCountryNames
     const mcCourse = isCapital ? updatedCards.map(c => c.capital) : (useDe ? updatedCards.map(c => c.country_name_de || c.country_name) : courseCountryNames)
     setCurrentMcOptions(freshMcOptions(updatedCards[next], mcCourse, mcPool, isCapital, lang))
+    if (courseType === 'regions') setCurrentRegionOptions(generateRegionOptions(updatedCards[next], updatedCards))
   }
 
   function handleRating(rating) {
-    const updated = advanceCard(card, rating)
+    const updated = advanceCard(card, rating, courseType)
     const newCards = cards.map((c, i) => i === currentIndex ? updated : c)
     setCards(newCards)
     const justLearned = updated.stage === 'learned'
@@ -389,6 +415,12 @@ export default function CoursePracticeView() {
     setSelectedOption(option)
     const correct = isCapitalGuess ? card.capital : cardDisplayName(card, lang)
     setIsCorrect(normalize(option) === normalize(correct))
+    setPhase('feedback')
+  }
+
+  function handleRegionSubmit(regionId) {
+    setSelectedOption(regionId)
+    setIsCorrect(regionId === card.region_id)
     setPhase('feedback')
   }
 
@@ -454,7 +486,7 @@ export default function CoursePracticeView() {
 
   const card = cards[currentIndex]
   if (!card) return null
-  const needed = { 1: 2, 2: 3 }[card.stage] ?? 0
+  const needed = courseType === 'regions' ? 5 : ({ 1: 2, 2: 3 }[card.stage] ?? 0)
 
   return (
     <div className="min-h-screen bg-gray-950 text-white flex flex-col">
@@ -485,14 +517,53 @@ export default function CoursePracticeView() {
           lang={lang}
         />
 
-        {/* STAGE 1: Multiple Choice */}
-        {card.stage === 1 && phase === 'answering' && (
+        {/* STAGE 1: Regions — map image buttons */}
+        {card.stage === 1 && phase === 'answering' && courseType === 'regions' && (
           <div className="w-full grid grid-cols-2 gap-3">
+            {currentRegionOptions.map(region => (
+              <button
+                key={region.id}
+                onClick={() => handleRegionSubmit(region.id)}
+                className="w-full bg-white hover:opacity-90 border-2 border-gray-700 hover:border-blue-500 rounded-xl overflow-hidden transition-all flex items-center justify-center"
+                style={{ height: '9rem' }}
+              >
+                <img src={region.map_image} alt={region.name} className="w-full h-full object-contain p-2" />
+              </button>
+            ))}
+          </div>
+        )}
+
+        {card.stage === 1 && phase === 'feedback' && courseType === 'regions' && (
+          <div className="w-full">
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              {currentRegionOptions.map(region => {
+                const isSelected = region.id === selectedOption
+                const isCorrectOption = region.id === card.region_id
+                let cls = 'w-full border-2 rounded-xl overflow-hidden flex items-center justify-center transition-all bg-white '
+                if (isCorrectOption) cls += 'border-green-500'
+                else if (isSelected && !isCorrectOption) cls += 'border-red-500 opacity-50'
+                else cls += 'border-gray-300 opacity-30'
+                return (
+                  <div key={region.id} className={cls} style={{ height: '9rem' }}>
+                    <img src={region.map_image} alt={region.name} className="w-full h-full object-contain p-2" />
+                  </div>
+                )
+              })}
+            </div>
+            <button onClick={handleContinue} className="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-xl font-semibold transition-colors">
+              {t.next}
+            </button>
+          </div>
+        )}
+
+        {/* STAGE 1: Multiple Choice (non-regions) */}
+        {card.stage === 1 && phase === 'answering' && courseType !== 'regions' && (
+          <div className="w-full grid grid-cols-2 gap-3 items-stretch">
             {currentMcOptions.map(option => (
               <button
                 key={option}
                 onClick={() => handleMcSubmit(option)}
-                className="py-4 px-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-blue-500 rounded-xl font-semibold text-center transition-all"
+                className="w-full h-full py-4 px-3 bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-blue-500 rounded-xl font-semibold text-center transition-all"
               >
                 {option}
               </button>
@@ -500,14 +571,14 @@ export default function CoursePracticeView() {
           </div>
         )}
 
-        {card.stage === 1 && phase === 'feedback' && (
+        {card.stage === 1 && phase === 'feedback' && courseType !== 'regions' && (
           <div className="w-full">
-            <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="grid grid-cols-2 gap-3 mb-4 items-stretch">
               {currentMcOptions.map(option => {
                 const isSelected = option === selectedOption
                 const correctAnswer = isCapitalGuess ? card.capital : cardDisplayName(card, lang)
                 const isCorrectOption = normalize(option) === normalize(correctAnswer)
-                let cls = 'py-4 px-3 border rounded-xl font-semibold text-center '
+                let cls = 'w-full h-full py-4 px-3 border rounded-xl font-semibold text-center '
                 if (isCorrectOption) cls += 'bg-green-900 border-green-600 text-green-300'
                 else if (isSelected && !isCorrectOption) cls += 'bg-red-900 border-red-600 text-red-300'
                 else cls += 'bg-gray-800 border-gray-700 text-gray-500'
@@ -521,7 +592,7 @@ export default function CoursePracticeView() {
         )}
 
         {/* STAGE 2: Text Input */}
-        {card.stage === 2 && phase === 'answering' && (
+        {card.stage === 2 && phase === 'answering' && courseType !== 'regions' && (
           <div className="w-full">
             <p className="text-gray-400 text-sm mb-3 text-center">
               {isCapitalGuess ? (t.typeCapital || 'Type the capital city') : t.typeCountry}
@@ -545,7 +616,7 @@ export default function CoursePracticeView() {
         )}
 
         {/* STAGE 2: feedback */}
-        {card.stage === 2 && phase === 'feedback' && (
+        {card.stage === 2 && phase === 'feedback' && courseType !== 'regions' && (
           <div className="w-full">
             <div className={`text-center rounded-xl py-3 px-4 mb-4 font-semibold ${isCorrect ? 'bg-green-900 border border-green-700 text-green-300' : 'bg-red-900 border border-red-700 text-red-300'}`}>
               {isCorrect

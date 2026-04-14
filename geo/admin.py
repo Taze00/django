@@ -1,11 +1,18 @@
 from django.contrib import admin
-from .models import Continent, Country, Clue, UserProgress, Course
+from .models import Continent, Country, Clue, UserProgress, Course, Region
 
 
 class ClueInline(admin.TabularInline):
     model = Clue
     extra = 1
-    fields = ('title', 'category', 'importance', 'image', 'description', 'order')
+    fields = ('title', 'category', 'importance', 'image', 'description', 'region', 'order')
+    autocomplete_fields = ['region']
+
+
+class RegionInline(admin.TabularInline):
+    model = Region
+    extra = 1
+    fields = ('name', 'map_image', 'order')
 
 
 class CountryInline(admin.TabularInline):
@@ -19,6 +26,7 @@ class CountryInline(admin.TabularInline):
 class ContinentAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug', 'order')
     prepopulated_fields = {'slug': ('name',)}
+    search_fields = ('name',)
     inlines = [CountryInline]
     fieldsets = (
         (None, {
@@ -36,7 +44,7 @@ class CountryAdmin(admin.ModelAdmin):
     list_filter = ('continent', 'drive_side', 'difficulty')
     search_fields = ('name',)
     prepopulated_fields = {'slug': ('name',)}
-    inlines = [ClueInline]
+    inlines = [RegionInline, ClueInline]
     fieldsets = (
         (None, {
             'fields': ('continent', 'name', 'slug', 'flag_emoji', 'order')
@@ -47,17 +55,27 @@ class CountryAdmin(admin.ModelAdmin):
     )
 
 
+@admin.register(Region)
+class RegionAdmin(admin.ModelAdmin):
+    list_display = ('name', 'country', 'order')
+    list_filter = ('country__continent', 'country')
+    search_fields = ('name', 'country__name')
+    autocomplete_fields = ['country']
+    fields = ('country', 'name', 'map_image', 'order')
+
+
 @admin.register(Clue)
 class ClueAdmin(admin.ModelAdmin):
-    list_display = ('title', 'country', 'category', 'importance', 'order')
-    list_filter = ('category', 'importance', 'country__continent')
+    list_display = ('title', 'country', 'region', 'category', 'importance', 'order')
+    list_filter = ('category', 'importance', 'country__continent', 'country')
     search_fields = ('title', 'country__name')
+    autocomplete_fields = ['country', 'region']
     fieldsets = (
         (None, {
-            'fields': ('country', 'title', 'category', 'importance', 'order')
+            'fields': ('country', 'region', 'title', 'category', 'importance', 'order')
         }),
         ('Inhalt', {
-            'fields': ('description', 'image')
+            'fields': ('question', 'description', 'image')
         }),
     )
 
@@ -71,13 +89,15 @@ class UserProgressAdmin(admin.ModelAdmin):
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('name', 'continent', 'difficulty', 'order', 'clue_count')
-    list_filter = ('continent', 'difficulty')
+    list_display = ('name', 'continent', 'course_type', 'difficulty', 'order', 'clue_count')
+    list_filter = ('continent', 'difficulty', 'course_type')
     search_fields = ('name',)
+    autocomplete_fields = ['continent']
     filter_horizontal = ('clues',)
     fieldsets = (
         (None, {
-            'fields': ('continent', 'name', 'difficulty', 'order', 'description')
+            'fields': ('continent', 'name', 'course_type', 'difficulty', 'order', 'description'),
+            'description': 'Kontinent leer lassen fuer Allgemein-Kurse'
         }),
         ('Clues', {
             'fields': ('clues',)

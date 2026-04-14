@@ -7,6 +7,8 @@ import CountryView from './views/CountryView'
 import PracticeView from './views/PracticeView'
 import CoursePracticeView from './views/CoursePracticeView'
 import CoursesView from './views/CoursesView'
+import CourseBuilderView from './views/CourseBuilderView'
+import MyCoursesView from './views/MyCoursesView'
 import SearchView from './views/DomainSearchView'
 import LoginView from './views/LoginView'
 
@@ -49,22 +51,28 @@ export default function App() {
           </ProtectedRoute>
         } />
         <Route path="/courses" element={
-          <ProtectedRoute isLoggedIn={isLoggedIn}><CoursesView /></ProtectedRoute>
+          <ProtectedRoute isLoggedIn={isLoggedIn}><CoursesView onLogout={logout} /></ProtectedRoute>
+        } />
+        <Route path="/create-course" element={
+          <ProtectedRoute isLoggedIn={isLoggedIn}><CourseBuilderView onLogout={logout} /></ProtectedRoute>
+        } />
+        <Route path="/my-courses" element={
+          <ProtectedRoute isLoggedIn={isLoggedIn}><MyCoursesView onLogout={logout} /></ProtectedRoute>
         } />
         <Route path="/domain-search" element={
-          <ProtectedRoute isLoggedIn={isLoggedIn}><SearchView /></ProtectedRoute>
+          <ProtectedRoute isLoggedIn={isLoggedIn}><SearchView onLogout={logout} /></ProtectedRoute>
         } />
         <Route path="/practice" element={
-          <ProtectedRoute isLoggedIn={isLoggedIn}><PracticeView /></ProtectedRoute>
+          <ProtectedRoute isLoggedIn={isLoggedIn}><PracticeView onLogout={logout} /></ProtectedRoute>
         } />
         <Route path="/practice/course/:courseId" element={
-          <ProtectedRoute isLoggedIn={isLoggedIn}><CoursePracticeView /></ProtectedRoute>
+          <ProtectedRoute isLoggedIn={isLoggedIn}><CoursePracticeView onLogout={logout} /></ProtectedRoute>
         } />
         <Route path="/:continentSlug" element={
-          <ProtectedRoute isLoggedIn={isLoggedIn}><ContinentView /></ProtectedRoute>
+          <ProtectedRoute isLoggedIn={isLoggedIn}><ContinentView onLogout={logout} /></ProtectedRoute>
         } />
         <Route path="/:continentSlug/:countrySlug" element={
-          <ProtectedRoute isLoggedIn={isLoggedIn}><CountryView /></ProtectedRoute>
+          <ProtectedRoute isLoggedIn={isLoggedIn}><CountryView onLogout={logout} /></ProtectedRoute>
         } />
       </Routes>
     </BrowserRouter>

@@ -131,9 +131,12 @@ class CoursePracticeAllCluesView(generics.GenericAPIView):
 
     def get(self, request, course_id):
         course = get_object_or_404(Course, id=course_id)
-        continent_country_names = list(
-            Country.objects.filter(continent=course.continent).values_list('name', flat=True)
-        )
+        if course.continent:
+            continent_country_names = list(
+                Country.objects.filter(continent=course.continent).values_list('name', flat=True)
+            )
+        else:
+            continent_country_names = list(Country.objects.values_list('name', flat=True))
 
         if course.course_type in ('flags', 'domains', 'capitals'):
             # Territories that share flag/domain with their parent country - excluded from flags/domains courses
@@ -177,9 +180,11 @@ class CoursePracticeAllCluesView(generics.GenericAPIView):
             country_names_de = [c['country_name_de'] for c in cards]
             continent_country_names_de = list(
                 Country.objects.filter(continent=course.continent).values_list('name_de', flat=True)
+                if course.continent else Country.objects.values_list('name_de', flat=True)
             )
             continent_capital_names = list(
                 Country.objects.filter(continent=course.continent, capital__gt='').values_list('capital', flat=True)
+                if course.continent else Country.objects.filter(capital__gt='').values_list('capital', flat=True)
             )
             return Response({
                 'clues': cards,
@@ -265,7 +270,7 @@ class AllCoursesView(generics.GenericAPIView):
             else:
                 learned = learned_by_course.get(course_obj.id, set())
                 d['learned_count'] = len(learned)
-                d['total_count'] = course_obj.continent.countries.count()
+                d['total_count'] = course_obj.continent.countries.count() if course_obj.continent else 0
             result.append(d)
 
         return Response(result)
@@ -320,3 +325,153 @@ class GlobalSearchView(generics.GenericAPIView):
 
         serializer = CountryListSerializer(countries, many=True, context={'request': request})
         return Response(serializer.data)
+
+# ── User-created Clues ────────────────────────────────────────────────────────
+
+class ClueCreateView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, slug):
+        country = get_object_or_404(Country, slug=slug)
+        data = request.data
+        clue = Clue(
+            country=country,
+            title=data.get("title", "").strip(),
+            category=data.get("category", "other"),
+            description=data.get("description", "").strip(),
+            question=data.get("question", "").strip(),
+            importance=int(data.get("importance", 1)),
+            order=int(data.get("order", 0)),
+        )
+        region_id = data.get("region_id")
+        if region_id:
+            clue.region_id = region_id
+        clue.save()
+        from .serializers import CoursePracticeClueSerializer
+        return Response(CoursePracticeClueSerializer(clue, context={"request": request}).data, status=status.HTTP_201_CREATED)
+
+
+class ClueDetailView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, clue_id):
+        clue = get_object_or_404(Clue, id=clue_id)
+        data = request.data
+        for field in ("title", "category", "description", "question", "importance", "order"):
+            if field in data:
+                setattr(clue, field, data[field])
+        if "region_id" in data:
+            clue.region_id = data["region_id"] or None
+        clue.save()
+        from .serializers import CoursePracticeClueSerializer
+        return Response(CoursePracticeClueSerializer(clue, context={"request": request}).data)
+
+    def delete(self, request, clue_id):
+        clue = get_object_or_404(Clue, id=clue_id)
+        clue.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ClueImageUploadView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, clue_id):
+        clue = get_object_or_404(Clue, id=clue_id)
+        image = request.FILES.get("image")
+        if not image:
+            return Response({"error": "No image"}, status=status.HTTP_400_BAD_REQUEST)
+        clue.image = image
+        clue.save()
+        from .serializers import CoursePracticeClueSerializer
+        return Response(CoursePracticeClueSerializer(clue, context={"request": request}).data)
+
+
+class UserCourseListCreateView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        data = request.data
+        name = data.get("name", "").strip()
+        if not name:
+            return Response({"error": "Name required"}, status=status.HTTP_400_BAD_REQUEST)
+        description = data.get("description", "").strip()
+        created_by = f"Created by {request.user.username}"
+        full_desc = f"{description}\n\n{created_by}".strip() if description else created_by
+        continent_id = data.get("continent_id") or None
+        continent = Continent.objects.filter(id=continent_id).first() if continent_id else None
+        course = Course.objects.create(
+            name=name,
+            description=full_desc,
+            course_type="clues",
+            continent=continent,
+            difficulty=int(data.get("difficulty", 1)),
+            order=100,
+        )
+        clue_ids = data.get("clue_ids", [])
+        if clue_ids:
+            clues = Clue.objects.filter(id__in=clue_ids)
+            course.clues.set(clues)
+        return Response({"id": course.id, "name": course.name}, status=status.HTTP_201_CREATED)
+
+
+class UserCourseDetailView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, course_id):
+        course = get_object_or_404(Course, id=course_id)
+        data = request.data
+        if "name" in data:
+            course.name = data["name"].strip()
+        if "description" in data:
+            course.description = data["description"].strip()
+        if "clue_ids" in data:
+            clues = Clue.objects.filter(id__in=data["clue_ids"])
+            course.clues.set(clues)
+        course.save()
+        return Response({"id": course.id, "name": course.name})
+
+    def delete(self, request, course_id):
+        course = get_object_or_404(Course, id=course_id)
+        course.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ClueSearchView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        q = request.query_params.get("q", "").strip()
+        country_slug = request.query_params.get("country", "")
+        continent_slug = request.query_params.get("continent", "")
+        clues = Clue.objects.select_related("country").order_by("country__name", "title")
+        if country_slug:
+            clues = clues.filter(country__slug=country_slug)
+        if continent_slug:
+            clues = clues.filter(country__continent__slug=continent_slug)
+        if q:
+            from django.db.models import Q
+            clues = clues.filter(Q(title__icontains=q) | Q(country__name__icontains=q) | Q(country__name_de__icontains=q))
+        clues = clues[:200]
+        from .serializers import CoursePracticeClueSerializer
+        return Response(CoursePracticeClueSerializer(clues, many=True, context={"request": request}).data)
+
+
+class UserCoursesView(generics.GenericAPIView):
+    """List courses created by the current user (clue courses with description containing their username)."""
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        courses = Course.objects.filter(
+            course_type="clues",
+            description__icontains=f"Created by {request.user.username}"
+        ).prefetch_related("clues").order_by("-id")
+        result = []
+        for course in courses:
+            result.append({
+                "id": course.id,
+                "name": course.name,
+                "description": course.description,
+                "clue_count": course.clues.count(),
+                "continent_id": course.continent_id,
+            })
+        return Response(result)

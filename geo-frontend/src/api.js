@@ -60,4 +60,31 @@ export const api = {
   }),
   search: (q) => apiFetch(`/search/?q=${encodeURIComponent(q)}`),
   searchDomain: (q) => apiFetch(`/domain-search/?q=${encodeURIComponent(q)}`),
+  // Clue editor
+  createClue: (countrySlug, data) => apiFetch(`/countries/${countrySlug}/clues/`, { method: 'POST', body: JSON.stringify(data) }),
+  updateClue: (clueId, data) => apiFetch(`/clues/${clueId}/`, { method: 'PATCH', body: JSON.stringify(data) }),
+  deleteClue: (clueId) => apiFetch(`/clues/${clueId}/`, { method: 'DELETE' }),
+  uploadClueImage: (clueId, file) => {
+    const form = new FormData()
+    form.append('image', file)
+    const token = localStorage.getItem('access_token')
+    return fetch(`/geo/api/clues/${clueId}/image/`, {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: form,
+    })
+  },
+  // Course builder
+  createCourse: (data) => apiFetch('/user-courses/', { method: 'POST', body: JSON.stringify(data) }),
+  updateCourse: (courseId, data) => apiFetch(`/user-courses/${courseId}/`, { method: 'PATCH', body: JSON.stringify(data) }),
+  deleteCourse: (courseId) => apiFetch(`/user-courses/${courseId}/`, { method: 'DELETE' }),
+  searchClues: (q, country, continent) => {
+    const params = new URLSearchParams()
+    if (q) params.set('q', q)
+    if (country) params.set('country', country)
+    if (continent) params.set('continent', continent)
+    return apiFetch(`/clue-search/?${params}`)
+  },
+  getContinents: () => apiFetch('/continents/'),
+  getMyCourses: () => apiFetch('/my-courses/'),
 }

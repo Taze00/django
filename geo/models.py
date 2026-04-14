@@ -51,6 +51,20 @@ class Country(models.Model):
         return f"{self.flag_emoji} {self.name}"
 
 
+class Region(models.Model):
+    """A sub-region of a country (e.g. Bali, West Sumatra) with a map image showing its location."""
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='regions')
+    name = models.CharField(max_length=200)
+    map_image = models.ImageField(upload_to='geo/regions/', help_text="Karte mit markierter Region (grau + rot)")
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order', 'name']
+
+    def __str__(self):
+        return f"{self.country.name} – {self.name}"
+
+
 class Clue(models.Model):
     CATEGORY_CHOICES = [
         ('car', 'Fahrzeuge'),
@@ -63,10 +77,12 @@ class Clue(models.Model):
     ]
 
     country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='clues')
+    region = models.ForeignKey(Region, on_delete=models.SET_NULL, related_name='clues', blank=True, null=True)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
     title = models.CharField(max_length=200)
     description = models.TextField(help_text="Warum ist das ein eindeutiger Hinweis?")
-    image = models.ImageField(upload_to='geo/clues/')
+    question = models.CharField(max_length=500, blank=True, help_text="Textfrage statt Bild, z.B. 'Wo wird MPH benutzt?'")
+    image = models.ImageField(upload_to='geo/clues/', blank=True, null=True)
     importance = models.IntegerField(
         default=1,
         choices=[(1, '★ Selten'), (2, '★★ Wichtig'), (3, '★★★ Entscheidend')]
@@ -112,7 +128,7 @@ class CourseCardProgress(models.Model):
 
 
 class Course(models.Model):
-    continent = models.ForeignKey(Continent, on_delete=models.CASCADE, related_name='courses')
+    continent = models.ForeignKey(Continent, on_delete=models.SET_NULL, related_name='courses', null=True, blank=True)
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     difficulty = models.IntegerField(
@@ -124,6 +140,7 @@ class Course(models.Model):
         ('flags', 'Flaggen'),
         ('domains', 'Domains'),
         ('capitals', 'Hauptstädte'),
+        ('regions', 'Regionen'),
     ]
     course_type = models.CharField(max_length=20, choices=COURSE_TYPE_CHOICES, default='clues')
     clues = models.ManyToManyField(Clue, related_name='courses', blank=True)

@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
+
 import { api } from '../api'
 import { useLang } from '../LanguageContext'
+import Header from '../Header'
 
 function flagUrl(val) {
   if (!val) return null
@@ -16,25 +18,18 @@ const DIFFICULTY_LABELS = { 1: '★ Leicht', 2: '★★ Mittel', 3: '★★★ S
 const DIFFICULTY_LABELS_EN = { 1: '★ Easy', 2: '★★ Medium', 3: '★★★ Hard' }
 const DIFFICULTY_COLORS = { 1: 'text-green-400', 2: 'text-yellow-400', 3: 'text-red-400' }
 
-export default function ContinentView() {
+export default function ContinentView({ onLogout }) {
   const { continentSlug } = useParams()
   const { t, lang } = useLang()
   const [searchParams] = useSearchParams()
   const coursesOnly = searchParams.get('courses') === '1'
   const [continent, setContinent] = useState(null)
-  const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(true)
-  const diffLabels = lang === 'en' ? DIFFICULTY_LABELS_EN : DIFFICULTY_LABELS
 
   useEffect(() => {
-    Promise.all([
-      api.getContinent(continentSlug).then(r => r.json()),
-      api.getCourses(continentSlug).then(r => r.json()),
-    ]).then(([cont, coursesData]) => {
-      setContinent(cont)
-      setCourses(coursesData.results ?? coursesData)
-      setLoading(false)
-    }).catch(() => setLoading(false))
+    api.getContinent(continentSlug).then(r => r.json())
+      .then(cont => { setContinent(cont); setLoading(false) })
+      .catch(() => setLoading(false))
   }, [continentSlug])
 
   if (loading) return (
@@ -51,6 +46,7 @@ export default function ContinentView() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white">
+      <Header onLogout={onLogout} />
       <div className="w-full max-w-6xl mx-auto px-6 py-12 sm:py-16 sm:px-16">
         <div className="grid grid-cols-[2.25rem_1fr_2.25rem] items-center mb-10">
           <Link to={coursesOnly ? '/courses' : '/'} className="inline-flex items-center justify-center w-9 h-9 text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500 rounded-lg transition-all">
@@ -59,31 +55,7 @@ export default function ContinentView() {
           <h1 className="text-3xl font-bold text-center">{lang === 'de' && continent.name_de ? continent.name_de : continent.name}</h1>
         </div>
 
-        {courses.length > 0 && (
-          <div className="mb-10">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {courses.map(course => (
-                <Link
-                  key={course.id}
-                  to={`/practice/course/${course.id}`}
-                  className="bg-gray-800 hover:bg-gray-700 border border-gray-700 hover:border-blue-500 rounded-xl p-5 transition-all"
-                >
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-semibold text-lg leading-snug">{course.name}</h3>
-                  </div>
-                  {course.description && (
-                    <p className="text-gray-400 text-sm mb-3 line-clamp-2">{course.description}</p>
-                  )}
-                  <div className="text-xs text-gray-500">
-                    {t.cards(course.clue_count)}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {!coursesOnly && <div>
+{!coursesOnly && <div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[...continent.countries].sort((a, b) => b.clue_count - a.clue_count).map(country => (
               <Link

@@ -42,3 +42,11 @@ urlpatterns = [
 # Serve media files in development
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+# Serve apple-touch-icon and favicon at root for iOS
+from django.views.static import serve as static_serve
+import os
+urlpatterns = [
+    path('apple-touch-icon.png', static_serve, {'document_root': os.path.join(settings.BASE_DIR, 'static/geo'), 'path': 'apple-touch-icon.png'}),
+    path('favicon.svg', static_serve, {'document_root': os.path.join(settings.BASE_DIR, 'static/geo'), 'path': 'favicon.svg'}),
+] + urlpatterns
