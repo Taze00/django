@@ -11,3 +11,9 @@ def impressum(request):
 
 def fitness_page(request):
     return render(request, 'fitness.html')
+
+def festival_page(request):
+    return render(request, 'festival.html')
+
+def skills_page(request):
+    return render(request, 'skills.html')

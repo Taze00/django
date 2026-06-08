@@ -37,6 +37,10 @@ urlpatterns = [
     re_path(r'^fitness/.*$', views.fitness_page, name='fitness_catch_all'),
     # Geo routes (React frontend)
     path('geo/', include('geo.urls')),
+    # Festival checklist
+    path('festival/', views.festival_page, name='festival_page'),
+    # Skills page
+    path('skills/', views.skills_page, name='skills_page'),
 ]
 
 # Serve media files in development
