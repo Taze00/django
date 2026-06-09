@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from django.db.models import Q
 from django.contrib.auth.models import User
-from fitness.models import Exercise, Progression, UserExerciseProgression, Workout, WorkoutSet, WarmupChecklist, UserProfile
+from fitness.models import Exercise, Progression, UserExerciseProgression, Workout, WorkoutSet, WarmupChecklist, UserProfile, RestDay
 from fitness.serializers import (
     ExerciseSerializer, UserProgressionSerializer, WorkoutSerializer,
     WorkoutSetSerializer, WarmupChecklistSerializer, UserProfileSerializer
@@ -426,6 +426,90 @@ def complete_onboarding(request):
 
     serializer = UserProfileSerializer(profile)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+def _user_training_days(user):
+    """Resolve a user's training days from profile, falling back to their
+    progressions, then Mon-Fri."""
+    profile = UserProfile.objects.filter(user=user).first()
+    if profile and profile.training_days:
+        return profile.training_days
+    prog = UserExerciseProgression.objects.filter(user=user).first()
+    if prog and prog.training_days:
+        return prog.training_days
+    return [1, 2, 3, 4, 5]
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def streak_status(request):
+    """Current + longest streak (training-day based, rest days excused)."""
+    from fitness.streak import calculate_streak, longest_streak
+
+    user = request.user
+    training_days = _user_training_days(user)
+
+    trained_dates = set(
+        Workout.objects.filter(user=user, completed=True).values_list('date', flat=True)
+    )
+    rest_dates = set(
+        RestDay.objects.filter(user=user).values_list('date', flat=True)
+    )
+
+    cur = calculate_streak(training_days, trained_dates, rest_dates)
+    longest = longest_streak(training_days, trained_dates, rest_dates)
+
+    return Response({
+        'current': cur['current'],
+        'longest': longest,
+        'trained_today': cur['trained_today'],
+        'rested_today': cur['rested_today'],
+        'is_training_day_today': cur['is_training_day_today'],
+        'training_days': training_days,
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def mark_rest_day(request):
+    """Mark today (or a given date) as an excused rest day ('Heute nicht')."""
+    user = request.user
+    date_str = request.data.get('date')
+    if date_str:
+        try:
+            day = timezone.datetime.fromisoformat(date_str).date()
+        except (ValueError, TypeError):
+            return Response({'error': 'Invalid date'}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        day = timezone.now().date()
+
+    rest, created = RestDay.objects.get_or_create(user=user, date=day)
+
+    from fitness.streak import calculate_streak
+    training_days = _user_training_days(user)
+    trained_dates = set(
+        Workout.objects.filter(user=user, completed=True).values_list('date', flat=True)
+    )
+    rest_dates = set(RestDay.objects.filter(user=user).values_list('date', flat=True))
+    cur = calculate_streak(training_days, trained_dates, rest_dates)
+
+    return Response({
+        'status': 'rest_day_marked',
+        'date': day.isoformat(),
+        'created': created,
+        'current_streak': cur['current'],
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def unmark_rest_day(request):
+    """Undo today's rest day (in case of a misclick)."""
+    user = request.user
+    day = timezone.now().date()
+    RestDay.objects.filter(user=user, date=day).delete()
+    return Response({'status': 'rest_day_removed', 'date': day.isoformat()},
+                    status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])

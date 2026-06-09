@@ -64,6 +64,53 @@ body {
   letter-spacing: 3px; color: var(--white);
 }
 .header-logo span { color: var(--orange); }
+
+/* Streak flame in header */
+.header-streak {
+  display: flex; align-items: center; gap: 0.35rem;
+  background: var(--bg3); border: 1px solid var(--muted3);
+  padding: 0.25rem 0.7rem 0.25rem 0.5rem; border-radius: 100px;
+}
+.streak-flame { font-size: 0.9rem; line-height: 1; }
+.streak-count {
+  font-family: var(--display); font-size: 1.1rem;
+  color: var(--orange); letter-spacing: 1px; line-height: 1;
+}
+
+/* "Heute nicht" rest option */
+.btn-rest {
+  width: 100%; background: none; border: none; color: var(--muted);
+  font-family: var(--mono); font-size: 0.62rem; letter-spacing: 2px;
+  text-transform: uppercase; padding: 1rem; cursor: pointer;
+  transition: color 0.2s; margin-top: 0.5rem;
+}
+.btn-rest:hover { color: var(--white); }
+.rest-confirm {
+  background: var(--bg2); border: 1px solid var(--muted3);
+  padding: 1.25rem; margin-top: 0.75rem; animation: fadeUp 0.25s ease;
+}
+.rest-confirm-text {
+  font-size: 0.68rem; color: var(--muted); line-height: 1.6;
+  letter-spacing: 0.3px; margin-bottom: 1rem; text-align: center;
+}
+.rest-confirm-btns { display: flex; gap: 1px; }
+.btn-rest-cancel {
+  flex: 1; background: var(--bg3); border: none; color: var(--white);
+  font-family: var(--mono); font-size: 0.6rem; letter-spacing: 1.5px;
+  text-transform: uppercase; padding: 0.85rem; cursor: pointer; transition: background 0.15s;
+}
+.btn-rest-cancel:hover { background: var(--muted2); }
+.btn-rest-confirm {
+  flex: 1; background: rgba(255,77,0,0.12); border: none; color: var(--orange);
+  font-family: var(--mono); font-size: 0.6rem; letter-spacing: 1.5px;
+  text-transform: uppercase; padding: 0.85rem; cursor: pointer; transition: background 0.15s;
+}
+.btn-rest-confirm:hover { background: rgba(255,77,0,0.2); }
+.btn-rest-confirm:disabled, .btn-rest-cancel:disabled { opacity: 0.5; cursor: not-allowed; }
+.rest-note {
+  font-size: 0.65rem; color: var(--orange); text-align: center;
+  letter-spacing: 0.3px; margin-top: 1rem; line-height: 1.6;
+}
 .header-close-btn {
   background: none; border: none; color: var(--muted);
   font-size: 1rem; cursor: pointer; padding: 0.5rem;

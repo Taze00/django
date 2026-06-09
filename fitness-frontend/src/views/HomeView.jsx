@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { useWorkoutStore } from '../stores/workoutStore';
@@ -13,7 +13,11 @@ export default function HomeView() {
   const userProgressions = useWorkoutStore(state => state.userProgressions);
   const workouts = useWorkoutStore(state => state.workouts);
   const trainingDays = useWorkoutStore(state => state.trainingDays);
+  const streak = useWorkoutStore(state => state.streak);
+  const markRestDay = useWorkoutStore(state => state.markRestDay);
   const isLoading = useWorkoutStore(state => state.isLoading);
+  const [restConfirm, setRestConfirm] = useState(false);
+  const [resting, setResting] = useState(false);
 
   useEffect(() => {
     if (user && user.onboarding_completed === false) navigate('/onboarding');
@@ -51,6 +55,22 @@ export default function HomeView() {
     return ALL_DAYS[i === 0 ? 6 : i - 1];
   }, []);
 
+  const handleRest = async () => {
+    setResting(true);
+    try {
+      await markRestDay();
+      setRestConfirm(false);
+    } catch {
+      // ignore — UI stays as-is
+    } finally {
+      setResting(false);
+    }
+  };
+
+  // Show the "Heute nicht" affordance only on an untrained, unrested training day.
+  const showRestOption =
+    streak.is_training_day_today && !streak.trained_today && !streak.rested_today;
+
   if (isLoading) {
     return (
       <div className="loading-shell">
@@ -66,6 +86,12 @@ export default function HomeView() {
       <div className="header">
         <div className="header-content">
           <div className="header-logo">COR<span>VIS</span></div>
+          {streak.current > 0 && (
+            <div className="header-streak" title={`Längste Serie: ${streak.longest}`}>
+              <span className="streak-flame">🔥</span>
+              <span className="streak-count">{streak.current}</span>
+            </div>
+          )}
         </div>
       </div>
 
@@ -112,6 +138,32 @@ export default function HomeView() {
         <button className="btn-start" onClick={() => navigate('/workout')}>
           Training starten →
         </button>
+
+        {streak.rested_today && (
+          <p className="rest-note">Heute pausiert — deine Serie bleibt. Erhol dich gut. 💪</p>
+        )}
+
+        {showRestOption && !restConfirm && (
+          <button className="btn-rest" onClick={() => setRestConfirm(true)}>
+            Heute nicht
+          </button>
+        )}
+
+        {showRestOption && restConfirm && (
+          <div className="rest-confirm">
+            <p className="rest-confirm-text">
+              Heute pausieren? Deine Serie bleibt erhalten — kein Verlust.
+            </p>
+            <div className="rest-confirm-btns">
+              <button className="btn-rest-cancel" onClick={() => setRestConfirm(false)} disabled={resting}>
+                Doch trainieren
+              </button>
+              <button className="btn-rest-confirm" onClick={handleRest} disabled={resting}>
+                {resting ? '...' : 'Ja, pausieren'}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

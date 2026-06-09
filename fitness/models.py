@@ -123,6 +123,21 @@ class WorkoutSet(models.Model):
         return f"{self.workout} - {self.exercise.name} Set {self.set_number}"
 
 
+class RestDay(models.Model):
+    """An intentional skipped training day ("Heute nicht"). Excused so it does
+    not break the streak."""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="rest_days")
+    date = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-date"]
+        unique_together = ["user", "date"]
+
+    def __str__(self):
+        return f"{self.user.username} - Rest {self.date}"
+
+
 class UserProfile(models.Model):
     """User profile with optional profile picture"""
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")

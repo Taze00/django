@@ -3,42 +3,12 @@ import { useWorkoutStore } from '../stores/workoutStore';
 
 export default function StatisticsView() {
   const workouts = useWorkoutStore(state => state.workouts);
+  const streak = useWorkoutStore(state => state.streak);
   const [expandedDate, setExpandedDate] = useState(null);
 
-  const trainedDates = new Set(
-    workouts.filter(w => w.sets && w.sets.length > 0).map(w => w.date)
-  );
-
-  const currentStreak = useMemo(() => {
-    if (trainedDates.size === 0) return 0;
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yStr = yesterday.toISOString().split('T')[0];
-    if (!trainedDates.has(yStr)) return 0;
-    let streak = 0;
-    for (let i = 0; i < 365; i++) {
-      const d = new Date(yesterday);
-      d.setDate(d.getDate() - i);
-      if (trainedDates.has(d.toISOString().split('T')[0])) streak++;
-      else break;
-    }
-    return streak;
-  }, [workouts]);
-
-  const longestStreak = useMemo(() => {
-    const sorted = Array.from(trainedDates).sort();
-    let max = 0, cur = 0, last = null;
-    for (const ds of sorted) {
-      if (!last) { cur = 1; }
-      else {
-        const diff = (new Date(ds) - new Date(last)) / 86400000;
-        if (diff === 1) cur++;
-        else { max = Math.max(max, cur); cur = 1; }
-      }
-      last = ds;
-    }
-    return Math.max(max, cur);
-  }, [workouts]);
+  // Streak comes from the backend (training-day based, rest days excused).
+  const currentStreak = streak.current;
+  const longestStreak = streak.longest;
 
   const stats = useMemo(() => {
     const r = { pushReps: 0, pullReps: 0, plankSeconds: 0 };
