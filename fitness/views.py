@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from django.db.models import Q
 from django.contrib.auth.models import User
-from fitness.models import Exercise, Progression, UserExerciseProgression, Workout, WorkoutSet, WarmupChecklist, UserProfile, RestDay
+from fitness.models import Exercise, Progression, UserExerciseProgression, Workout, WorkoutSet, WarmupChecklist, UserProfile, RestDay, LevelEvent
 from fitness.serializers import (
     ExerciseSerializer, UserProgressionSerializer, WorkoutSerializer,
     WorkoutSetSerializer, WarmupChecklistSerializer, UserProfileSerializer
@@ -218,9 +218,10 @@ class WorkoutViewSet(viewsets.ModelViewSet):
                 if user_prog.sessions_at_target >= user_prog.current_progression.sessions_required:
                     # Only upgrade if not at max level (7)
                     if user_prog.current_progression.level < 7:
+                        from_level = user_prog.current_progression.level
                         next_progression = Progression.objects.filter(
                             exercise=exercise,
-                            level=user_prog.current_progression.level + 1
+                            level=from_level + 1
                         ).first()
 
                         if next_progression:
@@ -232,10 +233,24 @@ class WorkoutViewSet(viewsets.ModelViewSet):
 
                             upgrades.append({
                                 'exercise': exercise.name,
-                                'from_level': user_prog.current_progression.level - 1,
+                                'from_level': from_level,
                                 'to_level': next_progression.level,
                                 'to_progression': next_progression.name,
                             })
+
+                            # Timeline: log the level-up.
+                            LevelEvent.objects.create(
+                                user=request.user,
+                                event_type='level_up',
+                                exercise=exercise,
+                                from_level=from_level,
+                                to_level=next_progression.level,
+                                progression_name=next_progression.name,
+                            )
+
+                            # Timeline: log first-time milestone for the iconic
+                            # threshold variants (first real pull-up / push-up).
+                            _log_first_time_milestone(request.user, exercise, next_progression)
                     else:
                         # Already at max level
                         user_prog.sessions_at_target = 0  # Reset but stay at level
@@ -251,6 +266,16 @@ class WorkoutViewSet(viewsets.ModelViewSet):
                 # Did not reach target, but mark first session as done
                 user_prog.is_first_session = False
                 user_prog.save()
+
+        # Timeline: check for a streak milestone now that today is completed.
+        from fitness.streak import calculate_streak
+        training_days = _user_training_days(request.user)
+        trained_dates = set(
+            Workout.objects.filter(user=request.user, completed=True).values_list('date', flat=True)
+        )
+        rest_dates = set(RestDay.objects.filter(user=request.user).values_list('date', flat=True))
+        streak_now = calculate_streak(training_days, trained_dates, rest_dates)['current']
+        _log_streak_milestone(request.user, streak_now)
 
         return Response({
             'status': 'completed',
@@ -428,6 +453,50 @@ def complete_onboarding(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+# Iconic threshold progressions worth a "first time" timeline moment.
+# Maps progression name -> celebratory label.
+_FIRST_TIME_MILESTONES = {
+    "Standard Push-ups": "Erster Standard Push-up! 💪",
+    "Standard Pull-ups": "Erster echter Pull-up! 🔥",
+    "Standard Plank": "Standard Plank gemeistert!",
+}
+
+# Streak counts that earn a milestone event.
+_STREAK_MILESTONES = [7, 14, 30, 50, 100, 200, 365]
+
+
+def _log_first_time_milestone(user, exercise, progression):
+    """Log a one-time 'first time' event when an iconic variant is reached."""
+    label = _FIRST_TIME_MILESTONES.get(progression.name)
+    if not label:
+        return
+    already = LevelEvent.objects.filter(
+        user=user, event_type='first_time', exercise=exercise,
+        progression_name=progression.name,
+    ).exists()
+    if not already:
+        LevelEvent.objects.create(
+            user=user, event_type='first_time', exercise=exercise,
+            to_level=progression.level, progression_name=progression.name,
+            label=label,
+        )
+
+
+def _log_streak_milestone(user, streak_value):
+    """Log a streak milestone event once when a threshold is reached."""
+    if streak_value not in _STREAK_MILESTONES:
+        return
+    already = LevelEvent.objects.filter(
+        user=user, event_type='streak_milestone', streak_value=streak_value,
+    ).exists()
+    if not already:
+        LevelEvent.objects.create(
+            user=user, event_type='streak_milestone',
+            streak_value=streak_value,
+            label=f'{streak_value} Tage Serie! 🔥',
+        )
+
+
 def _user_training_days(user):
     """Resolve a user's training days from profile, falling back to their
     progressions, then Mon-Fri."""
@@ -467,6 +536,30 @@ def streak_status(request):
         'is_training_day_today': cur['is_training_day_today'],
         'training_days': training_days,
     }, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def timeline(request):
+    """Chronological milestone feed for the progress timeline (newest first)."""
+    events = LevelEvent.objects.filter(user=request.user).select_related('exercise')
+
+    data = []
+    for e in events:
+        data.append({
+            'id': e.id,
+            'type': e.event_type,
+            'exercise': e.exercise.name if e.exercise else None,
+            'from_level': e.from_level,
+            'to_level': e.to_level,
+            'progression_name': e.progression_name,
+            'streak_value': e.streak_value,
+            'label': e.label,
+            'date': e.created_at.date().isoformat(),
+            'created_at': e.created_at.isoformat(),
+        })
+
+    return Response({'events': data}, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -594,6 +687,15 @@ def calibrate_onboarding(request):
     profile.onboarding_completed = True
     profile.save()
 
+    # Timeline: start the journey. Reset any prior events (in case of re-calibrate)
+    # so the timeline reflects this fresh start.
+    LevelEvent.objects.filter(user=request.user).delete()
+    LevelEvent.objects.create(
+        user=request.user,
+        event_type='journey_start',
+        label='Deine Reise beginnt 🚀',
+    )
+
     return Response({
         'status': 'calibrated',
         'training_days': training_days,
@@ -636,6 +738,10 @@ def reset_onboarding(request):
 
         # Delete all workouts
         Workout.objects.filter(user=user).delete()
+
+        # Clear timeline + rest days for a clean restart.
+        LevelEvent.objects.filter(user=user).delete()
+        RestDay.objects.filter(user=user).delete()
 
         return Response({'status': 'onboarding_reset'}, status=status.HTTP_200_OK)
     except Exception as e:

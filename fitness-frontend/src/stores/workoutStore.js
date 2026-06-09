@@ -17,6 +17,7 @@ export const useWorkoutStore = create((set, get) => ({
   lastPerformance: {},
   trainingDays: [1, 2, 3, 4, 5], // Mon-Fri default
   streak: { current: 0, longest: 0, trained_today: false, rested_today: false, is_training_day_today: false },
+  timeline: [],
   isInitialized: false,
   isLoading: false,
 
@@ -26,12 +27,13 @@ export const useWorkoutStore = create((set, get) => ({
 
     set({ isLoading: true });
     try {
-      const [exRes, progRes, workRes, settRes, streakRes] = await Promise.all([
+      const [exRes, progRes, workRes, settRes, streakRes, timelineRes] = await Promise.all([
         api.get('/exercises/'),
         api.get('/user-progressions/'),
         api.get('/workouts/'),
         api.get('/profile/settings/').catch(() => ({ data: { training_days: [1, 2, 3, 4, 5] } })),
         api.get('/streak/').catch(() => ({ data: null })),
+        api.get('/timeline/').catch(() => ({ data: { events: [] } })),
       ]);
 
       const progressionsMap = {};
@@ -45,6 +47,7 @@ export const useWorkoutStore = create((set, get) => ({
         workouts: workRes.data.results || [],
         trainingDays: settRes.data.training_days || [1, 2, 3, 4, 5],
         streak: streakRes.data || get().streak,
+        timeline: timelineRes.data?.events || [],
         isInitialized: true,
         isLoading: false,
       });
@@ -89,15 +92,17 @@ export const useWorkoutStore = create((set, get) => ({
   completeWorkout: async (workoutId) => {
     try {
       const res = await api.post(`/workouts/${workoutId}/complete/`);
-      // Refresh workouts list + streak after completing
-      const [workRes, streakRes] = await Promise.all([
+      // Refresh workouts list + streak + timeline after completing
+      const [workRes, streakRes, timelineRes] = await Promise.all([
         api.get('/workouts/'),
         api.get('/streak/').catch(() => ({ data: null })),
+        api.get('/timeline/').catch(() => ({ data: { events: [] } })),
       ]);
       set({
         workouts: workRes.data.results || [],
         currentWorkout: null,
         streak: streakRes.data || get().streak,
+        timeline: timelineRes.data?.events || get().timeline,
       });
       // Clear localStorage when workout is done
       localStorage.removeItem('currentWorkout');

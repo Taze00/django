@@ -138,6 +138,37 @@ class RestDay(models.Model):
         return f"{self.user.username} - Rest {self.date}"
 
 
+class LevelEvent(models.Model):
+    """A milestone on the user's progress timeline. Logged forward from now on:
+    level-ups, streak milestones, first-time achievements, journey start."""
+    EVENT_TYPES = [
+        ("journey_start", "Journey Start"),
+        ("level_up", "Level Up"),
+        ("streak_milestone", "Streak Milestone"),
+        ("first_time", "First Time"),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="level_events")
+    event_type = models.CharField(max_length=20, choices=EVENT_TYPES)
+    # Optional exercise context (null for streak milestones).
+    exercise = models.ForeignKey(Exercise, on_delete=models.CASCADE, null=True, blank=True)
+    # For level_up: the level reached and its progression name.
+    from_level = models.IntegerField(null=True, blank=True)
+    to_level = models.IntegerField(null=True, blank=True)
+    progression_name = models.CharField(max_length=100, blank=True)
+    # For streak_milestone: the streak count reached.
+    streak_value = models.IntegerField(null=True, blank=True)
+    # Freeform label for first_time / custom events.
+    label = models.CharField(max_length=120, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.user.username} - {self.event_type} ({self.created_at:%Y-%m-%d})"
+
+
 class UserProfile(models.Model):
     """User profile with optional profile picture"""
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")

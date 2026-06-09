@@ -1,9 +1,58 @@
 import { useState, useMemo } from 'react';
 import { useWorkoutStore } from '../stores/workoutStore';
 
+// Renders one timeline entry's content based on its type.
+function TimelineEntry({ event }) {
+  if (event.type === 'journey_start') {
+    return (
+      <div className="tl-entry tl-start">
+        <p className="tl-entry-title">{event.label || 'Deine Reise beginnt'}</p>
+        <p className="tl-entry-date">{formatTLDate(event.date)}</p>
+      </div>
+    );
+  }
+  if (event.type === 'level_up') {
+    return (
+      <div className="tl-entry tl-levelup">
+        <div className="tl-entry-head">
+          <span className="tl-entry-ex">{event.exercise}</span>
+          <span className="tl-entry-jump">L{event.from_level} → L{event.to_level}</span>
+        </div>
+        <p className="tl-entry-title">{event.progression_name}</p>
+        <p className="tl-entry-date">{formatTLDate(event.date)}</p>
+      </div>
+    );
+  }
+  if (event.type === 'streak_milestone') {
+    return (
+      <div className="tl-entry tl-streak">
+        <p className="tl-entry-title">{event.label}</p>
+        <p className="tl-entry-date">{formatTLDate(event.date)}</p>
+      </div>
+    );
+  }
+  if (event.type === 'first_time') {
+    return (
+      <div className="tl-entry tl-first">
+        <span className="tl-entry-ex">{event.exercise}</span>
+        <p className="tl-entry-title">{event.label}</p>
+        <p className="tl-entry-date">{formatTLDate(event.date)}</p>
+      </div>
+    );
+  }
+  return null;
+}
+
+function formatTLDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return d.toLocaleDateString('de-DE', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
 export default function StatisticsView() {
   const workouts = useWorkoutStore(state => state.workouts);
   const streak = useWorkoutStore(state => state.streak);
+  const timeline = useWorkoutStore(state => state.timeline);
   const [expandedDate, setExpandedDate] = useState(null);
 
   // Streak comes from the backend (training-day based, rest days excused).
@@ -73,6 +122,23 @@ export default function StatisticsView() {
             <p className="streak-label">Längste Serie</p>
           </div>
         </div>
+
+        {timeline.length > 0 && (
+          <>
+            <p className="history-section-title">— Deine Reise</p>
+            <div className="timeline">
+              {timeline.map(event => (
+                <div key={event.id} className="tl-row">
+                  <div className="tl-marker">
+                    <span className="tl-dot" />
+                    <span className="tl-line" />
+                  </div>
+                  <TimelineEntry event={event} />
+                </div>
+              ))}
+            </div>
+          </>
+        )}
 
         {completedWorkouts.length > 0 && (
           <>

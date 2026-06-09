@@ -111,6 +111,43 @@ body {
   font-size: 0.65rem; color: var(--orange); text-align: center;
   letter-spacing: 0.3px; margin-top: 1rem; line-height: 1.6;
 }
+
+/* ─── PROGRESS TIMELINE ─── */
+.timeline { margin-top: 0.5rem; margin-bottom: 1rem; }
+.tl-row { display: flex; gap: 0.9rem; }
+.tl-marker {
+  display: flex; flex-direction: column; align-items: center;
+  flex-shrink: 0; width: 14px;
+}
+.tl-dot {
+  width: 11px; height: 11px; border-radius: 50%;
+  background: var(--orange); margin-top: 0.35rem; flex-shrink: 0;
+  box-shadow: 0 0 0 3px rgba(255,77,0,0.15);
+}
+.tl-line { flex: 1; width: 1px; background: var(--muted3); margin: 0.3rem 0; }
+.tl-row:last-child .tl-line { display: none; }
+
+.tl-entry { flex: 1; padding-bottom: 1.5rem; }
+.tl-entry-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.2rem; }
+.tl-entry-ex {
+  font-size: 0.55rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+}
+.tl-entry-jump {
+  font-family: var(--display); font-size: 1.1rem; color: var(--orange); letter-spacing: 1px;
+}
+.tl-entry-title {
+  font-size: 0.78rem; color: var(--white); letter-spacing: 0.3px; line-height: 1.4;
+}
+.tl-entry-date {
+  font-size: 0.58rem; color: var(--muted); margin-top: 0.25rem; letter-spacing: 0.3px;
+}
+/* Variant accents */
+.tl-start .tl-entry-title { color: var(--orange); font-family: var(--display); font-size: 1.3rem; letter-spacing: 1px; }
+.tl-streak .tl-entry-title { color: var(--orange); }
+.tl-first .tl-entry-title { color: var(--white); }
+.tl-row:has(.tl-start) .tl-dot,
+.tl-row:has(.tl-streak) .tl-dot { background: var(--orange); }
+.tl-row:has(.tl-first) .tl-dot { background: var(--white); box-shadow: 0 0 0 3px rgba(240,237,232,0.12); }
 .header-close-btn {
   background: none; border: none; color: var(--muted);
   font-size: 1rem; cursor: pointer; padding: 0.5rem;
