@@ -10,146 +10,63 @@ export default function RegisterView() {
   const [email, setEmail] = useState('');
   const [registrationKey, setRegistrationKey] = useState('');
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const login = useAuthStore(state => state.login);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setError('');
-    setSuccess('');
-
-    // Validation
-    if (!username || !password || !registrationKey) {
-      setError('Username, password, and registration key are required');
-      return;
-    }
-
-    if (username.length < 3) {
-      setError('Username must be at least 3 characters');
-      return;
-    }
-
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters');
-      return;
-    }
-
-    if (password !== passwordConfirm) {
-      setError('Passwords do not match');
-      return;
-    }
-
+    if (username.length < 3) { setError('Benutzername mind. 3 Zeichen'); return; }
+    if (password.length < 8) { setError('Passwort mind. 8 Zeichen'); return; }
+    if (password !== passwordConfirm) { setError('Passwörter stimmen nicht überein'); return; }
     setIsLoading(true);
-
     try {
-      // Register user
-      const registerRes = await axios.post('/api/register/', {
-        username,
-        password,
-        email,
-        registration_key: registrationKey,
-      });
-
-      setSuccess('✅ Account created! Logging in...');
-
-      // Auto-login after successful registration
-      setTimeout(() => {
-        login(username, password).then(() => {
-          navigate('/onboarding');
-        }).catch(err => {
-          setError('Account created, but login failed. Please try logging in.');
-        });
-      }, 1000);
+      await axios.post('/api/register/', { username, password, email, registration_key: registrationKey });
+      await login(username, password);
+      navigate('/onboarding');
     } catch (err) {
-      const errorMsg = err.response?.data?.error || 'Registration failed';
-      setError(errorMsg);
+      setError(err.response?.data?.error || 'Registrierung fehlgeschlagen');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="login-container">
-      <div className="login-bg-orb login-bg-orb-1"></div>
-      <div className="login-bg-orb login-bg-orb-2"></div>
+    <div className="auth-container">
+      <p className="auth-logo">COR<span>VIS</span></p>
+      <p className="auth-tagline">Die Kraft deines Körpers</p>
 
-      <div className="login-card">
-        <img src="/static/fitness/favicon.png" alt="Logo" className="login-logo-img" />
-        <h1 className="login-title">Calisthenics</h1>
-        <p className="login-subtitle">Join the community</p>
-
+      <div className="auth-card">
+        <p className="auth-title">— Registrieren</p>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">Username</label>
-            <input
-              type="text"
-              className="form-input"
-              placeholder="Choose your username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
+            <label className="form-label">Benutzername</label>
+            <input className="form-input" type="text" value={username} onChange={e => setUsername(e.target.value)} required />
           </div>
-
           <div className="form-group">
-            <label className="form-label">Email (optional)</label>
-            <input
-              type="email"
-              className="form-input"
-              placeholder="your@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+            <label className="form-label">E-Mail (optional)</label>
+            <input className="form-input" type="email" value={email} onChange={e => setEmail(e.target.value)} />
           </div>
-
           <div className="form-group">
-            <label className="form-label">Password</label>
-            <input
-              type="password"
-              className="form-input"
-              placeholder="Minimum 8 characters"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <label className="form-label">Passwort</label>
+            <input className="form-input" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
           </div>
-
           <div className="form-group">
-            <label className="form-label">Confirm Password</label>
-            <input
-              type="password"
-              className="form-input"
-              placeholder="Confirm password"
-              value={passwordConfirm}
-              onChange={(e) => setPasswordConfirm(e.target.value)}
-              required
-            />
+            <label className="form-label">Passwort bestätigen</label>
+            <input className="form-input" type="password" value={passwordConfirm} onChange={e => setPasswordConfirm(e.target.value)} required />
           </div>
-
           <div className="form-group">
-            <label className="form-label">Registration Key</label>
-            <input
-              type="password"
-              className="form-input"
-              placeholder="Enter registration key"
-              value={registrationKey}
-              onChange={(e) => setRegistrationKey(e.target.value)}
-              required
-            />
+            <label className="form-label">Registrierungsschlüssel</label>
+            <input className="form-input" type="password" value={registrationKey} onChange={e => setRegistrationKey(e.target.value)} required />
           </div>
-
-          {error && <div className="error-message">⚠️ {error}</div>}
-          {success && <div className="success-message">✅ {success}</div>}
-
-          <button type="submit" className="btn-submit" disabled={isLoading}>
-            {isLoading ? 'Creating account...' : 'Create Account'}
+          {error && <div className="form-error">{error}</div>}
+          <button className="btn-auth" type="submit" disabled={isLoading}>
+            {isLoading ? 'Wird erstellt...' : 'Account erstellen →'}
           </button>
         </form>
-
-        <p className="login-footer">
-          Already have an account? <a href="/fitness/login" style={{ color: '#3b82f6', cursor: 'pointer' }}>Login here</a>
+        <p className="auth-footer">
+          Schon ein Account? <a href="/fitness/login">Anmelden</a>
         </p>
       </div>
     </div>

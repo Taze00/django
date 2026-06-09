@@ -32,15 +32,15 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/register/', register, name='register'),
     path('api/fitness/', include('fitness.urls')),
-    # Fitness routes (React frontend)
-    path('fitness/', views.fitness_page, name='fitness_page'),
-    re_path(r'^fitness/.*$', views.fitness_page, name='fitness_catch_all'),
-    # Geo routes (React frontend)
-    path('geo/', include('geo.urls')),
+    # CORVIS App (React frontend)
+    path('corvis-app/', views.fitness_page, name='fitness_page'),
+    re_path(r'^corvis-app/.*$', views.fitness_page, name='fitness_catch_all'),
     # Festival checklist
     path('festival/', views.festival_page, name='festival_page'),
     # Skills page
     path('skills/', views.skills_page, name='skills_page'),
+    # CORVIS landing page
+    path('corvis/', views.fitness_landing_page, name='fitness_landing_page'),
 ]
 
 # Serve media files in development

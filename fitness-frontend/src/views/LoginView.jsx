@@ -10,67 +10,57 @@ export default function LoginView() {
   const navigate = useNavigate();
   const login = useAuthStore(state => state.login);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async e => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-
     try {
       await login(username, password);
       navigate('/');
     } catch (err) {
-      setError(err.response?.data?.detail || 'Login failed');
+      setError(err.response?.data?.detail || 'Login fehlgeschlagen');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="login-container">
-      <div className="login-bg-orb login-bg-orb-1"></div>
-      <div className="login-bg-orb login-bg-orb-2"></div>
+    <div className="auth-container">
+      <p className="auth-logo">COR<span>VIS</span></p>
+      <p className="auth-tagline">Die Kraft deines Körpers</p>
 
-      <div className="login-card">
-        <img src="/static/fitness/favicon.png" alt="Logo" className="login-logo-img" />
-        <h1 className="login-title">Calisthenics</h1>
-        <p className="login-subtitle">Master your bodyweight</p>
-
+      <div className="auth-card">
+        <p className="auth-title">— Anmelden</p>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">Username</label>
+            <label className="form-label">Benutzername</label>
             <input
-              type="text"
               className="form-input"
-              placeholder="Enter your username"
+              type="text"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={e => setUsername(e.target.value)}
               autoComplete="username"
               required
             />
           </div>
-
           <div className="form-group">
-            <label className="form-label">Password</label>
+            <label className="form-label">Passwort</label>
             <input
-              type="password"
               className="form-input"
-              placeholder="Enter your password"
+              type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
               autoComplete="current-password"
               required
             />
           </div>
-
-          {error && <div className="error-message">⚠️ {error}</div>}
-
-          <button type="submit" className="btn-submit" disabled={isLoading}>
-            {isLoading ? 'Logging in...' : 'Enter'}
+          {error && <div className="form-error">{error}</div>}
+          <button className="btn-auth" type="submit" disabled={isLoading}>
+            {isLoading ? 'Einloggen...' : 'Einloggen →'}
           </button>
         </form>
-
-        <p className="login-footer">
-          Don't have an account? <a href="/fitness/register" style={{ color: '#3b82f6', cursor: 'pointer' }}>Register here</a>
+        <p className="auth-footer">
+          Noch kein Account? <a href="/fitness/register">Registrieren</a>
         </p>
       </div>
     </div>

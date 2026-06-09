@@ -49,7 +49,7 @@ function App() {
   }, [isAuthenticated, initialize]);
 
   return (
-    <Router basename="/fitness">
+    <Router basename="/corvis-app">
       <Routes>
         <Route path="/login" element={<LoginView />} />
         <Route path="/register" element={<RegisterView />} />

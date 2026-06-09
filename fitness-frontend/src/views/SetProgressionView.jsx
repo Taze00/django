@@ -7,216 +7,103 @@ export default function SetProgressionView() {
   const navigate = useNavigate();
   const exercises = useWorkoutStore(state => state.exercises) || [];
   const userProgressions = useWorkoutStore(state => state.userProgressions) || {};
+  const [selected, setSelected] = useState({});
   const [saving, setSaving] = useState(false);
   const [feedback, setFeedback] = useState(null);
-  const [progressions, setProgressions] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
-  const [exerciseDetails, setExerciseDetails] = useState({});
 
   useEffect(() => {
-    // Initialize progressions state from store
-    if (exercises && exercises.length > 0) {
-      const initialProgressions = {};
-      const details = {};
-
-      exercises.forEach(exercise => {
-        const key = String(exercise.id);
-        const prog = userProgressions[key];
-        details[key] = exercise.progressions || [];
-        
-        if (prog) {
-          initialProgressions[key] = prog.current_progression;
-        }
+    if (exercises.length > 0) {
+      const init = {};
+      exercises.forEach(ex => {
+        const prog = userProgressions[String(ex.id)];
+        if (prog) init[String(ex.id)] = prog.current_progression?.id;
       });
-      
-      setProgressions(initialProgressions);
-      setExerciseDetails(details);
-      setIsLoading(false);
-    } else {
-      setIsLoading(false);
+      setSelected(init);
     }
   }, [exercises, userProgressions]);
-
-  const handleProgressionChange = (exerciseId, newProgression) => {
-    setProgressions(prev => ({
-      ...prev,
-      [String(exerciseId)]: newProgression
-    }));
-  };
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      // Find only changed progressions
-      const updates = [];
-      exercises.forEach(exercise => {
-        const key = String(exercise.id);
-        const newProg = progressions[key];
-        const currentProg = userProgressions[key]?.current_progression;
-
-        // Only add to updates if the progression actually changed
-        if (newProg && newProg !== currentProg) {
-          updates.push({
-            exerciseId: exercise.id,
-            progression: newProg
-          });
-        }
+      const updates = exercises.filter(ex => {
+        const key = String(ex.id);
+        return selected[key] && selected[key] !== userProgressions[key]?.current_progression?.id;
       });
 
       if (updates.length === 0) {
-        setFeedback({ type: 'info', msg: 'No changes made.' });
+        setFeedback({ type: 'info', msg: 'Keine Änderungen.' });
         setSaving(false);
         return;
       }
 
-      // Call API to update only changed progressions
-      for (const update of updates) {
-        await api.patch(`/user-progressions/${update.exerciseId}/`, {
-          current_progression: update.progression
+      for (const ex of updates) {
+        await api.patch(`/user-progressions/${ex.id}/`, {
+          current_progression: selected[String(ex.id)]
         });
       }
 
-      // Refresh data
-      const state = useWorkoutStore.getState();
       useWorkoutStore.setState({ isInitialized: false });
-      await state.initialize();
-
-      setFeedback({ type: 'success', msg: 'Levels updated successfully!' });
-      setTimeout(() => navigate('/profile'), 1500);
-    } catch (error) {
-      console.error('Error saving progressions:', error);
-      setFeedback({ type: 'error', msg: 'Failed to update levels. Try again.' });
+      await useWorkoutStore.getState().initialize();
+      setFeedback({ type: 'success', msg: 'Level gespeichert!' });
+      setTimeout(() => navigate('/profile'), 1200);
+    } catch {
+      setFeedback({ type: 'error', msg: 'Speichern fehlgeschlagen.' });
     } finally {
       setSaving(false);
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="home-container">
-        <div className="header">
-          <div className="header-content">
-            <h1 className="header-title">Set Levels</h1>
-          </div>
-        </div>
-        <div className="main-content" style={{ textAlign: 'center', padding: '60px 20px' }}>
-          <p style={{ color: '#94a3b8' }}>Loading exercises...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!exercises || exercises.length === 0) {
-    return (
-      <div className="home-container">
-        <div className="header">
-          <div className="header-content">
-            <h1 className="header-title">Set Levels</h1>
-            <button
-              className="header-close-btn"
-              onClick={() => navigate('/profile')}
-              title="Close"
-            >
-              ✕
-            </button>
-          </div>
-        </div>
-        <div className="main-content" style={{ textAlign: 'center', padding: '60px 20px' }}>
-          <p style={{ color: '#94a3b8' }}>No exercises found</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="home-container">
+    <>
       <div className="header">
         <div className="header-content">
-          <h1 className="header-title">Set Levels</h1>
-          <button
-            className="header-close-btn"
-            onClick={() => navigate('/profile')}
-            title="Close"
-          >
-            ✕
-          </button>
+          <div className="header-logo">COR<span>VIS</span></div>
+          <button className="header-close-btn" onClick={() => navigate('/profile')}>✕</button>
         </div>
       </div>
-
-        {feedback && (
-          <div style={{
-            padding: '12px 16px',
-            margin: '12px 16px 0',
-            borderRadius: '8px',
-            backgroundColor: feedback.type === 'success' ? 'rgba(16, 185, 129, 0.15)' : feedback.type === 'error' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(59, 130, 246, 0.15)',
-            borderLeft: `4px solid ${feedback.type === 'success' ? '#10b981' : feedback.type === 'error' ? '#ef4444' : '#3b82f6'}`,
-            color: feedback.type === 'success' ? '#10b981' : feedback.type === 'error' ? '#ef4444' : '#3b82f6',
-            fontSize: '14px',
-            fontWeight: '500'
-          }}>
-            {feedback.msg}
-          </div>
-        )}
 
       <div className="main-content">
-        <div className="progression-settings-card">
-          <p className="progression-settings-desc">Choose your current level for each exercise</p>
+        {feedback && (
+          <div className={`feedback-bar ${feedback.type}`}>{feedback.msg}</div>
+        )}
 
-          {exercises.map(exercise => {
-            const key = String(exercise.id);
-            const prog = userProgressions[key];
-            const progressionsList = exerciseDetails[key] || exercise.progressions || [];
-            
-            if (!prog || !progressionsList || progressionsList.length === 0) {
-              return null;
-            }
-
-            const currentProgId = progressions[key];
-            const currentProgName = progressionsList.find(p => p.id === currentProgId)?.name || 'Not set';
-
-            return (
-              <div key={exercise.id} className="progression-setting-item">
-                <div className="progression-setting-header">
-                  <span className="progression-setting-icon">
-                    {exercise.name === 'Push-ups' ? '🚀' : '🔥'}
-                  </span>
-                  <h3 className="progression-setting-name">{exercise.name}</h3>
-                </div>
-
-                <div className="progression-levels-grid">
-                  {progressionsList.map((progressionLevel, idx) => (
-                    <button
-                      key={progressionLevel.id}
-                      className={`progression-level-btn ${currentProgId === progressionLevel.id ? 'active' : ''}`}
-                      onClick={() => handleProgressionChange(exercise.id, progressionLevel.id)}
-                      title={progressionLevel.name}
-                    >
-                      <p className="progression-level-number">Lvl {idx + 1}</p>
-                      <p className="progression-level-name">{progressionLevel.name}</p>
-                    </button>
-                  ))}
-                </div>
-
-                <p className="progression-setting-current">
-                  Current: {currentProgName}
-                </p>
-              </div>
-            );
-          })}
-        </div>
-
-        <button
-          className="progression-save-btn"
-          onClick={handleSave}
-          disabled={saving}
-        >
-          {saving ? 'Saving...' : 'Save Levels'}
-        </button>
-
-        <p className="progression-setting-info">
-          💡 You can always adjust your level later as your strength improves
+        <p className="progression-desc">
+          Wähle dein aktuelles Level für jede Übung. Dieses Level wird im Dashboard und im Training verwendet.
         </p>
+
+        {exercises.map(exercise => {
+          const key = String(exercise.id);
+          const progressions = exercise.progressions || [];
+          const currentId = selected[key];
+          const currentName = progressions.find(p => p.id === currentId)?.name || '—';
+
+          return (
+            <div key={exercise.id} className="progression-exercise-block">
+              <p className="progression-exercise-title">{exercise.name}</p>
+              <p className="progression-exercise-current">
+                Aktuell: <span>{currentName}</span>
+              </p>
+              <div className="progression-levels">
+                {progressions.map((prog, idx) => (
+                  <button
+                    key={prog.id}
+                    className={`progression-level-btn ${currentId === prog.id ? 'active' : ''}`}
+                    onClick={() => setSelected(prev => ({ ...prev, [key]: prog.id }))}
+                  >
+                    <span className="plvl-num">{idx + 1}</span>
+                    <span className="plvl-name">{prog.name}</span>
+                    {currentId === prog.id && <span className="plvl-check">●</span>}
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+
+        <button className="btn-save" onClick={handleSave} disabled={saving}>
+          {saving ? 'Wird gespeichert...' : 'Level speichern'}
+        </button>
       </div>
-    </div>
+    </>
   );
 }

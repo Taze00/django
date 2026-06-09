@@ -2,99 +2,77 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWorkoutStore } from '../stores/workoutStore';
 
+const DAY_FULL = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
+
 export default function TrainingDaysView() {
   const navigate = useNavigate();
   const trainingDays = useWorkoutStore(state => state.trainingDays);
   const updateTrainingDays = useWorkoutStore(state => state.updateTrainingDays);
   const [selectedDays, setSelectedDays] = useState(trainingDays);
   const [saving, setSaving] = useState(false);
+  const [feedback, setFeedback] = useState(null);
 
-  useEffect(() => {
-    setSelectedDays(trainingDays);
-  }, [trainingDays]);
+  useEffect(() => { setSelectedDays(trainingDays); }, [trainingDays]);
 
-  const handleToggleDay = (day) => {
-    setSelectedDays(prev =>
-      prev.includes(day)
-        ? prev.filter(d => d !== day)
-        : [...prev, day].sort((a, b) => a - b)
-    );
-  };
+  const toggle = day => setSelectedDays(prev =>
+    prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day].sort((a, b) => a - b)
+  );
 
   const handleSave = async () => {
-    if (selectedDays.length === 0) {
-      alert('Please select at least one day to train');
-      return;
-    }
-
+    if (selectedDays.length === 0) { setFeedback({ type: 'error', msg: 'Mindestens einen Tag auswählen.' }); return; }
     setSaving(true);
     try {
       await updateTrainingDays(selectedDays);
-      alert('Training days updated successfully');
-      navigate('/profile');
-    } catch (error) {
-      alert('Failed to update training days');
+      setFeedback({ type: 'success', msg: 'Gespeichert!' });
+      setTimeout(() => navigate('/profile'), 900);
+    } catch {
+      setFeedback({ type: 'error', msg: 'Speichern fehlgeschlagen.' });
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <div className="home-container">
+    <>
       <div className="header">
         <div className="header-content">
-          <h1 className="header-title">Training Days</h1>
-          <button
-            className="header-close-btn"
-            onClick={() => navigate('/profile')}
-            title="Close"
-          >
-            ✕
-          </button>
+          <div className="header-logo">COR<span>VIS</span></div>
+          <button className="header-close-btn" onClick={() => navigate('/profile')}>✕</button>
         </div>
       </div>
 
       <div className="main-content">
-        <div className="training-days-card">
-          <p className="training-days-desc">Select which days you want to train</p>
+        {feedback && <div className={`feedback-bar ${feedback.type}`}>{feedback.msg}</div>}
 
-          <div className="week-grid-inline">
-            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, idx) => {
-              const dayNum = idx + 1;
-              const isActive = selectedDays.includes(dayNum);
-              return (
-                <button
-                  key={dayNum}
-                  className={`week-day ${isActive ? 'active' : 'inactive'}`}
-                  onClick={() => handleToggleDay(dayNum)}
-                  title={`${isActive ? 'Remove' : 'Add'} ${day}`}
-                >
-                  <p className="week-day-name">{day}</p>
-                  <p className="week-day-status">{isActive ? '✓' : '○'}</p>
-                </button>
-              );
-            })}
-          </div>
+        <p className="progression-desc">
+          Wähle deine Trainingstage. An diesen Tagen wird der Kalender markiert.
+        </p>
 
-          <div className="training-days-info">
-            <p className="training-days-count">
-              {selectedDays.length} day{selectedDays.length !== 1 ? 's' : ''} selected
-            </p>
-          </div>
+        <div className="days-grid">
+          {DAY_FULL.map((name, idx) => {
+            const dayNum = idx + 1;
+            const isSelected = selectedDays.includes(dayNum);
+            return (
+              <button
+                key={dayNum}
+                className={`day-btn ${isSelected ? 'selected' : ''}`}
+                onClick={() => toggle(dayNum)}
+              >
+                <span className="day-btn-name">{name}</span>
+                <span className="day-btn-indicator" />
+              </button>
+            );
+          })}
         </div>
 
-        <button
-          className="training-days-save-btn"
-          onClick={handleSave}
-          disabled={saving}
-        >
-          {saving ? 'Saving...' : 'Save Changes'}
-        </button>
-
-        <p className="training-days-recommendation-bottom">
-          💡 Recommended: 4-5 days per week for optimal recovery and progress
+        <p style={{ fontSize: '0.58rem', color: 'var(--muted)', letterSpacing: '0.3px', marginBottom: '1.5rem' }}>
+          {selectedDays.length} von 7 Tagen · Empfehlung: 4–5 Tage
         </p>
+
+        <button className="btn-save" onClick={handleSave} disabled={saving}>
+          {saving ? 'Wird gespeichert...' : 'Speichern'}
+        </button>
       </div>
-    </div>
+    </>
   );
 }

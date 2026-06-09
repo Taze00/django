@@ -1,60 +1,36 @@
 import { useState } from 'react';
 
+const ITEMS = ['Handgelenke', 'Schultern', 'Ellbogen', 'Rücken', 'Beine'];
+
 export default function WarmupChecklist({ onComplete }) {
-  const [checks, setChecks] = useState({
-    wrists: false,
-    shoulders: false,
-    elbows: false,
-    back: false,
-    legs: false,
-  });
+  const [checked, setChecked] = useState({});
 
-  const handleToggle = (key) => {
-    setChecks(prev => ({
-      ...prev,
-      [key]: !prev[key]
-    }));
-  };
-
-  const allChecked = Object.values(checks).every(v => v === true);
+  const toggle = item => setChecked(prev => ({ ...prev, [item]: !prev[item] }));
+  const allDone = ITEMS.every(i => checked[i]);
 
   return (
-    <div className="workout-container">
-      <div className="workout-bg-orb workout-bg-orb-1"></div>
-      <div className="workout-bg-orb workout-bg-orb-2"></div>
+    <div className="warmup-shell">
+      <p className="warmup-title">Aufwärmen</p>
+      <p className="warmup-sub">Beweg kurz durch die Liste — dann geht's los.</p>
 
-      <div className="workout-card">
-        <h2 className="workout-title">Warm-up Checklist</h2>
-        <p className="workout-subtitle">Make sure to warm up these areas</p>
-
-        <div className="warmup-checklist">
-          {[
-            { key: 'wrists', label: 'Wrists', emoji: '🦗' },
-            { key: 'shoulders', label: 'Shoulders', emoji: '💪' },
-            { key: 'elbows', label: 'Elbows', emoji: '📐' },
-            { key: 'back', label: 'Back', emoji: '🔙' },
-            { key: 'legs', label: 'Legs', emoji: '🦵' },
-          ].map(item => (
-            <button
-              key={item.key}
-              className={`warmup-item ${checks[item.key] ? 'checked' : ''}`}
-              onClick={() => handleToggle(item.key)}
-            >
-              <span className="warmup-emoji">{item.emoji}</span>
-              <span className="warmup-label">{item.label}</span>
-              <span className="warmup-checkbox">{checks[item.key] ? '✓' : ''}</span>
-            </button>
-          ))}
-        </div>
-
-        <button
-          className="btn-submit-workout"
-          onClick={() => onComplete(checks)}
-          disabled={!allChecked}
-        >
-          {allChecked ? 'Start Workout' : 'Complete warm-up first'}
-        </button>
+      <div className="warmup-list">
+        {ITEMS.map(item => (
+          <div
+            key={item}
+            className={`warmup-item ${checked[item] ? 'checked' : ''}`}
+            onClick={() => toggle(item)}
+          >
+            <div className="warmup-check">
+              {checked[item] && <span className="warmup-check-inner">✓</span>}
+            </div>
+            <span className="warmup-item-label">{item}</span>
+          </div>
+        ))}
       </div>
+
+      <button className="btn-warmup-done" onClick={onComplete} disabled={!allDone}>
+        {allDone ? 'Training starten →' : `Noch ${ITEMS.filter(i => !checked[i]).length} offen`}
+      </button>
     </div>
   );
 }

@@ -1,68 +1,31 @@
 import { useState } from 'react';
 
 export default function DropSetInstructions({ exercise, progressions, onComplete }) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [dropSetStatus, setDropSetStatus] = useState(null); // 'completed' or 'skipped'
-
-  const handleComplete = async (completed) => {
-    setIsSubmitting(true);
-    try {
-      await onComplete(completed);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return (
-    <div className="workout-container">
-      <div className="workout-bg-orb workout-bg-orb-1"></div>
-      <div className="workout-bg-orb workout-bg-orb-2"></div>
+    <div className="workout-main">
+      <p className="workout-exercise-cat">Drop-Set</p>
+      <p className="workout-exercise-name">{exercise.name}</p>
+      <p className="workout-set-label">Geh durch die Varianten bis zur Erschöpfung</p>
 
-      <div className="workout-card">
-        {/* Header */}
-        <div className="drop-set-header" style={{ animation: 'fadeIn 0.5s ease-out' }}>
-          <h2 className="workout-title" style={{ fontSize: '1.8rem' }}>🔥 DROP-SET 🔥</h2>
-        </div>
+      <p className="drop-set-intro">
+        Starte mit deiner aktuellen Variante. Wenn du nicht mehr kannst, wechsle zur nächst einfacheren und mach weiter.
+      </p>
 
-        {/* Progression Sequence */}
-        <div className="drop-set-sequence">
-          {progressions.map((prog, idx) => (
-            <div
-              key={prog.id}
-              className="drop-set-progression"
-              style={{ animation: `slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) ${idx * 0.1}s both` }}
-            >
-              <div className="drop-set-number">{idx + 1}</div>
-              <div className="drop-set-info">
-                <p className="drop-set-name">{prog.name}</p>
-                {idx === 0 ? (
-                  <p className="drop-set-start">▶ Start here</p>
-                ) : (
-                  <p className="drop-set-next">↓ Drop & continue to failure</p>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Complete Buttons */}
-        <div className="button-group">
-          <button
-            className="btn-large btn-plus"
-            onClick={() => handleComplete(true)}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Saving...' : 'Completed'}
-          </button>
-          <button
-            className="btn-large btn-stop"
-            onClick={() => handleComplete(false)}
-            disabled={isSubmitting}
-          >
-            Skipped
-          </button>
-        </div>
+      <div className="drop-set-ladder">
+        {progressions.map((prog, idx) => (
+          <div key={prog.id} className="drop-set-item">
+            <span className="drop-item-idx">{idx + 1}</span>
+            <span className="drop-item-name">{prog.name}</span>
+          </div>
+        ))}
       </div>
+
+      <button className="btn-drop-done" onClick={() => onComplete(true)}>
+        Drop-Set abgeschlossen ✓
+      </button>
+      <button className="btn-drop-skip" onClick={() => onComplete(false)}>
+        Überspringen
+      </button>
     </div>
   );
 }

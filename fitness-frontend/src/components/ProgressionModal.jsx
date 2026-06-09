@@ -1,76 +1,120 @@
-import { useState } from 'react';
+import { useEffect, useRef } from 'react';
 
-export default function ProgressionModal({ upgrades, downgrades, onClose }) {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  
-  const allItems = [
-    ...upgrades.map(u => ({ ...u, type: 'upgrade' })),
-    ...downgrades.map(d => ({ ...d, type: 'downgrade' }))
-  ];
+function Confetti({ count = 60 }) {
+  const colors = ['#FF4D00', '#ff6a2a', '#f0ede8', '#ffb347', '#fff'];
+  const pieces = Array.from({ length: count }, (_, i) => ({
+    id: i,
+    color: colors[i % colors.length],
+    left: Math.random() * 100,
+    delay: Math.random() * 1.2,
+    size: 5 + Math.random() * 7,
+    duration: 1.8 + Math.random() * 1.4,
+    rotate: Math.random() * 360,
+  }));
+  return (
+    <div className="confetti-wrap" aria-hidden="true">
+      {pieces.map(p => (
+        <div
+          key={p.id}
+          className="confetti-piece"
+          style={{
+            left: `${p.left}%`,
+            width: p.size,
+            height: p.size * 0.6,
+            background: p.color,
+            animationDelay: `${p.delay}s`,
+            animationDuration: `${p.duration}s`,
+            transform: `rotate(${p.rotate}deg)`,
+          }}
+        />
+      ))}
+    </div>
+  );
+}
 
-  if (allItems.length === 0) {
-    return (
-      <div className="progression-complete">
-        <div className="progression-complete-card">
-          <div className="progression-complete-emoji">💯</div>
-          <h1 className="progression-complete-title">Workout Complete!</h1>
-          <p className="progression-complete-subtitle">Great effort! You're on track with your progression.</p>
-          <button className="progression-complete-btn" onClick={onClose}>Back to Home</button>
-        </div>
+function UpgradeCard({ item, idx }) {
+  return (
+    <div className="lvl-card" style={{ animationDelay: `${0.15 + idx * 0.1}s` }}>
+      <div className="lvl-card-top">
+        <span className="lvl-card-arrow">↑</span>
+        <span className="lvl-card-ex">{item.exercise}</span>
       </div>
-    );
-  }
+      <div className="lvl-card-body">
+        <div className="lvl-num-wrap">
+          <span className="lvl-num old">{item.from_level}</span>
+          <span className="lvl-arrow-big">→</span>
+          <span className="lvl-num new">{item.to_level}</span>
+        </div>
+        {item.to_progression && (
+          <p className="lvl-new-name">{item.to_progression}</p>
+        )}
+        {item.is_max_level && (
+          <p className="lvl-max-badge">MAX LEVEL</p>
+        )}
+      </div>
+    </div>
+  );
+}
 
-  const currentItem = allItems[currentIndex];
-  const isUpgrade = currentItem.type === 'upgrade';
-  const isMaxLevel = currentItem.is_max_level;
-  
-  const handleNext = () => {
-    if (currentIndex < allItems.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    } else {
-      onClose();
-    }
-  };
+function DowngradeCard({ item, idx }) {
+  return (
+    <div className="lvl-card lvl-card--down" style={{ animationDelay: `${0.15 + idx * 0.1}s` }}>
+      <div className="lvl-card-top">
+        <span className="lvl-card-arrow down">↓</span>
+        <span className="lvl-card-ex">{item.exercise}</span>
+      </div>
+      <div className="lvl-card-body">
+        <div className="lvl-num-wrap">
+          <span className="lvl-num old">{item.from_level}</span>
+          <span className="lvl-arrow-big">→</span>
+          <span className="lvl-num new dim">{item.to_level}</span>
+        </div>
+        {item.to_progression && (
+          <p className="lvl-new-name muted">{item.to_progression}</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function ProgressionModal({ upgrades = [], downgrades = [], onClose }) {
+  const hasUpgrades = upgrades.length > 0;
+  const hasChanges = upgrades.length + downgrades.length > 0;
 
   return (
-    <div className="progression-complete">
-      <div className="progression-complete-card">
-        {isMaxLevel ? (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      {hasUpgrades && <Confetti />}
+
+      <div className="lvl-modal-box">
+        {hasUpgrades ? (
           <>
-            <div className="progression-complete-emoji">👑</div>
-            <h1 className="progression-complete-title">MASTERED!</h1>
-            <p className="progression-complete-subtitle">You've reached the peak with {currentItem.exercise}!</p>
+            <p className="lvl-modal-eyebrow">— Level Update</p>
+            <h2 className="lvl-modal-title">
+              WEITER<span>GEKOMMEN</span>
+            </h2>
+            <p className="lvl-modal-sub">Du hast die Zielwerte erreicht.</p>
           </>
-        ) : isUpgrade ? (
+        ) : hasChanges ? (
           <>
-            <div className="progression-complete-emoji">🎉</div>
-            <h1 className="progression-complete-title">LEVEL UP!</h1>
-            <p className="progression-complete-subtitle">You've mastered {currentItem.exercise}!</p>
-            <div className="progression-info">
-              <p className="progression-label">Next Level</p>
-              <p className="progression-value">{currentItem.to_progression}</p>
-            </div>
+            <p className="lvl-modal-eyebrow">— Level Update</p>
+            <h2 className="lvl-modal-title">LEVEL<span>ANPASSUNG</span></h2>
           </>
         ) : (
           <>
-            <div className="progression-complete-emoji">💪</div>
-            <h1 className="progression-complete-title">Keep Building</h1>
-            <p className="progression-complete-subtitle">Let's master {currentItem.exercise} more!</p>
-            <div className="progression-info">
-              <p className="progression-label">Current Level</p>
-              <p className="progression-value">{currentItem.to_progression}</p>
-            </div>
+            <p className="lvl-modal-eyebrow">— Workout</p>
+            <h2 className="lvl-modal-title">ABGE<span>SCHLOSSEN</span></h2>
+            <p className="lvl-modal-sub">Weiter so — gleiches Level beibehalten.</p>
           </>
         )}
-        
-        <button className="progression-complete-btn" onClick={handleNext}>
-          {currentIndex < allItems.length - 1 ? 'Next' : 'Done'}
-        </button>
 
-        {allItems.length > 1 && (
-          <p className="progression-counter">{currentIndex + 1}/{allItems.length}</p>
-        )}
+        <div className="lvl-cards">
+          {upgrades.map((u, i) => <UpgradeCard key={i} item={u} idx={i} />)}
+          {downgrades.map((d, i) => <DowngradeCard key={i} item={d} idx={upgrades.length + i} />)}
+        </div>
+
+        <button className="modal-close-btn" onClick={onClose}>
+          Fertig →
+        </button>
       </div>
     </div>
   );

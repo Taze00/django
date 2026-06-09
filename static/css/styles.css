@@ -960,6 +960,23 @@ section {
     transform: scale(1.05);
 }
 
+.gallery-video-icon {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 32px;
+    height: 32px;
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 12px;
+    pointer-events: none;
+    backdrop-filter: blur(4px);
+}
+
 .gallery-overlay {
     position: absolute;
     bottom: 0;

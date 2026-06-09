@@ -17,3 +17,7 @@ def festival_page(request):
 
 def skills_page(request):
     return render(request, 'skills.html')
+
+def fitness_landing_page(request):
+    return render(request, 'fitness-landing.html')
+
