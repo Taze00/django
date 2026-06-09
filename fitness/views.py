@@ -430,6 +430,95 @@ def complete_onboarding(request):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
+def calibrate_onboarding(request):
+    """
+    Hybrid calibration: user self-assesses a level and performs one test set per
+    exercise. CORVIS adjusts the starting level and saves it.
+
+    Expected payload:
+    {
+      "training_days": [1,2,4,5,6],
+      "results": [
+        {"exercise": 1, "self_assessed_level": 4, "test_result": 12},
+        {"exercise": 2, "self_assessed_level": 6, "test_result": 0},
+        {"exercise": 3, "self_assessed_level": 3, "test_result": 45}
+      ]
+    }
+    """
+    from fitness.calibration import calibrate_level
+
+    training_days = request.data.get('training_days', [1, 2, 3, 4, 5])
+    results = request.data.get('results', [])
+
+    if not results:
+        return Response({'error': 'No calibration results provided'},
+                        status=status.HTTP_400_BAD_REQUEST)
+
+    calibrated = []
+
+    for item in results:
+        exercise_id = item.get('exercise')
+        self_assessed = item.get('self_assessed_level')
+        test_result = item.get('test_result', 0)
+
+        try:
+            exercise = Exercise.objects.get(id=exercise_id)
+        except Exercise.DoesNotExist:
+            continue
+
+        progressions = list(exercise.progressions.all())
+        if not progressions:
+            continue
+
+        calc = calibrate_level(progressions, int(self_assessed), test_result)
+
+        target_prog = next(
+            (p for p in progressions if p.level == calc['calibrated_level']),
+            None
+        )
+        if target_prog is None:
+            continue
+
+        # Save the calibrated level for this exercise.
+        UserExerciseProgression.objects.update_or_create(
+            user=request.user,
+            exercise=exercise,
+            defaults={
+                'current_progression': target_prog,
+                'sessions_at_target': 0,
+                'custom_target': None,
+                'is_first_session': True,
+                'training_days': training_days,
+            }
+        )
+
+        calibrated.append({
+            'exercise': exercise.name,
+            'exercise_id': exercise.id,
+            'self_assessed_level': calc['self_assessed_level'],
+            'calibrated_level': calc['calibrated_level'],
+            'delta': calc['delta'],
+            'reason': calc['reason'],
+            'progression_name': target_prog.name,
+            'target_type': target_prog.target_type,
+            'target_value': target_prog.target_value,
+        })
+
+    # Mark onboarding complete.
+    profile, _ = UserProfile.objects.get_or_create(user=request.user)
+    profile.training_days = training_days
+    profile.onboarding_completed = True
+    profile.save()
+
+    return Response({
+        'status': 'calibrated',
+        'training_days': training_days,
+        'results': calibrated,
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def reset_onboarding(request):
     """Reset onboarding and all user progress for the current user"""
     user = request.user

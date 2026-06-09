@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎪 Festival Checkliste</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #0f0f13;
+      font-family: 'Trebuchet MS', 'Lucida Grande', sans-serif;
+      color: #f0ece4;
+      padding-bottom: 60px;
+    }
+
+    /* Header */
+    #header {
+      background: linear-gradient(135deg, #1a1025 0%, #0f1a20 100%);
+      border-bottom: 2px solid #2a2a3a;
+      padding: 28px 20px 20px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    #header .subtitle {
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: #888;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    #header h1 {
+      font-size: 28px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      color: #fff;
+    }
+    #progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #aaa;
+      margin: 16px 0 6px;
+    }
+    #progress-pct { font-weight: 700; color: #f472b6; }
+    #progress-bar-bg {
+      height: 6px;
+      background: #1e1e2e;
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    #progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #f472b6, #fb923c);
+      border-radius: 99px;
+      transition: width 0.4s cubic-bezier(.4,0,.2,1);
+    }
+    #done-msg {
+      display: none;
+      margin-top: 10px;
+      font-size: 13px;
+      color: #4ade80;
+      font-weight: 700;
+    }
+
+    /* Tabs */
+    #tabs {
+      display: flex;
+      gap: 8px;
+      padding: 14px 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      border-bottom: 1px solid #1e1e2e;
+      background: #0f0f13;
+      position: sticky;
+      top: 145px;
+      z-index: 9;
+    }
+    #tabs::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      background: #1a1a28;
+      color: #aaa;
+      border: none;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: #f472b6;
+      color: #fff;
+    }
+
+    /* Desktop layout */
+    @media (min-width: 768px) {
+      #header { padding: 28px 0 20px; }
+      #header > * { max-width: 720px; margin-left: auto; margin-right: auto; }
+      #header > a { max-width: none; position: absolute; top: 12px; left: calc(50% - 360px); }
+      #tabs { justify-content: center; }
+      #filter-bar { max-width: 720px; margin: 0 auto; }
+      #content { max-width: 720px; margin: 0 auto; }
+      #reset-wrap { max-width: 720px; margin: 8px auto 0; }
+    }
+
+    /* Content */
+    #content { padding: 16px; }
+
+    .category { margin-bottom: 24px; }
+    .cat-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .cat-badge {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 4px;
+    }
+    .cat-count { font-size: 12px; color: #888; }
+
+    .essential-badge {
+      background: #fbbf24;
+      color: #000;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      padding: 3px 10px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .items { display: flex; flex-direction: column; gap: 6px; }
+
+    .item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      background: #17171f;
+      border: 1px solid #2a2a3a;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .item.checked {
+      background: #141414;
+      border-color: #2a2a2a;
+    }
+    .item.checked-essential {
+      background: #141a10;
+      border-color: #2a4a20;
+    }
+
+    .checkbox {
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      border: 2px solid #444;
+      background: transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.15s;
+      font-size: 11px;
+      color: #000;
+      font-weight: 900;
+    }
+
+    .item-label {
+      font-size: 14px;
+      color: #f0ece4;
+      transition: all 0.15s;
+    }
+    .item.checked .item-label,
+    .item.checked-essential .item-label {
+      color: #555;
+      text-decoration: line-through;
+    }
+
+    /* Filter bar */
+    #filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding: 10px 16px 0;
+    }
+    #filter-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #1a1a28;
+      border: 1px solid #2a2a3a;
+      color: #aaa;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    #filter-btn.active {
+      background: #fb923c22;
+      border-color: #fb923c66;
+      color: #fb923c;
+    }
+    #filter-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: #fb923c;
+      display: none;
+    }
+    #filter-btn.active #filter-dot { display: block; }
+
+    /* Reset */
+    #reset-wrap { text-align: center; margin-top: 8px; }
+    #reset-btn {
+      background: transparent;
+      border: 1px solid #333;
+      color: #666;
+      border-radius: 8px;
+      padding: 8px 20px;
+      font-size: 12px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    #reset-btn:hover { border-color: #555; color: #999; }
+  </style>
+</head>
+<body>
+
+<div id="header">
+  <a href="/" style="position:absolute;top:12px;left:16px;font-size:11px;color:#555;text-decoration:none;letter-spacing:1px;">← Home</a>
+  <div class="subtitle">Festival Checkliste · 4–5 Tage · Zelten</div>
+  <h1>🎪 Pack deinen Kram!</h1>
+  <div id="progress-label">
+    <span id="progress-text">0 von 0 Sachen eingepackt</span>
+    <span id="progress-pct">0%</span>
+  </div>
+  <div id="progress-bar-bg"><div id="progress-bar"></div></div>
+  <div id="done-msg">🎉 Alles eingepackt – viel Spaß auf dem Festival!</div>
+</div>
+
+<div id="tabs"></div>
+<div id="filter-bar">
+  <button id="filter-btn" onclick="toggleFilter()">
+    <div id="filter-dot"></div>
+    Noch nicht eingepackt
+  </button>
+</div>
+<div id="content"></div>
+
+<div id="reset-wrap">
+  <button id="reset-btn" onclick="resetAll()">↺ Zurücksetzen</button>
+</div>
+
+<script>
+  const data = {
+    essentials: {
+      label: "⚡ Wichtig",
+      color: "#fbbf24",
+      isEssential: true,
+      items: [
+        "🎫 Festivalticket",
+        "🪪 Personalausweis",
+        "💳 EC-Karte & Bargeld",
+        "📱 Smartphone + Ladekabel",
+        "🔋 Powerbank",
+      ]
+    },
+    camping: {
+      label: "⛺ Camping & Schlafen",
+      color: "#4ade80",
+      items: [
+        "Zelt",
+        "Schlafsack",
+        "Isomatte",
+        "Kleines Schloss für Zeltverschluss",
+        "Campingstuhl",
+        "Campingtisch",
+        "Gummihammer",
+      ]
+    },
+    kleidung: {
+      label: "👗 Kleidung & Mode",
+      color: "#f472b6",
+      items: [
+        "T-Shirts",
+        "Lange Hose",
+        "Kurze Hose",
+        "Jogginghose",
+        "Badehose",
+        "Regenjacke",
+        "Pullover",
+        "Unterwäsche",
+        "Socken",
+        "Schuhe",
+        "Latschen",
+        "Cap",
+        "Sonnenbrille",
+        "Bauchtasche",
+      ]
+    },
+    essen: {
+      label: "🍕 Essen & Trinken",
+      color: "#fb923c",
+      items: [
+        "Snacks",
+        "Campingessen",
+        "Campingkocher + Gaskartusche",
+        "Topf & Besteck",
+        "Becher / Schüssel",
+        "Dosenöffner",
+        "Kühltasche",
+        "Kühlakkus",
+        "Müllbeutel",
+        "Zewa",
+        "Lappen",
+      ]
+    },
+    hygiene: {
+      label: "🧴 Hygiene & Gesundheit",
+      color: "#60a5fa",
+      items: [
+        "Toilettenpapier",
+        "Zahnbürste & Zahnpasta",
+        "Duschgel",
+        "Deo",
+        "Sonnencreme",
+        "Handdesinfektionsmittel",
+        "Feuchttücher",
+        "Taschentücher",
+        "Handtücher",
+        "Schmerzmittel (Ibuprofen, Paracetamol)",
+        "Pflaster",
+        "Mückenspray",
+        "Ohrstöpsel",
+        "Medikamente (persönliche)",
+      ]
+    }
+  };
+
+  let checked = JSON.parse(localStorage.getItem('festival-checklist') || '{}');
+  let activeTab = 'all';
+  let filterOnly = false;
+
+  function toggleFilter() {
+    filterOnly = !filterOnly;
+    document.getElementById('filter-btn').classList.toggle('active', filterOnly);
+    render();
+  }
+
+  function save() {
+    localStorage.setItem('festival-checklist', JSON.stringify(checked));
+  }
+
+  function toggle(key) {
+    checked[key] = !checked[key];
+    save();
+    render();
+  }
+
+  function resetAll() {
+    checked = {};
+    save();
+    render();
+  }
+
+  function setTab(tab) {
+    activeTab = tab;
+    render();
+  }
+
+  function getAllItems() {
+    let all = [];
+    for (const [catId, cat] of Object.entries(data)) {
+      cat.items.forEach((_, i) => all.push(`${catId}-${i}`));
+    }
+    return all;
+  }
+
+  function updateProgress() {
+    const all = getAllItems();
+    const total = all.length;
+    const done = all.filter(k => checked[k]).length;
+    const pct = total ? Math.round((done / total) * 100) : 0;
+
+    document.getElementById('progress-text').textContent = `${done} von ${total} Sachen eingepackt`;
+    document.getElementById('progress-pct').textContent = `${pct}%`;
+    document.getElementById('progress-pct').style.color = pct === 100 ? '#4ade80' : '#f472b6';
+
+    const bar = document.getElementById('progress-bar');
+    bar.style.width = pct + '%';
+    bar.style.background = pct === 100
+      ? 'linear-gradient(90deg, #4ade80, #22d3ee)'
+      : 'linear-gradient(90deg, #f472b6, #fb923c)';
+
+    document.getElementById('done-msg').style.display = pct === 100 ? 'block' : 'none';
+  }
+
+  function renderTabs() {
+    const tabs = [
+      { id: 'all', label: 'Alle' },
+      { id: 'essentials', label: '⚡ Wichtig' },
+      { id: 'camping', label: '⛺ Camping' },
+      { id: 'kleidung', label: '👗 Kleidung' },
+      { id: 'essen', label: '🍕 Essen' },
+      { id: 'hygiene', label: '🧴 Hygiene' },
+    ];
+    document.getElementById('tabs').innerHTML = tabs.map(t => `
+      <button class="tab-btn ${activeTab === t.id ? 'active' : ''}" onclick="setTab('${t.id}')">${t.label}</button>
+    `).join('');
+  }
+
+  function renderCategories() {
+    const visible = activeTab === 'all' ? Object.keys(data) : [activeTab];
+    let html = '';
+
+    for (const catId of visible) {
+      const cat = data[catId];
+      if (!cat) continue;
+      const filteredItems = cat.items.filter((_, i) => !filterOnly || !checked[`${catId}-${i}`]);
+      if (filteredItems.length === 0) continue;
+      const done = cat.items.filter((_, i) => checked[`${catId}-${i}`]).length;
+      const total = cat.items.length;
+
+      const badgeHtml = cat.isEssential
+        ? `<span class="essential-badge">Unverzichtbar</span>`
+        : `<span class="cat-badge" style="background:${cat.color}22;color:${cat.color};border:1px solid ${cat.color}44">${cat.label}</span>`;
+
+      const itemsHtml = filteredItems.map((item) => {
+        const i = cat.items.indexOf(item);
+        const key = `${catId}-${i}`;
+        const isChecked = !!checked[key];
+        const itemClass = isChecked ? (cat.isEssential ? 'item checked-essential' : 'item checked') : 'item';
+        const cbStyle = isChecked
+          ? `border-color:${cat.isEssential ? '#4ade80' : cat.color};background:${cat.isEssential ? '#4ade80' : cat.color}`
+          : '';
+        return `
+          <div class="${itemClass}" onclick="toggle('${key}')">
+            <div class="checkbox" style="${cbStyle}">${isChecked ? '✓' : ''}</div>
+            <span class="item-label">${item}</span>
+          </div>`;
+      }).join('');
+
+      html += `
+        <div class="category">
+          <div class="cat-header">
+            ${badgeHtml}
+            <span class="cat-count">${done}/${total}</span>
+          </div>
+          <div class="items">${itemsHtml}</div>
+        </div>`;
+    }
+
+    document.getElementById('content').innerHTML = html;
+  }
+
+  function render() {
+    updateProgress();
+    renderTabs();
+    renderCategories();
+  }
+
+  render();
+</script>
+</body>
+</html>

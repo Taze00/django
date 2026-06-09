@@ -1,361 +1,368 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import api from '../api';
 
+const DAYS = [
+  { num: 1, name: 'Montag' },
+  { num: 2, name: 'Dienstag' },
+  { num: 3, name: 'Mittwoch' },
+  { num: 4, name: 'Donnerstag' },
+  { num: 5, name: 'Freitag' },
+  { num: 6, name: 'Samstag' },
+  { num: 7, name: 'Sonntag' },
+];
+
+// Exercise test config. levelOptions = the self-assessment choices the user
+// picks from. defaultLevel = pre-selected sensible middle. testType drives
+// whether the test set is a rep counter or a hold timer.
+const EXERCISES = [
+  {
+    id: 1,
+    key: 'push',
+    name: 'Push-Ups',
+    category: 'PUSH',
+    testType: 'reps',
+    defaultLevel: 4,
+    levels: [
+      { level: 1, name: 'Wall Push-ups', hint: 'Hände an der Wand' },
+      { level: 2, name: 'Incline Push-ups', hint: 'Hände erhöht (Tisch/Bank)' },
+      { level: 3, name: 'Knee Push-ups', hint: 'Auf den Knien' },
+      { level: 4, name: 'Standard Push-ups', hint: 'Klassisch, voller Körper' },
+      { level: 5, name: 'Diamond Push-ups', hint: 'Hände eng zusammen' },
+      { level: 6, name: 'Decline Push-ups', hint: 'Füße erhöht' },
+      { level: 7, name: 'Pseudo Planche', hint: 'Fortgeschritten' },
+    ],
+  },
+  {
+    id: 2,
+    key: 'pull',
+    name: 'Pull-Ups',
+    category: 'PULL',
+    testType: 'mixed',
+    defaultLevel: 4,
+    levels: [
+      { level: 1, name: 'Dead Hang', hint: 'Einfach an der Stange hängen', type: 'time' },
+      { level: 2, name: 'Scapular Shrugs', hint: 'Hängen + Schultern ziehen', type: 'reps' },
+      { level: 3, name: 'Active Hang', hint: 'Aktives Hängen', type: 'time' },
+      { level: 4, name: 'Pull-up Negatives', hint: 'Hochspringen, langsam runter', type: 'reps' },
+      { level: 5, name: 'Band-Assisted Pull-ups', hint: 'Mit Widerstandsband', type: 'reps' },
+      { level: 6, name: 'Standard Pull-ups', hint: 'Voller Klimmzug', type: 'reps' },
+      { level: 7, name: 'Chest-to-Bar', hint: 'Fortgeschritten', type: 'reps' },
+    ],
+  },
+  {
+    id: 3,
+    key: 'plank',
+    name: 'Planks',
+    category: 'CORE',
+    testType: 'time',
+    defaultLevel: 3,
+    levels: [
+      { level: 1, name: 'Knee Plank', hint: 'Auf den Knien' },
+      { level: 2, name: 'Incline Plank', hint: 'Hände erhöht' },
+      { level: 3, name: 'Standard Plank', hint: 'Voller Körper, gerade Linie' },
+      { level: 4, name: 'Feet-Elevated Plank', hint: 'Füße erhöht' },
+      { level: 5, name: 'Extended Plank', hint: 'Arme nach vorne gestreckt' },
+      { level: 6, name: 'RKC Plank', hint: 'Maximale Spannung' },
+      { level: 7, name: 'One-Arm Plank', hint: 'Fortgeschritten' },
+    ],
+  },
+];
+
+// ── Rep counter input ──
+function RepTest({ onSubmit }) {
+  const [reps, setReps] = useState('');
+  return (
+    <div className="onb-test-input">
+      <input
+        className="onb-number-input"
+        type="number"
+        inputMode="numeric"
+        min="0"
+        value={reps}
+        onChange={e => setReps(e.target.value)}
+        autoFocus
+        placeholder="0"
+      />
+      <span className="onb-test-unit">Wiederholungen</span>
+      <button
+        className="onb-btn-primary"
+        onClick={() => onSubmit(parseInt(reps, 10) || 0)}
+        disabled={reps === ''}
+      >
+        Weiter →
+      </button>
+    </div>
+  );
+}
+
+// ── Hold timer input ──
+function TimeTest({ onSubmit }) {
+  const [elapsed, setElapsed] = useState(0);
+  const [running, setRunning] = useState(false);
+  const intervalRef = useRef(null);
+
+  useEffect(() => {
+    if (running) {
+      intervalRef.current = setInterval(() => setElapsed(p => p + 1), 1000);
+    } else {
+      clearInterval(intervalRef.current);
+    }
+    return () => clearInterval(intervalRef.current);
+  }, [running]);
+
+  const fmt = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+
+  return (
+    <div className="onb-test-input">
+      <p className={`onb-timer ${running ? 'running' : ''}`}>{fmt(elapsed)}</p>
+      <button className="onb-btn-timer" onClick={() => setRunning(r => !r)}>
+        {running ? '⏸ Stop' : elapsed > 0 ? '▶ Weiter' : '▶ Start'}
+      </button>
+      <button
+        className="onb-btn-primary"
+        onClick={() => onSubmit(elapsed)}
+        disabled={elapsed === 0}
+      >
+        Weiter →
+      </button>
+    </div>
+  );
+}
+
 export default function OnboardingView() {
   const navigate = useNavigate();
   const user = useAuthStore(state => state.user);
-  const [currentStep, setCurrentStep] = useState(1);
+
+  // Steps: 0=welcome, 1=days, 2..4=exercise tests, 5=reveal
+  const [step, setStep] = useState(0);
+  const [selectedDays, setSelectedDays] = useState([1, 2, 4, 5, 6]);
+  const [assessments, setAssessments] = useState({}); // {exId: level}
+  const [results, setResults] = useState({});         // {exId: testValue}
+  const [calibrated, setCalibrated] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Form state
-  const [selectedDays, setSelectedDays] = useState([1, 2, 4, 5, 6]); // Mon, Tue, Thu, Fri, Sat // Mon-Fri by default
-  const [pushLevel, setPushLevel] = useState(4);
-  const [pullLevel, setPullLevel] = useState(1);
-  const [plankLevel, setPlankLevel] = useState(3);
+  // For the per-exercise test screen: track sub-phase (assess | test)
+  const [phase, setPhase] = useState('assess');
 
-  const weekDays = [
-    { num: 1, name: 'Monday' },
-    { num: 2, name: 'Tuesday' },
-    { num: 3, name: 'Wednesday' },
-    { num: 4, name: 'Thursday' },
-    { num: 5, name: 'Friday' },
-    { num: 6, name: 'Saturday' },
-    { num: 7, name: 'Sunday' },
-  ];
+  const exIndex = step - 2; // 0,1,2 during exercise steps
+  const currentEx = exIndex >= 0 && exIndex < EXERCISES.length ? EXERCISES[exIndex] : null;
 
-  const pushOptions = [
-    { level: 1, name: 'Wall Push-ups', desc: 'Level 1: Hands on wall, body straight. Easiest.' },
-    { level: 2, name: 'Incline Push-ups', desc: 'Level 2: Hands on bench/table.' },
-    { level: 3, name: 'Knee Push-ups', desc: 'Level 3: On your knees. Medium difficulty. Min 4-5 reps' },
-    { level: 4, name: 'Standard Push-ups', desc: 'Level 4: Full body weight. Classic. Min 4-5 reps' },
-    { level: 5, name: 'Diamond Push-ups', desc: 'Level 5: Hands close together. Hard on triceps. Min 4-5 reps' },
-    { level: 6, name: 'Decline Push-ups', desc: 'Level 6: Feet elevated. Very hard. Min 4-5 reps' },
-    { level: 7, name: 'Pseudo Planche', desc: 'Level 7: Advanced strength. Super hard. Min 4-5 reps' },
-  ];
+  const toggleDay = num => setSelectedDays(prev =>
+    prev.includes(num) ? prev.filter(d => d !== num) : [...prev, num].sort((a, b) => a - b)
+  );
 
-  const pullOptions = [
-    { level: 1, name: 'Dead Hang', desc: 'Level 1: Just hang from the bar. Hold 10-15 seconds minimum' },
-    { level: 2, name: 'Scapular Shrugs', desc: 'Level 2: Hang with shoulder engagement. 10+ reps' },
-    { level: 3, name: 'Active Hang', desc: 'Level 3: Engaged hang. Hold 10-15 seconds' },
-    { level: 4, name: 'Pull-up Negatives', desc: 'Level 4: Jump up, lower yourself. Min 1-2 controlled reps' },
-    { level: 5, name: 'Band-Assisted Pull-ups', desc: 'Level 5: Use a resistance band. Min 1-2 reps' },
-    { level: 6, name: 'Standard Pull-ups', desc: 'Level 6: Full pull-up. Min 1-2 reps' },
-    { level: 7, name: 'Chest-to-Bar', desc: 'Level 7: Advanced pull-up. Min 1 rep' },
-  ];
+  // Determine the test type for the currently self-assessed level.
+  const getTestTypeForLevel = (ex, level) => {
+    if (ex.testType === 'mixed') {
+      const lvl = ex.levels.find(l => l.level === level);
+      return lvl?.type || 'reps';
+    }
+    return ex.testType;
+  };
 
-  const plankOptions = [
-    { level: 1, name: 'Knee Plank', desc: 'Level 1: On your knees. Easier version. Hold 20-30 seconds' },
-    { level: 2, name: 'Incline Plank', desc: 'Level 2: Hands on elevated surface. Hold 30-45 seconds' },
-    { level: 3, name: 'Standard Plank', desc: 'Level 3: Full body weight, straight line. Hold 45-60 seconds' },
-    { level: 4, name: 'Feet-Elevated Plank', desc: 'Level 4: Feet on bench. Hold 45-60 seconds' },
-    { level: 5, name: 'Extended Plank', desc: 'Level 5: Arms extended forward. Hold 30-45 seconds' },
-    { level: 6, name: 'RKC Plank', desc: 'Level 6: Maximum tension, shorter hold. Hold 20-30 seconds' },
-    { level: 7, name: 'One-Arm Plank', desc: 'Level 7: Advanced strength. Hold 15-20 seconds' },
-  ];
+  const handleAssess = level => {
+    setAssessments(prev => ({ ...prev, [currentEx.id]: level }));
+    setPhase('test');
+  };
 
-  const handleNext = () => {
-    if (currentStep < 6) {
-      setCurrentStep(currentStep + 1);
-      setError('');
+  const handleTest = value => {
+    setResults(prev => ({ ...prev, [currentEx.id]: value }));
+    setPhase('assess');
+    if (exIndex < EXERCISES.length - 1) {
+      setStep(step + 1);
+    } else {
+      submitCalibration({ ...results, [currentEx.id]: value });
     }
   };
 
-  const handlePrev = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
-      setError('');
-    }
-  };
-
-  const toggleDay = (dayNum) => {
-    setSelectedDays(prev =>
-      prev.includes(dayNum)
-        ? prev.filter(d => d !== dayNum)
-        : [...prev, dayNum].sort()
-    );
-  };
-
-  const handleComplete = async () => {
+  const submitCalibration = async (finalResults) => {
     setIsLoading(true);
     setError('');
-
     try {
-      console.log('=== Starting onboarding save ===');
-      console.log('Push Level:', pushLevel);
-      console.log('Pull Level:', pullLevel);
-      console.log('Plank Level:', plankLevel);
-      console.log('Selected Days:', selectedDays);
-
-      // Step 1: Get all user progressions
-      console.log('Step 1: Fetching user progressions...');
-      const progressionsRes = await api.get('/user-progressions/');
-      const progressions = progressionsRes.data.results || progressionsRes.data;
-      
-      console.log('Found progressions:', progressions);
-
-      // Step 2: Find progression IDs by exercise
-      const pushProg = progressions.find(p => p.exercise === 1); // Push-ups
-      const pullProg = progressions.find(p => p.exercise === 2); // Pull-ups
-      const plankProg = progressions.find(p => p.exercise === 3); // Planks
-
-      console.log('Progression IDs:', { pushProg: pushProg?.id, pullProg: pullProg?.id, plankProg: plankProg?.id });
-
-      if (!pushProg || !pullProg || !plankProg) {
-        throw new Error('Could not find user progressions. Please refresh and try again.');
-      }
-
-      // Step 3: Update progressions
-      console.log('Step 2: Updating progressions...');
-      const updatePush = api.patch(`/user-progressions/${pushProg.id}/`, {
-        current_progression: pushLevel,
+      const payload = {
         training_days: selectedDays,
-      });
-      
-      const updatePull = api.patch(`/user-progressions/${pullProg.id}/`, {
-        current_progression: pullLevel,
-        training_days: selectedDays,
-      });
-      
-      const updatePlank = api.patch(`/user-progressions/${plankProg.id}/`, {
-        current_progression: plankLevel,
-        training_days: selectedDays,
-      });
+        results: EXERCISES.map(ex => ({
+          exercise: ex.id,
+          self_assessed_level: assessments[ex.id] ?? ex.defaultLevel,
+          test_result: finalResults[ex.id] ?? 0,
+        })),
+      };
+      const res = await api.post('/onboarding/calibrate/', payload);
+      setCalibrated(res.data.results);
 
-      const results = await Promise.all([updatePush, updatePull, updatePlank]);
-      console.log('Progressions updated:', results);
-
-      // Step 4: Mark onboarding as complete
-      console.log('Step 3: Marking onboarding as complete...');
-      const completeResult = await api.post('/onboarding/complete/', {});
-      console.log('Onboarding marked complete:', completeResult);
-
-      // Step 5: Reload user data from backend to get updated onboarding_completed flag
-      console.log('Step 4: Reloading user data...');
+      // Reload user so onboarding_completed flag updates.
       const userRes = await api.get('/user/');
       useAuthStore.setState({ user: userRes.data });
-      console.log('User data reloaded:', userRes.data);
 
-      console.log('=== Onboarding save successful! Navigating home... ===');
-
-      // Step 6: Navigate to home
-      setTimeout(() => navigate('/'), 500);
+      setStep(5);
     } catch (err) {
-      console.error('=== Onboarding error ===');
-      console.error('Error:', err);
-      console.error('Error response:', err.response?.data);
-      console.error('Error status:', err.response?.status);
-      
-      const errorMsg = err.response?.data?.detail || 
-                      err.response?.data?.error || 
-                      err.message || 
-                      'Failed to save onboarding. Please try again.';
-      setError(errorMsg);
+      setError(err.response?.data?.error || 'Kalibrierung fehlgeschlagen. Versuch es nochmal.');
+    } finally {
       setIsLoading(false);
     }
   };
 
-  return (
-    <div className="onboarding-container">
-      <div className="onboarding-bg-orb onboarding-bg-orb-1"></div>
-      <div className="onboarding-bg-orb onboarding-bg-orb-2"></div>
+  const finish = () => navigate('/');
 
-      <div className="onboarding-card">
-        {/* Step 1: Welcome */}
-        {currentStep === 1 && (
-          <>
-            <h1 className="onboarding-title">Hey {user?.username}! 🎉</h1>
-            <p className="onboarding-subtitle">Let's set up your training</p>
-            <p className="onboarding-text">
-              We'll ask about your current level so we can start you at the right difficulty.
+  const totalSteps = 5; // days + 3 exercises + reveal
+  const progress = Math.min(step, totalSteps) / totalSteps;
+
+  return (
+    <div className="onb-shell">
+      <div className="onb-card">
+
+        {/* ── STEP 0: WELCOME ── */}
+        {step === 0 && (
+          <div className="onb-screen">
+            <p className="onb-eyebrow">Willkommen bei</p>
+            <div className="onb-logo">COR<span>VIS</span></div>
+            <p className="onb-welcome-text">
+              Hey {user?.username || 'Athlet'}. Bevor du startest, findet CORVIS dein
+              richtiges Level — du schätzt dich ein, machst einen kurzen Test, und
+              wir justieren automatisch.
             </p>
-            <button onClick={handleNext} className="btn-onboarding-next">
-              Let's Go →
+            <button className="onb-btn-primary" onClick={() => setStep(1)}>
+              Los geht's →
             </button>
-          </>
+          </div>
         )}
 
-        {/* Step 2: Training Days */}
-        {currentStep === 2 && (
-          <>
-            <h2 className="onboarding-step-title">Training Days 📅</h2>
-            <p className="onboarding-question">
-              Which days do you want to train?
-            </p>
-
-            <div className="onboarding-days-list">
-              {weekDays.map((day) => (
+        {/* ── STEP 1: TRAINING DAYS ── */}
+        {step === 1 && (
+          <div className="onb-screen">
+            <p className="onb-eyebrow">— Schritt 1</p>
+            <h2 className="onb-title">Deine<br />Trainingstage</h2>
+            <p className="onb-sub">An welchen Tagen willst du trainieren? Empfehlung: 4–5 Tage.</p>
+            <div className="onb-days">
+              {DAYS.map(d => (
                 <button
-                  key={day.num}
-                  className={`onboarding-day-btn ${selectedDays.includes(day.num) ? 'active' : ''}`}
-                  onClick={() => toggleDay(day.num)}
+                  key={d.num}
+                  className={`onb-day ${selectedDays.includes(d.num) ? 'active' : ''}`}
+                  onClick={() => toggleDay(d.num)}
                 >
-                  <span>{day.name}</span>
-                  <span className="day-status">{selectedDays.includes(day.num) ? '✓ Training' : '○ Rest'}</span>
+                  <span>{d.name}</span>
+                  <span className="onb-day-dot" />
                 </button>
               ))}
             </div>
-
-            <div className="onboarding-buttons">
-              <button onClick={handlePrev} className="btn-onboarding-prev">← Back</button>
-              <button onClick={handleNext} className="btn-onboarding-next">Next →</button>
-            </div>
-          </>
-        )}
-
-        {/* Step 3: Push-ups */}
-        {currentStep === 3 && (
-          <>
-            <h2 className="onboarding-step-title">Push-ups Level 💪</h2>
-            <p className="onboarding-question">
-              Which push-up variation can you do?
-            </p>
-
-            <div className="onboarding-options">
-              {pushOptions.map((opt) => (
-                <label key={opt.level} className="onboarding-radio-card">
-                  <input
-                    type="radio"
-                    value={opt.level}
-                    checked={pushLevel === opt.level}
-                    onChange={(e) => setPushLevel(Number(e.target.value))}
-                  />
-                  <div className="onboarding-option-content">
-                    <span className="onboarding-option-name">{opt.name}</span>
-                  </div>
-                </label>
-              ))}
-            </div>
-
-            <div className="onboarding-buttons">
-              <button onClick={handlePrev} className="btn-onboarding-prev">← Back</button>
-              <button onClick={handleNext} className="btn-onboarding-next">Next →</button>
-            </div>
-          </>
-        )}
-
-        {/* Step 4: Pull-ups */}
-        {currentStep === 4 && (
-          <>
-            <h2 className="onboarding-step-title">Pull-ups Level 🔥</h2>
-            <p className="onboarding-question">
-              What's your pull-up level?
-            </p>
-
-            <div className="onboarding-options">
-              {pullOptions.map((opt) => (
-                <label key={opt.level} className="onboarding-radio-card">
-                  <input
-                    type="radio"
-                    value={opt.level}
-                    checked={pullLevel === opt.level}
-                    onChange={(e) => setPullLevel(Number(e.target.value))}
-                  />
-                  <div className="onboarding-option-content">
-                    <span className="onboarding-option-name">{opt.name}</span>
-                  </div>
-                </label>
-              ))}
-            </div>
-
-            <div className="onboarding-buttons">
-              <button onClick={handlePrev} className="btn-onboarding-prev">← Back</button>
-              <button onClick={handleNext} className="btn-onboarding-next">Next →</button>
-            </div>
-          </>
-        )}
-
-        {/* Step 5: Planks */}
-        {currentStep === 5 && (
-          <>
-            <h2 className="onboarding-step-title">Planks Level 💪</h2>
-            <p className="onboarding-question">
-              What's your plank level?
-            </p>
-
-            <div className="onboarding-options">
-              {plankOptions.map((opt) => (
-                <label key={opt.level} className="onboarding-radio-card">
-                  <input
-                    type="radio"
-                    value={opt.level}
-                    checked={plankLevel === opt.level}
-                    onChange={(e) => setPlankLevel(Number(e.target.value))}
-                  />
-                  <div className="onboarding-option-content">
-                    <span className="onboarding-option-name">{opt.name}</span>
-                  </div>
-                </label>
-              ))}
-            </div>
-
-            <div className="onboarding-buttons">
-              <button onClick={handlePrev} className="btn-onboarding-prev">← Back</button>
-              <button onClick={handleNext} className="btn-onboarding-next">Next →</button>
-            </div>
-          </>
-        )}
-
-        {/* Step 6: How It Works */}
-        {currentStep === 6 && (
-          <>
-            <h2 className="onboarding-step-title">How It Works 📖</h2>
-            <p className="onboarding-subtitle">Here's the system:</p>
-
-            <div className="onboarding-how-it-works">
-              <div className="onboarding-point">
-                <span className="onboarding-check">✓</span>
-                <span>3 exercises per session: Push • Pull • Core</span>
-              </div>
-              <div className="onboarding-point">
-                <span className="onboarding-check">✓</span>
-                <span>Complete all sets → progress tracked automatically</span>
-              </div>
-              <div className="onboarding-point">
-                <span className="onboarding-check">✓</span>
-                <span>After 3 successful sessions → you level up!</span>
-              </div>
-              <div className="onboarding-point">
-                <span className="onboarding-check">✓</span>
-                <span>Can't finish a set? We add a drop-set to build strength</span>
-              </div>
-              <div className="onboarding-point">
-                <span className="onboarding-check">✓</span>
-                <span>Rest: 3 min between sets | 5 min after drop-sets</span>
-              </div>
-              <div className="onboarding-point">
-                <span className="onboarding-check">✓</span>
-                <span>Too hard? We'll scale back and adjust your level</span>
-              </div>
-            </div>
-
-            {error && <div className="error-message">⚠️ {error}</div>}
-
-            <div className="onboarding-buttons">
-              <button onClick={handlePrev} className="btn-onboarding-prev" disabled={isLoading}>← Back</button>
-              <button 
-                onClick={handleComplete} 
-                className="btn-onboarding-complete"
-                disabled={isLoading}
-              >
-                {isLoading ? 'Setting up...' : 'Complete Setup'}
-              </button>
-            </div>
-          </>
-        )}
-
-        {/* Progress indicator */}
-        <div className="onboarding-progress">
-          <div className="onboarding-progress-bar">
-            <div 
-              className="onboarding-progress-fill" 
-              style={{ width: `${(currentStep / 6) * 100}%` }}
-            ></div>
+            <button
+              className="onb-btn-primary"
+              onClick={() => setStep(2)}
+              disabled={selectedDays.length === 0}
+            >
+              Weiter →
+            </button>
           </div>
-          <p className="onboarding-progress-text">Step {currentStep} of 6</p>
-        </div>
+        )}
+
+        {/* ── STEPS 2-4: EXERCISE TESTS ── */}
+        {currentEx && (
+          <div className="onb-screen">
+            <p className="onb-eyebrow">— {currentEx.category} · Übung {exIndex + 1}/3</p>
+
+            {phase === 'assess' && (
+              <>
+                <h2 className="onb-title">{currentEx.name}</h2>
+                <p className="onb-sub">Welche Variante schaffst du? Schätz dich ein — wir testen es gleich.</p>
+                <div className="onb-levels">
+                  {currentEx.levels.map(l => (
+                    <button
+                      key={l.level}
+                      className={`onb-level ${(assessments[currentEx.id] ?? currentEx.defaultLevel) === l.level ? 'active' : ''}`}
+                      onClick={() => handleAssess(l.level)}
+                    >
+                      <span className="onb-level-num">L{l.level}</span>
+                      <span className="onb-level-info">
+                        <span className="onb-level-name">{l.name}</span>
+                        <span className="onb-level-hint">{l.hint}</span>
+                      </span>
+                      <span className="onb-level-arrow">→</span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {phase === 'test' && (() => {
+              const level = assessments[currentEx.id] ?? currentEx.defaultLevel;
+              const levelInfo = currentEx.levels.find(l => l.level === level);
+              const testType = getTestTypeForLevel(currentEx, level);
+              return (
+                <>
+                  <h2 className="onb-title">{levelInfo?.name}</h2>
+                  <p className="onb-sub">
+                    {testType === 'time'
+                      ? 'Halte so lange du kannst. CORVIS misst die Zeit.'
+                      : 'Mach so viele saubere Wiederholungen wie du schaffst.'}
+                  </p>
+                  {testType === 'time'
+                    ? <TimeTest onSubmit={handleTest} />
+                    : <RepTest onSubmit={handleTest} />}
+                  <button className="onb-btn-back" onClick={() => setPhase('assess')}>
+                    ← Andere Variante wählen
+                  </button>
+                </>
+              );
+            })()}
+          </div>
+        )}
+
+        {/* ── STEP 5: REVEAL ── */}
+        {step === 5 && (
+          <div className="onb-screen">
+            {isLoading ? (
+              <>
+                <div className="onb-logo">COR<span>VIS</span></div>
+                <div className="onb-spinner" />
+                <p className="onb-sub">CORVIS berechnet dein Level…</p>
+              </>
+            ) : (
+              <>
+                <p className="onb-eyebrow">— Deine Kalibrierung</p>
+                <h2 className="onb-title">Dein Start<br />steht fest.</h2>
+                <p className="onb-sub">CORVIS hat dein Level aus deinem Test berechnet:</p>
+
+                <div className="onb-reveal-list">
+                  {calibrated?.map((r, i) => (
+                    <div key={r.exercise_id} className="onb-reveal-card" style={{ animationDelay: `${0.15 + i * 0.12}s` }}>
+                      <div className="onb-reveal-top">
+                        <span className="onb-reveal-ex">{r.exercise}</span>
+                        {r.reason === 'up' && <span className="onb-reveal-tag up">↑ höher als gedacht</span>}
+                        {r.reason === 'down' && <span className="onb-reveal-tag down">angepasst</span>}
+                        {r.reason === 'stay' && <span className="onb-reveal-tag stay">✓ bestätigt</span>}
+                      </div>
+                      <div className="onb-reveal-body">
+                        <span className="onb-reveal-level">L{r.calibrated_level}</span>
+                        <div className="onb-reveal-detail">
+                          <span className="onb-reveal-prog">{r.progression_name}</span>
+                          <span className="onb-reveal-target">
+                            Ziel: {r.target_value}{r.target_type === 'time' ? 's' : ' Wdh'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {error && <p className="onb-error">{error}</p>}
+
+                <button className="onb-btn-primary" onClick={finish}>
+                  Training starten →
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ── PROGRESS BAR ── */}
+        {step > 0 && step < 5 && (
+          <div className="onb-progress">
+            <div className="onb-progress-fill" style={{ width: `${progress * 100}%` }} />
+          </div>
+        )}
       </div>
     </div>
   );
