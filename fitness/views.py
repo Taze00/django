@@ -562,6 +562,73 @@ def timeline(request):
     return Response({'events': data}, status=status.HTTP_200_OK)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def weekly_review(request):
+    """Summary of the current week (Mon-Sun): trainings done vs. planned,
+    level-ups, training volume, and current streak."""
+    import datetime as dt
+
+    user = request.user
+    today = timezone.now().date()
+    # Monday of the current week.
+    monday = today - dt.timedelta(days=today.weekday())
+    sunday = monday + dt.timedelta(days=6)
+
+    training_days = _user_training_days(user)
+
+    # Trainings done this week (completed workouts within Mon-Sun).
+    week_workouts = Workout.objects.filter(
+        user=user, completed=True, date__gte=monday, date__lte=sunday
+    )
+    trainings_done = week_workouts.count()
+
+    # Planned trainings this week = number of scheduled weekdays Mon-Sun.
+    trainings_planned = sum(
+        1 for i in range(7)
+        if (monday + dt.timedelta(days=i)).isoweekday() in training_days
+    )
+
+    # Level-ups this week.
+    level_ups = LevelEvent.objects.filter(
+        user=user, event_type='level_up',
+        created_at__date__gte=monday, created_at__date__lte=sunday,
+    ).count()
+
+    # Volume this week from the week's workout sets.
+    push_reps = pull_reps = plank_seconds = 0
+    for w in week_workouts:
+        for s in WorkoutSet.objects.filter(workout=w).select_related('exercise'):
+            cat = s.exercise.category
+            if cat == 'PUSH' and s.reps:
+                push_reps += s.reps
+            elif cat == 'PULL' and s.reps:
+                pull_reps += s.reps
+            elif cat == 'CORE' and s.seconds:
+                plank_seconds += s.seconds
+
+    # Current streak.
+    from fitness.streak import calculate_streak
+    trained_dates = set(
+        Workout.objects.filter(user=user, completed=True).values_list('date', flat=True)
+    )
+    rest_dates = set(RestDay.objects.filter(user=user).values_list('date', flat=True))
+    streak = calculate_streak(training_days, trained_dates, rest_dates)['current']
+
+    return Response({
+        'week_start': monday.isoformat(),
+        'week_end': sunday.isoformat(),
+        'trainings_done': trainings_done,
+        'trainings_planned': trainings_planned,
+        'level_ups': level_ups,
+        'push_reps': push_reps,
+        'pull_reps': pull_reps,
+        'plank_seconds': plank_seconds,
+        'streak': streak,
+        'is_weekend': today.weekday() >= 5,  # Sat=5, Sun=6
+    }, status=status.HTTP_200_OK)
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def mark_rest_day(request):

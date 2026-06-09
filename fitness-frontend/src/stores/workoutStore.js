@@ -18,6 +18,7 @@ export const useWorkoutStore = create((set, get) => ({
   trainingDays: [1, 2, 3, 4, 5], // Mon-Fri default
   streak: { current: 0, longest: 0, trained_today: false, rested_today: false, is_training_day_today: false },
   timeline: [],
+  weeklyReview: null,
   isInitialized: false,
   isLoading: false,
 
@@ -27,13 +28,14 @@ export const useWorkoutStore = create((set, get) => ({
 
     set({ isLoading: true });
     try {
-      const [exRes, progRes, workRes, settRes, streakRes, timelineRes] = await Promise.all([
+      const [exRes, progRes, workRes, settRes, streakRes, timelineRes, weeklyRes] = await Promise.all([
         api.get('/exercises/'),
         api.get('/user-progressions/'),
         api.get('/workouts/'),
         api.get('/profile/settings/').catch(() => ({ data: { training_days: [1, 2, 3, 4, 5] } })),
         api.get('/streak/').catch(() => ({ data: null })),
         api.get('/timeline/').catch(() => ({ data: { events: [] } })),
+        api.get('/weekly-review/').catch(() => ({ data: null })),
       ]);
 
       const progressionsMap = {};
@@ -48,6 +50,7 @@ export const useWorkoutStore = create((set, get) => ({
         trainingDays: settRes.data.training_days || [1, 2, 3, 4, 5],
         streak: streakRes.data || get().streak,
         timeline: timelineRes.data?.events || [],
+        weeklyReview: weeklyRes.data || null,
         isInitialized: true,
         isLoading: false,
       });

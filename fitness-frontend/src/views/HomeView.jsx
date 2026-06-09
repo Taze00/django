@@ -14,10 +14,18 @@ export default function HomeView() {
   const workouts = useWorkoutStore(state => state.workouts);
   const trainingDays = useWorkoutStore(state => state.trainingDays);
   const streak = useWorkoutStore(state => state.streak);
+  const weeklyReview = useWorkoutStore(state => state.weeklyReview);
   const markRestDay = useWorkoutStore(state => state.markRestDay);
   const isLoading = useWorkoutStore(state => state.isLoading);
   const [restConfirm, setRestConfirm] = useState(false);
   const [resting, setResting] = useState(false);
+  const [reviewDismissed, setReviewDismissed] = useState(() => {
+    // Dismissed per ISO week, stored client-side.
+    try {
+      const wk = useWorkoutStore.getState().weeklyReview?.week_start;
+      return wk ? localStorage.getItem(`reviewDismissed_${wk}`) === '1' : false;
+    } catch { return false; }
+  });
 
   useEffect(() => {
     if (user && user.onboarding_completed === false) navigate('/onboarding');
@@ -71,6 +79,16 @@ export default function HomeView() {
   const showRestOption =
     streak.is_training_day_today && !streak.trained_today && !streak.rested_today;
 
+  const dismissReview = () => {
+    if (weeklyReview?.week_start) {
+      try { localStorage.setItem(`reviewDismissed_${weeklyReview.week_start}`, '1'); } catch {}
+    }
+    setReviewDismissed(true);
+  };
+
+  const showWeeklyReview = weeklyReview?.is_weekend && !reviewDismissed;
+  const fmtMin = s => s >= 60 ? `${Math.floor(s / 60)}m` : `${s}s`;
+
   if (isLoading) {
     return (
       <div className="loading-shell">
@@ -96,6 +114,35 @@ export default function HomeView() {
       </div>
 
       <div className="main-content">
+        {/* Weekly review banner (weekend only) */}
+        {showWeeklyReview && (
+          <div className="week-review">
+            <button className="week-review-close" onClick={dismissReview}>✕</button>
+            <p className="week-review-label">— Deine Woche</p>
+            <div className="week-review-grid">
+              <div className="week-review-stat">
+                <span className="wr-val">{weeklyReview.trainings_done}<span className="wr-sub">/{weeklyReview.trainings_planned}</span></span>
+                <span className="wr-label">Trainings</span>
+              </div>
+              <div className="week-review-stat">
+                <span className="wr-val">{weeklyReview.level_ups}</span>
+                <span className="wr-label">Level-Ups</span>
+              </div>
+              <div className="week-review-stat">
+                <span className="wr-val">{weeklyReview.streak}</span>
+                <span className="wr-label">Serie 🔥</span>
+              </div>
+            </div>
+            <div className="week-review-volume">
+              <span>{weeklyReview.push_reps} Push</span>
+              <span>·</span>
+              <span>{weeklyReview.pull_reps} Pull</span>
+              <span>·</span>
+              <span>{fmtMin(weeklyReview.plank_seconds)} Core</span>
+            </div>
+          </div>
+        )}
+
         {/* Week strip */}
         <div className="week-strip">
           {ALL_DAYS.map((day, idx) => {

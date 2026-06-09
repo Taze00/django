@@ -148,6 +148,54 @@ body {
 .tl-row:has(.tl-start) .tl-dot,
 .tl-row:has(.tl-streak) .tl-dot { background: var(--orange); }
 .tl-row:has(.tl-first) .tl-dot { background: var(--white); box-shadow: 0 0 0 3px rgba(240,237,232,0.12); }
+
+/* ─── WEEKLY REVIEW BANNER ─── */
+.week-review {
+  position: relative;
+  background: var(--bg2);
+  border: 1px solid var(--muted3);
+  border-left: 3px solid var(--orange);
+  padding: 1.25rem 1.25rem 1rem;
+  margin-bottom: 1.25rem;
+  animation: fadeUp 0.4s ease;
+  overflow: hidden;
+}
+.week-review::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse at top right, rgba(255,77,0,0.07) 0%, transparent 60%);
+  pointer-events: none;
+}
+.week-review-close {
+  position: absolute; top: 0.75rem; right: 0.75rem;
+  background: none; border: none; color: var(--muted);
+  font-size: 0.7rem; cursor: pointer; padding: 0.25rem; transition: color 0.2s; z-index: 1;
+}
+.week-review-close:hover { color: var(--white); }
+.week-review-label {
+  font-size: 0.55rem; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--orange); margin-bottom: 1rem;
+}
+.week-review-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: var(--muted2); margin-bottom: 1rem;
+}
+.week-review-stat {
+  background: var(--bg2); display: flex; flex-direction: column;
+  align-items: center; padding: 0.75rem 0.5rem; gap: 0.25rem;
+}
+.wr-val {
+  font-family: var(--display); font-size: 2.2rem; color: var(--white);
+  line-height: 1; letter-spacing: 1px;
+}
+.wr-sub { font-size: 1.1rem; color: var(--muted); }
+.wr-label {
+  font-size: 0.52rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted);
+}
+.week-review-volume {
+  display: flex; align-items: center; justify-content: center; gap: 0.6rem;
+  font-size: 0.62rem; color: var(--muted); letter-spacing: 0.5px;
+}
+.week-review-volume span:nth-child(even) { color: var(--muted3); }
 .header-close-btn {
   background: none; border: none; color: var(--muted);
   font-size: 1rem; cursor: pointer; padding: 0.5rem;
