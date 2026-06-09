@@ -19,11 +19,15 @@ Design principles (researched, multi-source):
 
 The ratio = test_result / target_value drives the adjustment:
 
-    ratio < 0.5    -> 2 levels down   (far below target)
-    0.5 <= r < 1.0 -> 1 level down    (just short)
-    1.0 <= r < 2.0 -> stay            (target met)
-    2.0 <= r < 3.0 -> 1 level up       (well above)
-    ratio >= 3.0   -> 2 levels up      (far above)
+    ratio < 0.5     -> 2 levels down   (far below target)
+    0.5 <= r < 0.85 -> 1 level down    (clearly short)
+    0.85 <= r < 2.0 -> stay            (target met, incl. 15% tolerance)
+    2.0 <= r < 3.0  -> 1 level up       (well above)
+    ratio >= 3.0    -> 2 levels up      (far above)
+
+The 0.85 lower bound for "stay" is a tolerance band: missing the target by a
+few reps/seconds (e.g. 55s of a 60s plank) keeps you on your level rather than
+punishing a near-miss with a downgrade.
 
 The result is always clamped to the exercise's available level range (1..max).
 """
@@ -33,7 +37,7 @@ The result is always clamped to the exercise's available level range (1..max).
 _ADJUSTMENT_BANDS = [
     (3.0, +2),
     (2.0, +1),
-    (1.0, 0),
+    (0.85, 0),
     (0.5, -1),
     (0.0, -2),
 ]
