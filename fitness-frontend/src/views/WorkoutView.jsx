@@ -98,14 +98,22 @@ export default function WorkoutView() {
       const progInfo = getProgInfo(step.exerciseName);
       if (!progInfo) { setIsLoading(false); return; }
 
+      // For drop-sets, `value` is the reached progression id (or false = skip).
+      // We store that reached variant as the drop-set's progression so history
+      // shows how far down the user had to go. This is a progress signal only —
+      // it does NOT feed the level logic.
       const dropCompleted = isDropSet && value !== false;
+      const dropProgressionId = (isDropSet && value !== false)
+        ? value
+        : progInfo.currentProgression.id;
+
       const reps = (!isDropSet && progInfo.currentProgression.target_type === 'reps') ? value : null;
       const secs = (!isDropSet && progInfo.currentProgression.target_type === 'time') ? value : null;
 
       await addSet(
         currentWorkout.id,
         progInfo.exercise.id,
-        progInfo.currentProgression.id,
+        isDropSet ? dropProgressionId : progInfo.currentProgression.id,
         step.setNumber,
         reps,
         secs,
@@ -179,6 +187,7 @@ export default function WorkoutView() {
         <DropSetInstructions
           exercise={progInfo.exercise}
           progressions={[progInfo.currentProgression, ...progInfo.lowerProgressions]}
+          lastReachedName={lastPerformance?.[String(progInfo.exercise.id)]?.drop_reached}
           onComplete={handleSetComplete}
         />
         {showModal && <ProgressionModal upgrades={progressionData?.upgrades || []} downgrades={progressionData?.downgrades || []} onClose={handleModalClose} />}

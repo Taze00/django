@@ -161,7 +161,9 @@ export default function StatisticsView() {
                           {sets.map((s, i) => (
                             <span key={i} className={`history-set-chip ${s.is_drop_set ? 'drop' : ''}`}>
                               {s.is_drop_set
-                                ? (s.drop_set_completed ? 'Drop ✓' : 'Drop')
+                                ? (s.drop_set_completed
+                                    ? `Drop → ${s.progression_name}`
+                                    : 'Drop übersprungen')
                                 : s.reps ? `S${s.set_number}: ${s.reps}` : `S${s.set_number}: ${s.seconds}s`}
                             </span>
                           ))}

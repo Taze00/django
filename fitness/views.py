@@ -306,12 +306,23 @@ class WorkoutViewSet(viewsets.ModelViewSet):
                 is_drop_set=False
             ).first()
 
-            if set1:
+            # Last reached drop-set variant (the progression saved on the
+            # completed drop set) — shown as a "last time" comparison.
+            drop_set = WorkoutSet.objects.filter(
+                workout=last_workout,
+                exercise=exercise,
+                is_drop_set=True,
+                drop_set_completed=True,
+            ).select_related('progression').first()
+
+            if set1 or drop_set:
                 last_sets[str(exercise.id)] = {
                     'exercise_id': exercise.id,
                     'exercise_name': exercise.name,
-                    'set1_reps': set1.reps,
-                    'set1_seconds': set1.seconds,
+                    'set1_reps': set1.reps if set1 else None,
+                    'set1_seconds': set1.seconds if set1 else None,
+                    'drop_reached': drop_set.progression.name if drop_set else None,
+                    'drop_reached_level': drop_set.progression.level if drop_set else None,
                 }
 
         return Response(last_sets, status=status.HTTP_200_OK)
