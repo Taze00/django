@@ -17,7 +17,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/Dockerfile
-    command: python3 manage.py runserver 0.0.0.0:80
+    command: gunicorn meinprojekt.wsgi:application --bind 0.0.0.0:80 --workers 3 --timeout 60
     volumes:
       - .:/code
     ports:

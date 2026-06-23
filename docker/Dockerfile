@@ -17,4 +17,4 @@ COPY . /code/
 
 EXPOSE 80
 
-CMD ["python3", "manage.py", "runserver", "0.0.0.0:80"]
+CMD ["gunicorn", "meinprojekt.wsgi:application", "--bind", "0.0.0.0:80", "--workers", "3", "--timeout", "60"]
