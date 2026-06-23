@@ -166,22 +166,30 @@ export default function HomeView() {
           {exercises.map(ex => {
             const prog = userProgressions[String(ex.id)];
             const currentProg = prog?.current_progression;
+            const level = currentProg?.level ?? 0;
+            const pct = Math.max(0, Math.min(100, (level / 7) * 100));
             return (
               <div key={ex.id} className="ex-card-home">
-                <div className="ex-card-left">
-                  <p className="ex-card-cat">{ex.category}</p>
-                  <p className="ex-card-name">{ex.name}</p>
-                  <p className="ex-card-prog">{currentProg?.name || '—'}</p>
+                <div className="ex-card-top">
+                  <div className="ex-card-left">
+                    <p className="ex-card-cat">{ex.category}</p>
+                    <p className="ex-card-name">{ex.name}</p>
+                    <p className="ex-card-prog">{currentProg?.name || '—'}</p>
+                  </div>
+                  <div className="ex-card-right">
+                    <p className="ex-card-level">{level || '—'}</p>
+                    <p className="ex-card-level-label">/ 7 Level</p>
+                  </div>
                 </div>
-                <div className="ex-card-right">
-                  <p className="ex-card-level">{currentProg?.level ?? '—'}</p>
-                  <p className="ex-card-level-label">Level</p>
+                <div className="ex-card-track">
+                  <div className="ex-card-fill" style={{ width: `${pct}%` }} />
                 </div>
               </div>
             );
           })}
         </div>
 
+        <div className="home-bottom">
         <button className="btn-start" onClick={() => navigate('/workout')}>
           Training starten →
         </button>
@@ -192,7 +200,8 @@ export default function HomeView() {
 
         {showRestOption && !restConfirm && (
           <button className="btn-rest" onClick={() => setRestConfirm(true)}>
-            Heute nicht
+            <span className="btn-rest-main">Heute pausieren</span>
+            <span className="btn-rest-hint">Ruhetag einlegen, ohne deine Serie zu verlieren</span>
           </button>
         )}
 
@@ -211,6 +220,7 @@ export default function HomeView() {
             </div>
           </div>
         )}
+        </div>
       </div>
     </>
   );

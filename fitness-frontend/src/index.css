@@ -79,12 +79,19 @@ body {
 
 /* "Heute nicht" rest option */
 .btn-rest {
-  width: 100%; background: none; border: none; color: var(--muted);
-  font-family: var(--mono); font-size: 0.62rem; letter-spacing: 2px;
-  text-transform: uppercase; padding: 1rem; cursor: pointer;
-  transition: color 0.2s; margin-top: 0.5rem;
+  width: 100%; background: var(--bg2); border: 1px solid var(--muted2);
+  color: var(--white); font-family: var(--mono); cursor: pointer;
+  padding: 0.85rem 1rem; margin-top: 0.75rem;
+  display: flex; flex-direction: column; gap: 0.25rem; align-items: center;
+  transition: border-color 0.2s;
 }
-.btn-rest:hover { color: var(--white); }
+.btn-rest:hover { border-color: var(--muted3); }
+.btn-rest-main {
+  font-size: 0.7rem; letter-spacing: 1.5px; text-transform: uppercase; color: var(--white);
+}
+.btn-rest-hint {
+  font-size: 0.58rem; letter-spacing: 0.3px; color: var(--muted); text-transform: none;
+}
 .rest-confirm {
   background: var(--bg2); border: 1px solid var(--muted3);
   padding: 1.25rem; margin-top: 0.75rem; animation: fadeUp 0.25s ease;
@@ -205,7 +212,10 @@ body {
 
 /* ─── MAIN CONTENT ─── */
 .main-content {
-  padding: 1.25rem; padding-bottom: 80px;
+  padding: 1.5rem 1.25rem;
+  padding-bottom: 84px;
+  min-height: calc(100vh - 56px); /* full viewport minus header */
+  display: flex; flex-direction: column;
   animation: fadeUp 0.4s ease;
 }
 
@@ -238,12 +248,12 @@ body {
 
 /* ─── HOME VIEW ─── */
 .week-strip {
-  display: flex; gap: 0;
-  background: var(--muted2); margin-bottom: 1px;
+  display: flex; gap: 1px;
+  background: var(--muted2); margin-bottom: 2rem;
 }
 .week-day {
   flex: 1; background: var(--bg2);
-  padding: 0.75rem 0.25rem; text-align: center;
+  padding: 1rem 0.25rem; text-align: center;
 }
 .week-day-name {
   font-size: 0.5rem; letter-spacing: 1.5px;
@@ -262,36 +272,61 @@ body {
 
 .exercise-cards {
   display: flex; flex-direction: column;
-  gap: 1px; background: var(--muted2); margin-bottom: 1px;
+  gap: 0.85rem; margin: 1.5rem 0;
 }
 .ex-card-home {
-  background: var(--bg2); padding: 1.25rem;
-  display: flex; align-items: center;
-  justify-content: space-between; gap: 1rem;
+  background: var(--bg2);
+  border: 1px solid var(--muted2);
+  border-left: 3px solid var(--orange);
+  padding: 1.4rem 1.4rem 1.2rem;
+  position: relative; overflow: hidden;
+  transition: border-color 0.2s, background 0.2s;
+}
+.ex-card-home::after {
+  content: ''; position: absolute; top: 0; right: 0;
+  width: 120px; height: 120px;
+  background: radial-gradient(circle at top right, rgba(255,77,0,0.06), transparent 70%);
+  pointer-events: none;
+}
+.ex-card-home:active { background: var(--bg3); }
+.ex-card-top {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 1rem; margin-bottom: 1.1rem;
 }
 .ex-card-cat {
   font-size: 0.5rem; letter-spacing: 3px;
-  text-transform: uppercase; color: var(--orange); margin-bottom: 0.3rem;
+  text-transform: uppercase; color: var(--orange); margin-bottom: 0.4rem;
 }
 .ex-card-name {
-  font-family: var(--display); font-size: 1.6rem;
+  font-family: var(--display); font-size: 1.7rem;
   letter-spacing: 1px; color: var(--white);
-  line-height: 1; margin-bottom: 0.2rem;
+  line-height: 1; margin-bottom: 0.35rem;
 }
 .ex-card-prog { font-size: 0.62rem; color: var(--muted); letter-spacing: 0.3px; }
+.ex-card-right {
+  display: flex; align-items: baseline; gap: 0.3rem; flex-shrink: 0;
+}
 .ex-card-level {
-  font-family: var(--display); font-size: 2.8rem;
-  line-height: 1; color: var(--muted2); letter-spacing: 1px;
+  font-family: var(--display); font-size: 3.2rem;
+  line-height: 0.8; color: var(--orange); letter-spacing: 1px;
 }
 .ex-card-level-label {
-  font-size: 0.45rem; letter-spacing: 2px;
-  text-transform: uppercase; color: var(--muted); text-align: right;
+  font-size: 0.5rem; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--muted);
 }
+.ex-card-track {
+  height: 3px; background: var(--muted2); overflow: hidden;
+}
+.ex-card-fill {
+  height: 100%; background: linear-gradient(90deg, var(--orange), var(--orange2));
+  transition: width 0.6s cubic-bezier(.16,1,.3,1);
+}
+.home-bottom { margin-top: auto; }
 .btn-start {
   width: 100%; background: var(--orange); color: #000; border: none;
   font-family: var(--mono); font-size: 0.72rem;
   letter-spacing: 3px; text-transform: uppercase;
-  padding: 1.1rem; cursor: pointer; transition: background 0.2s; margin-top: 1px;
+  padding: 1.2rem; cursor: pointer; transition: background 0.2s;
 }
 .btn-start:hover { background: var(--orange2); }
 
