@@ -23,7 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-scizz_1!1w56v()@wxsldrzl_$v52g5px_m2vc4&7+8@-arv_s'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Controlled via the DJANGO_DEBUG env var. Defaults to True for local dev;
+# set DJANGO_DEBUG=False (or 0/no/off) in the live environment.
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() not in ('false', '0', 'no', 'off')
 
 # start stevo
 # ALLOWED_HOSTS = []
@@ -59,6 +61,9 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # WhiteNoise serves static files in production; must sit right after
+    # SecurityMiddleware and before everything else.
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -144,6 +149,18 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
+
+# WhiteNoise: serve static files from STATIC_ROOT in production.
+# Use the non-manifest compressed storage so hard-coded /static/ paths in
+# templates (e.g. the hashed React bundle) keep working without a manifest.
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+}
 
 # Media files (User uploads)
 MEDIA_URL = '/media/'

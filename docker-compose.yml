@@ -28,6 +28,7 @@ services:
       - POSTGRES_NAME=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+      - DJANGO_DEBUG=False
     depends_on:
       - db
     labels:
