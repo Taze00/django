@@ -4,11 +4,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>COR<span>VIS</span> — Werde stärker. Jeden Tag.</title>
-<meta name="description" content="COR<span>VIS</span> — Die Kraft deines Körpers. 3 Übungen. 30 Minuten. 5x pro Woche. Kein Gym. Kein Abo.">
+<title>CORVIS — Werde stärker. Jeden Tag.</title>
+<meta name="description" content="CORVIS — Die Kraft deines Körpers. 3 Übungen. 30 Minuten. 5x pro Woche. Kein Gym. Kein Abo.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Archivo+Black&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 
 <!-- Three.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
@@ -70,7 +70,7 @@ nav {
   align-items: center;
   gap: .7rem;
   font-family: var(--display);
-  font-size: 1.6rem;
+  font-size: 2.2rem;
   letter-spacing: 1px;
   color: var(--white);
   text-decoration: none;
@@ -93,12 +93,12 @@ nav {
 @media(max-width:600px){
   .nav-cta-label { display: none; }
   .nav-cta-short { display: inline; }
-  nav { padding: 1rem 1.25rem; }
+  nav { padding: 1.25rem 1.5rem; }
   .nav-cta-small {
     background: var(--orange);
     color: #000;
     border: none;
-    padding: .45rem .9rem;
+    padding: .5rem 1rem;
     font-size: .65rem;
     letter-spacing: 1px;
   }
@@ -146,17 +146,34 @@ nav {
 }
 .hero-title {
   font-family: var(--display);
-  font-size: clamp(5.5rem, 16vw, 14rem);
-  line-height: 0.92;
+  font-size: clamp(3rem, 10vw, 9rem);
+  line-height: 0.88;
   letter-spacing: 3px;
   color: var(--white);
+  mix-blend-mode: screen;
 }
-.hero-title .line { display:block; overflow:hidden; padding-top: 0.1em; }
+.hero-title .line { display:block; overflow:hidden; padding-top: 0.08em; }
 .hero-title .line-inner {
   display: block;
   transform: translateY(110%);
 }
-.hero-title .orange { color: var(--orange); }
+.hero-title .orange {
+  color: var(--orange);
+  font-style: italic;
+  position: relative;
+}
+/* Blinking caret after the typed word */
+.hero-title .orange .typed::after {
+  content: '';
+  display: inline-block;
+  width: 0.06em;
+  height: 0.82em;
+  background: var(--orange);
+  margin-left: 0.18em;
+  vertical-align: baseline;
+  animation: caretBlink 0.8s step-end infinite;
+}
+@keyframes caretBlink { 50% { opacity: 0; } }
 .hero-subtitle {
   font-size: .8rem;
   letter-spacing: 2px;
@@ -267,104 +284,6 @@ section {
   letter-spacing: .5px;
 }
 
-/* ─── EXERCISES ─── */
-.exercises {
-  padding: 6rem 3rem 12rem;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-.exercises-label {
-  font-size: .65rem;
-  letter-spacing:4px;
-  text-transform:uppercase;
-  color:var(--orange);
-  margin-bottom:4rem;
-  opacity:0;
-}
-.exercises-grid {
-  display: grid;
-  grid-template-columns: repeat(3,1fr);
-  gap: 1.5px;
-  background: var(--muted2);
-}
-.ex-card {
-  background: var(--bg2);
-  padding: 3rem 2.5rem;
-  position: relative;
-  overflow: hidden;
-  transition: background .3s;
-  cursor: default;
-}
-.ex-card::after {
-  content:'';
-  position:absolute;
-  bottom:0; left:0; right:0;
-  height:2px;
-  background: var(--orange);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform .4s cubic-bezier(.16,1,.3,1);
-}
-.ex-card:hover::after { transform: scaleX(1); }
-.ex-card:hover { background: #131313; }
-
-.ex-num {
-  font-size: .6rem;
-  letter-spacing:3px;
-  color: var(--muted);
-  margin-bottom: 2rem;
-}
-.ex-icon {
-  font-size: 2.5rem;
-  margin-bottom: 1.5rem;
-  display:block;
-}
-.ex-name {
-  font-family: var(--display);
-  font-size: 2.5rem;
-  letter-spacing:0;
-  color: var(--white);
-  margin-bottom: .5rem;
-  line-height: 1;
-}
-.ex-sub {
-  font-size: .65rem;
-  letter-spacing:2px;
-  text-transform:uppercase;
-  color: var(--muted);
-  margin-bottom:2rem;
-}
-.ex-levels {
-  display: flex; gap:.4rem; flex-wrap:wrap;
-  margin-bottom: 2rem;
-}
-.ex-level-dot {
-  width:6px;height:6px;
-  border-radius:50%;
-  background: var(--muted2);
-  transition: background .3s;
-}
-.ex-level-dot.active { background: var(--orange); }
-.ex-card:hover .ex-level-dot { background: var(--muted); }
-.ex-card:hover .ex-level-dot.active { background: var(--orange); }
-
-.ex-desc {
-  font-size:.78rem;
-  color: var(--muted);
-  line-height:1.75;
-  letter-spacing:.3px;
-  margin-bottom:2rem;
-  flex:1;
-}
-.ex-range {
-  display:flex; justify-content:space-between;
-  font-size:.62rem; letter-spacing:0;
-  color: var(--muted);
-  padding-top: 1rem;
-  border-top: 1px solid var(--muted2);
-}
-.ex-range span:last-child { color: var(--orange); }
-
 /* ─── COMPARE SECTION ─── */
 .compare-section {
   padding: 10rem 3rem;
@@ -434,7 +353,7 @@ section {
 }
 .hscroll-label {
   position:absolute;
-  top:3rem; left:3rem;
+  top:5.5rem; left:3rem;
   font-size:.65rem;
   letter-spacing:4px;
   text-transform:uppercase;
@@ -463,12 +382,12 @@ section {
   gap: 6rem;
 }
 .hscroll-step {
-  width: 50vw;
+  width: 38vw;
   flex-shrink:0;
   display:flex;
   flex-direction:column;
   justify-content:center;
-  padding-right:4rem;
+  padding-right:3rem;
 }
 .hscroll-step-num {
   font-family: var(--display);
@@ -487,26 +406,99 @@ section {
   line-height:1.05;
 }
 .hscroll-step-desc {
-  font-size:.8rem;
+  font-size:1rem;
   color: var(--muted);
-  line-height:1.9;
-  max-width:380px;
+  line-height:1.7;
+  max-width:400px;
   letter-spacing:.5px;
 }
 .hscroll-visual {
-  width:36vw;
+  width:44vw;
   flex-shrink:0;
-  height:55vh;
+  height:62vh;
   border:1px solid var(--muted2);
   position:relative;
   overflow:hidden;
   background: var(--bg2);
   display:flex; align-items:center; justify-content:center;
 }
-.hscroll-visual-inner {
-  font-size:5rem;
-  opacity:.4;
+.mock {
+  width: 80%; max-width: 480px;
+  display: flex; flex-direction: column; gap: .9rem;
+  position: relative; z-index: 1;
+  margin: auto;
 }
+
+/* Mock: level-up card */
+.mock-levelcard {
+  background: var(--bg); border:1px solid var(--muted2);
+  border-left:4px solid var(--orange); padding:2rem;
+}
+.mock-lc-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; }
+.mock-lc-ex { font-size:.85rem; letter-spacing:3px; color:var(--muted); }
+.mock-lc-tag { font-size:.75rem; letter-spacing:1px; color:var(--orange); border:1px solid var(--orange); padding:.25rem .6rem; }
+.mock-lc-jump { display:flex; align-items:center; gap:1.2rem; margin-bottom:1rem; }
+.mock-lc-old { font-family:var(--display); font-size:4.5rem; color:var(--muted); line-height:1; }
+.mock-lc-arrow { color:#444; font-size:1.5rem; }
+.mock-lc-new { font-family:var(--display); font-size:4.5rem; color:var(--orange); line-height:1; }
+.mock-lc-name { font-size:1.05rem; color:var(--white); margin-bottom:1.5rem; }
+.mock-lc-bar { height:5px; background:var(--muted2); }
+.mock-lc-fill { width:65%; height:100%; background:var(--orange); }
+
+/* Mock: week strip */
+.mock-week { display:flex; gap:2px; background:var(--muted2); }
+.mock-day {
+  flex:1; background:var(--bg); display:flex; flex-direction:column;
+  align-items:center; gap:.8rem; padding:1.4rem .3rem;
+}
+.mock-day span { font-size:.8rem; letter-spacing:1px; color:var(--muted); }
+.mock-day i {
+  width:30px; height:30px; border-radius:50%; border:1px solid #444;
+  display:flex; align-items:center; justify-content:center; font-size:.85rem; font-style:normal;
+}
+.mock-day.done i { background:var(--orange); border-color:var(--orange); color:#000; }
+.mock-day.today { background:var(--bg3); }
+.mock-day.today span { color:var(--orange); }
+.mock-day.today i { border-color:var(--orange); }
+.mock-day.rest span, .mock-day.rest i { opacity:.4; }
+
+/* Mock: stats (centered) */
+.mock-stats { align-items:center; text-align:center; gap:1.6rem; }
+.mock-stat-hero { display:flex; flex-direction:column; align-items:center; gap:.3rem; }
+.mock-stat-flame { font-size:2.2rem; }
+.mock-stat-big {
+  font-family:var(--display); font-size:5.5rem; color:var(--orange); line-height:.9;
+}
+.mock-stat-cap { font-size:.8rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); }
+.mock-graph {
+  display:flex; align-items:flex-end; justify-content:center; gap:.6rem;
+  height:90px; width:100%;
+}
+.mock-bar {
+  flex:1; max-width:32px; min-height:6px;
+  background:#444; border-radius:3px 3px 0 0;
+}
+.mock-bar.on { background:var(--orange); }
+.mock-graph-label { font-size:.65rem; letter-spacing:1px; color:var(--muted); }
+.mock-chips { display:flex; gap:.6rem; flex-wrap:wrap; justify-content:center; }
+.mock-chip {
+  font-size:.72rem; letter-spacing:.5px; color:var(--muted);
+  border:1px solid #444; padding:.4rem .8rem; border-radius:100px;
+}
+.mock-chip.on { color:var(--orange); border-color:var(--orange); }
+
+/* Mock: exercise cards */
+.mock-excard {
+  background:var(--bg); border:1px solid var(--muted2);
+  display:flex; justify-content:space-between; align-items:center; padding:1.2rem 1.5rem;
+}
+.mock-ex-l { display:flex; flex-direction:column; gap:.25rem; }
+.mock-ex-cat { font-size:.7rem; letter-spacing:2px; color:var(--orange); }
+.mock-ex-name { font-size:1.15rem; color:var(--white); }
+.mock-ex-prog { font-size:.78rem; color:var(--muted); }
+.mock-ex-r { display:flex; flex-direction:column; align-items:center; }
+.mock-ex-lvl { font-family:var(--display); font-size:3rem; color:var(--orange); line-height:1; }
+.mock-ex-lbl { font-size:.65rem; letter-spacing:1px; color:var(--muted); }
 .hscroll-visual::before {
   content:'';
   position:absolute;
@@ -521,6 +513,60 @@ section {
   letter-spacing:2px;
   text-transform:uppercase;
   color:var(--muted);
+}
+
+/* ─── LEVEL FLYTHROUGH ─── */
+.flythrough{ position:relative; height:320vh; background:var(--bg); }
+.fly-pin{
+  position:sticky; top:0; height:100vh; overflow:hidden;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+}
+.fly-label{
+  position:absolute; top:4rem; left:50%; transform:translateX(-50%);
+  font-size:.6rem; letter-spacing:4px; text-transform:uppercase; color:var(--orange);
+}
+.fly-bignum{
+  position:absolute; font-family:var(--display);
+  font-size:60vh; line-height:1; color:rgba(255,77,0,.07);
+  z-index:0; user-select:none;
+}
+.fly-stage{ position:relative; z-index:1; text-align:center; }
+.fly-lvl{
+  font-size:.7rem; letter-spacing:5px; text-transform:uppercase; color:var(--orange);
+  margin-bottom:1rem;
+}
+.fly-name{
+  font-family:var(--display);
+  font-size:clamp(3rem,10vw,9rem); line-height:.9; letter-spacing:1px; color:var(--white);
+}
+.fly-desc{
+  font-size:.8rem; letter-spacing:1px; color:var(--muted); margin-top:1.5rem;
+}
+.fly-progress{
+  position:absolute; bottom:4rem; left:50%; transform:translateX(-50%);
+  display:flex; gap:.5rem;
+}
+.fly-tick{ width:24px; height:2px; background:var(--muted2); transition:background .3s; }
+.fly-tick.on{ background:var(--orange); }
+
+/* ─── COMMUNITY LIVE STATS ─── */
+.live-section{ padding:12rem 3.5rem; max-width:1100px; margin:0 auto; }
+.live-head{ display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:4rem; flex-wrap:wrap; gap:1.5rem; }
+.live-head h2{ font-family:var(--display); font-size:clamp(2.5rem,6vw,5rem); line-height:.95; letter-spacing:1px; color:var(--white); }
+.live-head h2 span{ color:var(--orange); }
+.live-badge{ display:flex; align-items:center; gap:.6rem; font-size:.6rem; letter-spacing:2px; text-transform:uppercase; color:var(--orange); }
+.live-dot{ width:7px; height:7px; border-radius:50%; background:var(--orange); animation:livePulse 1.6s ease-in-out infinite; }
+@keyframes livePulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(255,77,0,.5)}50%{opacity:.5;box-shadow:0 0 0 8px rgba(255,77,0,0)}}
+.live-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:1.5px; background:var(--muted2); }
+.live-cell{ background:var(--bg2); padding:2.5rem 2rem; }
+.live-num{ font-family:var(--display); font-size:3.5rem; line-height:1; color:var(--white); }
+.live-num span{ color:var(--orange); }
+.live-cell-label{ font-size:.62rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-top:.6rem; }
+.live-bar{ height:2px; background:var(--muted2); margin-top:1.2rem; overflow:hidden; }
+.live-bar-fill{ height:100%; width:0; background:var(--orange); }
+@media(max-width:700px){
+  .live-section{ padding:7rem 1.25rem; }
+  .live-grid{ grid-template-columns:1fr; }
 }
 
 /* ─── PROBLEM ─── */
@@ -704,7 +750,7 @@ footer {
   align-items:center;
   gap:.5rem;
   font-family:var(--display);
-  font-size:1.2rem;
+  font-size:2.2rem;
   letter-spacing:0;
   color:var(--white);
   text-decoration:none;
@@ -731,16 +777,14 @@ footer {
 
 /* ─── RESPONSIVE ─── */
 @media(max-width:900px){
-  .exercises-grid { grid-template-columns:1fr; gap:1.5px; }
   .compare-grid { grid-template-columns:1fr; gap:1.5px; }
   .problem-section { grid-template-columns:1fr; gap:4rem; }
   .hscroll-step { width:80vw; }
   .hscroll-visual { width:70vw; }
   nav { padding:1.2rem 1.5rem; }
-  .hero-content, .intro, .exercises, .compare-section, .cta-section, footer { padding-left:1.5rem; padding-right:1.5rem; }
+  .hero-content, .intro, .compare-section, .cta-section, footer { padding-left:1.5rem; padding-right:1.5rem; }
   .hero-bottom { left:1.5rem; right:1.5rem; }
   .intro { padding:8rem 1.5rem; }
-  .exercises { padding:4rem 1.5rem 8rem; }
   .compare-section { padding:6rem 1.5rem; }
   .problem-section { padding:8rem 1.5rem; }
 }
@@ -752,7 +796,7 @@ footer {
   .nav-cta-small { font-size:.6rem; letter-spacing:1.5px; }
 
   /* Hero */
-  .hero-title { font-size: clamp(3.8rem, 18vw, 5rem); }
+  .hero-title { font-size: clamp(4.5rem, 21vw, 7rem); letter-spacing: 1px; }
   .hero-subtitle { font-size:.7rem; margin-top:1.5rem; }
   .hero-bottom { display:none; }
 
@@ -760,11 +804,6 @@ footer {
   .intro { padding:6rem 1.25rem; }
   .intro-text { font-size: clamp(1.8rem, 7vw, 2.4rem); }
   .intro-sub { margin-left:0; font-size:.75rem; }
-
-  /* Exercises */
-  .exercises { padding:4rem 1.25rem 6rem; }
-  .ex-card { padding:2rem 1.5rem; }
-  .ex-name { font-size:2rem; }
 
   /* Compare */
   .compare-section { padding:4rem 1.25rem; }
@@ -777,7 +816,8 @@ footer {
   .hscroll-sticky { position:static; height:auto; overflow:visible; }
   .hscroll-track { flex-direction:column; width:100%; padding:4rem 1.25rem; gap:3rem; }
   .hscroll-step { width:100%; padding-right:0; }
-  .hscroll-visual { width:100%; height:200px; }
+  .hscroll-visual { width:100%; height:auto; padding:2.5rem 1.5rem 3.5rem; }
+  .mock { width:100%; max-width:360px; }
   .hscroll-progress-bar { display:none; }
   .hscroll-step-num { font-size:4rem; }
   .hscroll-step-title { font-size:clamp(1.8rem,6vw,2.5rem); }
@@ -814,7 +854,7 @@ footer {
     <div class="hero-eyebrow">Kein Gym. Keine Ausrede.</div>
     <h1 class="hero-title">
       <span class="line"><span class="line-inner">DEIN</span></span>
-      <span class="line"><span class="line-inner orange">KÖRPER.</span></span>
+      <span class="line"><span class="line-inner orange"><span class="typed" id="typed-word">KÖRPER.</span></span></span>
       <span class="line"><span class="line-inner">DEINE</span></span>
       <span class="line"><span class="line-inner">WAFFE.</span></span>
     </h1>
@@ -897,6 +937,20 @@ footer {
   </div>
 </section>
 
+<!-- ── JOURNEY FLYTHROUGH ── -->
+<section class="flythrough" id="flythrough">
+  <div class="fly-pin">
+    <div class="fly-label">— Deine Verwandlung</div>
+    <div class="fly-bignum" id="flyBignum">01</div>
+    <div class="fly-stage">
+      <div class="fly-lvl" id="flyLvl">Tag 1</div>
+      <div class="fly-name" id="flyName">Der erste Satz.</div>
+      <div class="fly-desc" id="flyDesc">Jeder fängt bei Null an. Auch du.</div>
+    </div>
+    <div class="fly-progress" id="flyTicks"></div>
+  </div>
+</section>
+
 <!-- ── HORIZONTAL SCROLL ── -->
 <div class="hscroll-section">
   <div class="hscroll-sticky">
@@ -909,44 +963,92 @@ footer {
       <div class="hscroll-step">
         <div class="hscroll-step-num">01</div>
         <div class="hscroll-step-title">Automatische<br>Progression.</div>
-        <p class="hscroll-step-desc">Kein anderes System macht das: CORVIS beobachtet deine Leistung und stuft dich automatisch hoch — oder runter. Kein Raten. Kein Plateau. Immer genau das richtige Level.</p>
+        <p class="hscroll-step-desc">CORVIS stuft dich selbst hoch und runter. Kein Raten, kein Plateau.</p>
       </div>
 
       <div class="hscroll-visual">
-        <div class="hscroll-visual-inner">↑</div>
+        <div class="mock">
+          <div class="mock-levelcard">
+            <div class="mock-lc-top">
+              <span class="mock-lc-ex">PUSH-UPS</span>
+              <span class="mock-lc-tag">↑ LEVEL UP</span>
+            </div>
+            <div class="mock-lc-jump">
+              <span class="mock-lc-old">L3</span>
+              <span class="mock-lc-arrow">→</span>
+              <span class="mock-lc-new">L4</span>
+            </div>
+            <div class="mock-lc-name">Standard Push-ups</div>
+            <div class="mock-lc-bar"><div class="mock-lc-fill"></div></div>
+          </div>
+        </div>
         <div class="hscroll-visual-tag">FEATURE 01 / PROGRESSION</div>
       </div>
 
       <div class="hscroll-step">
         <div class="hscroll-step-num">02</div>
         <div class="hscroll-step-title">Dein<br>Wochenplan.</div>
-        <p class="hscroll-step-desc">Du wählst deine Trainingstage — Montag bis Sonntag, wie es in deinen Alltag passt. Die App weiß wann du trainierst und wann du Pause machst. Kein Kalenderchaos.</p>
+        <p class="hscroll-step-desc">Wähl deine Trainingstage. CORVIS weiß wann du dran bist.</p>
       </div>
 
       <div class="hscroll-visual">
-        <div class="hscroll-visual-inner">▦</div>
+        <div class="mock">
+          <div class="mock-week">
+            <div class="mock-day done"><span>Mo</span><i>✓</i></div>
+            <div class="mock-day done"><span>Di</span><i>✓</i></div>
+            <div class="mock-day rest"><span>Mi</span><i></i></div>
+            <div class="mock-day done"><span>Do</span><i>✓</i></div>
+            <div class="mock-day today"><span>Fr</span><i></i></div>
+            <div class="mock-day plan"><span>Sa</span><i></i></div>
+            <div class="mock-day rest"><span>So</span><i></i></div>
+          </div>
+        </div>
         <div class="hscroll-visual-tag">FEATURE 02 / WOCHENPLAN</div>
       </div>
 
       <div class="hscroll-step">
         <div class="hscroll-step-num">03</div>
         <div class="hscroll-step-title">Fortschritt<br>sichtbar.</div>
-        <p class="hscroll-step-desc">Trainingshistorie, Streak, Level-Verlauf — du siehst auf einen Blick wie weit du gekommen bist. Fortschritt den du anfassen kannst motiviert mehr als jedes Motivations-Video.</p>
+        <p class="hscroll-step-desc">Streak, Level-Verlauf, Meilensteine. Deine ganze Reise auf einen Blick.</p>
       </div>
 
       <div class="hscroll-visual">
-        <div class="hscroll-visual-inner">↗</div>
+        <div class="mock mock-stats">
+          <div class="mock-stat-hero">
+            <span class="mock-stat-flame">🔥</span>
+            <span class="mock-stat-big">14</span>
+            <span class="mock-stat-cap">Tage in Folge</span>
+          </div>
+          <div class="mock-graph">
+            <div class="mock-bar" style="height:35%"></div>
+            <div class="mock-bar" style="height:50%"></div>
+            <div class="mock-bar" style="height:45%"></div>
+            <div class="mock-bar" style="height:70%"></div>
+            <div class="mock-bar" style="height:65%"></div>
+            <div class="mock-bar" style="height:85%"></div>
+            <div class="mock-bar on" style="height:100%"></div>
+          </div>
+          <div class="mock-graph-label">Volumen · letzte 7 Wochen</div>
+          <div class="mock-chips">
+            <span class="mock-chip on">↑ 6 Level-Ups</span>
+            <span class="mock-chip">🏅 3 Meilensteine</span>
+          </div>
+        </div>
         <div class="hscroll-visual-tag">FEATURE 03 / STATISTIKEN</div>
       </div>
 
       <div class="hscroll-step">
         <div class="hscroll-step-num">04</div>
         <div class="hscroll-step-title">Übungen<br>erklärt.</div>
-        <p class="hscroll-step-desc">Jede Variante, jede Stufe — mit Beschreibung. Du weißt immer was du tust und warum. Kein YouTube-Rabbit-Hole, keine Unsicherheit, nur klare Ausführung.</p>
+        <p class="hscroll-step-desc">Jede Stufe mit klarer Anleitung. Du weißt immer was zu tun ist.</p>
       </div>
 
       <div class="hscroll-visual">
-        <div class="hscroll-visual-inner">≡</div>
+        <div class="mock">
+          <div class="mock-excard"><div class="mock-ex-l"><span class="mock-ex-cat">PUSH</span><span class="mock-ex-name">Push-ups</span><span class="mock-ex-prog">Standard Push-ups</span></div><div class="mock-ex-r"><span class="mock-ex-lvl">4</span><span class="mock-ex-lbl">Level</span></div></div>
+          <div class="mock-excard"><div class="mock-ex-l"><span class="mock-ex-cat">PULL</span><span class="mock-ex-name">Pull-ups</span><span class="mock-ex-prog">Active Hang</span></div><div class="mock-ex-r"><span class="mock-ex-lvl">3</span><span class="mock-ex-lbl">Level</span></div></div>
+          <div class="mock-excard"><div class="mock-ex-l"><span class="mock-ex-cat">CORE</span><span class="mock-ex-name">Planks</span><span class="mock-ex-prog">Standard Plank</span></div><div class="mock-ex-r"><span class="mock-ex-lvl">3</span><span class="mock-ex-lbl">Level</span></div></div>
+        </div>
         <div class="hscroll-visual-tag">FEATURE 04 / ÜBUNGEN</div>
       </div>
 
@@ -954,40 +1056,43 @@ footer {
   </div>
 </div>
 
-<!-- ── EXERCISES ── -->
+<!-- ── COMMUNITY LIVE STATS ── -->
 <section>
-  <div class="exercises">
-    <div class="exercises-label">— Drei Übungen. Unbegrenzte Stärke.</div>
-    <div class="exercises-grid">
-      <div class="ex-card" id="ex-1">
-        <div class="ex-num">01 / PUSH</div>
-        <div class="ex-name">Push-Ups</div>
-        <div class="ex-sub">Brust · Trizeps · Schultern</div>
-        <p class="ex-desc">Von der Wand bis zum einarmigen Push-up. 7 Stufen die dich nie langweilen lassen — und nie überfordern. Genau das richtige Level. Immer.</p>
-        <div class="ex-range">
-          <span>Anfänger</span>
-          <span>Fortgeschritten →</span>
-        </div>
+  <div class="live-section">
+    <div class="live-head">
+      <h2>Gemeinsam<br><span>stärker.</span></h2>
+      <div class="live-badge"><span class="live-dot"></span>Live · Echtzeit-Daten</div>
+    </div>
+    <div class="live-grid" id="liveGrid">
+      <div class="live-cell">
+        <div class="live-num" id="lvAthletes">—</div>
+        <div class="live-cell-label">Athleten</div>
+        <div class="live-bar"><div class="live-bar-fill" data-w="100"></div></div>
       </div>
-      <div class="ex-card" id="ex-2">
-        <div class="ex-num">02 / PULL</div>
-        <div class="ex-name">Pull-Ups</div>
-        <div class="ex-sub">Rücken · Bizeps · Core</div>
-        <p class="ex-desc">Die Übung die echte Stärke zeigt. CORVIS bringt dich dorthin — egal ob du heute noch kein einziges schaffst. Stufe für Stufe. Ohne Wenn und Aber.</p>
-        <div class="ex-range">
-          <span>Dead Hang</span>
-          <span>Chest-to-Bar →</span>
-        </div>
+      <div class="live-cell">
+        <div class="live-num" id="lvWorkouts">—</div>
+        <div class="live-cell-label">Workouts absolviert</div>
+        <div class="live-bar"><div class="live-bar-fill" data-w="80"></div></div>
       </div>
-      <div class="ex-card" id="ex-3">
-        <div class="ex-num">03 / CORE</div>
-        <div class="ex-name">Planks</div>
-        <div class="ex-sub">Core · Rücken · Stabilität</div>
-        <p class="ex-desc">Kraft kommt von innen. Buchstäblich. Ein starker Core macht jeden Push-up besser, jeden Pull-up leichter — und deinen Rücken dankbar.</p>
-        <div class="ex-range">
-          <span>Knie-Plank</span>
-          <span>Extended Plank →</span>
-        </div>
+      <div class="live-cell">
+        <div class="live-num" id="lvLevelups">—</div>
+        <div class="live-cell-label">Level-Ups</div>
+        <div class="live-bar"><div class="live-bar-fill" data-w="65"></div></div>
+      </div>
+      <div class="live-cell">
+        <div class="live-num" id="lvPush">—</div>
+        <div class="live-cell-label">Push-ups total</div>
+        <div class="live-bar"><div class="live-bar-fill" data-w="90"></div></div>
+      </div>
+      <div class="live-cell">
+        <div class="live-num" id="lvPull">—</div>
+        <div class="live-cell-label">Pull-ups total</div>
+        <div class="live-bar"><div class="live-bar-fill" data-w="55"></div></div>
+      </div>
+      <div class="live-cell">
+        <div class="live-num" id="lvPlank">—</div>
+        <div class="live-cell-label">Plank-Minuten</div>
+        <div class="live-bar"><div class="live-bar-fill" data-w="70"></div></div>
       </div>
     </div>
   </div>
@@ -1021,6 +1126,76 @@ footer {
 
 <script>
 gsap.registerPlugin(ScrollTrigger);
+
+// ── JOURNEY FLYTHROUGH — scroll through the transformation over time ──
+(function(){
+  const stops=[
+    {tag:'Tag 1',    name:'Der erste Satz.',   desc:'Jeder fängt bei Null an. Auch du.',        num:'01'},
+    {tag:'Tag 7',    name:'Die Gewohnheit.',   desc:'Aus Überwindung wird Routine.',           num:'07'},
+    {tag:'Tag 30',   name:'Die Wende.',        desc:'Du spürst es. Andere sehen es.',          num:'30'},
+    {tag:'Tag 90',   name:'Die neue Norm.',    desc:'Was schwer war, ist jetzt leicht.',       num:'90'},
+    {tag:'Für immer',name:'Dein Standard.',    desc:'Stärke ist keine Phase. Sie ist du.',     num:'∞'},
+  ];
+  const ticks=document.getElementById('flyTicks');
+  stops.forEach((_,i)=>{ const t=document.createElement('span'); t.className='fly-tick'+(i===0?' on':''); ticks.appendChild(t); });
+  const tickEls=[...ticks.children];
+
+  const lvlEl=document.getElementById('flyLvl'),
+        nameEl=document.getElementById('flyName'),
+        descEl=document.getElementById('flyDesc'),
+        bigEl=document.getElementById('flyBignum'),
+        stage=document.querySelector('.fly-stage');
+
+  ScrollTrigger.create({
+    trigger:'#flythrough', start:'top top', end:'bottom bottom', scrub:1,
+    onUpdate(self){
+      const i=Math.min(stops.length-1, Math.floor(self.progress*stops.length));
+      const local=(self.progress*stops.length)%1;
+      const scale=0.85+local*0.3;
+      const op=Math.sin(local*Math.PI);
+      gsap.set(stage,{scale:scale, opacity:0.15+op*0.85});
+      gsap.set(bigEl,{scale:0.9+local*0.4, opacity:0.04+op*0.06});
+
+      if(bigEl.dataset.i!=i){
+        bigEl.dataset.i=i;
+        lvlEl.textContent=stops[i].tag;
+        nameEl.textContent=stops[i].name;
+        descEl.textContent=stops[i].desc;
+        bigEl.textContent=stops[i].num;
+        tickEls.forEach((t,k)=>t.classList.toggle('on',k<=i));
+      }
+    }
+  });
+})();
+
+// ── COMMUNITY LIVE STATS — CMS-style: fetch aggregate, count up, fill bars ──
+(function(){
+  const fmt=n=>n.toLocaleString('de-DE');
+  function countUp(el,target){
+    const o={v:0};
+    gsap.to(o,{v:target,duration:1.6,ease:'power2.out',
+      onUpdate:()=>{ el.textContent=fmt(Math.floor(o.v)); }});
+  }
+  let fired=false;
+  function run(data){
+    if(fired) return; fired=true;
+    countUp(document.getElementById('lvAthletes'), data.total_athletes);
+    countUp(document.getElementById('lvWorkouts'), data.total_workouts);
+    countUp(document.getElementById('lvLevelups'), data.level_ups);
+    countUp(document.getElementById('lvPush'),     data.push_reps);
+    countUp(document.getElementById('lvPull'),     data.pull_reps);
+    countUp(document.getElementById('lvPlank'),    data.plank_minutes);
+    gsap.to('.live-bar-fill',{width:(i,t)=>t.dataset.w+'%',duration:1.4,ease:'power3.out',stagger:.08});
+  }
+  // Fetch the live aggregate (public endpoint).
+  fetch('/api/fitness/community-stats/')
+    .then(r=>r.json())
+    .then(data=>{
+      ScrollTrigger.create({ trigger:'.live-section', start:'top 75%', once:true,
+        onEnter:()=>run(data) });
+    })
+    .catch(()=>{ /* endpoint unavailable — leave dashes */ });
+})();
 
 // ── MARQUEE ──
 const items=['Push-Ups','Pull-Ups','Planks','7 Level System','Gratis','Kein Gym','Kein Abo','5× Pro Woche','30 Minuten','Progression','COR<span>VIS</span>','Die Kraft deines Körpers'];
@@ -1148,6 +1323,42 @@ gsap.utils.toArray('.line-inner').forEach((el,i)=>{
   gsap.to(el,{y:'0%',duration:1,delay:.5+i*.12,ease:'power4.out'});
 });
 
+// ── TYPEWRITER LOOP on the orange word ──
+(function(){
+  const el = document.getElementById('typed-word');
+  if(!el) return;
+  const words = ['KÖRPER.','WILLE.','ANTRIEB.','FOKUS.','KAMPF.'];
+  let wi = 0;          // word index
+  let ci = 0;          // char index
+  let deleting = false;
+
+  const TYPE = 110, DEL = 55, HOLD = 1400, PAUSE = 350;
+
+  function tick(){
+    const word = words[wi];
+    if(!deleting){
+      el.textContent = word.slice(0, ci+1);
+      ci++;
+      if(ci === word.length){
+        deleting = true;
+        return setTimeout(tick, HOLD);
+      }
+      return setTimeout(tick, TYPE);
+    } else {
+      el.textContent = word.slice(0, ci-1);
+      ci--;
+      if(ci === 0){
+        deleting = false;
+        wi = (wi + 1) % words.length;
+        return setTimeout(tick, PAUSE);
+      }
+      return setTimeout(tick, DEL);
+    }
+  }
+  // Start after the entrance reveal finishes.
+  setTimeout(()=>{ ci = words[0].length; deleting = true; setTimeout(tick, HOLD); }, 2200);
+})();
+
 // ── HERO TEXT SPLIT ON SCROLL ──
 gsap.to('.hero-title',{
   scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1},
@@ -1187,29 +1398,6 @@ gsap.to('.hero-eyebrow',{
     opacity:1, y:0, duration:1, ease:'power3.out'
   });
 })();
-
-// ── EXERCISE CARDS FLY IN ──
-gsap.set('#ex-1',{x:-80,opacity:0});
-gsap.set('#ex-2',{y:60,opacity:0});
-gsap.set('#ex-3',{x:80,opacity:0});
-
-ScrollTrigger.create({
-  trigger:'.exercises-grid', start:'top 90%',
-  onEnter:()=>{
-    gsap.to('#ex-1',{x:0,opacity:1,duration:.9,ease:'power3.out'});
-    gsap.to('#ex-2',{y:0,opacity:1,duration:.9,delay:.12,ease:'power3.out'});
-    gsap.to('#ex-3',{x:0,opacity:1,duration:.9,delay:.24,ease:'power3.out'});
-  },
-  once:true
-});
-gsap.utils.toArray('.exercises-label').forEach(el=>{
-  gsap.set(el,{opacity:0});
-  ScrollTrigger.create({
-    trigger:el, start:'top 90%',
-    onEnter:()=>gsap.to(el,{opacity:1,duration:.6,ease:'power2.out'}),
-    once:true
-  });
-});
 
 // ── COMPARE SECTION ──
 ScrollTrigger.create({
