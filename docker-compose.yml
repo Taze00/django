@@ -29,6 +29,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - DJANGO_DEBUG=False
+      # Secret value lives only in the gitignored .env, injected here by name.
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY}
     depends_on:
       - db
     labels:
