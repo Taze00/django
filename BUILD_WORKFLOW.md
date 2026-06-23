@@ -1,3 +1,6 @@
+> ⚠️ VERALTET (Stand überholt). Gültige Doku: CORVIS_DOCUMENTATION.md + CLAUDE.md.
+> Diese Datei nur als historische Referenz behalten.
+
 # Fitness App Build Workflow
 
 ## Quick Start

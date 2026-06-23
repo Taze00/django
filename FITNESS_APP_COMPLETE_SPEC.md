@@ -1,3 +1,6 @@
+> ⚠️ VERALTET (Stand überholt). Gültige Doku: CORVIS_DOCUMENTATION.md + CLAUDE.md.
+> Diese Datei nur als historische Referenz behalten.
+
 # 🏋️ FITNESS APP - COMPLETE SPECIFICATION
 
 **Version:** 1.1 (Updated Apr 2, 2026)
