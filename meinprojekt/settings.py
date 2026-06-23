@@ -20,11 +20,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# Read from env; the literal fallback keeps existing sessions valid for local
-# dev. In production, set DJANGO_SECRET_KEY to a fresh secret.
+# The real key is provided via the DJANGO_SECRET_KEY env var (gitignored .env).
+# The fallback below is an obvious dev-only placeholder — NOT a real key.
 SECRET_KEY = os.environ.get(
     'DJANGO_SECRET_KEY',
-    'django-insecure-scizz_1!1w56v()@wxsldrzl_$v52g5px_m2vc4&7+8@-arv_s',
+    'django-insecure-dev-only-change-me',
 )
 
 # SECURITY WARNING: don't run with debug turned on in production!
