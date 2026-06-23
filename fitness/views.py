@@ -12,6 +12,37 @@ from fitness.serializers import (
 )
 
 
+@api_view(['GET'])
+@permission_classes([])
+def community_stats(request):
+    """Public aggregate stats across all users for the landing page 'live' section."""
+    from django.db.models import Sum, Count
+
+    total_workouts = Workout.objects.filter(completed=True).count()
+    total_athletes = User.objects.count()
+
+    push_reps = WorkoutSet.objects.filter(
+        exercise__category='PUSH', reps__isnull=False
+    ).aggregate(s=Sum('reps'))['s'] or 0
+    pull_reps = WorkoutSet.objects.filter(
+        exercise__category='PULL', reps__isnull=False
+    ).aggregate(s=Sum('reps'))['s'] or 0
+    plank_seconds = WorkoutSet.objects.filter(
+        exercise__category='CORE', seconds__isnull=False
+    ).aggregate(s=Sum('seconds'))['s'] or 0
+
+    level_ups = LevelEvent.objects.filter(event_type='level_up').count()
+
+    return Response({
+        'total_athletes': total_athletes,
+        'total_workouts': total_workouts,
+        'push_reps': push_reps,
+        'pull_reps': pull_reps,
+        'plank_minutes': plank_seconds // 60,
+        'level_ups': level_ups,
+    })
+
+
 class ExerciseViewSet(viewsets.ReadOnlyModelViewSet):
     """List all exercises with progressions (public endpoint)"""
     queryset = Exercise.objects.prefetch_related('progressions')
