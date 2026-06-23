@@ -33,8 +33,13 @@ SECRET_KEY = os.environ.get(
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() not in ('false', '0', 'no', 'off')
 
 # start stevo
-# ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ["*"]
+# Restricted to the real host(s). Override via DJANGO_ALLOWED_HOSTS
+# (comma-separated). Default covers the production domain + local dev access
+# (port 8000). No more wildcard "*".
+ALLOWED_HOSTS = os.environ.get(
+    'DJANGO_ALLOWED_HOSTS',
+    'alex.volkmann.com,localhost,127.0.0.1',
+).split(',')
 CORS_ORIGIN_ALLOW_ALL = True
 CSRF_TRUSTED_ORIGINS = [
     "https://alex.volkmann.com",
