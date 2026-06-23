@@ -20,7 +20,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-scizz_1!1w56v()@wxsldrzl_$v52g5px_m2vc4&7+8@-arv_s'
+# Read from env; the literal fallback keeps existing sessions valid for local
+# dev. In production, set DJANGO_SECRET_KEY to a fresh secret.
+SECRET_KEY = os.environ.get(
+    'DJANGO_SECRET_KEY',
+    'django-insecure-scizz_1!1w56v()@wxsldrzl_$v52g5px_m2vc4&7+8@-arv_s',
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # Controlled via the DJANGO_DEBUG env var. Defaults to True for local dev;
@@ -198,5 +203,10 @@ print(BASE_DIR)
 # Registration Secret Key - Keep this secure!
 # Share this only with people you trust for registration
 
-# Registration Secret Key - Required for user registration
-REGISTRATION_SECRET_KEY = 'IchGlaubeDieZahlenVon1Bis10'
+# Registration Secret Key - Required for user registration.
+# Read from env; literal fallback keeps local dev working. In production, set
+# DJANGO_REGISTRATION_KEY to a secret value.
+REGISTRATION_SECRET_KEY = os.environ.get(
+    'DJANGO_REGISTRATION_KEY',
+    'IchGlaubeDieZahlenVon1Bis10',
+)
