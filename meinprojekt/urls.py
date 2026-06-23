@@ -41,6 +41,8 @@ urlpatterns = [
     path('skills/', views.skills_page, name='skills_page'),
     # CORVIS landing page
     path('corvis/', views.fitness_landing_page, name='fitness_landing_page'),
+    # AURELIA demo (technique showcase)
+    path('aurelia/', views.aurelia_demo, name='aurelia_demo'),
 ]
 
 # Serve media files in development
@@ -54,3 +56,10 @@ urlpatterns = [
     path('apple-touch-icon.png', static_serve, {'document_root': os.path.join(settings.BASE_DIR, 'static/geo'), 'path': 'apple-touch-icon.png'}),
     path('favicon.svg', static_serve, {'document_root': os.path.join(settings.BASE_DIR, 'static/geo'), 'path': 'favicon.svg'}),
 ] + urlpatterns
+
+# Custom 404. handler404 covers DEBUG=False; the catch-all re_path hides the
+# debug URL list while DEBUG=True. Must stay LAST so real routes win.
+handler404 = 'meinprojekt.views.not_found'
+urlpatterns += [
+    re_path(r'^.*$', views.not_found),
+]

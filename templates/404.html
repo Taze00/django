@@ -1,0 +1,45 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CORVIS — Seite nicht gefunden</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#080808; --orange:#FF4D00; --white:#f0ede8; --muted:#555; --muted2:#333; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { height:100%; }
+  body {
+    background:var(--bg); color:var(--white); font-family:'DM Mono',monospace;
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    padding:2rem; overflow:hidden; position:relative;
+  }
+  .glow {
+    position:fixed; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse at center, rgba(255,77,0,0.08) 0%, transparent 60%);
+  }
+  .wrap { position:relative; z-index:1; max-width:420px; }
+  .logo { font-family:'Bebas Neue',sans-serif; font-size:2rem; letter-spacing:1px; margin-bottom:3rem; }
+  .logo span { color:var(--orange); }
+  .code { font-family:'Bebas Neue',sans-serif; font-size:9rem; line-height:0.9; color:var(--orange); letter-spacing:2px; }
+  .msg { font-size:0.85rem; letter-spacing:1px; color:var(--muted); margin:1.5rem 0 2.5rem; line-height:1.8; }
+  .home {
+    display:inline-block; background:var(--orange); color:#000; text-decoration:none;
+    font-size:0.72rem; letter-spacing:3px; text-transform:uppercase; padding:0.9rem 2.5rem;
+    transition:background 0.2s;
+  }
+  .home:hover { background:#ff6a2a; }
+</style>
+</head>
+<body>
+  <div class="glow"></div>
+  <div class="wrap">
+    <div class="logo">COR<span>VIS</span></div>
+    <div class="code">404</div>
+    <p class="msg">Diese Seite gibt es nicht.<br>Aber dein nächstes Training schon.</p>
+    <a href="/corvis/" class="home">Zur Startseite →</a>
+  </div>
+</body>
+</html>

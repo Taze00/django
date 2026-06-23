@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AURELIA — Residences in the Sky</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+<style>
+:root{
+  --ink:#0a0805;
+  --ink2:#13100a;
+  --gold:#c79a4b;
+  --gold-bright:#e8be72;
+  --cream:#f3ead8;
+  --muted:#6b6052;
+  --line:#2a2419;
+  --serif:'Fraunces',serif;
+  --mono:'Space Mono',monospace;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+body{
+  background:var(--ink);
+  color:var(--cream);
+  font-family:var(--mono);
+  overflow-x:hidden;
+  cursor:none;
+}
+
+/* ── CUSTOM CURSOR ── */
+.cursor{
+  position:fixed;top:0;left:0;width:10px;height:10px;border-radius:50%;
+  background:var(--gold-bright);pointer-events:none;z-index:9999;
+  mix-blend-mode:difference;transform:translate(-50%,-50%);
+}
+.cursor-ring{
+  position:fixed;top:0;left:0;width:42px;height:42px;border-radius:50%;
+  border:1px solid rgba(199,154,75,.5);pointer-events:none;z-index:9998;
+  transform:translate(-50%,-50%);
+}
+
+/* ── GOLDEN GRADE (WebGL post overlay) ── */
+#grade{
+  position:fixed;inset:0;z-index:60;pointer-events:none;
+  mix-blend-mode:soft-light;opacity:.9;
+}
+.grain{
+  position:fixed;inset:0;z-index:61;pointer-events:none;opacity:.06;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:gr .6s steps(2) infinite;
+}
+@keyframes gr{to{transform:translate(-3px,2px)}}
+.vignette{
+  position:fixed;inset:0;z-index:59;pointer-events:none;
+  background:radial-gradient(ellipse at center,transparent 45%,rgba(5,4,2,.7) 100%);
+}
+
+/* ── DRONE / WEBGL CANVASES ── */
+#drone,#facade{position:fixed;inset:0;width:100%;height:100%;}
+#drone{z-index:1;}
+#facade{z-index:2;opacity:0;}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:2rem 3.5rem;mix-blend-mode:difference;
+}
+.brand{font-family:var(--serif);font-size:1.6rem;letter-spacing:6px;color:var(--cream);font-weight:600;}
+.nav-right{display:flex;gap:3rem;align-items:center;}
+.nav-link{font-size:.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--cream);text-decoration:none;}
+
+/* ── HERO ── */
+.hero{
+  position:relative;z-index:10;height:100vh;
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  text-align:center;mix-blend-mode:overlay;
+}
+.hero-eyebrow{font-size:.72rem;letter-spacing:8px;text-transform:uppercase;color:var(--gold-bright);margin-bottom:2rem;opacity:0;}
+.hero h1{
+  font-family:var(--serif);font-weight:300;
+  font-size:clamp(4rem,17vw,15rem);line-height:.82;letter-spacing:-2px;
+  color:#fff;mix-blend-mode:overlay;
+}
+.hero h1 em{font-style:italic;font-weight:400;color:#fff;}
+.hero .word{display:inline-block;overflow:hidden;}
+.hero .word span{display:inline-block;transform:translateY(105%);}
+.hero-sub{
+  margin-top:2.5rem;font-size:.78rem;letter-spacing:3px;color:var(--cream);
+  text-transform:uppercase;opacity:0;
+}
+
+.scroll-cue{
+  position:fixed;bottom:2.5rem;left:50%;transform:translateX(-50%);z-index:50;
+  font-size:.6rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);
+  display:flex;flex-direction:column;align-items:center;gap:.8rem;mix-blend-mode:difference;
+}
+.scroll-cue .bar{width:1px;height:40px;background:linear-gradient(var(--gold),transparent);animation:cue 2s ease-in-out infinite;}
+@keyframes cue{0%,100%{transform:scaleY(.4);opacity:.4}50%{transform:scaleY(1);opacity:1}}
+
+/* ── FACADE FLYTHROUGH SECTION ── */
+.flythrough{position:relative;z-index:10;height:300vh;}
+.fly-pin{position:sticky;top:0;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.fly-type{
+  font-family:var(--serif);font-weight:300;
+  font-size:clamp(3rem,11vw,11rem);line-height:.9;letter-spacing:-3px;
+  text-align:center;color:#fff;mix-blend-mode:overlay;max-width:90%;
+}
+.fly-type em{font-style:italic;color:var(--gold-bright);mix-blend-mode:normal;}
+.fly-num{
+  position:absolute;font-family:var(--serif);font-size:42vw;color:rgba(199,154,75,.06);
+  line-height:1;z-index:-1;font-weight:600;
+}
+
+/* ── STAT STRIP ── */
+.stats{
+  position:relative;z-index:10;background:var(--ink);
+  display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);
+}
+.stat{padding:4rem 2rem;border-right:1px solid var(--line);text-align:center;}
+.stat:last-child{border-right:none;}
+.stat-n{font-family:var(--serif);font-size:3.5rem;color:var(--gold-bright);line-height:1;}
+.stat-l{font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:.8rem;}
+
+/* ── EDITORIAL SPLIT ── */
+.editorial{
+  position:relative;z-index:10;background:var(--ink);
+  padding:12rem 3.5rem;display:grid;grid-template-columns:1fr 1fr;gap:6rem;align-items:center;
+}
+.ed-label{font-size:.65rem;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:2rem;}
+.ed-title{font-family:var(--serif);font-weight:300;font-size:clamp(2.5rem,5vw,4.5rem);line-height:1.02;letter-spacing:-1px;margin-bottom:2rem;}
+.ed-title em{font-style:italic;color:var(--gold-bright);}
+.ed-body{font-size:.85rem;line-height:2;color:var(--muted);max-width:420px;letter-spacing:.3px;}
+.ed-visual{
+  height:60vh;border:1px solid var(--line);position:relative;overflow:hidden;
+  background:linear-gradient(135deg,#1a150d 0%,#0a0805 60%);
+}
+.ed-visual::before{
+  content:'';position:absolute;inset:0;
+  background:
+    repeating-linear-gradient(180deg,transparent 0 38px,rgba(199,154,75,.07) 38px 39px),
+    repeating-linear-gradient(90deg,transparent 0 60px,rgba(199,154,75,.05) 60px 61px);
+}
+.ed-visual::after{
+  content:'';position:absolute;top:-30%;left:-10%;width:60%;height:160%;
+  background:linear-gradient(105deg,transparent,rgba(232,190,114,.18),transparent);
+  transform:rotate(8deg);filter:blur(8px);
+  animation:sheen 7s ease-in-out infinite;
+}
+@keyframes sheen{0%,100%{transform:translateX(-30%) rotate(8deg)}50%{transform:translateX(120%) rotate(8deg)}}
+
+/* ── CONSTRUCTION PROGRESS (CMS) ── */
+.progress{position:relative;z-index:10;background:var(--ink2);padding:12rem 3.5rem;}
+.progress-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:5rem;flex-wrap:wrap;gap:2rem;}
+.progress-head h2{font-family:var(--serif);font-weight:300;font-size:clamp(2.5rem,5vw,4rem);line-height:1;letter-spacing:-1px;}
+.progress-head h2 em{font-style:italic;color:var(--gold-bright);}
+.live-tag{display:flex;align-items:center;gap:.6rem;font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold);}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--gold-bright);animation:pulse 1.6s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(232,190,114,.5)}50%{opacity:.5;box-shadow:0 0 0 8px rgba(232,190,114,0)}}
+#milestones{display:flex;flex-direction:column;gap:0;}
+.ms{
+  display:grid;grid-template-columns:80px 1fr 90px;gap:2rem;align-items:center;
+  padding:2rem 0;border-top:1px solid var(--line);
+}
+.ms:last-child{border-bottom:1px solid var(--line);}
+.ms-phase{font-family:var(--serif);font-size:1.4rem;color:var(--gold);}
+.ms-mid{display:flex;flex-direction:column;gap:1rem;}
+.ms-name{font-size:.95rem;letter-spacing:1px;color:var(--cream);}
+.ms-track{height:2px;background:var(--line);position:relative;overflow:hidden;}
+.ms-fill{position:absolute;left:0;top:0;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold-bright));}
+.ms-pct{font-family:var(--serif);font-size:1.8rem;color:var(--cream);text-align:right;}
+.ms.done .ms-name{color:var(--gold-bright);}
+
+/* ── CTA ── */
+.cta{
+  position:relative;z-index:10;min-height:90vh;background:var(--ink);
+  display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;
+  padding:6rem 2rem;overflow:hidden;
+}
+.cta::before{
+  content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:700px;height:700px;border-radius:50%;
+  background:radial-gradient(circle,rgba(199,154,75,.12),transparent 70%);
+}
+.cta-eyebrow{font-size:.65rem;letter-spacing:5px;text-transform:uppercase;color:var(--gold);margin-bottom:2rem;position:relative;}
+.cta h2{font-family:var(--serif);font-weight:300;font-size:clamp(3rem,9vw,8rem);line-height:.9;letter-spacing:-2px;margin-bottom:3rem;position:relative;}
+.cta h2 em{font-style:italic;color:var(--gold-bright);}
+
+/* ── MAGNETIC BUTTON ── */
+.btn{
+  position:relative;display:inline-flex;align-items:center;gap:1rem;
+  font-family:var(--mono);font-size:.72rem;letter-spacing:3px;text-transform:uppercase;
+  color:var(--ink);background:var(--gold-bright);
+  padding:1.4rem 3.5rem;border:none;text-decoration:none;cursor:none;overflow:hidden;
+}
+.btn span{position:relative;z-index:2;}
+.btn::before{
+  content:'';position:absolute;inset:0;background:var(--cream);
+  transform:translateY(101%);transition:transform .5s cubic-bezier(.16,1,.3,1);z-index:1;
+}
+.btn:hover::before{transform:translateY(0);}
+
+/* ── FOOTER ── */
+footer{
+  position:relative;z-index:10;background:var(--ink2);border-top:1px solid var(--line);
+  padding:3rem 3.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1.5rem;
+}
+.foot-brand{font-family:var(--serif);font-size:1.3rem;letter-spacing:5px;color:var(--cream);}
+.foot-links{display:flex;gap:2.5rem;}
+.foot-links a{font-size:.62rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);text-decoration:none;}
+.foot-copy{font-size:.6rem;letter-spacing:1px;color:var(--muted);}
+
+@media(max-width:860px){
+  nav{padding:1.5rem;}
+  .nav-right{gap:1.5rem;}
+  .nav-link{display:none;}
+  .stats{grid-template-columns:repeat(2,1fr);}
+  .stat:nth-child(2){border-right:none;}
+  .editorial{grid-template-columns:1fr;gap:3rem;padding:8rem 1.5rem;}
+  .progress{padding:8rem 1.5rem;}
+  .ms{grid-template-columns:50px 1fr 60px;gap:1rem;}
+  .ms-pct{font-size:1.2rem;}
+  body{cursor:auto;}
+  .cursor,.cursor-ring{display:none;}
+  .btn{cursor:pointer;}
+}
+</style>
+</head>
+<body>
+
+<canvas id="drone"></canvas>
+<canvas id="facade"></canvas>
+<canvas id="grade"></canvas>
+<div class="vignette"></div>
+<div class="grain"></div>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<nav>
+  <div class="brand">AURELIA</div>
+  <div class="nav-right">
+    <a class="nav-link" href="#">Residences</a>
+    <a class="nav-link" href="#">Progress</a>
+    <a class="nav-link" href="#" data-mag>Enquire</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Park Avenue · Above the Clouds</div>
+  <h1>
+    <span class="word"><span>LIVE</span></span><br>
+    <span class="word"><span><em>elevated</em></span></span>
+  </h1>
+  <p class="hero-sub">42 Private Residences · From $4.8M</p>
+</section>
+
+<div class="scroll-cue"><span>Descend</span><span class="bar"></span></div>
+
+<!-- FACADE FLYTHROUGH -->
+<section class="flythrough">
+  <div class="fly-pin">
+    <div class="fly-num" id="flyNum">01</div>
+    <div class="fly-type" id="flyType">A tower carved<br>from <em>light</em>.</div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="stat"><div class="stat-n">61</div><div class="stat-l">Storeys</div></div>
+  <div class="stat"><div class="stat-n">270&deg;</div><div class="stat-l">City Views</div></div>
+  <div class="stat"><div class="stat-n">11,400</div><div class="stat-l">Sq Ft Penthouse</div></div>
+  <div class="stat"><div class="stat-n">2027</div><div class="stat-l">Completion</div></div>
+</section>
+
+<!-- EDITORIAL -->
+<section class="editorial">
+  <div class="ed-text">
+    <div class="ed-label">The Philosophy</div>
+    <h2 class="ed-title">Architecture that <em>breathes</em> with the sky.</h2>
+    <p class="ed-body">
+      Designed by Atelier Voss, AURELIA rises as a single gesture of bronze and
+      glass. Floor-to-ceiling apertures dissolve the line between interior and
+      horizon. Every residence is oriented to capture the golden hour — twice a
+      day, the city below turns to amber.
+    </p>
+  </div>
+  <div class="ed-visual"></div>
+</section>
+
+<!-- CONSTRUCTION PROGRESS (CMS) -->
+<section class="progress">
+  <div class="progress-head">
+    <h2>Construction <em>Live</em></h2>
+    <div class="live-tag"><span class="live-dot"></span>Updated from site · CMS</div>
+  </div>
+  <div id="milestones"></div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="cta-eyebrow">Private Viewings Now Open</div>
+  <h2>Claim your <em>altitude</em>.</h2>
+  <a href="#" class="btn" data-mag><span>Request the Brochure</span></a>
+</section>
+
+<footer>
+  <div class="foot-brand">AURELIA</div>
+  <div class="foot-links">
+    <a href="#">Residences</a>
+    <a href="#">Gallery</a>
+    <a href="#">Team</a>
+    <a href="#">Contact</a>
+  </div>
+  <div class="foot-copy">&copy; 2027 AURELIA Development · A Voss Property</div>
+</footer>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+/* 1. DRONE — slow WebGL aerial drift */
+(function(){
+  const canvas=document.getElementById('drone');
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:false});
+  renderer.setPixelRatio(1);
+  const scene=new THREE.Scene();
+  const camera=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+  const mat=new THREE.ShaderMaterial({
+    uniforms:{uTime:{value:0},uRes:{value:new THREE.Vector2(innerWidth,innerHeight)}},
+    vertexShader:`void main(){gl_Position=vec4(position,1.0);}`,
+    fragmentShader:`
+      uniform float uTime; uniform vec2 uRes;
+      float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+      float noise(vec2 p){
+        vec2 i=floor(p),f=fract(p);
+        float a=hash(i),b=hash(i+vec2(1,0)),c=hash(i+vec2(0,1)),d=hash(i+vec2(1,1));
+        vec2 u=f*f*(3.0-2.0*f);
+        return mix(a,b,u.x)+(c-a)*u.y*(1.0-u.x)+(d-b)*u.x*u.y;
+      }
+      float fbm(vec2 p){float v=0.0,a=0.5;for(int i=0;i<5;i++){v+=a*noise(p);p*=2.0;a*=0.5;}return v;}
+      void main(){
+        vec2 uv=gl_FragCoord.xy/uRes;
+        vec2 p=uv;
+        p.y+=uTime*0.012;
+        p.x+=sin(uTime*0.05)*0.04;
+        float grid=fbm(p*7.0);
+        float lights=smoothstep(0.62,0.78,grid)*fbm(p*40.0+uTime*0.1);
+        vec3 col=mix(vec3(0.03,0.024,0.014),vec3(0.10,0.07,0.03),fbm(p*3.0));
+        col+=vec3(1.0,0.72,0.34)*lights*1.4;
+        float horizon=smoothstep(0.2,1.0,uv.y);
+        col+=vec3(0.9,0.6,0.28)*horizon*0.10;
+        col*=1.0-0.5*length(uv-0.5);
+        gl_FragColor=vec4(col,1.0);
+      }`
+  });
+  scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),mat));
+  function resize(){renderer.setSize(innerWidth,innerHeight);mat.uniforms.uRes.value.set(innerWidth,innerHeight);}
+  resize();addEventListener('resize',resize);
+  let t=0;(function loop(){requestAnimationFrame(loop);t+=0.016;mat.uniforms.uTime.value=t;renderer.render(scene,camera);})();
+})();
+
+/* 2. FACADE — scroll-mapped flythrough */
+const facade=(function(){
+  const canvas=document.getElementById('facade');
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:false,alpha:true});
+  renderer.setPixelRatio(1);
+  const scene=new THREE.Scene();
+  const camera=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+  const uniforms={uTime:{value:0},uRes:{value:new THREE.Vector2(innerWidth,innerHeight)},uProg:{value:0}};
+  const mat=new THREE.ShaderMaterial({transparent:true,uniforms,
+    vertexShader:`void main(){gl_Position=vec4(position,1.0);}`,
+    fragmentShader:`
+      uniform float uTime,uProg; uniform vec2 uRes;
+      void main(){
+        vec2 uv=(gl_FragCoord.xy-0.5*uRes)/uRes.y;
+        float zoom=mix(1.6,0.25,uProg);
+        uv*=zoom;
+        uv.y+=mix(-0.15,0.55,uProg);
+        vec2 g=uv*vec2(9.0,16.0);
+        vec2 cell=fract(g);
+        vec2 id=floor(g);
+        float mull=smoothstep(0.0,0.045,cell.x)*smoothstep(0.0,0.045,cell.y)
+                  *smoothstep(0.0,0.045,1.0-cell.x)*smoothstep(0.0,0.045,1.0-cell.y);
+        float lit=fract(sin(dot(id,vec2(12.9,78.2)))*43758.0);
+        lit=smoothstep(0.55,1.0,lit);
+        float flick=0.85+0.15*sin(uTime*2.0+id.x*3.0+id.y);
+        vec3 glass=mix(vec3(0.04,0.03,0.02),vec3(1.0,0.74,0.36),lit*flick);
+        vec3 col=glass*mull + (1.0-mull)*vec3(0.08,0.06,0.03);
+        float fade=smoothstep(1.1,0.2,length(uv));
+        float reveal=smoothstep(0.0,0.15,uProg)*smoothstep(1.0,0.82,uProg);
+        gl_FragColor=vec4(col, fade*reveal*0.92);
+      }`
+  });
+  scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),mat));
+  function resize(){renderer.setSize(innerWidth,innerHeight);uniforms.uRes.value.set(innerWidth,innerHeight);}
+  resize();addEventListener('resize',resize);
+  let t=0;(function loop(){requestAnimationFrame(loop);t+=0.016;uniforms.uTime.value=t;renderer.render(scene,camera);})();
+  return {uniforms};
+})();
+ScrollTrigger.create({
+  trigger:'.flythrough',start:'top top',end:'bottom bottom',scrub:1,
+  onUpdate(self){
+    facade.uniforms.uProg.value=self.progress;
+    gsap.set('#facade',{opacity:Math.sin(self.progress*Math.PI)});
+  }
+});
+const flyStates=[
+  {n:'01',html:'A tower carved<br>from <em>light</em>.'},
+  {n:'02',html:'Bronze ribs.<br>Glass <em>breath</em>.'},
+  {n:'03',html:'Then &mdash; <em>your</em><br>front door.'}
+];
+ScrollTrigger.create({
+  trigger:'.flythrough',start:'top top',end:'bottom bottom',
+  onUpdate(self){
+    const i=Math.min(flyStates.length-1,Math.floor(self.progress*flyStates.length));
+    const ft=document.getElementById('flyType'),fn=document.getElementById('flyNum');
+    if(ft.dataset.i!=i){
+      ft.dataset.i=i;
+      gsap.fromTo(ft,{opacity:0,y:30},{opacity:1,y:0,duration:.6,ease:'power2.out'});
+      ft.innerHTML=flyStates[i].html;
+      fn.textContent=flyStates[i].n;
+    }
+  }
+});
+
+/* 3. GOLDEN GRADE — warm post layer */
+(function(){
+  const canvas=document.getElementById('grade');
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:false,alpha:true});
+  renderer.setPixelRatio(1);
+  const scene=new THREE.Scene();
+  const camera=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+  const uniforms={uTime:{value:0},uRes:{value:new THREE.Vector2(innerWidth,innerHeight)}};
+  const mat=new THREE.ShaderMaterial({transparent:true,uniforms,
+    vertexShader:`void main(){gl_Position=vec4(position,1.0);}`,
+    fragmentShader:`
+      uniform float uTime; uniform vec2 uRes;
+      void main(){
+        vec2 uv=gl_FragCoord.xy/uRes;
+        vec3 warm=mix(vec3(0.55,0.36,0.12),vec3(1.0,0.78,0.42),uv.y*0.6+uv.x*0.4);
+        float bloom=0.5+0.5*sin(uTime*0.3);
+        warm+=vec3(0.3,0.2,0.05)*bloom*0.15;
+        gl_FragColor=vec4(warm,1.0);
+      }`});
+  scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),mat));
+  function resize(){renderer.setSize(innerWidth,innerHeight);uniforms.uRes.value.set(innerWidth,innerHeight);}
+  resize();addEventListener('resize',resize);
+  let t=0;(function loop(){requestAnimationFrame(loop);t+=0.016;uniforms.uTime.value=t;renderer.render(scene,camera);})();
+})();
+
+/* 4. CONSTRUCTION CMS — data -> milestones */
+const constructionCMS=[
+  {phase:'P1',name:'Foundation & Core Raft',pct:100,done:true},
+  {phase:'P2',name:'Structural Frame — L1 to L40',pct:100,done:true},
+  {phase:'P3',name:'Bronze Facade Cladding',pct:74,done:false},
+  {phase:'P4',name:'Sky Lobby & Amenity Deck',pct:38,done:false},
+  {phase:'P5',name:'Penthouse Fit-Out',pct:12,done:false},
+  {phase:'P6',name:'Landscaping & Handover',pct:0,done:false},
+];
+const msWrap=document.getElementById('milestones');
+constructionCMS.forEach(m=>{
+  const el=document.createElement('div');
+  el.className='ms'+(m.done?' done':'');
+  el.innerHTML=
+    '<div class="ms-phase">'+m.phase+'</div>'+
+    '<div class="ms-mid"><div class="ms-name">'+m.name+'</div>'+
+    '<div class="ms-track"><div class="ms-fill" data-pct="'+m.pct+'"></div></div></div>'+
+    '<div class="ms-pct">'+m.pct+'<small style="font-size:.5em">%</small></div>';
+  msWrap.appendChild(el);
+});
+gsap.utils.toArray('.ms-fill').forEach(f=>{
+  ScrollTrigger.create({trigger:f,start:'top 88%',once:true,
+    onEnter:()=>gsap.to(f,{width:f.dataset.pct+'%',duration:1.4,ease:'power3.out'})});
+});
+
+/* 5. HERO REVEAL */
+window.addEventListener('load',()=>{
+  gsap.to('.hero-eyebrow',{opacity:1,duration:1,delay:.2});
+  gsap.to('.hero .word span',{y:'0%',duration:1.1,stagger:.12,delay:.4,ease:'power4.out'});
+  gsap.to('.hero-sub',{opacity:1,duration:1,delay:1.1});
+});
+gsap.to('.hero',{scrollTrigger:{trigger:'.hero',start:'top top',end:'bottom top',scrub:1},y:-120,opacity:0,ease:'none'});
+gsap.utils.toArray('.editorial .ed-text > *, .progress-head, .stat').forEach((el,i)=>{
+  gsap.from(el,{scrollTrigger:{trigger:el,start:'top 88%'},opacity:0,y:40,duration:.9,delay:(i%4)*.06,ease:'power3.out'});
+});
+
+/* 6. MICROINTERACTIONS — GSAP quickTo magnetic */
+document.querySelectorAll('[data-mag]').forEach(el=>{
+  const xT=gsap.quickTo(el,'x',{duration:.5,ease:'power3'});
+  const yT=gsap.quickTo(el,'y',{duration:.5,ease:'power3'});
+  el.addEventListener('mousemove',e=>{
+    const r=el.getBoundingClientRect();
+    xT((e.clientX-(r.left+r.width/2))*0.4);
+    yT((e.clientY-(r.top+r.height/2))*0.4);
+  });
+  el.addEventListener('mouseleave',()=>{xT(0);yT(0);});
+});
+
+/* custom cursor with quickTo */
+const cur=document.getElementById('cursor'), ring=document.getElementById('cursorRing');
+const cx=gsap.quickTo(cur,'x',{duration:.08}),cy=gsap.quickTo(cur,'y',{duration:.08});
+const rx=gsap.quickTo(ring,'x',{duration:.4,ease:'power3'}),ry=gsap.quickTo(ring,'y',{duration:.4,ease:'power3'});
+window.addEventListener('mousemove',e=>{cx(e.clientX);cy(e.clientY);rx(e.clientX);ry(e.clientY);});
+document.querySelectorAll('a,button,.btn,[data-mag]').forEach(el=>{
+  el.addEventListener('mouseenter',()=>gsap.to(ring,{scale:1.8,borderColor:'rgba(232,190,114,.9)',duration:.3}));
+  el.addEventListener('mouseleave',()=>gsap.to(ring,{scale:1,borderColor:'rgba(199,154,75,.5)',duration:.3}));
+});
+</script>
+</body>
+</html>

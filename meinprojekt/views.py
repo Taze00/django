@@ -21,3 +21,9 @@ def skills_page(request):
 def fitness_landing_page(request):
     return render(request, 'fitness-landing.html')
 
+def not_found(request, exception=None):
+    return render(request, '404.html', status=404)
+
+def aurelia_demo(request):
+    return render(request, 'aurelia-demo.html')
+
