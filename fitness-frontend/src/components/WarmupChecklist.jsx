@@ -1,12 +1,18 @@
 import { useState } from 'react';
 
-const ITEMS = ['Handgelenke', 'Schultern', 'Ellbogen', 'Rücken', 'Beine'];
+const ITEMS = [
+  { name: 'Handgelenke',  desc: 'Kreisen + sanft in beide Richtungen dehnen' },
+  { name: 'Schultern',    desc: 'Große Armkreise vor- und rückwärts' },
+  { name: 'Ellbogen',     desc: 'Arme strecken und beugen, locker kreisen' },
+  { name: 'Rücken',       desc: 'Katze-Kuh oder sanftes Rumpfdrehen' },
+  { name: 'Beine',        desc: 'Hüftkreisen + lockere Kniebeugen ohne Gewicht' },
+];
 
 export default function WarmupChecklist({ onComplete }) {
   const [checked, setChecked] = useState({});
 
-  const toggle = item => setChecked(prev => ({ ...prev, [item]: !prev[item] }));
-  const allDone = ITEMS.every(i => checked[i]);
+  const toggle = name => setChecked(prev => ({ ...prev, [name]: !prev[name] }));
+  const allDone = ITEMS.every(i => checked[i.name]);
 
   return (
     <div className="warmup-shell">
@@ -16,20 +22,23 @@ export default function WarmupChecklist({ onComplete }) {
       <div className="warmup-list">
         {ITEMS.map(item => (
           <div
-            key={item}
-            className={`warmup-item ${checked[item] ? 'checked' : ''}`}
-            onClick={() => toggle(item)}
+            key={item.name}
+            className={`warmup-item cooldown-item ${checked[item.name] ? 'checked' : ''}`}
+            onClick={() => toggle(item.name)}
           >
             <div className="warmup-check">
-              {checked[item] && <span className="warmup-check-inner">✓</span>}
+              {checked[item.name] && <span className="warmup-check-inner">✓</span>}
             </div>
-            <span className="warmup-item-label">{item}</span>
+            <div className="cooldown-item-text">
+              <span className="warmup-item-label">{item.name}</span>
+              <span className="cooldown-item-desc">{item.desc}</span>
+            </div>
           </div>
         ))}
       </div>
 
       <button className="btn-warmup-done" onClick={onComplete} disabled={!allDone}>
-        {allDone ? 'Training starten →' : `Noch ${ITEMS.filter(i => !checked[i]).length} offen`}
+        {allDone ? 'Training starten →' : `Noch ${ITEMS.filter(i => !checked[i.name]).length} offen`}
       </button>
     </div>
   );
