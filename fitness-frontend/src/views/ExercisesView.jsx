@@ -2,8 +2,20 @@ import { useState } from 'react';
 import { useWorkoutStore } from '../stores/workoutStore';
 import { EXERCISE_INFO } from '../data/exerciseInfo';
 
+const PROGRESSION_EXPLANATION =
+  'Schaffst du deine Sätze in mehreren Trainings hintereinander sauber, steigst du eine Stufe auf. ' +
+  'Schaffst du sie deutlich nicht, passt CORVIS dein Level wieder an — damit du immer auf dem Level ' +
+  'trainierst, das zu dir passt.';
+
+function sessionText(at, required) {
+  if (at === 0) return 'Stark trainieren, um aufzusteigen';
+  if (at >= required - 1) return 'Noch ein starkes Training';
+  return 'Auf gutem Weg zum nächsten Level';
+}
+
 export default function ExercisesView() {
   const [infoModal, setInfoModal] = useState(null);
+  const [openInfo, setOpenInfo] = useState(null); // exercise id with open info panel
   const exercises = useWorkoutStore(state => state.exercises);
   const userProgressions = useWorkoutStore(state => state.userProgressions);
 
@@ -25,13 +37,48 @@ export default function ExercisesView() {
           const sessionsRequired = currentProg?.sessions_required || 3;
           const totalLevels = exercise.progressions?.length || 1;
           const progressPct = currentProg ? ((currentProg.level - 1) / (totalLevels - 1)) * 100 : 0;
+          const isInfoOpen = openInfo === exercise.id;
 
           return (
             <div key={exercise.id} className="exercise-block">
               <p className="exercise-block-title">{exercise.name}</p>
               <p className="exercise-block-meta">
-                Level {currentProg?.level ?? '—'} · {sessionsAtTarget}/{sessionsRequired} Sessions
+                Level {currentProg?.level ?? '—'}
               </p>
+
+              <div className="exercise-session-row">
+                <div className="exercise-session-dots">
+                  {Array.from({ length: sessionsRequired }).map((_, i) => (
+                    <span
+                      key={i}
+                      className={`exercise-session-dot ${i < sessionsAtTarget ? 'filled' : ''}`}
+                    />
+                  ))}
+                </div>
+                <span className="exercise-session-text">
+                  {sessionText(sessionsAtTarget, sessionsRequired)}
+                </span>
+                <button
+                  className="exercise-info-toggle"
+                  onClick={() => setOpenInfo(isInfoOpen ? null : exercise.id)}
+                  aria-label="Wie funktioniert der Aufstieg?"
+                >
+                  ?
+                </button>
+              </div>
+
+              {isInfoOpen && (
+                <div className="exercise-info-panel">
+                  {PROGRESSION_EXPLANATION}
+                  <button
+                    className="exercise-info-panel-close"
+                    onClick={() => setOpenInfo(null)}
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+
               <div className="exercise-progress-bar-wrap">
                 <div className="exercise-progress-bar-fill" style={{ width: `${progressPct}%` }} />
               </div>

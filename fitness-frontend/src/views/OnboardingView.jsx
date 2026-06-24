@@ -347,6 +347,11 @@ export default function OnboardingView() {
                   ))}
                 </div>
 
+                <div className="onb-system-hint">
+                  Trainierst du mehrere Einheiten sauber auf deinem Level, steigt CORVIS dich automatisch auf —
+                  schaffst du es deutlich nicht, passt es dein Level wieder an. Das System arbeitet für dich.
+                </div>
+
                 {error && <p className="onb-error">{error}</p>}
 
                 <button className="onb-btn-primary" onClick={finish}>
