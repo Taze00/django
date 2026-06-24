@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import { useAuthStore } from './stores/authStore';
 import { useWorkoutStore } from './stores/workoutStore';
 import BottomNav from './components/BottomNav';
+import IosInstallHint from './components/IosInstallHint';
 import LoginView from './views/LoginView';
 import RegisterView from './views/RegisterView';
 import OnboardingView from './views/OnboardingView';
@@ -50,6 +51,7 @@ function App() {
 
   return (
     <Router basename="/corvis-app">
+      <IosInstallHint />
       <Routes>
         <Route path="/login" element={<LoginView />} />
         <Route path="/register" element={<RegisterView />} />

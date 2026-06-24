@@ -1,23 +1,29 @@
 {
-  "name": "Calisthenics Fitness",
-  "short_name": "Calisthenics",
-  "description": "Track your calisthenics workouts and progressions",
-  "start_url": "/fitness/",
-  "scope": "/fitness/",
+  "name": "CORVIS",
+  "short_name": "CORVIS",
+  "description": "Werde stärker. Jeden Tag. 3 Übungen, adaptive Progression.",
+  "start_url": "/corvis-app/",
+  "scope": "/corvis-app/",
   "display": "standalone",
-  "background_color": "#0f172a",
-  "theme_color": "#10b981",
+  "background_color": "#080808",
+  "theme_color": "#FF4D00",
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/static/fitness/favicon.png",
-      "sizes": "any",
+      "src": "/static/fitness/icon-192.png",
+      "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/static/fitness/favicon.png",
-      "sizes": "any",
+      "src": "/static/fitness/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/fitness/icon-512.png",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     }
