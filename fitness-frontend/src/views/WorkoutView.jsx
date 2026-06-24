@@ -6,6 +6,7 @@ import TimerInput from '../components/TimerInput';
 import RestTimer from '../components/RestTimer';
 import DropSetInstructions from '../components/DropSetInstructions';
 import WarmupChecklist from '../components/WarmupChecklist';
+import CooldownChecklist from '../components/CooldownChecklist';
 import ProgressionModal from '../components/ProgressionModal';
 import FormTip from '../components/FormTip';
 import { requestWakeLock, releaseWakeLock } from '../utils/wakeLock';
@@ -43,6 +44,7 @@ export default function WorkoutView() {
   const [showModal, setShowModal] = useState(false);
   const [progressionData, setProgressionData] = useState(null);
   const [isWarmupComplete, setIsWarmupComplete] = useState(false);
+  const [showCooldown, setShowCooldown] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const exercises = useWorkoutStore(state => state.exercises);
@@ -142,9 +144,7 @@ export default function WorkoutView() {
       );
 
       if (currentStep === WORKOUT_STEPS.length - 1) {
-        const result = await completeWorkout(currentWorkout.id);
-        setProgressionData(result);
-        setShowModal(true);
+        setShowCooldown(true);
       } else {
         setIsResting(true);
       }
@@ -159,6 +159,20 @@ export default function WorkoutView() {
   const handleExit = () => { if (window.confirm('Workout beenden?')) navigate('/'); };
   const handleModalClose = () => { setShowModal(false); navigate('/'); };
 
+  const handleCooldownDone = async () => {
+    setIsLoading(true);
+    try {
+      const result = await completeWorkout(currentWorkout.id);
+      setProgressionData(result);
+      setShowCooldown(false);
+      setShowModal(true);
+    } catch (err) {
+      console.error('Error completing workout:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (isLoading || !isInitialized || !currentWorkout || WORKOUT_STEPS.length === 0) {
     return (
       <div className="loading-shell">
@@ -171,6 +185,10 @@ export default function WorkoutView() {
 
   if (!isWarmupComplete) {
     return <WarmupChecklist onComplete={() => setIsWarmupComplete(true)} />;
+  }
+
+  if (showCooldown) {
+    return <CooldownChecklist onComplete={handleCooldownDone} />;
   }
 
   if (isResting) {
