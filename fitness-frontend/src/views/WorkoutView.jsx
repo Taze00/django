@@ -47,6 +47,9 @@ export default function WorkoutView() {
   const userProgressions = useWorkoutStore(state => state.userProgressions);
   const isInitialized = useWorkoutStore(state => state.isInitialized);
   const lastPerformance = useWorkoutStore(state => state.lastPerformance);
+  const workouts = useWorkoutStore(state => state.workouts);
+  const streak = useWorkoutStore(state => state.streak);
+  const trainingDays = useWorkoutStore(state => state.trainingDays);
   const getCurrentWorkout = useWorkoutStore(state => state.getCurrentWorkout);
   const addSet = useWorkoutStore(state => state.addSet);
   const completeWorkout = useWorkoutStore(state => state.completeWorkout);
@@ -190,7 +193,7 @@ export default function WorkoutView() {
           lastReachedName={lastPerformance?.[String(progInfo.exercise.id)]?.drop_reached}
           onComplete={handleSetComplete}
         />
-        {showModal && <ProgressionModal upgrades={progressionData?.upgrades || []} downgrades={progressionData?.downgrades || []} onClose={handleModalClose} />}
+        {showModal && <ProgressionModal upgrades={progressionData?.upgrades || []} downgrades={progressionData?.downgrades || []} workouts={workouts} streak={streak} trainingDays={trainingDays} onClose={handleModalClose} />}
       </div>
     );
   }
@@ -233,7 +236,7 @@ export default function WorkoutView() {
         )}
       </div>
 
-      {showModal && <ProgressionModal upgrades={progressionData?.upgrades || []} downgrades={progressionData?.downgrades || []} onClose={handleModalClose} />}
+      {showModal && <ProgressionModal upgrades={progressionData?.upgrades || []} downgrades={progressionData?.downgrades || []} workouts={workouts} streak={streak} trainingDays={trainingDays} onClose={handleModalClose} />}
     </div>
   );
 }

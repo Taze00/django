@@ -795,7 +795,7 @@ body {
   background: var(--bg2); border: 1px solid var(--muted3);
   width: 100%; max-width: 360px;
   padding: 2rem 1.5rem 1.5rem; animation: fadeUp 0.35s ease;
-  position: relative; overflow: hidden;
+  position: relative; overflow-y: auto; max-height: 90vh;
 }
 .lvl-modal-box::before {
   content: ''; position: absolute; inset: 0;
@@ -859,6 +859,59 @@ body {
   font-size: 0.5rem; letter-spacing: 3px; text-transform: uppercase;
   color: var(--orange); border: 1px solid var(--orange);
   padding: 0.15rem 0.4rem; display: inline-block;
+}
+
+/* ─── SESSION SUMMARY (Workout-Abschluss) ─── */
+.session-summary {
+  border-top: 1px solid var(--muted3);
+  margin-top: 0.25rem; padding-top: 1.25rem;
+  margin-bottom: 1.25rem;
+  display: flex; flex-direction: column; gap: 0.6rem;
+}
+.session-label {
+  font-size: 0.5rem; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 0.1rem;
+}
+.session-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 0.5rem;
+}
+.session-ex-name {
+  font-size: 0.65rem; color: var(--white); letter-spacing: 0.3px;
+}
+.session-ex-val {
+  font-size: 0.65rem; color: var(--orange);
+  font-family: var(--mono); letter-spacing: 0.5px; white-space: nowrap;
+}
+.session-streak-row {
+  display: flex; align-items: center; gap: 0.75rem;
+  margin-top: 0.4rem; padding-top: 0.75rem;
+  border-top: 1px solid var(--muted3);
+}
+.session-streak-num {
+  font-family: var(--display); font-size: 2.6rem; line-height: 1;
+  color: var(--orange); letter-spacing: 1px;
+}
+.session-streak-text {
+  display: flex; flex-direction: column; gap: 0.2rem;
+}
+.session-streak-text > span:first-child {
+  font-size: 0.6rem; color: var(--muted); letter-spacing: 0.4px;
+}
+.session-streak-record {
+  font-size: 0.5rem; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--orange); border: 1px solid var(--orange);
+  padding: 0.1rem 0.3rem; display: inline-block; width: fit-content;
+}
+.session-next {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 0.5rem;
+}
+.session-next-label {
+  font-size: 0.55rem; color: var(--muted); letter-spacing: 0.4px;
+}
+.session-next-val {
+  font-size: 0.6rem; color: var(--white); letter-spacing: 0.3px; text-align: right;
 }
 
 /* Modals */
