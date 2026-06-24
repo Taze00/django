@@ -7,6 +7,7 @@ import RestTimer from '../components/RestTimer';
 import DropSetInstructions from '../components/DropSetInstructions';
 import WarmupChecklist from '../components/WarmupChecklist';
 import ProgressionModal from '../components/ProgressionModal';
+import FormTip from '../components/FormTip';
 import { requestWakeLock, releaseWakeLock } from '../utils/wakeLock';
 
 const REST_TIMES = { normal: 180, afterDrop: 300 };
@@ -231,6 +232,7 @@ export default function WorkoutView() {
         <p className="workout-set-label">
           {progInfo.currentProgression.name} · Satz {step.setNumber}
         </p>
+        <FormTip progressionName={progInfo.currentProgression.name} />
         {progInfo.currentProgression.target_type === 'reps' ? (
           <SetInput
             setNumber={step.setNumber}

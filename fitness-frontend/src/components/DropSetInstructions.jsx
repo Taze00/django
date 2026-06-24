@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import FormTip from './FormTip';
 
 /**
  * Drop-set: the user descends through easier variants to exhaustion, then taps
@@ -15,6 +16,7 @@ export default function DropSetInstructions({ exercise, progressions, lastReache
       <p className="workout-exercise-cat">Drop-Set</p>
       <p className="workout-exercise-name">{exercise.name}</p>
       <p className="workout-set-label">Geh durch die Varianten bis zur Erschöpfung</p>
+      <FormTip progressionName={progressions[0]?.name} />
 
       <p className="drop-set-intro">
         Starte mit deiner aktuellen Variante. Wenn du nicht mehr kannst, wechsle zur
