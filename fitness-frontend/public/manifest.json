@@ -5,8 +5,8 @@
   "start_url": "/corvis-app/",
   "scope": "/corvis-app/",
   "display": "standalone",
-  "background_color": "#080808",
-  "theme_color": "#FF4D00",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
   "orientation": "portrait-primary",
   "icons": [
     {
