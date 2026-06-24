@@ -1,7 +1,6 @@
-// Screen Wake Lock: hält das Display während einer laufenden Pause an, damit
-// iOS den Timer nicht einfriert und der Pausen-Ton zuverlässig kommt.
-// Nur während der aktiven Pause halten (Akku!). Sauberer Fallback, wenn der
-// Browser die API nicht unterstützt oder die Anfrage fehlschlägt.
+// Screen Wake Lock: hält das Display während der gesamten aktiven Workout-Session
+// wach. Wird von WorkoutView gesteuert (Mount = anfordern, Unmount = freigeben).
+// Sauberer Fallback wenn der Browser die API nicht unterstützt — App läuft normal.
 
 let sentinel = null;
 

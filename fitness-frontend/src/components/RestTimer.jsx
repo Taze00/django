@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { restAlert } from '../utils/restAlert';
 import { showRestDoneNotification } from '../utils/notify';
-import { requestWakeLock, releaseWakeLock } from '../utils/wakeLock';
 
 export default function RestTimer({ seconds, nextExercise, onComplete }) {
   // Ziel-Zeitstempel statt Runterzählen: bleibt korrekt, auch wenn der Browser
@@ -38,7 +37,6 @@ export default function RestTimer({ seconds, nextExercise, onComplete }) {
           completedRef.current = true;
           setFinishedWhileHidden(true);
           showRestDoneNotification();
-          releaseWakeLock(); // Pause vorbei -> Display darf wieder schlafen
         } else {
           finishVisible();
         }
@@ -46,7 +44,6 @@ export default function RestTimer({ seconds, nextExercise, onComplete }) {
     };
 
     // Beim Zurückkommen prüfen, ob die Pause während der Abwesenheit ablief.
-    // Wake Lock geht beim Wechsel in den Hintergrund verloren -> ggf. neu holen.
     const onVisibility = () => {
       if (document.hidden) return;
       if (!completedRef.current && Date.now() >= endAtRef.current) {
@@ -54,21 +51,18 @@ export default function RestTimer({ seconds, nextExercise, onComplete }) {
         restAlert(); // jetzt sichtbar -> Ton + Vibration
         setFinishedWhileHidden(true);
       } else if (!completedRef.current) {
-        requestWakeLock(); // Pause läuft noch -> Display erneut wachhalten
         setRemaining(computeRemaining());
       } else {
         setRemaining(computeRemaining());
       }
     };
 
-    requestWakeLock(); // Pause startet -> Display wachhalten
     const id = setInterval(tick, 250);
     document.addEventListener('visibilitychange', onVisibility);
     tick();
     return () => {
       clearInterval(id);
       document.removeEventListener('visibilitychange', onVisibility);
-      releaseWakeLock(); // Pause beendet/abgebrochen/verlassen -> freigeben
     };
   }, []);
 

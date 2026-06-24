@@ -7,6 +7,7 @@ import RestTimer from '../components/RestTimer';
 import DropSetInstructions from '../components/DropSetInstructions';
 import WarmupChecklist from '../components/WarmupChecklist';
 import ProgressionModal from '../components/ProgressionModal';
+import { requestWakeLock, releaseWakeLock } from '../utils/wakeLock';
 
 const REST_TIMES = { normal: 180, afterDrop: 300 };
 
@@ -56,6 +57,20 @@ export default function WorkoutView() {
   const getLastPerformance = useWorkoutStore(state => state.getLastPerformance);
 
   const WORKOUT_STEPS = useMemo(() => buildWorkoutSteps(exercises), [exercises]);
+
+  // Wake Lock für die gesamte Workout-Session: anfordern beim Betreten der View,
+  // freigeben beim Verlassen (egal ob Abschluss, Abbruch oder Navigation).
+  // visibilitychange: nach Hintergrund re-akquirieren, weil der Browser den Lock
+  // beim Tab-Wechsel automatisch aufhebt.
+  useEffect(() => {
+    requestWakeLock();
+    const onVisibility = () => { if (!document.hidden) requestWakeLock(); };
+    document.addEventListener('visibilitychange', onVisibility);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      releaseWakeLock();
+    };
+  }, []);
 
   useEffect(() => {
     if (isInitialized && exercises.length > 0) initializeWorkout();
