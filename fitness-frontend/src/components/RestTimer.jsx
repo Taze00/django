@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { restAlert } from '../utils/restAlert';
+import { showRestDoneNotification } from '../utils/notify';
 
 export default function RestTimer({ seconds, nextExercise, onComplete }) {
   // Ziel-Zeitstempel statt Runterzählen: bleibt korrekt, auch wenn der Browser
@@ -30,10 +31,12 @@ export default function RestTimer({ seconds, nextExercise, onComplete }) {
       setRemaining(r);
       if (r <= 0 && !completedRef.current) {
         if (document.hidden) {
-          // App im Hintergrund: nicht automatisch weiterspringen.
-          // (Commit 2 löst hier zusätzlich eine System-Benachrichtigung aus.)
+          // App im Hintergrund: nicht automatisch weiterspringen, stattdessen
+          // System-Benachrichtigung (falls erlaubt) + "Pause vorbei"-Hinweis
+          // beim Zurückkommen.
           completedRef.current = true;
           setFinishedWhileHidden(true);
+          showRestDoneNotification();
         } else {
           finishVisible();
         }

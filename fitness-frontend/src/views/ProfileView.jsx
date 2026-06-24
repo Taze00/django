@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { useWorkoutStore } from '../stores/workoutStore';
+import { notificationsSupported, notificationPermission, requestNotificationPermission } from '../utils/notify';
 import api from '../api';
 
 export default function ProfileView() {
@@ -15,6 +16,13 @@ export default function ProfileView() {
   const [resetting, setResetting] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
   const [confirmText, setConfirmText] = useState('');
+  const [notifPerm, setNotifPerm] = useState(notificationPermission());
+
+  const handleNotifToggle = async () => {
+    if (notifPerm !== 'default') return; // nur abfragen, wenn noch offen
+    const res = await requestNotificationPermission();
+    setNotifPerm(res);
+  };
 
   const handleFileChange = async e => {
     const file = e.target.files[0];
@@ -112,6 +120,26 @@ export default function ProfileView() {
           </div>
           <span className="profile-nav-arrow">›</span>
         </button>
+
+        {notificationsSupported() && (
+          <button
+            className="profile-nav-btn"
+            onClick={handleNotifToggle}
+            disabled={notifPerm !== 'default'}
+          >
+            <div>
+              <p className="profile-nav-label">Pausen-Benachrichtigung</p>
+              <p className="profile-nav-desc">
+                {notifPerm === 'granted'
+                  ? 'Aktiviert — Hinweis am Pausenende'
+                  : notifPerm === 'denied'
+                  ? 'Blockiert — in den Geräte-Einstellungen erlauben'
+                  : 'Antippen, um sie zu aktivieren'}
+              </p>
+            </div>
+            <span className="profile-nav-arrow">{notifPerm === 'granted' ? '✓' : '›'}</span>
+          </button>
+        )}
 
         {/* Danger */}
         <span className="profile-section-label" style={{ marginTop: '1rem' }}>Danger Zone</span>
