@@ -209,9 +209,9 @@ print(BASE_DIR)
 # Share this only with people you trust for registration
 
 # Registration Secret Key - Required for user registration.
-# Read from env; literal fallback keeps local dev working. In production, set
-# DJANGO_REGISTRATION_KEY to a secret value.
+# The real value is provided via DJANGO_REGISTRATION_KEY (gitignored .env).
+# The fallback below is an obvious placeholder — NOT a real key.
 REGISTRATION_SECRET_KEY = os.environ.get(
     'DJANGO_REGISTRATION_KEY',
-    'IchGlaubeDieZahlenVon1Bis10',
+    'set-in-env',
 )
