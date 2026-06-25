@@ -372,7 +372,7 @@ body {
 .home-hero { text-align: center; padding: 0.2rem 0; margin-top: 1rem; }
 .home-hero-eyebrow {
   font-size: 0.52rem; letter-spacing: 3px;
-  text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 0.65rem;
 }
 .home-hero-total {
   display: block;
