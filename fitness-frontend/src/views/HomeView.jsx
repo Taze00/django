@@ -42,21 +42,21 @@ function StrengthTriangle({ push, pull, core }) {
       ))}
 
       {/* Push — above top vertex */}
-      <text x={px} y={py - 14} textAnchor="middle" fontSize="9"
+      <text x={px} y={py - 25} textAnchor="middle" fontSize="9"
             fontFamily="DM Mono, monospace" letterSpacing="2" fill="#555">PUSH</text>
-      <text x={px} y={py - 1} textAnchor="middle" fontSize="26"
+      <text x={px} y={py - 2} textAnchor="middle" fontSize="26"
             fontFamily="Bebas Neue, sans-serif" letterSpacing="1" fill="#f0ede8">L{p}</text>
 
       {/* Pull — right of right vertex */}
-      <text x={rx + 14} y={ry - 4} textAnchor="start" fontSize="9"
+      <text x={rx + 14} y={ry - 8} textAnchor="start" fontSize="9"
             fontFamily="DM Mono, monospace" letterSpacing="2" fill="#555">PULL</text>
-      <text x={rx + 14} y={ry + 16} textAnchor="start" fontSize="26"
+      <text x={rx + 14} y={ry + 20} textAnchor="start" fontSize="26"
             fontFamily="Bebas Neue, sans-serif" letterSpacing="1" fill="#f0ede8">L{u}</text>
 
       {/* Core — left of left vertex */}
-      <text x={lx - 14} y={ly - 4} textAnchor="end" fontSize="9"
+      <text x={lx - 14} y={ly - 8} textAnchor="end" fontSize="9"
             fontFamily="DM Mono, monospace" letterSpacing="2" fill="#555">CORE</text>
-      <text x={lx - 14} y={ly + 16} textAnchor="end" fontSize="26"
+      <text x={lx - 14} y={ly + 20} textAnchor="end" fontSize="26"
             fontFamily="Bebas Neue, sans-serif" letterSpacing="1" fill="#f0ede8">L{c}</text>
     </svg>
   );

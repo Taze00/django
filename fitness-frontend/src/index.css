@@ -372,7 +372,7 @@ body {
 .home-hero { text-align: center; padding: 0.2rem 0; margin-top: 1rem; }
 .home-hero-eyebrow {
   font-size: 0.52rem; letter-spacing: 3px;
-  text-transform: uppercase; color: var(--muted); margin-bottom: 0.1rem;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem;
 }
 .home-hero-total {
   display: block;
@@ -427,8 +427,8 @@ body {
   border: 1.5px solid transparent;
 }
 .week-bar-label {
-  font-size: 0.42rem; letter-spacing: 1.5px;
-  color: #999; font-family: var(--mono); line-height: 1;
+  font-size: 0.45rem; letter-spacing: 1.5px;
+  color: #aaa; font-family: var(--mono); line-height: 1;
 }
 /* Completed — filled orange */
 .week-bar-day.completed {
