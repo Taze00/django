@@ -168,7 +168,6 @@ export default function HomeView() {
           return (
             <div key={day} className={`week-bar-day${isToday ? ' today' : ''}${isDone ? ' completed' : ''}`}>
               <span className="week-bar-label">{DAY_SHORT[day]}</span>
-              <div className="week-bar-line" />
             </div>
           );
         })}

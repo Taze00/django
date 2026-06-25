@@ -341,10 +341,13 @@ body {
   background: radial-gradient(ellipse 100% 55% at 50% 0%, rgba(255,77,0,0.22) 0%, transparent 68%);
 }
 
-/* Outer shell: full screen height, flex column */
+/* Outer shell: exactly fills the visible screen — no scrolling */
 .home-shell {
-  min-height: 100dvh; min-height: 100vh;
+  height: 100dvh;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   display: flex; flex-direction: column;
+  overflow: hidden;
   position: relative; z-index: 1;
 }
 
@@ -360,12 +363,13 @@ body {
 .home-content {
   flex: 1;
   display: flex; flex-direction: column;
-  padding: 0.5rem 1.25rem 88px;
+  padding: 0.5rem 1.25rem 5.5rem;
+  overflow: hidden;
   animation: fadeUp 0.4s ease;
 }
 
-/* Hero: compact Gesamtstärke block — margin-top schiebt es weg von der Wochentage-Leiste */
-.home-hero { text-align: center; padding: 0.2rem 0; margin-top: 2rem; }
+/* Hero: compact Gesamtstärke block */
+.home-hero { text-align: center; padding: 0.2rem 0; margin-top: 1rem; }
 .home-hero-eyebrow {
   font-size: 0.52rem; letter-spacing: 3px;
   text-transform: uppercase; color: var(--muted); margin-bottom: 0.1rem;
@@ -409,33 +413,40 @@ body {
   text-transform: uppercase; color: var(--muted);
 }
 
-/* ── Week bar (underline style, below logo) ── */
+/* ── Week bar — pill style ── */
 .week-bar {
   display: flex; position: relative; z-index: 1;
-  padding: 0.55rem 1.25rem 0.65rem;
-  /* no border — let content breathe */
+  padding: 0 1.25rem 0.75rem;
+  gap: 5px;
 }
 .week-bar-day {
-  flex: 1; display: flex; flex-direction: column;
-  align-items: center; gap: 5px;
+  flex: 1; display: flex;
+  align-items: center; justify-content: center;
+  height: 28px; border-radius: 999px;
+  background: #161616;
+  border: 1.5px solid transparent;
 }
 .week-bar-label {
   font-size: 0.42rem; letter-spacing: 1.5px;
-  color: var(--muted); font-family: var(--mono); line-height: 1;
+  color: #555; font-family: var(--mono); line-height: 1;
 }
-.week-bar-line {
-  height: 2px; width: 75%;
-  background: var(--muted2); border-radius: 1px;
+/* Completed — filled orange */
+.week-bar-day.completed {
+  background: #EA5429;
 }
-/* Completed (trained this week) */
-.week-bar-day.completed .week-bar-label { color: var(--white); }
-.week-bar-day.completed .week-bar-line  { background: var(--orange); }
-/* Today — orange text, orange line + glow (overwrites completed) */
-.week-bar-day.today .week-bar-label { color: var(--orange); }
-.week-bar-day.today .week-bar-line  {
-  background: var(--orange);
-  box-shadow: 0 0 7px rgba(255,77,0,0.55);
+.week-bar-day.completed .week-bar-label { color: #1a0804; }
+/* Today — transparent with orange border */
+.week-bar-day.today {
+  background: transparent;
+  border-color: #EA5429;
 }
+.week-bar-day.today .week-bar-label { color: #EA5429; }
+/* Today + completed — keep filled, add border ring */
+.week-bar-day.today.completed {
+  background: #EA5429;
+  border-color: var(--white);
+}
+.week-bar-day.today.completed .week-bar-label { color: #1a0804; }
 
 /* ── "Heute pausieren" text link ── */
 .btn-rest-text {
@@ -446,6 +457,18 @@ body {
   text-align: center; transition: color 0.2s;
 }
 .btn-rest-text:hover { color: var(--white); }
+
+/* ── iPhone SE + kleine Geräte: Abstände komprimieren statt scrollen ── */
+@media (max-height: 680px) {
+  .home-hero { margin-top: 0.25rem; }
+  .home-hero-total { font-size: 4rem; }
+  .home-triangle-section { min-height: 180px; padding-bottom: 0.25rem; margin-top: 0; }
+  .home-stat { padding: 0.55rem 0.5rem; }
+  .home-stat-val { font-size: 1.7rem; }
+  .home-bottom { margin-top: 0.5rem; }
+  .btn-start { padding: 0.85rem; }
+  .week-bar-day { height: 24px; }
+}
 
 /* ─── EXERCISES VIEW ─── */
 .exercises-header-label {
