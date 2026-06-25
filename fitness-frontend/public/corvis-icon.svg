@@ -1,4 +1,9 @@
-<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
-  <rect x="0" y="0" width="512" height="512" rx="114" fill="#0a0a0a"/>
-  <path d="M 422 104 L 178 104 L 104 178 L 104 334 L 178 408 L 422 408 L 376 354 L 158 354 L 158 158 L 376 158 Z" fill="#EA5429"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <rect x="0" y="0" width="100" height="100" rx="22" ry="22" fill="#0a0a0a"/>
+  <g transform="translate(19,19) scale(0.62)">
+    <polyline points="75.5,24.5 50,14 24.5,24.5 14,50 24.5,75.5 50,86 75.5,75.5"
+              fill="none" stroke="#EA5429" stroke-width="13"
+              stroke-linecap="butt" stroke-linejoin="miter"/>
+    <path d="M50,35 L66,62 L34,62 Z" fill="#EDE8E0"/>
+  </g>
 </svg>
