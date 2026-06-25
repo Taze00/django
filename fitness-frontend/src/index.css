@@ -332,16 +332,41 @@ body {
 
 /* ─── HOME DASHBOARD ─── */
 
-/* Fixed radial orange glow — anchored below header (56px), clearly visible */
+/* ─── HOME DASHBOARD LAYOUT ─── */
+
+/* Full-screen glow — starts at very top (behind transparent header) */
 .home-glow {
-  position: fixed; top: 56px; left: 0; right: 0; bottom: 0;
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
   pointer-events: none; z-index: 0;
-  background: radial-gradient(ellipse 100% 52% at 50% 0%, rgba(255,77,0,0.20) 0%, transparent 70%);
+  background: radial-gradient(ellipse 100% 55% at 50% 0%, rgba(255,77,0,0.22) 0%, transparent 68%);
 }
-.home-main { position: relative; z-index: 1; padding-top: 1rem; gap: 0; }
+
+/* Outer shell: full screen height, flex column */
+.home-shell {
+  min-height: 100dvh; min-height: 100vh;
+  display: flex; flex-direction: column;
+  position: relative; z-index: 1;
+}
+
+/* Transparent, non-sticky header — logo floats on the glow */
+.home-header {
+  background: transparent;
+  border-bottom: none;
+  backdrop-filter: none;
+  position: relative;
+}
+
+/* Main content: grows to fill remaining height, distributes items vertically */
+.home-content {
+  flex: 1;
+  display: flex; flex-direction: column;
+  justify-content: space-between;
+  padding: 0.25rem 1.25rem 88px;
+  animation: fadeUp 0.4s ease;
+}
 
 /* Hero: big Gesamtstärke number */
-.home-hero { text-align: center; padding: 0.4rem 0 0.6rem; }
+.home-hero { text-align: center; padding: 0.25rem 0 0; }
 .home-hero-eyebrow {
   font-size: 0.52rem; letter-spacing: 3px;
   text-transform: uppercase; color: var(--muted); margin-bottom: 0.1rem;
@@ -352,24 +377,27 @@ body {
   line-height: 0.85; color: var(--orange); letter-spacing: 4px;
 }
 
-/* Stärke-Dreieck */
-.home-triangle-section { display: flex; justify-content: center; margin-bottom: 1rem; }
-/* Wrap: 300px wide, 284px tall (44px top label space + 240px SVG) */
-.home-triangle-wrap { position: relative; width: 300px; height: 284px; }
-/* SVG placed: left = (300-240)/2 = 30, top = 44 */
-.home-triangle-svg { position: absolute; top: 44px; left: 30px; }
+/* Stärke-Dreieck — breaks out of content padding for full width */
+.home-triangle-section {
+  margin: 0 -1.25rem;
+  display: flex; justify-content: center;
+}
+/* Wrap: 340px wide × 336px tall (36px top label + 300px SVG) */
+.home-triangle-wrap { position: relative; width: 340px; height: 336px; }
+/* SVG: left = (340-300)/2 = 20, top = 36 */
+.home-triangle-svg { position: absolute; top: 36px; left: 20px; }
 .home-vertex {
   position: absolute; display: flex; flex-direction: column; gap: 2px;
 }
-/* Push: centered at top of wrap, vertex dot at wrap-y≈74 */
+/* Push vertex in wrap: x=170, y=74 → label above at top:2 */
 .home-vertex-top {
-  top: 0; left: 50%; transform: translateX(-50%);
+  top: 2px; left: 50%; transform: translateX(-50%);
   align-items: center; text-align: center;
 }
-/* Pull (right): vertex in wrap at approx (228, 209) → label center on y=209 */
-.home-vertex-br { top: 188px; right: 4px; align-items: flex-end; text-align: right; }
-/* Core (left): same y, mirror */
-.home-vertex-bl { top: 188px; left: 4px; align-items: flex-start; text-align: left; }
+/* Pull vertex in wrap: x=267, y=242 → label right, centered on y */
+.home-vertex-br { top: 224px; right: 4px; align-items: flex-end; text-align: right; }
+/* Core vertex in wrap: x=73, y=242 → label left, mirrored */
+.home-vertex-bl { top: 224px; left: 4px; align-items: flex-start; text-align: left; }
 .home-vertex-cat {
   font-size: 0.5rem; letter-spacing: 2px;
   text-transform: uppercase; color: var(--muted);
@@ -382,7 +410,7 @@ body {
 /* Stats row */
 .home-stats {
   display: grid; grid-template-columns: 1fr 1fr 1fr;
-  gap: 1px; background: var(--muted2); margin-bottom: 0.85rem;
+  gap: 1px; background: var(--muted2);
 }
 .home-stat {
   background: var(--bg2); padding: 0.9rem 0.5rem;
@@ -398,28 +426,11 @@ body {
   text-transform: uppercase; color: var(--muted);
 }
 
-/* "Heute dran" card */
-.home-today-card {
-  background: var(--bg2); border: 1px solid var(--muted2);
-  padding: 0.8rem 1rem; margin-bottom: 0.85rem;
-  display: flex; align-items: center; gap: 0.75rem;
-}
-.home-today-arrow { font-size: 1.2rem; color: var(--orange); flex-shrink: 0; line-height: 1; }
-.home-today-text { display: flex; flex-direction: column; gap: 0.1rem; flex: 1; }
-.home-today-eyebrow {
-  font-size: 0.46rem; letter-spacing: 2px;
-  text-transform: uppercase; color: var(--muted);
-}
-.home-today-exercises { font-size: 0.7rem; color: var(--white); letter-spacing: 0.5px; }
-.home-today-duration {
-  font-size: 0.52rem; color: var(--muted); letter-spacing: 1px; flex-shrink: 0;
-}
-
-/* ── Week bar (underline style, top of screen) ── */
+/* ── Week bar (underline style, below logo) ── */
 .week-bar {
   display: flex; position: relative; z-index: 1;
   padding: 0.55rem 1.25rem 0.65rem;
-  border-bottom: 1px solid var(--muted2);
+  /* no border — let content breathe */
 }
 .week-bar-day {
   flex: 1; display: flex; flex-direction: column;

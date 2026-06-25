@@ -23,7 +23,7 @@ function StrengthTriangle({ push, pull, core }) {
   const dataStr = dataPts.map(d => d.join(',')).join(' ');
 
   return (
-    <svg viewBox="0 0 300 300" width="240" height="240" style={{ display: 'block', overflow: 'visible' }}>
+    <svg viewBox="0 0 300 300" width="300" height="300" style={{ display: 'block', overflow: 'visible' }}>
       {[1, 0.715, 0.43, 0.145].map((f, i) => (
         <polygon key={i} points={triStr(f)} fill="none" stroke="#1d1d1d" strokeWidth="1" />
       ))}
@@ -33,7 +33,7 @@ function StrengthTriangle({ push, pull, core }) {
       })}
       <polygon points={dataStr} fill="rgba(255,77,0,0.16)" stroke="#FF4D00" strokeWidth="2.5" strokeLinejoin="round" />
       {dataPts.map(([x, y], i) => (
-        <circle key={i} cx={x} cy={y} r="4.5" fill="#FF4D00" stroke="#080808" strokeWidth="2" />
+        <circle key={i} cx={x} cy={y} r="5" fill="#FF4D00" stroke="#080808" strokeWidth="2" />
       ))}
     </svg>
   );
@@ -63,7 +63,6 @@ export default function HomeView() {
     }
   }, [user?.onboarding_completed, initialize]);
 
-  // Derive per-category levels
   const levels = useMemo(() => {
     const get = cat => {
       const ex = exercises.find(e => e.category === cat);
@@ -127,17 +126,18 @@ export default function HomeView() {
   }
 
   return (
-    <>
-      <div className="header">
+    <div className="home-shell">
+      {/* orange radial glow — fills entire screen behind content */}
+      <div className="home-glow" aria-hidden="true" />
+
+      {/* ── LOGO — schwebt frei, kein Kasten ── */}
+      <div className="header home-header">
         <div className="header-content">
           <div className="header-logo">COR<span>VIS</span></div>
         </div>
       </div>
 
-      {/* orange radial glow — starts below header */}
-      <div className="home-glow" aria-hidden="true" />
-
-      {/* ── WOCHENTAGE-LEISTE — direkt unter Header ── */}
+      {/* ── WOCHENTAGE-LEISTE ── */}
       <div className="week-bar">
         {ALL_DAYS.map(day => {
           const isDone = weekStatus[day];
@@ -151,15 +151,16 @@ export default function HomeView() {
         })}
       </div>
 
-      <div className="main-content home-main">
+      {/* ── MAIN CONTENT — flex: 1, verteilt Raum gleichmäßig ── */}
+      <div className="home-content">
 
-        {/* ── HERO: Gesamtstärke ── */}
+        {/* Gesamtstärke */}
         <section className="home-hero">
           <p className="home-hero-eyebrow">— Gesamtstärke</p>
           <span className="home-hero-total">{levels.total}</span>
         </section>
 
-        {/* ── STÄRKE-DREIECK ── */}
+        {/* Stärke-Dreieck */}
         <section className="home-triangle-section">
           <div className="home-triangle-wrap">
             <div className="home-vertex home-vertex-top">
@@ -180,7 +181,7 @@ export default function HomeView() {
           </div>
         </section>
 
-        {/* ── STATS ROW ── */}
+        {/* Stats */}
         <section className="home-stats">
           <div className="home-stat">
             <span className="home-stat-val home-stat-orange">{streak.current}</span>
@@ -196,7 +197,7 @@ export default function HomeView() {
           </div>
         </section>
 
-        {/* ── ACTION ── */}
+        {/* Buttons — bleibt unten */}
         <div className="home-bottom">
           <button className="btn-start" onClick={() => navigate('/workout')}>
             Training starten →
@@ -230,6 +231,6 @@ export default function HomeView() {
         </div>
 
       </div>
-    </>
+    </div>
   );
 }
