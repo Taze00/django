@@ -4,6 +4,7 @@ import { useAuthStore } from '../stores/authStore';
 import { useWorkoutStore } from '../stores/workoutStore';
 
 const ALL_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const DAY_SHORT = { Mon: 'Mo', Tue: 'Di', Wed: 'Mi', Thu: 'Do', Fri: 'Fr', Sat: 'Sa', Sun: 'So' };
 const MAX_LEVEL = 7;
 
 // ── Radar triangle SVG — translated from the design's DC script ──
@@ -45,7 +46,6 @@ export default function HomeView() {
   const exercises = useWorkoutStore(state => state.exercises);
   const userProgressions = useWorkoutStore(state => state.userProgressions);
   const workouts = useWorkoutStore(state => state.workouts);
-  const trainingDays = useWorkoutStore(state => state.trainingDays);
   const streak = useWorkoutStore(state => state.streak);
   const markRestDay = useWorkoutStore(state => state.markRestDay);
   const isLoading = useWorkoutStore(state => state.isLoading);
@@ -134,8 +134,22 @@ export default function HomeView() {
         </div>
       </div>
 
-      {/* orange radial glow behind content */}
+      {/* orange radial glow — starts below header */}
       <div className="home-glow" aria-hidden="true" />
+
+      {/* ── WOCHENTAGE-LEISTE — direkt unter Header ── */}
+      <div className="week-bar">
+        {ALL_DAYS.map(day => {
+          const isDone = weekStatus[day];
+          const isToday = day === todayName;
+          return (
+            <div key={day} className={`week-bar-day${isToday ? ' today' : ''}${isDone ? ' completed' : ''}`}>
+              <span className="week-bar-label">{DAY_SHORT[day]}</span>
+              <div className="week-bar-line" />
+            </div>
+          );
+        })}
+      </div>
 
       <div className="main-content home-main">
 
@@ -148,7 +162,6 @@ export default function HomeView() {
         {/* ── STÄRKE-DREIECK ── */}
         <section className="home-triangle-section">
           <div className="home-triangle-wrap">
-            {/* vertex labels */}
             <div className="home-vertex home-vertex-top">
               <span className="home-vertex-cat">Push</span>
               <span className="home-vertex-level">L{levels.push}</span>
@@ -161,7 +174,6 @@ export default function HomeView() {
               <span className="home-vertex-cat">Core</span>
               <span className="home-vertex-level">L{levels.core}</span>
             </div>
-
             <div className="home-triangle-svg">
               <StrengthTriangle push={levels.push} pull={levels.pull} core={levels.core} />
             </div>
@@ -184,34 +196,6 @@ export default function HomeView() {
           </div>
         </section>
 
-        {/* ── "HEUTE DRAN" HINT ── */}
-        <section className="home-today-card">
-          <span className="home-today-arrow">↑</span>
-          <div className="home-today-text">
-            <span className="home-today-eyebrow">— Heute dran</span>
-            <span className="home-today-exercises">Push · Pull · Core</span>
-          </div>
-          <span className="home-today-duration">~30 Min</span>
-        </section>
-
-        {/* ── WOCHENSTREIFEN ── */}
-        <div className="week-strip">
-          {ALL_DAYS.map((day, idx) => {
-            const dayNum = idx + 1;
-            const isTraining = trainingDays.includes(dayNum);
-            const isDone = weekStatus[day];
-            const isToday = day === todayName;
-            return (
-              <div key={day} className={`week-day ${isToday ? 'today' : ''} ${isDone ? 'completed' : ''} ${!isTraining ? 'rest' : ''}`}>
-                <p className="week-day-name">{day}</p>
-                <div className="week-day-dot">
-                  {isDone && <span className="week-dot-inner">✓</span>}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
         {/* ── ACTION ── */}
         <div className="home-bottom">
           <button className="btn-start" onClick={() => navigate('/workout')}>
@@ -223,9 +207,8 @@ export default function HomeView() {
           )}
 
           {showRestOption && !restConfirm && (
-            <button className="btn-rest" onClick={() => setRestConfirm(true)}>
-              <span className="btn-rest-main">Heute pausieren</span>
-              <span className="btn-rest-hint">Ruhetag einlegen, ohne deine Serie zu verlieren</span>
+            <button className="btn-rest-text" onClick={() => setRestConfirm(true)}>
+              Ruhetag einlegen — deine Serie bleibt erhalten
             </button>
           )}
 
