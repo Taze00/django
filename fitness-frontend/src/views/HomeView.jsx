@@ -7,12 +7,12 @@ const ALL_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const DAY_SHORT = { Mon: 'Mo', Tue: 'Di', Wed: 'Mi', Thu: 'Do', Fri: 'Fr', Sat: 'Sa', Sun: 'So' };
 const MAX_LEVEL = 7;
 
-// ── Radar triangle SVG — translated from the design's DC script ──
+// ── Radar triangle SVG — labels inside, scales with screen width ──
 function StrengthTriangle({ push, pull, core }) {
   const clamp = v => Math.max(0, Math.min(MAX_LEVEL, v || 0));
   const p = clamp(push), u = clamp(pull), c = clamp(core);
 
-  const C = 150, R = 112;
+  const C = 150, R = 125;
   const ang = { push: -90, pull: 30, core: 150 };
   const pt = (key, frac) => {
     const a = ang[key] * Math.PI / 180;
@@ -22,10 +22,15 @@ function StrengthTriangle({ push, pull, core }) {
   const dataPts = [pt('push', p / MAX_LEVEL), pt('pull', u / MAX_LEVEL), pt('core', c / MAX_LEVEL)];
   const dataStr = dataPts.map(d => d.join(',')).join(' ');
 
+  // Full-size vertex positions for label placement
+  const [px, py] = pt('push', 1);  // ≈ [150, 25]
+  const [rx, ry] = pt('pull', 1);  // ≈ [258, 212]
+  const [lx, ly] = pt('core', 1);  // ≈ [42, 212]
+
   return (
-    <svg viewBox="0 0 300 300" width="300" height="300" style={{ display: 'block', overflow: 'visible' }}>
+    <svg viewBox="-42 -46 384 350" className="home-triangle-svg">
       {[1, 0.715, 0.43, 0.145].map((f, i) => (
-        <polygon key={i} points={triStr(f)} fill="none" stroke="#1d1d1d" strokeWidth="1" />
+        <polygon key={i} points={triStr(f)} fill="none" stroke="#1d1d1d" strokeWidth="1.2" />
       ))}
       {['push', 'pull', 'core'].map((k, i) => {
         const [x, y] = pt(k, 1);
@@ -33,8 +38,26 @@ function StrengthTriangle({ push, pull, core }) {
       })}
       <polygon points={dataStr} fill="rgba(255,77,0,0.16)" stroke="#FF4D00" strokeWidth="2.5" strokeLinejoin="round" />
       {dataPts.map(([x, y], i) => (
-        <circle key={i} cx={x} cy={y} r="5" fill="#FF4D00" stroke="#080808" strokeWidth="2" />
+        <circle key={i} cx={x} cy={y} r="5.5" fill="#FF4D00" stroke="#080808" strokeWidth="2" />
       ))}
+
+      {/* Push — above top vertex */}
+      <text x={px} y={py - 14} textAnchor="middle" fontSize="9"
+            fontFamily="DM Mono, monospace" letterSpacing="2" fill="#555">PUSH</text>
+      <text x={px} y={py - 1} textAnchor="middle" fontSize="26"
+            fontFamily="Bebas Neue, sans-serif" letterSpacing="1" fill="#f0ede8">L{p}</text>
+
+      {/* Pull — right of right vertex */}
+      <text x={rx + 14} y={ry - 4} textAnchor="start" fontSize="9"
+            fontFamily="DM Mono, monospace" letterSpacing="2" fill="#555">PULL</text>
+      <text x={rx + 14} y={ry + 16} textAnchor="start" fontSize="26"
+            fontFamily="Bebas Neue, sans-serif" letterSpacing="1" fill="#f0ede8">L{u}</text>
+
+      {/* Core — left of left vertex */}
+      <text x={lx - 14} y={ly - 4} textAnchor="end" fontSize="9"
+            fontFamily="DM Mono, monospace" letterSpacing="2" fill="#555">CORE</text>
+      <text x={lx - 14} y={ly + 16} textAnchor="end" fontSize="26"
+            fontFamily="Bebas Neue, sans-serif" letterSpacing="1" fill="#f0ede8">L{c}</text>
     </svg>
   );
 }
@@ -160,25 +183,9 @@ export default function HomeView() {
           <span className="home-hero-total">{levels.total}</span>
         </section>
 
-        {/* Stärke-Dreieck */}
+        {/* Stärke-Dreieck — section fills the dead vertical space */}
         <section className="home-triangle-section">
-          <div className="home-triangle-wrap">
-            <div className="home-vertex home-vertex-top">
-              <span className="home-vertex-cat">Push</span>
-              <span className="home-vertex-level">L{levels.push}</span>
-            </div>
-            <div className="home-vertex home-vertex-br">
-              <span className="home-vertex-cat">Pull</span>
-              <span className="home-vertex-level">L{levels.pull}</span>
-            </div>
-            <div className="home-vertex home-vertex-bl">
-              <span className="home-vertex-cat">Core</span>
-              <span className="home-vertex-level">L{levels.core}</span>
-            </div>
-            <div className="home-triangle-svg">
-              <StrengthTriangle push={levels.push} pull={levels.pull} core={levels.core} />
-            </div>
-          </div>
+          <StrengthTriangle push={levels.push} pull={levels.pull} core={levels.core} />
         </section>
 
         {/* Stats */}

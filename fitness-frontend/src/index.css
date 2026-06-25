@@ -356,55 +356,37 @@ body {
   position: relative;
 }
 
-/* Main content: grows to fill remaining height, distributes items vertically */
+/* Main content: grows to fill remaining height; triangle section absorbs free space via flex:1 */
 .home-content {
   flex: 1;
   display: flex; flex-direction: column;
-  justify-content: space-between;
-  padding: 0.25rem 1.25rem 88px;
+  padding: 0.5rem 1.25rem 88px;
   animation: fadeUp 0.4s ease;
 }
 
-/* Hero: big Gesamtstärke number */
-.home-hero { text-align: center; padding: 0.25rem 0 0; }
+/* Hero: compact Gesamtstärke block */
+.home-hero { text-align: center; padding: 0.2rem 0; }
 .home-hero-eyebrow {
   font-size: 0.52rem; letter-spacing: 3px;
   text-transform: uppercase; color: var(--muted); margin-bottom: 0.1rem;
 }
 .home-hero-total {
   display: block;
-  font-family: var(--display); font-size: 6.5rem;
+  font-family: var(--display); font-size: 5.5rem;
   line-height: 0.85; color: var(--orange); letter-spacing: 4px;
 }
 
-/* Stärke-Dreieck — breaks out of content padding for full width */
+/* Stärke-Dreieck — flex:1 absorbs all dead vertical space; SVG scales to screen width */
 .home-triangle-section {
-  margin: 0 -1.25rem;
-  display: flex; justify-content: center;
+  flex: 1;
+  min-height: 260px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0.5rem -1.25rem;
 }
-/* Wrap: 340px wide × 336px tall (36px top label + 300px SVG) */
-.home-triangle-wrap { position: relative; width: 340px; height: 336px; }
-/* SVG: left = (340-300)/2 = 20, top = 36 */
-.home-triangle-svg { position: absolute; top: 36px; left: 20px; }
-.home-vertex {
-  position: absolute; display: flex; flex-direction: column; gap: 2px;
-}
-/* Push vertex in wrap: x=170, y=74 → label above at top:2 */
-.home-vertex-top {
-  top: 2px; left: 50%; transform: translateX(-50%);
-  align-items: center; text-align: center;
-}
-/* Pull vertex in wrap: x=267, y=242 → label right, centered on y */
-.home-vertex-br { top: 224px; right: 4px; align-items: flex-end; text-align: right; }
-/* Core vertex in wrap: x=73, y=242 → label left, mirrored */
-.home-vertex-bl { top: 224px; left: 4px; align-items: flex-start; text-align: left; }
-.home-vertex-cat {
-  font-size: 0.5rem; letter-spacing: 2px;
-  text-transform: uppercase; color: var(--muted);
-}
-.home-vertex-level {
-  font-family: var(--display); font-size: 1.6rem;
-  line-height: 1; color: var(--white); letter-spacing: 1px;
+.home-triangle-svg {
+  width: min(92vw, 440px);
+  height: auto;
+  display: block;
 }
 
 /* Stats row */
