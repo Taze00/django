@@ -330,6 +330,93 @@ body {
 }
 .btn-start:hover { background: var(--orange2); }
 
+/* ─── HOME DASHBOARD ─── */
+
+/* Fixed radial orange glow — behind all content */
+.home-glow {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(255,77,0,0.09) 0%, transparent 65%);
+}
+.home-main { position: relative; z-index: 1; padding-top: 1rem; gap: 0; }
+
+/* Hero: big Gesamtstärke number */
+.home-hero { text-align: center; padding: 0.4rem 0 0.6rem; }
+.home-hero-eyebrow {
+  font-size: 0.52rem; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 0.1rem;
+}
+.home-hero-total {
+  display: block;
+  font-family: var(--display); font-size: 6.5rem;
+  line-height: 0.85; color: var(--orange); letter-spacing: 4px;
+}
+
+/* Stärke-Dreieck */
+.home-triangle-section { display: flex; justify-content: center; margin-bottom: 1rem; }
+/* Wrap: 300px wide, 284px tall (44px top label space + 240px SVG) */
+.home-triangle-wrap { position: relative; width: 300px; height: 284px; }
+/* SVG placed: left = (300-240)/2 = 30, top = 44 */
+.home-triangle-svg { position: absolute; top: 44px; left: 30px; }
+.home-vertex {
+  position: absolute; display: flex; flex-direction: column; gap: 2px;
+}
+/* Push: centered at top of wrap, vertex dot at wrap-y≈74 */
+.home-vertex-top {
+  top: 0; left: 50%; transform: translateX(-50%);
+  align-items: center; text-align: center;
+}
+/* Pull (right): vertex in wrap at approx (228, 209) → label center on y=209 */
+.home-vertex-br { top: 188px; right: 4px; align-items: flex-end; text-align: right; }
+/* Core (left): same y, mirror */
+.home-vertex-bl { top: 188px; left: 4px; align-items: flex-start; text-align: left; }
+.home-vertex-cat {
+  font-size: 0.5rem; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--muted);
+}
+.home-vertex-level {
+  font-family: var(--display); font-size: 1.6rem;
+  line-height: 1; color: var(--white); letter-spacing: 1px;
+}
+
+/* Stats row */
+.home-stats {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 1px; background: var(--muted2); margin-bottom: 0.85rem;
+}
+.home-stat {
+  background: var(--bg2); padding: 0.9rem 0.5rem;
+  display: flex; flex-direction: column; align-items: center; gap: 0.3rem;
+}
+.home-stat-val {
+  font-family: var(--display); font-size: 2.2rem;
+  line-height: 1; color: var(--white); letter-spacing: 1px;
+}
+.home-stat-orange { color: var(--orange); }
+.home-stat-label {
+  font-size: 0.48rem; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--muted);
+}
+
+/* "Heute dran" card */
+.home-today-card {
+  background: var(--bg2); border: 1px solid var(--muted2);
+  padding: 0.8rem 1rem; margin-bottom: 0.85rem;
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.home-today-arrow { font-size: 1.2rem; color: var(--orange); flex-shrink: 0; line-height: 1; }
+.home-today-text { display: flex; flex-direction: column; gap: 0.1rem; flex: 1; }
+.home-today-eyebrow {
+  font-size: 0.46rem; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--muted);
+}
+.home-today-exercises { font-size: 0.7rem; color: var(--white); letter-spacing: 0.5px; }
+.home-today-duration {
+  font-size: 0.52rem; color: var(--muted); letter-spacing: 1px; flex-shrink: 0;
+}
+
+/* Tighten week-strip in new dashboard context */
+.home-main .week-strip { margin-bottom: 1.25rem; }
+
 /* ─── EXERCISES VIEW ─── */
 .exercises-header-label {
   font-size: 0.5rem; letter-spacing: 4px;
