@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 
 export default function LoginView() {
@@ -60,7 +60,7 @@ export default function LoginView() {
           </button>
         </form>
         <p className="auth-footer">
-          Noch kein Account? <a href="/fitness/register">Registrieren</a>
+          Noch kein Account? <Link to="/register">Registrieren</Link>
         </p>
       </div>
     </div>

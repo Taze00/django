@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import axios from 'axios';
 
@@ -66,7 +66,7 @@ export default function RegisterView() {
           </button>
         </form>
         <p className="auth-footer">
-          Schon ein Account? <a href="/fitness/login">Anmelden</a>
+          Schon ein Account? <Link to="/login">Anmelden</Link>
         </p>
       </div>
     </div>
