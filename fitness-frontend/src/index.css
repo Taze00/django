@@ -224,10 +224,13 @@ body {
 /* ─── BOTTOM NAV ─── */
 .bottom-nav {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 200;
-  min-height: 64px; background: rgba(8,8,8,0.97);
+  /* safe-area-inset wird in die Höhe gefaltet (nicht als padding-bottom),
+     damit die Items über den GANZEN sichtbaren Streifen zentriert werden
+     und nicht oben am Trennstrich kleben */
+  min-height: calc(64px + env(safe-area-inset-bottom, 0px));
+  background: rgba(8,8,8,0.97);
   border-top: 1px solid var(--muted2);
   display: flex; align-items: stretch;
-  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 .bottom-nav-item {
   flex: 1 1 0; min-width: 0; background: none; border: none; color: var(--muted);
