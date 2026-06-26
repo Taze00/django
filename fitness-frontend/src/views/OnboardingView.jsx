@@ -216,16 +216,33 @@ export default function OnboardingView() {
 
         {/* ── STEP 0: WELCOME ── */}
         {step === 0 && (
-          <div className="onb-screen">
-            <p className="onb-eyebrow">Willkommen bei</p>
-            <div className="onb-logo">COR<span>VIS</span></div>
-            <p className="onb-welcome-text">
-              Hey {user?.username || 'Athlet'}. Bevor du startest, findet CORVIS dein
-              richtiges Level — du schätzt dich ein, machst einen kurzen Test, und
-              wir justieren automatisch.
-            </p>
+          <div className="onb-screen onb-screen--welcome">
+            <div className="onb-welcome-top">
+              <p className="onb-welcome-kicker">CORVIS · KALIBRIERUNG</p>
+              <div className="onb-welcome-logo">COR<span>VIS</span></div>
+              <p className="onb-welcome-claim">FINDE DEIN LEVEL.</p>
+            </div>
+            <div className="onb-welcome-body">
+              <p className="onb-welcome-text">
+                Hey {user?.username || 'Athlet'} — bevor du startest, findet CORVIS dein
+                genaues Level. Du schätzt dich ein, machst einen kurzen Test,
+                wir justieren automatisch.
+              </p>
+              <div className="onb-welcome-steps">
+                {[
+                  { n: '01', label: 'Trainingstage wählen' },
+                  { n: '02', label: 'Selbsteinschätzung + Test' },
+                  { n: '03', label: 'Level-Reveal' },
+                ].map(s => (
+                  <div key={s.n} className="onb-welcome-step">
+                    <span className="onb-welcome-step-n">{s.n}</span>
+                    <span className="onb-welcome-step-label">{s.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
             <button className="onb-btn-primary" onClick={() => setStep(1)}>
-              Los geht's →
+              Starten →
             </button>
           </div>
         )}
@@ -314,42 +331,39 @@ export default function OnboardingView() {
         {step === 5 && (
           <div className="onb-screen">
             {isLoading ? (
-              <>
+              <div className="onb-loading-center">
                 <div className="onb-logo">COR<span>VIS</span></div>
                 <div className="onb-spinner" />
-                <p className="onb-sub">CORVIS berechnet dein Level…</p>
-              </>
+                <p className="onb-sub">Berechne dein Level…</p>
+              </div>
             ) : (
               <>
-                <p className="onb-eyebrow">— Deine Kalibrierung</p>
-                <h2 className="onb-title">Dein Start<br />steht fest.</h2>
-                <p className="onb-sub">CORVIS hat dein Level aus deinem Test berechnet:</p>
+                <div className="onb-reveal-hero">
+                  <p className="onb-eyebrow">— Kalibrierung abgeschlossen</p>
+                  <h2 className="onb-reveal-title">DEIN<br /><span>START.</span></h2>
+                </div>
 
-                <div className="onb-reveal-list">
+                <div className="onb-reveal-grid">
                   {calibrated?.map((r, i) => (
-                    <div key={r.exercise_id} className="onb-reveal-card" style={{ animationDelay: `${0.15 + i * 0.12}s` }}>
-                      <div className="onb-reveal-top">
+                    <div key={r.exercise_id} className="onb-reveal-tile" style={{ animationDelay: `${0.1 + i * 0.15}s` }}>
+                      <div className="onb-reveal-tile-top">
                         <span className="onb-reveal-ex">{r.exercise}</span>
-                        {r.reason === 'up' && <span className="onb-reveal-tag up">↑ höher als gedacht</span>}
-                        {r.reason === 'down' && <span className="onb-reveal-tag down">angepasst</span>}
-                        {r.reason === 'stay' && <span className="onb-reveal-tag stay">✓ bestätigt</span>}
+                        {r.reason === 'up' && <span className="onb-reveal-tag up">↑ HÖHER</span>}
+                        {r.reason === 'down' && <span className="onb-reveal-tag down">ANGEPASST</span>}
+                        {r.reason === 'stay' && <span className="onb-reveal-tag stay">✓</span>}
                       </div>
-                      <div className="onb-reveal-body">
-                        <span className="onb-reveal-level">L{r.calibrated_level}</span>
-                        <div className="onb-reveal-detail">
-                          <span className="onb-reveal-prog">{r.progression_name}</span>
-                          <span className="onb-reveal-target">
-                            Ziel: {r.target_value}{r.target_type === 'time' ? 's' : ' Wdh'}
-                          </span>
-                        </div>
+                      <div className="onb-reveal-tile-level">L{r.calibrated_level}</div>
+                      <div className="onb-reveal-tile-name">{r.progression_name}</div>
+                      <div className="onb-reveal-tile-target">
+                        Ziel · {r.target_value}{r.target_type === 'time' ? 's' : ' Wdh'}
                       </div>
                     </div>
                   ))}
                 </div>
 
                 <div className="onb-system-hint">
-                  Trainierst du mehrere Einheiten sauber auf deinem Level, steigt CORVIS dich automatisch auf —
-                  schaffst du es deutlich nicht, passt es dein Level wieder an. Das System arbeitet für dich.
+                  Schaffst du dein Level mehrmals sauber, steigt CORVIS dich auf —
+                  schaffst du es deutlich nicht, passt es sich wieder an.
                 </div>
 
                 {error && <p className="onb-error">{error}</p>}
@@ -362,10 +376,12 @@ export default function OnboardingView() {
           </div>
         )}
 
-        {/* ── PROGRESS BAR ── */}
+        {/* ── STEP DOTS ── */}
         {step > 0 && step < 5 && (
-          <div className="onb-progress">
-            <div className="onb-progress-fill" style={{ width: `${progress * 100}%` }} />
+          <div className="onb-dots">
+            {[1,2,3,4].map(i => (
+              <div key={i} className={`onb-dot ${step >= i ? 'active' : ''}`} />
+            ))}
           </div>
         )}
       </div>
