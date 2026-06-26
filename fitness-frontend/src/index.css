@@ -364,6 +364,8 @@ body {
   border-bottom: none;
   backdrop-filter: none;
   position: relative;
+  /* safe-area-inset kommt schon von .home-shell — hier nicht doppelt addieren */
+  padding-top: 0;
 }
 
 /* Main content: grows to fill remaining height; triangle section absorbs free space via flex:1 */
