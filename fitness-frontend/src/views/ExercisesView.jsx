@@ -2,20 +2,9 @@ import { useState } from 'react';
 import { useWorkoutStore } from '../stores/workoutStore';
 import { EXERCISE_INFO } from '../data/exerciseInfo';
 
-const PROGRESSION_EXPLANATION =
-  'Schaffst du deine Sätze in mehreren Trainings hintereinander sauber, steigst du eine Stufe auf. ' +
-  'Schaffst du sie deutlich nicht, passt CORVIS dein Level wieder an — damit du immer auf dem Level ' +
-  'trainierst, das zu dir passt.';
-
-function sessionText(at, required) {
-  if (at === 0) return 'Stark trainieren, um aufzusteigen';
-  if (at >= required - 1) return 'Noch ein starkes Training';
-  return 'Auf gutem Weg zum nächsten Level';
-}
-
 export default function ExercisesView() {
+  const [openAll, setOpenAll] = useState({});
   const [infoModal, setInfoModal] = useState(null);
-  const [openInfo, setOpenInfo] = useState(null); // exercise id with open info panel
   const exercises = useWorkoutStore(state => state.exercises);
   const userProgressions = useWorkoutStore(state => state.userProgressions);
 
@@ -35,79 +24,83 @@ export default function ExercisesView() {
           const currentProg = userProg?.current_progression;
           const sessionsAtTarget = userProg?.sessions_at_target || 0;
           const sessionsRequired = currentProg?.sessions_required || 3;
-          const totalLevels = exercise.progressions?.length || 1;
-          const progressPct = currentProg ? ((currentProg.level - 1) / (totalLevels - 1)) * 100 : 0;
-          const isInfoOpen = openInfo === exercise.id;
+
+          const progressions = exercise.progressions || [];
+          const currentLevel = currentProg?.level ?? 1;
+          const currentIdx = progressions.findIndex(p => p.level === currentLevel);
+          const prevProg = currentIdx > 0 ? progressions[currentIdx - 1] : null;
+          const currProg = currentIdx >= 0 ? progressions[currentIdx] : null;
+          const nextProg = currentIdx >= 0 && currentIdx < progressions.length - 1
+            ? progressions[currentIdx + 1] : null;
+          const isExpanded = !!openAll[exercise.id];
 
           return (
-            <div key={exercise.id} className="exercise-block">
-              <p className="exercise-block-title">{exercise.name}</p>
-              <p className="exercise-block-meta">
-                Level {currentProg?.level ?? '—'}
-              </p>
+            <div key={exercise.id} className="lib-block">
+              <p className="lib-title">{exercise.name}</p>
 
-              <div className="exercise-session-row">
-                <div className="exercise-session-dots">
-                  {Array.from({ length: sessionsRequired }).map((_, i) => (
-                    <span
-                      key={i}
-                      className={`exercise-session-dot ${i < sessionsAtTarget ? 'filled' : ''}`}
-                    />
-                  ))}
-                </div>
-                <span className="exercise-session-text">
-                  {sessionText(sessionsAtTarget, sessionsRequired)}
-                </span>
-                <button
-                  className="exercise-info-toggle"
-                  onClick={() => setOpenInfo(isInfoOpen ? null : exercise.id)}
-                  aria-label="Wie funktioniert der Aufstieg?"
-                >
-                  ?
-                </button>
-              </div>
-
-              {isInfoOpen && (
-                <div className="exercise-info-panel">
-                  {PROGRESSION_EXPLANATION}
-                  <button
-                    className="exercise-info-panel-close"
-                    onClick={() => setOpenInfo(null)}
-                  >
-                    ✕
-                  </button>
+              {prevProg && (
+                <div className="lib-level-row lib-level-prev">
+                  <span className="lib-num">{prevProg.level}</span>
+                  <span className="lib-name">{prevProg.name}</span>
+                  <span className="lib-badge">✓</span>
                 </div>
               )}
 
-              <div className="exercise-progress-bar-wrap">
-                <div className="exercise-progress-bar-fill" style={{ width: `${progressPct}%` }} />
-              </div>
+              {currProg && (
+                <div className="lib-level-row lib-level-current">
+                  <span className="lib-num">{currProg.level}</span>
+                  <span className="lib-name">{currProg.name}</span>
+                  <div className="lib-dots">
+                    {Array.from({ length: sessionsRequired }).map((_, i) => (
+                      <span key={i} className={`lib-dot${i < sessionsAtTarget ? ' filled' : ''}`} />
+                    ))}
+                  </div>
+                  {EXERCISE_INFO[currProg.name] && (
+                    <button className="lib-info-btn" onClick={() => setInfoModal(currProg.name)}>
+                      INFO
+                    </button>
+                  )}
+                </div>
+              )}
 
-              <div className="exercise-ladder">
-                {exercise.progressions?.map(prog => {
-                  let status = 'future';
-                  if (prog.level < (currentProg?.level || 0)) status = 'completed';
-                  else if (prog.level === currentProg?.level) status = 'current';
+              {nextProg && (
+                <div className="lib-level-row lib-level-next">
+                  <span className="lib-num">{nextProg.level}</span>
+                  <span className="lib-name">{nextProg.name}</span>
+                  <span className="lib-badge">↑</span>
+                </div>
+              )}
 
-                  return (
-                    <div key={prog.id} className={`exercise-ladder-item ${status}`}>
-                      <span className="ladder-level">{prog.level}</span>
-                      <span className="ladder-name">{prog.name}</span>
-                      <span className="ladder-status">
-                        {status === 'completed' ? '✓' : status === 'current' ? '●' : ''}
-                      </span>
-                      {EXERCISE_INFO[prog.name] && (
-                        <button
-                          className="exercise-info-btn"
-                          onClick={() => setInfoModal(prog.name)}
-                        >
-                          INFO
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+              <button
+                className="lib-expand-btn"
+                onClick={() => setOpenAll(prev => ({ ...prev, [exercise.id]: !prev[exercise.id] }))}
+              >
+                {isExpanded ? '▲ Weniger anzeigen' : `Alle ${progressions.length} Stufen ›`}
+              </button>
+
+              {isExpanded && (
+                <div className="lib-full-ladder">
+                  {progressions.map(prog => {
+                    let status = 'future';
+                    if (prog.level < currentLevel) status = 'completed';
+                    else if (prog.level === currentLevel) status = 'current';
+                    return (
+                      <div key={prog.id} className={`lib-ladder-item ${status}`}>
+                        <span className="lib-ladder-num">{prog.level}</span>
+                        <span className="lib-ladder-name">{prog.name}</span>
+                        <span className="lib-ladder-status">
+                          {status === 'completed' ? '✓' : status === 'current' ? '●' : ''}
+                        </span>
+                        {EXERCISE_INFO[prog.name] && (
+                          <button className="lib-info-btn" onClick={() => setInfoModal(prog.name)}>
+                            INFO
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           );
         })}

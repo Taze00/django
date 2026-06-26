@@ -476,75 +476,86 @@ body {
   font-size: 0.5rem; letter-spacing: 4px;
   text-transform: uppercase; color: var(--orange); margin-bottom: 1.5rem;
 }
-.exercise-block { margin-bottom: 2.5rem; }
-.exercise-block-title {
-  font-family: var(--display); font-size: 2rem;
+
+/* ── Library card per exercise ── */
+.lib-block { margin-bottom: 1.75rem; }
+.lib-title {
+  font-family: var(--display); font-size: 1.6rem;
   letter-spacing: 2px; color: var(--white);
-  margin-bottom: 0.2rem; line-height: 1;
+  line-height: 1; margin-bottom: 0.5rem;
 }
-.exercise-block-meta {
-  font-size: 0.55rem; letter-spacing: 2px;
-  text-transform: uppercase; color: var(--muted); margin-bottom: 0.5rem;
+
+/* ── Level rows ── */
+.lib-level-row {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.5rem 0.75rem;
 }
-.exercise-session-row {
-  display: flex; align-items: center; gap: 0.55rem;
-  margin-bottom: 0.65rem; flex-wrap: wrap;
+.lib-level-prev { opacity: 0.45; }
+.lib-level-next { opacity: 0.45; }
+.lib-level-current {
+  background: var(--bg3); border-left: 2px solid var(--orange);
+  margin: 0.15rem 0;
 }
-.exercise-session-dots { display: flex; gap: 5px; align-items: center; flex-shrink: 0; }
-.exercise-session-dot {
-  width: 8px; height: 8px; border-radius: 50%; background: var(--muted3);
+.lib-num {
+  font-family: var(--display); font-size: 1.1rem;
+  letter-spacing: 1px; width: 20px; flex-shrink: 0;
+  color: var(--muted);
 }
-.exercise-session-dot.filled { background: var(--orange); }
-.exercise-session-text {
-  font-size: 0.56rem; color: var(--muted); letter-spacing: 0.3px;
-  text-transform: none; flex: 1;
+.lib-level-current .lib-num { color: var(--orange); }
+.lib-name { flex: 1; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.3px; }
+.lib-level-current .lib-name { color: var(--white); }
+.lib-badge { font-size: 0.6rem; color: var(--muted); width: 14px; text-align: center; flex-shrink: 0; }
+
+/* ── Session dots ── */
+.lib-dots { display: flex; gap: 4px; align-items: center; flex-shrink: 0; }
+.lib-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--bg2); border: 1px solid var(--muted3);
 }
-.exercise-info-toggle {
+.lib-dot.filled { background: var(--orange); border-color: var(--orange); }
+
+/* ── Info button ── */
+.lib-info-btn {
   background: none; border: 1px solid var(--muted3); color: var(--muted);
-  font-size: 0.5rem; width: 16px; height: 16px; border-radius: 50%; cursor: pointer;
-  display: inline-flex; align-items: center; justify-content: center;
-  padding: 0; font-family: var(--mono); flex-shrink: 0; line-height: 1;
+  font-size: 0.45rem; letter-spacing: 1px; padding: 0.12rem 0.35rem;
+  cursor: pointer; transition: all 0.2s; font-family: var(--mono); flex-shrink: 0;
 }
-.exercise-info-toggle:hover { border-color: var(--muted); color: var(--white); }
-.exercise-info-panel {
-  font-size: 0.61rem; color: var(--muted); line-height: 1.7;
-  padding: 0.65rem 0.85rem 0.65rem 0.85rem;
-  background: var(--bg3); border-left: 2px solid var(--muted3);
-  margin-bottom: 0.75rem; position: relative;
+.lib-info-btn:hover { border-color: var(--orange); color: var(--orange); }
+
+/* ── Expand toggle ── */
+.lib-expand-btn {
+  width: 100%; background: none; border: none;
+  font-family: var(--mono); font-size: 0.48rem; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--muted);
+  padding: 0.55rem 0.75rem; text-align: left;
+  cursor: pointer; transition: color 0.2s;
+  border-top: 1px solid var(--muted2); margin-top: 0.2rem;
 }
-.exercise-info-panel-close {
-  position: absolute; top: 0.4rem; right: 0.55rem;
-  background: none; border: none; color: var(--muted);
-  font-size: 0.65rem; cursor: pointer; padding: 0; line-height: 1;
-}
-.exercise-info-panel-close:hover { color: var(--white); }
-.exercise-progress-bar-wrap { height: 1px; background: var(--muted2); margin-bottom: 1rem; }
-.exercise-progress-bar-fill { height: 100%; background: var(--orange); transition: width 0.6s ease; }
-.exercise-ladder {
+.lib-expand-btn:hover { color: var(--white); }
+
+/* ── Full ladder (expanded) ── */
+.lib-full-ladder {
   display: flex; flex-direction: column;
-  gap: 1px; background: var(--muted2);
+  gap: 1px; background: var(--muted2); margin-top: 0.25rem;
 }
-.exercise-ladder-item {
-  background: var(--bg2); padding: 0.85rem 1rem;
-  display: flex; align-items: center; gap: 0.75rem;
+.lib-ladder-item {
+  background: var(--bg2); padding: 0.7rem 0.75rem;
+  display: flex; align-items: center; gap: 0.6rem;
 }
-.exercise-ladder-item.completed { opacity: 0.35; }
-.exercise-ladder-item.current { background: var(--bg3); }
-.ladder-level {
+.lib-ladder-item.completed { opacity: 0.35; }
+.lib-ladder-item.current { background: var(--bg3); border-left: 2px solid var(--orange); }
+.lib-ladder-num {
   font-family: var(--display); font-size: 1rem;
-  color: var(--muted3); width: 24px; flex-shrink: 0; letter-spacing: 1px;
+  color: var(--muted3); width: 20px; flex-shrink: 0; letter-spacing: 1px;
 }
-.exercise-ladder-item.current .ladder-level { color: var(--orange); }
-.ladder-name { flex: 1; font-size: 0.72rem; color: var(--muted); letter-spacing: 0.3px; }
-.exercise-ladder-item.current .ladder-name { color: var(--white); }
-.ladder-status { font-size: 0.55rem; color: var(--muted3); letter-spacing: 1px; }
-.exercise-ladder-item.current .ladder-status { color: var(--orange); }
-.exercise-info-btn {
-  background: none; border: 1px solid var(--muted3); color: var(--muted);
-  font-size: 0.5rem; letter-spacing: 1px; padding: 0.15rem 0.4rem;
-  cursor: pointer; transition: all 0.2s; font-family: var(--mono);
+.lib-ladder-item.current .lib-ladder-num { color: var(--orange); }
+.lib-ladder-name { flex: 1; font-size: 0.68rem; color: var(--muted); letter-spacing: 0.3px; }
+.lib-ladder-item.current .lib-ladder-name { color: var(--white); }
+.lib-ladder-status {
+  font-size: 0.55rem; color: var(--muted3); letter-spacing: 1px;
+  width: 14px; text-align: center; flex-shrink: 0;
 }
-.exercise-info-btn:hover { border-color: var(--orange); color: var(--orange); }
+.lib-ladder-item.current .lib-ladder-status { color: var(--orange); }
 
 /* ─── STATISTICS VIEW ─── */
 .stats-row {
