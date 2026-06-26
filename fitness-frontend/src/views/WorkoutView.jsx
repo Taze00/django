@@ -245,12 +245,21 @@ export default function WorkoutView() {
       </header>
 
       <div className="workout-main">
-        <p className="workout-exercise-cat">{progInfo.exercise.category}</p>
-        <p className="workout-exercise-name">{progInfo.exercise.name}</p>
-        <p className="workout-set-label">
-          {progInfo.currentProgression.name} · Satz {step.setNumber}
-        </p>
-        <FormTip progressionName={progInfo.currentProgression.name} />
+        <div className="wv-info">
+          <span className="wv-cat-pill">{progInfo.exercise.category}</span>
+          <p className="wv-prog-name">{progInfo.currentProgression.name}</p>
+          <p className="wv-set-num">Satz {step.setNumber}</p>
+          <FormTip progressionName={progInfo.currentProgression.name} />
+          {progInfo.currentProgression.target_value && (
+            <p className="wv-target">
+              Ziel: <strong>
+                {progInfo.currentProgression.target_type === 'reps'
+                  ? `${progInfo.currentProgression.target_value} Wdh`
+                  : `${progInfo.currentProgression.target_value} s`}
+              </strong>
+            </p>
+          )}
+        </div>
         {progInfo.currentProgression.target_type === 'reps' ? (
           <SetInput
             setNumber={step.setNumber}
