@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function SetInput({ setNumber, exerciseName, progressionName, lastTime, onComplete }) {
+export default function SetInput({ setNumber, exerciseName, progressionName, onComplete }) {
   const [reps, setReps] = useState('');
 
   return (
@@ -15,9 +15,6 @@ export default function SetInput({ setNumber, exerciseName, progressionName, las
         autoFocus
         placeholder="0"
       />
-      {lastTime !== null && lastTime !== undefined && (
-        <p className="workout-last">Letztes Mal: <span>{lastTime} Wdh</span></p>
-      )}
       <button
         className="btn-done"
         onClick={() => onComplete(parseInt(reps, 10) || 0)}

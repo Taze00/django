@@ -232,6 +232,8 @@ export default function WorkoutView() {
     );
   }
 
+  const lastTime = getLastTime(step.exerciseName, step.setNumber);
+
   return (
     <div className="workout-shell">
       <header className="workout-header">
@@ -245,39 +247,49 @@ export default function WorkoutView() {
       </header>
 
       <div className="workout-main">
-        <div className="wv-info">
-          <span className="wv-cat-pill">{progInfo.exercise.category}</span>
-          <p className="wv-prog-name">{progInfo.currentProgression.name}</p>
-          <p className="wv-set-num">Satz {step.setNumber}</p>
-          <FormTip progressionName={progInfo.currentProgression.name} />
-          {progInfo.currentProgression.target_value && (
-            <p className="wv-target">
-              Ziel: <strong>
-                {progInfo.currentProgression.target_type === 'reps'
-                  ? `${progInfo.currentProgression.target_value} Wdh`
-                  : `${progInfo.currentProgression.target_value} s`}
-              </strong>
-            </p>
+        <div className="workout-main-center">
+          <div className="wv-info">
+            <span className="wv-cat-pill">{progInfo.exercise.category}</span>
+            <p className="wv-prog-name">{progInfo.currentProgression.name}</p>
+            <p className="wv-set-num">Satz {step.setNumber}</p>
+            {progInfo.currentProgression.target_value && (
+              <p className="wv-target">
+                Ziel: <strong>
+                  {progInfo.currentProgression.target_type === 'reps'
+                    ? `${progInfo.currentProgression.target_value} Wdh`
+                    : `${progInfo.currentProgression.target_value} s`}
+                </strong>
+              </p>
+            )}
+            {lastTime !== null && lastTime !== undefined && (
+              <p className="wv-last">
+                Letztes Mal:{' '}
+                <span>
+                  {progInfo.currentProgression.target_type === 'reps'
+                    ? `${lastTime} Wdh`
+                    : `${Math.floor(lastTime / 60)}:${String(lastTime % 60).padStart(2, '0')}`}
+                </span>
+              </p>
+            )}
+            <FormTip progressionName={progInfo.currentProgression.name} />
+          </div>
+          {progInfo.currentProgression.target_type === 'reps' ? (
+            <SetInput
+              setNumber={step.setNumber}
+              exerciseName={step.exerciseName}
+              progressionName={progInfo.currentProgression.name}
+              onComplete={handleSetComplete}
+            />
+          ) : (
+            <TimerInput
+              setNumber={step.setNumber}
+              exerciseName={step.exerciseName}
+              progressionName={progInfo.currentProgression.name}
+              targetSeconds={progInfo.currentProgression.target_value}
+              onComplete={handleSetComplete}
+            />
           )}
         </div>
-        {progInfo.currentProgression.target_type === 'reps' ? (
-          <SetInput
-            setNumber={step.setNumber}
-            exerciseName={step.exerciseName}
-            progressionName={progInfo.currentProgression.name}
-            lastTime={getLastTime(step.exerciseName, step.setNumber)}
-            onComplete={handleSetComplete}
-          />
-        ) : (
-          <TimerInput
-            setNumber={step.setNumber}
-            exerciseName={step.exerciseName}
-            progressionName={progInfo.currentProgression.name}
-            targetSeconds={progInfo.currentProgression.target_value}
-            lastTime={getLastTime(step.exerciseName, step.setNumber)}
-            onComplete={handleSetComplete}
-          />
-        )}
       </div>
 
       {showModal && <ProgressionModal upgrades={progressionData?.upgrades || []} downgrades={progressionData?.downgrades || []} workouts={workouts} streak={streak} trainingDays={trainingDays} onClose={handleModalClose} />}

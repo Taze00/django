@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 
-export default function TimerInput({ setNumber, exerciseName, progressionName, targetSeconds, lastTime, onComplete }) {
+export default function TimerInput({ setNumber, exerciseName, progressionName, targetSeconds, onComplete }) {
   const [elapsed, setElapsed] = useState(0);
   const [running, setRunning] = useState(false);
   const intervalRef = useRef(null);
@@ -23,9 +23,6 @@ export default function TimerInput({ setNumber, exerciseName, progressionName, t
 
   return (
     <div className="workout-input-wrap">
-      {lastTime !== null && lastTime !== undefined && (
-        <p className="workout-last">Letztes Mal: <span>{fmt(lastTime)}</span></p>
-      )}
       <p className={`timer-display ${running ? 'running' : ''}`}>{fmt(elapsed)}</p>
       <button
         className="timer-btn"

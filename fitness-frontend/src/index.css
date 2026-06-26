@@ -805,37 +805,43 @@ body {
 }
 .workout-progress-bar { height: 1px; background: var(--muted2); }
 .workout-progress-fill { height: 100%; background: var(--orange); transition: width 0.4s ease; }
+
+/* Main area: vertically centers info block, pins input+button to bottom */
 .workout-main {
-  flex: 1; display: flex; flex-direction: column; padding: 0 1.25rem;
+  flex: 1; display: flex; flex-direction: column;
+  padding: 0 1.25rem 1.5rem;
 }
-/* Info zone: kategorie pill + progressionsname + satznummer + ziel */
-.wv-info { padding: 1.75rem 0 1.5rem; display: flex; flex-direction: column; }
+.workout-main-center {
+  flex: 1; display: flex; flex-direction: column; justify-content: center;
+}
+
+/* Info zone */
+.wv-info { display: flex; flex-direction: column; gap: 0.55rem; padding-bottom: 1.75rem; }
 .wv-cat-pill {
   display: inline-block; align-self: flex-start;
   font-family: var(--mono); font-size: 0.44rem;
   letter-spacing: 3px; text-transform: uppercase;
   color: var(--orange); border: 1px solid rgba(255,77,0,0.3);
-  padding: 0.18rem 0.5rem; margin-bottom: 0.65rem;
+  padding: 0.18rem 0.5rem;
 }
 .wv-prog-name {
   font-family: var(--display);
   font-size: clamp(1.9rem, 8vw, 3rem);
   letter-spacing: 2px; color: var(--white); line-height: 1.05;
-  margin-bottom: 0.35rem;
 }
 .wv-set-num {
-  font-size: 0.52rem; letter-spacing: 2.5px; text-transform: uppercase;
-  color: var(--muted); margin-bottom: 0.9rem;
+  font-size: 0.52rem; letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted);
 }
-.wv-target { font-size: 0.62rem; letter-spacing: 0.5px; color: var(--muted); margin-top: 0.6rem; }
+.wv-target { font-size: 0.62rem; letter-spacing: 0.5px; color: var(--muted); }
 .wv-target strong { color: var(--white); }
-.workout-last { font-size: 0.58rem; letter-spacing: 0.5px; color: var(--muted); }
-.workout-last span { color: var(--orange); }
+.wv-last { font-size: 0.58rem; letter-spacing: 0.5px; color: var(--muted); }
+.wv-last span { color: var(--orange); }
+
+/* Input + button zone */
 .workout-input-wrap {
-  flex: 1; display: flex; flex-direction: column;
-  align-items: center; gap: 1.5rem; padding-bottom: 1.5rem;
+  display: flex; flex-direction: column;
+  align-items: center; gap: 1.25rem;
 }
-.workout-input-wrap .btn-done { margin-top: auto; }
 .workout-number-input {
   font-family: var(--display);
   font-size: clamp(4rem, 20vw, 7rem);
