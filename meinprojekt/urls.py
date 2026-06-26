@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.static import serve
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from . import views
 from fitness.views import register
@@ -45,9 +46,12 @@ urlpatterns = [
     path('aurelia/', views.aurelia_demo, name='aurelia_demo'),
 ]
 
-# Serve media files in development
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Serve uploaded media files. Works regardless of DEBUG — under gunicorn +
+# WhiteNoise + DEBUG=False the old static()-only route returned nothing, so
+# /media/ 404'd in production. This explicit serve() route fixes that.
+urlpatterns += [
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+]
 
 # Custom 404. handler404 covers DEBUG=False; the catch-all re_path hides the
 # debug URL list while DEBUG=True. Must stay LAST so real routes win.
