@@ -222,7 +222,6 @@ class UserProfile(models.Model):
             img_io.seek(0)
             
             # Save bytes to field - use only filename to prevent duplication
-            import os
             filename = os.path.basename(self.profile_picture.name)
             self.profile_picture.save(
                 filename,
