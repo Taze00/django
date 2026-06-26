@@ -1003,28 +1003,96 @@ body {
 .lvl-modal-box {
   background: var(--bg2); border: 1px solid var(--muted3);
   width: 100%; max-width: 360px;
-  padding: 2rem 1.5rem 1.5rem; animation: fadeUp 0.35s ease;
+  padding: 0 0 1.5rem; animation: fadeUp 0.35s ease;
   position: relative; overflow-y: auto; max-height: 90vh;
 }
 .lvl-modal-box::before {
   content: ''; position: absolute; inset: 0;
-  background: radial-gradient(ellipse at top, rgba(255,77,0,0.08) 0%, transparent 65%);
+  background: radial-gradient(ellipse at top, rgba(255,77,0,0.09) 0%, transparent 55%);
   pointer-events: none;
 }
-.lvl-modal-eyebrow {
-  font-size: 0.55rem; letter-spacing: 4px; text-transform: uppercase;
-  color: var(--orange); margin-bottom: 0.5rem;
+
+/* ── Modal Hero (top section per state) ── */
+.pm-hero {
+  padding: 2rem 1.5rem 1.25rem;
+  border-bottom: 1px solid var(--muted2);
+  margin-bottom: 1.25rem;
+  position: relative;
 }
-.lvl-modal-title {
-  font-family: var(--display); font-size: 2.6rem;
+.pm-hero--up { border-bottom-color: rgba(255,77,0,0.25); }
+.pm-hero--down { border-bottom-color: var(--muted2); }
+.pm-hero--done {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+.pm-hero-eyebrow {
+  font-size: 0.52rem; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--orange); margin-bottom: 0.4rem;
+}
+.pm-hero--down .pm-hero-eyebrow { color: var(--muted); }
+.pm-hero-title {
+  font-family: var(--display); font-size: clamp(3rem, 14vw, 4rem);
   letter-spacing: 2px; color: var(--white);
-  line-height: 1; margin-bottom: 0.4rem;
+  line-height: 0.9; margin-bottom: 0.6rem;
 }
-.lvl-modal-title span { color: var(--orange); }
-.lvl-modal-sub {
+.pm-hero-title span { color: var(--orange); }
+.pm-hero--down .pm-hero-title span { color: var(--muted); }
+.pm-hero--done .pm-hero-title span { color: var(--orange); }
+.pm-hero-sub {
   font-size: 0.62rem; color: var(--muted); letter-spacing: 0.4px;
-  margin-bottom: 1.5rem;
+  line-height: 1.6;
 }
+
+/* Level cards stay inside their own padding */
+.lvl-modal-box .lvl-cards { padding: 0 1.5rem; margin-bottom: 1.25rem; }
+
+/* ── Summary blocks ── */
+.pm-summary {
+  display: flex; flex-direction: column;
+  gap: 1px; background: var(--muted2);
+  margin: 0 0 1.5rem;
+}
+.pm-block {
+  background: var(--bg2); padding: 1rem 1.5rem;
+}
+.pm-block-label {
+  font-size: 0.48rem; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 0.6rem;
+}
+.pm-session-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 0.5rem; padding: 0.15rem 0;
+}
+.pm-session-ex { font-size: 0.65rem; color: var(--white); letter-spacing: 0.3px; }
+.pm-session-val {
+  font-size: 0.65rem; color: var(--orange);
+  font-family: var(--mono); letter-spacing: 0.5px; white-space: nowrap;
+}
+
+.pm-block--streak {
+  display: flex; align-items: center; gap: 0.85rem;
+}
+.pm-streak-num {
+  font-family: var(--display); font-size: 3rem; line-height: 1;
+  color: var(--orange); letter-spacing: 1px; flex-shrink: 0;
+}
+.pm-streak-right { display: flex; flex-direction: column; gap: 0.25rem; }
+.pm-streak-label { font-size: 0.6rem; color: var(--muted); letter-spacing: 0.4px; }
+.pm-streak-record {
+  font-size: 0.48rem; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--orange); border: 1px solid var(--orange);
+  padding: 0.1rem 0.3rem; display: inline-block; width: fit-content;
+}
+
+.pm-block--next {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem;
+}
+.pm-next-label { font-size: 0.55rem; color: var(--muted); letter-spacing: 0.4px; }
+.pm-next-val { font-size: 0.62rem; color: var(--white); letter-spacing: 0.3px; text-align: right; }
+
+/* Close button gets outer padding */
+.lvl-modal-box .modal-close-btn { margin: 0 1.5rem; width: calc(100% - 3rem); }
 
 /* ─── LEVEL CARDS ─── */
 .lvl-cards { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.5rem; }
@@ -1070,58 +1138,7 @@ body {
   padding: 0.15rem 0.4rem; display: inline-block;
 }
 
-/* ─── SESSION SUMMARY (Workout-Abschluss) ─── */
-.session-summary {
-  border-top: 1px solid var(--muted3);
-  margin-top: 0.25rem; padding-top: 1.25rem;
-  margin-bottom: 1.25rem;
-  display: flex; flex-direction: column; gap: 0.6rem;
-}
-.session-label {
-  font-size: 0.5rem; letter-spacing: 4px; text-transform: uppercase;
-  color: var(--muted); margin-bottom: 0.1rem;
-}
-.session-row {
-  display: flex; justify-content: space-between; align-items: baseline;
-  gap: 0.5rem;
-}
-.session-ex-name {
-  font-size: 0.65rem; color: var(--white); letter-spacing: 0.3px;
-}
-.session-ex-val {
-  font-size: 0.65rem; color: var(--orange);
-  font-family: var(--mono); letter-spacing: 0.5px; white-space: nowrap;
-}
-.session-streak-row {
-  display: flex; align-items: center; gap: 0.75rem;
-  margin-top: 0.4rem; padding-top: 0.75rem;
-  border-top: 1px solid var(--muted3);
-}
-.session-streak-num {
-  font-family: var(--display); font-size: 2.6rem; line-height: 1;
-  color: var(--orange); letter-spacing: 1px;
-}
-.session-streak-text {
-  display: flex; flex-direction: column; gap: 0.2rem;
-}
-.session-streak-text > span:first-child {
-  font-size: 0.6rem; color: var(--muted); letter-spacing: 0.4px;
-}
-.session-streak-record {
-  font-size: 0.5rem; letter-spacing: 3px; text-transform: uppercase;
-  color: var(--orange); border: 1px solid var(--orange);
-  padding: 0.1rem 0.3rem; display: inline-block; width: fit-content;
-}
-.session-next {
-  display: flex; justify-content: space-between; align-items: baseline;
-  gap: 0.5rem;
-}
-.session-next-label {
-  font-size: 0.55rem; color: var(--muted); letter-spacing: 0.4px;
-}
-.session-next-val {
-  font-size: 0.6rem; color: var(--white); letter-spacing: 0.3px; text-align: right;
-}
+/* ─── SESSION SUMMARY CSS — replaced by pm-* classes in ProgressionModal ─── */
 
 /* ─── FORM-TIPP (Workout-Ansicht) ─── */
 .form-tip { margin: 0.5rem 0 0.6rem; }

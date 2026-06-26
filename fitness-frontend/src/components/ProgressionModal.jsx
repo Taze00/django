@@ -32,7 +32,7 @@ function Confetti({ count = 60 }) {
 
 function UpgradeCard({ item, idx }) {
   return (
-    <div className="lvl-card" style={{ animationDelay: `${0.15 + idx * 0.1}s` }}>
+    <div className="lvl-card" style={{ animationDelay: `${0.3 + idx * 0.1}s` }}>
       <div className="lvl-card-top">
         <span className="lvl-card-arrow">↑</span>
         <span className="lvl-card-ex">{item.exercise}</span>
@@ -56,7 +56,7 @@ function UpgradeCard({ item, idx }) {
 
 function DowngradeCard({ item, idx }) {
   return (
-    <div className="lvl-card lvl-card--down" style={{ animationDelay: `${0.15 + idx * 0.1}s` }}>
+    <div className="lvl-card lvl-card--down" style={{ animationDelay: `${0.3 + idx * 0.1}s` }}>
       <div className="lvl-card-top">
         <span className="lvl-card-arrow down">↓</span>
         <span className="lvl-card-ex">{item.exercise}</span>
@@ -102,7 +102,7 @@ function getNextTrainingDay(trainingDays) {
   return null;
 }
 
-function SessionSummary({ workouts, streak, trainingDays }) {
+function SessionBlock({ workouts }) {
   const todayStr = new Date().toISOString().slice(0, 10);
   const todayWorkout = workouts?.find(w => w.date === todayStr && w.completed);
 
@@ -118,48 +118,54 @@ function SessionSummary({ workouts, streak, trainingDays }) {
   }
 
   const entries = Object.entries(exSummary);
-  const isRecord = streak?.current > 1 && streak.current === streak?.longest;
-  const nextDay = getNextTrainingDay(trainingDays);
+  if (!entries.length) return null;
 
   return (
-    <div className="session-summary">
-      {entries.length > 0 && (
-        <>
-          <p className="session-label">Heute geleistet</p>
-          {entries.map(([name, data]) => (
-            <div key={name} className="session-row">
-              <span className="session-ex-name">{name}</span>
-              <span className="session-ex-val">
-                {data.hasReps && `${data.reps} Wdh.`}
-                {data.hasTime && formatTime(data.seconds)}
-              </span>
-            </div>
-          ))}
-        </>
-      )}
-
-      {streak?.current > 0 && (
-        <div className="session-streak-row">
-          <span className="session-streak-num">{streak.current}</span>
-          <div className="session-streak-text">
-            <span>{streak.current === 1 ? 'Trainingstag am Stück' : 'Trainingstage am Stück'}</span>
-            {isRecord && <span className="session-streak-record">Neuer Rekord</span>}
-          </div>
+    <div className="pm-block pm-block--session">
+      <p className="pm-block-label">Heute geleistet</p>
+      {entries.map(([name, data]) => (
+        <div key={name} className="pm-session-row">
+          <span className="pm-session-ex">{name}</span>
+          <span className="pm-session-val">
+            {data.hasReps && `${data.reps} Wdh.`}
+            {data.hasTime && formatTime(data.seconds)}
+          </span>
         </div>
-      )}
+      ))}
+    </div>
+  );
+}
 
-      {nextDay && (
-        <div className="session-next">
-          <span className="session-next-label">Nächstes Training</span>
-          <span className="session-next-val">{nextDay}</span>
-        </div>
-      )}
+function StreakBlock({ streak }) {
+  if (!streak?.current) return null;
+  const isRecord = streak.current > 1 && streak.current === streak?.longest;
+  return (
+    <div className="pm-block pm-block--streak">
+      <div className="pm-streak-num">{streak.current}</div>
+      <div className="pm-streak-right">
+        <span className="pm-streak-label">
+          {streak.current === 1 ? 'Tag am Stück' : 'Tage am Stück'}
+        </span>
+        {isRecord && <span className="pm-streak-record">Neuer Rekord</span>}
+      </div>
+    </div>
+  );
+}
+
+function NextBlock({ trainingDays }) {
+  const nextDay = getNextTrainingDay(trainingDays);
+  if (!nextDay) return null;
+  return (
+    <div className="pm-block pm-block--next">
+      <span className="pm-next-label">Nächstes Training</span>
+      <span className="pm-next-val">{nextDay}</span>
     </div>
   );
 }
 
 export default function ProgressionModal({ upgrades = [], downgrades = [], workouts = [], streak = {}, trainingDays = [], onClose }) {
   const hasUpgrades = upgrades.length > 0;
+  const hasDowngrades = downgrades.length > 0;
   const hasChanges = upgrades.length + downgrades.length > 0;
 
   return (
@@ -167,33 +173,50 @@ export default function ProgressionModal({ upgrades = [], downgrades = [], worko
       {hasUpgrades && <Confetti />}
 
       <div className="lvl-modal-box">
-        {hasUpgrades ? (
+
+        {/* ── LEVEL-UP STATE ── */}
+        {hasUpgrades && (
           <>
-            <p className="lvl-modal-eyebrow">— Level Update</p>
-            <h2 className="lvl-modal-title">WEITER<span>GEKOMMEN</span></h2>
-            <p className="lvl-modal-sub">Du hast die Zielwerte erreicht.</p>
-          </>
-        ) : hasChanges ? (
-          <>
-            <p className="lvl-modal-eyebrow">— Level Update</p>
-            <h2 className="lvl-modal-title">LEVEL<span>ANPASSUNG</span></h2>
-            <p className="lvl-modal-sub">Passt so — du kennst dein Level jetzt besser.</p>
-          </>
-        ) : (
-          <>
-            <p className="lvl-modal-eyebrow">— Workout</p>
-            <h2 className="lvl-modal-title">ABGE<span>SCHLOSSEN</span></h2>
+            <div className="pm-hero pm-hero--up">
+              <p className="pm-hero-eyebrow">— Level Update</p>
+              <h2 className="pm-hero-title">LEVEL<span>UP</span></h2>
+              <p className="pm-hero-sub">Du hast die Zielwerte erreicht.</p>
+            </div>
+            <div className="lvl-cards">
+              {upgrades.map((u, i) => <UpgradeCard key={i} item={u} idx={i} />)}
+            </div>
           </>
         )}
 
-        {hasChanges && (
-          <div className="lvl-cards">
-            {upgrades.map((u, i) => <UpgradeCard key={i} item={u} idx={i} />)}
-            {downgrades.map((d, i) => <DowngradeCard key={i} item={d} idx={upgrades.length + i} />)}
+        {/* ── DOWNGRADE STATE ── */}
+        {!hasUpgrades && hasDowngrades && (
+          <>
+            <div className="pm-hero pm-hero--down">
+              <p className="pm-hero-eyebrow">— Level Update</p>
+              <h2 className="pm-hero-title">NEUES<span>LEVEL</span></h2>
+              <p className="pm-hero-sub">CORVIS hat dein Level angepasst — das macht dich langfristig stärker.</p>
+            </div>
+            <div className="lvl-cards">
+              {downgrades.map((d, i) => <DowngradeCard key={i} item={d} idx={i} />)}
+            </div>
+          </>
+        )}
+
+        {/* ── NO-CHANGE STATE ── */}
+        {!hasChanges && (
+          <div className="pm-hero pm-hero--done">
+            <p className="pm-hero-eyebrow">— Workout</p>
+            <h2 className="pm-hero-title">DONE<span>.</span></h2>
+            <p className="pm-hero-sub">Sauber durchgezogen.</p>
           </div>
         )}
 
-        <SessionSummary workouts={workouts} streak={streak} trainingDays={trainingDays} />
+        {/* ── SESSION + STREAK + NEXT ── */}
+        <div className="pm-summary">
+          <SessionBlock workouts={workouts} />
+          <StreakBlock streak={streak} />
+          <NextBlock trainingDays={trainingDays} />
+        </div>
 
         <button className="modal-close-btn" onClick={onClose}>
           Fertig →
