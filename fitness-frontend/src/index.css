@@ -53,6 +53,8 @@ body {
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--muted2);
   padding: 0 1.25rem; height: 56px;
+  padding-top: env(safe-area-inset-top, 0px);
+  box-sizing: content-box;
   display: flex; align-items: center;
 }
 .header-content {
@@ -790,6 +792,8 @@ body {
   position: sticky; top: 0; z-index: 10;
   background: rgba(8,8,8,0.97); border-bottom: 1px solid var(--muted2);
   padding: 0 1.25rem; height: 56px;
+  padding-top: env(safe-area-inset-top, 0px);
+  box-sizing: content-box;
   display: flex; align-items: center; gap: 1rem;
 }
 .workout-exit-btn {
