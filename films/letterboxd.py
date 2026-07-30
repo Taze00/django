@@ -73,9 +73,11 @@ def _parse_item(item):
         except ValueError:
             bewertung = None
 
-    # Serien tragen tmdb:tvId statt tmdb:movieId. Nur movieId ergibt eine
-    # gueltige TMDB-Poster-URL, tvId wird deshalb verworfen.
+    # Serien tragen tmdb:tvId statt tmdb:movieId. Beide werden ausgelesen
+    # und getrennt gefuehrt, damit tmdb.py den passenden Endpunkt waehlen
+    # kann - eine tvId gegen /movie/ liefert 404 oder ein fremdes Poster.
     tmdb_id = _text(item, "tmdb:movieId", NS)
+    tmdb_tv_id = _text(item, "tmdb:tvId", NS)
 
     gesehen_am = None
     roh_datum = _text(item, "letterboxd:watchedDate", NS)
@@ -95,6 +97,7 @@ def _parse_item(item):
         "jahr": jahr,
         "bewertung": bewertung,
         "tmdb_id": tmdb_id,
+        "tmdb_tv_id": tmdb_tv_id,
         "gesehen_am": gesehen_am,
         "link": _text(item, "link"),
     }

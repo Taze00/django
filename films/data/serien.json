@@ -1,0 +1,102 @@
+[
+  {
+    "titel": "Prison Break",
+    "jahr": 2005,
+    "gattung": "serie",
+    "tmdb_tv_id": 2288,
+    "meine_wertung": 4.5,
+    "episoden": "5 Staffeln",
+    "wo_zu_sehen": "Amazon Prime",
+    "mein_text": "Durchgehend spannend, echtes Meisterwerk der Serienwelt."
+  },
+  {
+    "titel": "Haus des Geldes",
+    "jahr": 2017,
+    "gattung": "serie",
+    "tmdb_tv_id": 71446,
+    "meine_wertung": 4.5,
+    "episoden": "5 Staffeln",
+    "wo_zu_sehen": "Netflix",
+    "mein_text": "Eine verdammt geile Idee mit unverwechselbaren Charakteren und packenden Wendungen."
+  },
+  {
+    "titel": "From",
+    "jahr": 2022,
+    "gattung": "serie",
+    "tmdb_tv_id": 124364,
+    "meine_wertung": 4.5,
+    "episoden": "3 Staffeln",
+    "wo_zu_sehen": "Amazon Prime",
+    "mein_text": "Mysteriös und atmosphärisch, ständig neue Fragen."
+  },
+  {
+    "titel": "The Watcher",
+    "jahr": 2022,
+    "gattung": "serie",
+    "tmdb_tv_id": 210232,
+    "meine_wertung": 4.5,
+    "episoden": "1 Staffel",
+    "wo_zu_sehen": "Netflix",
+    "mein_text": "Ryan Murphy Thriller über Obsession und Paranoia mit einem verrückten Ende."
+  },
+  {
+    "titel": "Solange wir lügen",
+    "jahr": 2024,
+    "gattung": "serie",
+    "tmdb_tv_id": 215522,
+    "meine_wertung": 4.0,
+    "episoden": "8 Episoden",
+    "wo_zu_sehen": "Amazon Prime",
+    "mein_text": "Spannend über Geheimnisse und Verrat, überraschend."
+  },
+  {
+    "titel": "Attack on Titan",
+    "jahr": 2013,
+    "gattung": "anime",
+    "tmdb_tv_id": 1429,
+    "meine_wertung": 5.0,
+    "episoden": "4 Staffeln",
+    "wo_zu_sehen": "Crunchyroll",
+    "mein_text": "Immer spannend, unglaubliche Plottwists, absolutes Meisterwerk."
+  },
+  {
+    "titel": "Hunter x Hunter",
+    "jahr": 2011,
+    "gattung": "anime",
+    "tmdb_tv_id": 46298,
+    "meine_wertung": 4.5,
+    "episoden": "6 Staffeln",
+    "wo_zu_sehen": "Crunchyroll",
+    "mein_text": "Sehr cool, macht dich wach, willst was Großes erreichen."
+  },
+  {
+    "titel": "Death Note",
+    "jahr": 2006,
+    "gattung": "anime",
+    "tmdb_tv_id": 13916,
+    "meine_wertung": 4.5,
+    "episoden": "2 Staffeln",
+    "wo_zu_sehen": "Netflix",
+    "mein_text": "Hin und her mit Tricks, pure Spannung auf höchstem Niveau."
+  },
+  {
+    "titel": "Vinland Saga",
+    "jahr": 2019,
+    "gattung": "anime",
+    "tmdb_tv_id": 88803,
+    "meine_wertung": 4.5,
+    "episoden": "2 Staffeln",
+    "wo_zu_sehen": "Netflix",
+    "mein_text": "Wikinger-Epos mit beeindruckender Charakterentwicklung und dem besten Antagonisten. Fesselndes Storytelling vom Anfang bis zum Ende."
+  },
+  {
+    "titel": "7 Deadly Sins",
+    "jahr": 2014,
+    "gattung": "anime",
+    "tmdb_tv_id": 62104,
+    "meine_wertung": 4.0,
+    "episoden": "5 Staffeln",
+    "wo_zu_sehen": "Netflix",
+    "mein_text": "Ich feier die Charaktere und die Story, einfach solid durchzuschauen."
+  }
+]

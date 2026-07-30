@@ -23,9 +23,16 @@ from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
 
-DETAIL_URL = "https://api.themoviedb.org/3/movie/{tmdb_id}"
+# Filme und Serien liegen bei TMDB unter verschiedenen Endpunkten. Eine
+# Serien-ID gegen /movie/ zu schicken liefert 404 - deshalb zwei Zweige.
+DETAIL_URL = {
+    "movie": "https://api.themoviedb.org/3/movie/{tmdb_id}",
+    "tv": "https://api.themoviedb.org/3/tv/{tmdb_id}",
+}
 
-CACHE_KEY = "tmdb:poster:{tmdb_id}"
+# Medium steckt im Cache-Key: dieselbe Zahl kann als Film und als Serie
+# existieren und auf voellig verschiedene Titel zeigen.
+CACHE_KEY = "tmdb:poster:{medium}:{tmdb_id}"
 CACHE_SECONDS = 30 * 24 * 60 * 60  # 30 Tage
 CACHE_MISS = ""  # gecachtes "kein Poster" - None hiesse "noch nicht geprueft"
 
@@ -33,10 +40,10 @@ REQUEST_TIMEOUT = 5
 USER_AGENT = "alex-volkmann-portfolio/1.0 (+https://alex.volkmann.com)"
 
 
-def _hole_poster_pfad(tmdb_id, api_key):
+def _hole_poster_pfad(tmdb_id, api_key, medium):
     query = urlencode({"api_key": api_key})
     request = Request(
-        f"{DETAIL_URL.format(tmdb_id=tmdb_id)}?{query}",
+        f"{DETAIL_URL[medium].format(tmdb_id=tmdb_id)}?{query}",
         headers={"User-Agent": USER_AGENT, "Accept": "application/json"},
     )
     with urlopen(request, timeout=REQUEST_TIMEOUT) as response:
@@ -44,18 +51,21 @@ def _hole_poster_pfad(tmdb_id, api_key):
     return daten.get("poster_path") or CACHE_MISS
 
 
-def get_poster_url(tmdb_id, groesse=None):
-    """Vollstaendige Poster-URL oder None."""
+def get_poster_url(tmdb_id, groesse=None, medium="movie"):
+    """Vollstaendige Poster-URL oder None.
+
+    `medium` waehlt den Endpunkt: "movie" (Standard) oder "tv".
+    """
     api_key = getattr(settings, "TMDB_API_KEY", "")
-    if not tmdb_id or not api_key:
+    if not tmdb_id or not api_key or medium not in DETAIL_URL:
         return None
 
-    cache_key = CACHE_KEY.format(tmdb_id=tmdb_id)
+    cache_key = CACHE_KEY.format(medium=medium, tmdb_id=tmdb_id)
     pfad = cache.get(cache_key)
 
     if pfad is None:
         try:
-            pfad = _hole_poster_pfad(tmdb_id, api_key)
+            pfad = _hole_poster_pfad(tmdb_id, api_key, medium)
         except (URLError, HTTPError, TimeoutError, OSError) as fehler:
             logger.warning("TMDB nicht erreichbar (%s): %s", tmdb_id, fehler)
             return None
@@ -75,8 +85,24 @@ def get_poster_url(tmdb_id, groesse=None):
     return f"{basis}/{groesse}{pfad}"
 
 
-def mit_postern(eintraege, id_feld="tmdb_id", ziel_feld="poster_url"):
+def mit_postern(eintraege, id_feld="tmdb_id", ziel_feld="poster_url", medium="movie"):
     """Ergaenzt jeden Eintrag um seine Poster-URL (None, wenn keine)."""
     for eintrag in eintraege:
-        eintrag[ziel_feld] = get_poster_url(eintrag.get(id_feld))
+        eintrag[ziel_feld] = get_poster_url(eintrag.get(id_feld), medium=medium)
+    return eintraege
+
+
+def mit_postern_gemischt(eintraege):
+    """Wie mit_postern, waehlt den Endpunkt aber pro Eintrag.
+
+    Fuer das Letterboxd-Tagebuch: Filme tragen tmdb_id, Serien
+    tmdb_tv_id. Bisher blieben Serien ohne Poster.
+    """
+    for eintrag in eintraege:
+        if eintrag.get("tmdb_id"):
+            eintrag["poster_url"] = get_poster_url(eintrag["tmdb_id"], medium="movie")
+        elif eintrag.get("tmdb_tv_id"):
+            eintrag["poster_url"] = get_poster_url(eintrag["tmdb_tv_id"], medium="tv")
+        else:
+            eintrag["poster_url"] = None
     return eintraege

@@ -117,41 +117,8 @@
         </div>
     </div>
 
-    <!-- Rankings Section -->
-    <section id="rankings-section" class="rankings-section">
-        <div class="container">
-            <h2 class="fade-in" id="ranking-title">Meine <span class="text-gradient">Top 5</span> <span id="ranking-category">Serien</span></h2>
-
-            <div class="rankings-tabs fade-in">
-                <button class="rankings-tab-btn active" data-category="series">Serien</button>
-                <button class="rankings-tab-btn" data-category="anime">Anime</button>
-            </div>
-
-            <div id="rankings-container" class="rankings-container"></div>
-
-            <!-- Recommendations Carousel -->
-            <div id="recommendations-section" class="recommendations-section">
-                <h3 class="recommendations-title">Weitere Empfehlungen</h3>
-                <div class="carousel-wrapper">
-                    <button class="carousel-btn carousel-btn-prev" id="carousel-prev-btn" aria-label="Vorheriger Film">
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <div id="recommendations-carousel" class="recommendations-carousel">
-                        <div class="carousel-track" id="carousel-track"></div>
-                    </div>
-                    <button class="carousel-btn carousel-btn-next" id="carousel-next-btn" aria-label="Nächster Film">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
-                </div>
-                <div class="carousel-progress-bar">
-                    <div class="carousel-progress-fill" id="carousel-progress-fill"></div>
-                </div>
-            </div>
-        </div>
-    </section>
-
     <!-- Filmempfehlungen -->
-    {% if filme %}
+    {% if eintraege %}
     <section id="filme" class="films-section">
         <div class="container">
             <div class="section-header fade-in">
@@ -160,36 +127,71 @@
 
             <p class="films-claim fade-in">Ich bewerte streng. Von <strong>204 Filmen</strong> haben drei fünf Sterne. Was hier über vier steht, meine ich ernst.</p>
 
-            <ul class="films-grid">
-                {% for film in filme %}
-                <li class="film-card fade-in">
+            {% if gattungen %}
+            {# Ebene 1: Gattung. Tauscht das Raster aus. #}
+            <div class="films-filter films-filter--gattung fade-in" role="group" aria-label="Nach Gattung filtern">
+                {% for wert, label in gattungen %}
+                <button type="button"
+                        class="films-chip{% if forloop.first %} is-active{% endif %}"
+                        data-gattung="{{ wert }}"
+                        aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}">{{ label }}</button>
+                {% endfor %}
+                <button type="button" class="films-shuffle" data-shuffle>Überrasch mich</button>
+            </div>
+            {% endif %}
+
+            {% if stimmungen %}
+            {# Ebene 2: Stimmung. Nur sichtbar, solange "Filme" aktiv ist. #}
+            <div class="films-filter films-filter--stimmung fade-in" data-stimmung-zeile role="group" aria-label="Nach Stimmung filtern">
+                <button type="button" class="films-chip is-active" data-stimmung="alle" aria-pressed="true">Alle</button>
+                {% for wert, label in stimmungen %}
+                <button type="button" class="films-chip" data-stimmung="{{ wert }}" aria-pressed="false">{{ label }}</button>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {# Zufallstreffer von "Ueberrasch mich"; per JS befuellt. #}
+            <div class="films-spotlight" data-spotlight hidden aria-live="polite"></div>
+
+            <ul class="films-grid" data-grid>
+                {% for eintrag in eintraege %}
+                <li class="film-card fade-in"
+                    data-eintrag
+                    data-gattung="{{ eintrag.gattung }}"
+                    {% if eintrag.stimmung %}data-stimmung="{{ eintrag.stimmung }}"{% endif %}>
                     <div class="film-poster">
-                        {% if film.poster_url %}
-                        <img src="{{ film.poster_url }}" alt="Filmplakat: {{ film.titel }}" loading="lazy">
+                        {% if eintrag.poster_url %}
+                        <img src="{{ eintrag.poster_url }}" alt="Plakat: {{ eintrag.titel }}" loading="lazy">
                         {% else %}
-                        <span class="film-poster-fallback" aria-hidden="true">{{ film.titel|first }}</span>
+                        <span class="film-poster-fallback" aria-hidden="true">{{ eintrag.titel|first }}</span>
                         {% endif %}
 
                         <div class="film-overlay">
-                            <p class="film-text">{{ film.mein_text }}</p>
-                            {% if film.letterboxd_slug %}
-                            <a class="film-link" href="https://letterboxd.com/film/{{ film.letterboxd_slug }}/" target="_blank" rel="noopener noreferrer">Auf Letterboxd &rarr;</a>
+                            <p class="film-text">{{ eintrag.mein_text }}</p>
+                            {% if eintrag.letterboxd_slug %}
+                            <a class="film-link" href="https://letterboxd.com/film/{{ eintrag.letterboxd_slug }}/" target="_blank" rel="noopener noreferrer">Auf Letterboxd &rarr;</a>
+                            {% elif eintrag.wo_zu_sehen %}
+                            <span class="film-link">{{ eintrag.wo_zu_sehen }}</span>
                             {% endif %}
                         </div>
                     </div>
 
                     <div class="film-body">
-                        <h3 class="film-title">{{ film.titel }}</h3>
+                        <h3 class="film-title">{{ eintrag.titel }}</h3>
                         <div class="film-meta">
-                            <span class="film-stars" aria-hidden="true" style="--rating: {{ film.meine_wertung }};"></span>
-                            <span class="visually-hidden">{{ film.meine_wertung }} von 5 Sternen</span>
-                            <span>{{ film.jahr }}</span>
-                            {% if film.regie %}<span>· {{ film.regie }}</span>{% endif %}
+                            <span class="film-stars" aria-hidden="true" style="--rating: {{ eintrag.meine_wertung }};"></span>
+                            <span class="visually-hidden">{{ eintrag.meine_wertung }} von 5 Sternen</span>
+                            <span>{{ eintrag.jahr }}</span>
+                            {# Serien zeigen Episoden statt Laufzeit/Regie. #}
+                            {% if eintrag.episoden %}<span>· {{ eintrag.episoden }}</span>
+                            {% elif eintrag.regie %}<span>· {{ eintrag.regie }}</span>{% endif %}
                         </div>
                     </div>
                 </li>
                 {% endfor %}
             </ul>
+
+            <p class="films-empty" data-empty hidden>Zu dieser Auswahl ist noch nichts eingetragen.</p>
 
             {% if tagebuch %}
             <div class="diary fade-in">

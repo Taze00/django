@@ -5,15 +5,25 @@ from films import kuratiert, letterboxd, tmdb
 
 
 def index(request):
+    # Filme und Serien holen ihre Poster von verschiedenen TMDB-Endpunkten.
     filme = tmdb.mit_postern(kuratiert.get_filme())
+    serien = tmdb.mit_postern(
+        kuratiert.get_serien(), id_feld='tmdb_tv_id', medium='tv'
+    )
+
+    # Ein gemeinsames Raster; die Gattung steckt als data-Attribut an der
+    # Karte und wird clientseitig gefiltert.
+    eintraege = filme + serien
 
     # Faellt Letterboxd aus, ist das hier eine leere Liste und die
     # Tagebuch-Zeile wird im Template uebersprungen. Die Seite bleibt
     # in jedem Fall bei 200.
-    tagebuch = tmdb.mit_postern(letterboxd.get_recent_entries())
+    tagebuch = tmdb.mit_postern_gemischt(letterboxd.get_recent_entries())
 
     return render(request, 'index.html', {
-        'filme': filme,
+        'eintraege': eintraege,
+        'gattungen': kuratiert.get_gattungen(eintraege),
+        'stimmungen': kuratiert.get_stimmungen(filme),
         'tagebuch': tagebuch,
         'letterboxd_url': letterboxd.get_profile_url(),
         'letterboxd_user': settings.LETTERBOXD_USERNAME,

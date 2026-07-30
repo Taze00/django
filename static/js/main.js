@@ -1,56 +1,3 @@
-// ===== RANKINGS DATA =====
-// HIER KANNST DU DIE POSTER URLS UND IMDB LINKS ÄNDERN
-// Format für jeden Eintrag:
-// { rank: 1, title: 'Filmname', year: 2023, rating: '9.2', length: '120min', description: '...', platform: 'Netflix', imdb: 'https://www.imdb.com/title/ttXXXXXX/', poster: '/static/css/images/movie/poster-name.jpg' }
-//
-// POSTER BILDER:
-// 1. Speichere deine Bilder im Ordner: /static/css/images/movie/
-// 2. Trage den Pfad ein: '/static/css/images/movie/dein-bild.jpg'
-// 3. Empfohlene Größe: 336×500px (2:3 Seitenverhältnis)
-//
-// IMDb Link: Format ist https://www.imdb.com/title/ttXXXXXX/
-// Die ttXXXXXX ist die IMDb ID (kannst du auf imdb.com finden)
-
-const RANKINGS = {
-    movies: [
-        { rank: 1, title: 'The Sixth Sense', year: 1999, rating: '9.5', length: '107min', genre: 'Thriller', description: 'Unvergesslicher Twist, meisterhaft gemacht, Gänsehaut beim Schauen.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt0167404/', poster: '/static/css/images/movie/the-sixth-sense.jpeg' },
-        { rank: 2, title: 'Fight Club', year: 1999, rating: '9.2', length: '139min', genre: 'Thriller', description: 'Tiefgründige Fragen aufs Leben mit David Fincher, der zum Denken anregt.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt0137523/', poster: '/static/css/images/movie/fightclub.png' },
-        { rank: 3, title: 'Prisoners', year: 2013, rating: '9.1', length: '153min', genre: 'Thriller', description: 'Meisterhafte Darstellungen, unfassbar wie echte Eltern reagieren.', platform: 'Netflix', imdb: 'https://www.imdb.com/title/tt1392214/', poster: '/static/css/images/movie/prisoners.png' },
-        { rank: 4, title: 'The Green Mile', year: 1999, rating: '9.0', length: '189min', genre: 'Drama', description: 'Emotional und tiefgründig, ein Film, der einen nicht mehr loslässt.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt0120689/', poster: '/static/css/images/movie/thegreenmile.png' },
-        { rank: 5, title: 'Das Streben nach Glück', year: 2006, rating: '8.8', length: '117min', genre: 'Drama', description: 'Inspirierend und emotional, eine wahre Geschichte über Hoffnung und Durchhaltevermögen.', platform: 'Netflix', imdb: 'https://www.imdb.com/title/tt0454921/', poster: '/static/css/images/movie/das_streben_nach_glück.png' },
-        { rank: 6, title: 'Interstellar', year: 2014, rating: '8.7', length: '169min', genre: 'Sci-Fi', description: 'Visuelle Wucht kombiniert mit emotionalem Storytelling und der besten Filmmusik.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt0816692/', poster: '/static/css/images/movie/interstellar.png' },
-        { rank: 7, title: 'In Time', year: 2011, rating: '8.0', length: '109min', genre: 'Sci-Fi', description: 'Spannender Plot mit interessantem Konzept, Zeit als Währung.', platform: 'Disney+ / Prime', imdb: 'https://www.imdb.com/title/tt1637688/', poster: '/static/css/images/movie/InTime.png' },
-        { rank: 8, title: 'The Prestige', year: 2006, rating: '8.5', length: '130min', genre: 'Mystery', description: 'Meisterhafter Thriller über zwei Magier und ihren obsessiven Wettkampf.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt0482571/', poster: '/static/css/images/movie/thePrestige.png', isFavorite: true },
-        { rank: 9, title: 'Train Dreams', year: 2023, rating: '8.5', length: '127min', genre: 'Drama', description: 'Tiefgründig über Träume und Verlust, emotional überwältigend.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt29768334/', poster: '/static/css/images/movie/traindreams.png' },
-        { rank: 10, title: 'Pulp Fiction', year: 1994, rating: '8.9', length: '154min', genre: 'Crime', description: 'Kultiger Tarantino Klassiker mit unvergesslichen Szenen und perfektem Soundtrack.', platform: 'Netflix', imdb: 'https://www.imdb.com/title/tt0110912/', poster: '/static/css/images/movie/PulpFiction.png' },
-        { rank: 11, title: 'Die Verurteilten', year: 1994, rating: '9.3', length: '142min', genre: 'Drama', description: 'Masterpiece über Hoffnung und Freundschaft im Gefängnis, absolut fesselnd.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt0111161/', poster: '/static/css/images/movie/DieVerurteilten.png' }
-    ],
-    series: [
-        { rank: 1, title: 'Prison Break', year: 2005, rating: '9.4', length: '5 Staffeln', genre: 'Thriller', description: 'Durchgehend spannend, echtes Meisterwerk der Serienwelt.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt0455275/', poster: '/static/css/images/movie/prisonbreak.png' },
-        { rank: 2, title: 'Haus des Geldes', year: 2017, rating: '9.1', length: '5 Staffeln', genre: 'Heist', description: 'Eine verdammt geile Idee mit unverwechselbaren Charakteren und packenden Wendungen.', platform: 'Netflix', imdb: 'https://www.imdb.com/title/tt6468322/', poster: '/static/css/images/movie/hausdesgeldes.png' },
-        { rank: 3, title: 'From', year: 2022, rating: '9.0', length: '3 Staffeln', genre: 'Mystery', description: 'Mysteriös und atmosphärisch, ständig neue Fragen.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/title/tt9813792/', poster: '/static/css/images/movie/from.png' },
-        { rank: 4, title: 'The Watcher', year: 2022, rating: '8.7', length: '1 Staffel', genre: 'Thriller', description: 'Ryan Murphy Thriller über Obsession und Paranoia mit einem verrückten Ende.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt14852808/', poster: '/static/css/images/movie/the-watcher_cover.png' },
-        { rank: 5, title: 'Solange wir lügen', year: 2024, rating: '8.5', length: '8 Episoden', genre: 'Drama', description: 'Spannend über Geheimnisse und Verrat, überraschend.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/de/title/tt3914054/', poster: '/static/css/images/movie/solangewirlügen.png' },
-        { rank: 6, title: 'Discounter', year: 2022, rating: '8.0', length: '2 Staffeln', genre: 'Comedy', description: 'Mal was Anderes, echt lustig mit genau meinem Humor.', platform: 'Amazon Prime', imdb: 'https://www.imdb.com/de/title/tt16463942/', poster: '/static/css/images/movie/Discounter.png' },
-        { rank: 7, title: 'Sons of Anarchy', year: 2008, rating: '8.6', length: '7 Staffeln', genre: 'Crime Drama', description: 'Düstere, fesselnde Serie über Motorrad-Gangs mit starken Charakteren.', platform: 'Disney+', imdb: 'https://www.imdb.com/title/tt1124373/', poster: '/static/css/images/movie/SonsofAnarchy.png' },
-        { rank: 8, title: 'Stranger Things', year: 2016, rating: '8.4', length: '4 Staffeln', genre: 'Sci-Fi Horror', description: 'Nostalgisch, spannend und atmosphärisch mit großartigen Charakteren.', platform: 'Netflix', imdb: 'https://www.imdb.com/title/tt4574334/', poster: '/static/css/images/movie/StrangerThings.png' },
-        { rank: 9, title: 'Black Mirror', year: 2011, rating: '8.8', length: '6 Staffeln', genre: 'Sci-Fi Thriller', description: 'Dystopische Episoden über Technologie und ihre Auswirkungen auf die Gesellschaft.', platform: 'Netflix', imdb: 'https://www.imdb.com/title/tt2085059/', poster: '/static/css/images/movie/BlackMirror.png' },
-        { rank: 10, title: 'Das Damen Gambit', year: 2020, rating: '8.4', length: '1 Staffel', genre: 'Drama', description: 'Fesselnde Serie über eine junge Schachspielerin und ihren Aufstieg.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt10048342/?ref_=nv_sr_srsg_0_tt_2_nm_0_in_0_q_Das%20Damengamb', poster: '/static/css/images/movie/DasDamengambit.png' },
-        { rank: 11, title: 'Sie weiß von dir', year: 2023, rating: '8.2', length: '8 Episoden', genre: 'Thriller', description: 'Psychologischer Thriller über Obsession und gefährliche Lügen.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt9698442/?ref_=nv_sr_srsg_0_tt_5_nm_3_in_0_q_Sie%20weis%20von%20dir', poster: '/static/css/images/movie/Siewiesvondir.png' },
-        { rank: 12, title: 'Sherlock', year: 2010, rating: '9.1', length: '4 Staffeln', genre: 'Crime Drama', description: 'Moderner Detektiv Sherlock Holmes mit brillanten Wendungen und scharfsinnigen Fällen.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt1475582/?ref_=nv_sr_srsg_3_tt_8_nm_0_in_0_q_Sherlock', poster: '/static/css/images/movie/Sherlock.png', isFavorite: true },
-        { rank: 13, title: 'Adolescence', year: 2024, rating: '8.9', length: '1 Staffel', genre: 'Drama', description: 'Bewegende Serie über die Herausforderungen der Adoleszenz mit tiefgründigen Charakteren.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt31806037/?ref_=nv_sr_srsg_0_tt_8_nm_0_in_0_q_Abdolesence', poster: '/static/css/images/movie/adolescence.png', isFavorite: true }
-    ],
-    anime: [
-        { rank: 1, title: 'Attack on Titan', year: 2013, rating: '9.9', length: '4 Staffeln', genre: 'Action', description: 'Immer spannend, unglaubliche Plottwists, absolutes Meisterwerk.', platform: 'Crunchyroll', imdb: 'https://www.imdb.com/title/tt2560140/', poster: '/static/css/images/movie/attackontitan.png' },
-        { rank: 2, title: 'Hunter x Hunter', year: 2011, rating: '9.4', length: '6 Staffeln', genre: 'Adventure', description: 'Sehr cool, macht dich wach, willst was Großes erreichen.', platform: 'Crunchyroll', imdb: 'https://www.imdb.com/title/tt2098220/', poster: '/static/css/images/movie/hunterxhunter.png' },
-        { rank: 3, title: 'Death Note', year: 2006, rating: '9.0', length: '2 Staffeln', genre: 'Thriller', description: 'Hin und her mit Tricks, pure Spannung auf höchstem Niveau.', platform: 'Netflix', imdb: 'https://www.imdb.com/title/tt0877057/', poster: '/static/css/images/movie/DEATH_NOTE.png' },
-        { rank: 4, title: 'Vinland Saga', year: 2019, rating: '8.9', length: '2 Staffeln', genre: 'Action', description: 'Wikinger-Epos mit beeindruckender Charakterentwicklung und dem besten Antagonisten. Fesselndes Storytelling vom Anfang bis zum Ende.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt10233448/?ref_=nv_sr_srsg_0_tt_8_nm_0_in_0_q_Vinland%20Saga', poster: '/static/css/images/movie/VinlandSaga.png' },
-        { rank: 5, title: '7 Deadly Sins', year: 2014, rating: '8.2', length: '5 Staffeln', genre: 'Fantasy', description: 'Ich feier die Charaktere und die Story, einfach solid durchzuschauen.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt3909224/', poster: '/static/css/images/movie/7deadlysins.png' },
-        { rank: 6, title: 'Demon Slayer', year: 2019, rating: '7.8', length: '4 Staffeln', genre: 'Action', description: 'Wahnsinn Animationen, emotional, unforgettable Kämpfe.', platform: 'Netflix', imdb: 'https://www.imdb.com/title/tt9335498/', poster: '/static/css/images/movie/DemonSlayer.png' },
-        { rank: 7, title: 'My Hero Academia', year: 2016, rating: '7.6', length: '7 Staffeln', genre: 'Action', description: 'Viele Charaktere und die sind alle wichtig, gute Story mit guter Action.', platform: 'Crunchyroll', imdb: 'https://www.imdb.com/title/tt5626028/', poster: '/static/css/images/movie/myheroacademia.png' },
-        { rank: 8, title: 'Fullmetal Alchemist: Brotherhood', year: 2009, rating: '9.1', length: '5 Staffeln', genre: 'Action', description: 'Meisterwerk über zwei Brüder und ihre Reise zur Wiedererlangung ihres Körpers.', platform: 'Netflix', imdb: 'https://www.imdb.com/de/title/tt1355642/?ref_=nv_sr_srsg_0_tt_8_nm_0_in_0_q_Fullmetal', poster: '/static/css/images/movie/FullmetalAlchimistBrotherhood.png', isFavorite: true }
-    ]
-};
 
 // ===== MAIN CONFIGURATION =====
 const CONFIG = {
@@ -541,58 +488,6 @@ function createClubCards() {
             card.classList.add('active');
         });
     }, 300);
-}
-
-// ===== RANKINGS FUNCTIONS =====
-
-// ===== TOP LISTS FUNCTIONS =====
-function createTopLists() {
-    const categories = ['anime', 'movies', 'series'];
-    const categoryTitles = ['Top 5 Anime', 'Top 5 Filme', 'Top 5 Serien'];
-    const categoryIcons = ['fas fa-torii-gate', 'fas fa-film', 'fas fa-tv'];
-    
-    categories.forEach((category, categoryIndex) => {
-        const listCategory = document.querySelector(`.list-category:nth-child(${categoryIndex + 1})`);
-        if (!listCategory) return;
-        
-        const topList = listCategory.querySelector('.top-list');
-        if (!topList) return;
-        
-        topList.innerHTML = '';
-        
-        topListsData[category].forEach(item => {
-            const listItem = document.createElement('div');
-            listItem.className = 'list-item';
-            listItem.setAttribute('data-rank', item.rank);
-            listItem.onclick = () => toggleDetails(listItem);
-            
-            const detailsInfo = category === 'movies' 
-                ? `<span><i class="fas fa-play-circle"></i> ${item.platform}</span>
-                   <span><i class="fas fa-calendar"></i> ${item.year}</span>`
-                : `<span><i class="fas fa-play-circle"></i> ${item.platform}</span>
-                   <span><i class="fas fa-tv"></i> ${item.episodes}</span>`;
-            
-            listItem.innerHTML = `
-                <div class="item-main">
-                    <div class="rank-number">${item.rank}</div>
-                    <div class="item-content">
-                        <h4>${item.title}</h4>
-                        <div class="rating">
-                            <span class="stars">${item.rating}</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="item-details">
-                    <p>${item.description}</p>
-                    <div class="details-info">
-                        ${detailsInfo}
-                    </div>
-                </div>
-            `;
-            
-            topList.appendChild(listItem);
-        });
-    });
 }
 
 // ===== TOP LISTS TOGGLE FUNCTION =====
@@ -1280,277 +1175,6 @@ class TinderGallery {
     }
 }
 
-// ===== 3D TILT EFFECT FOR RANKING POSTERS =====
-function init3DTilt() {
-    const rankingPosters = document.querySelectorAll('.ranking-poster');
-    const recommendationPosters = document.querySelectorAll('.recommendation-poster');
-
-    // 3D Tilt nur für Ranking Posters - nur Rotation + Shadow, kein Lift
-    rankingPosters.forEach(poster => {
-        poster.addEventListener('mousemove', (e) => {
-            const rect = poster.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            // Berechne Position im Element (0-1)
-            const xPercent = x / rect.width;
-            const yPercent = y / rect.height;
-
-            // Berechne Rotation basierend auf Maus-Position
-            const rotateY = (xPercent - 0.5) * 25; // -12.5 bis +12.5 Grad
-            const rotateX = (0.5 - yPercent) * 25;  // -12.5 bis +12.5 Grad
-
-            // Berechne Shadow-Intensität basierend auf Maus-Position
-            const distance = Math.sqrt(Math.pow(xPercent - 0.5, 2) + Math.pow(yPercent - 0.5, 2));
-            const shadowIntensity = Math.max(0.6, 1 - distance * 0.3);
-            const shadowX = (xPercent - 0.5) * 30;
-            const shadowY = (yPercent - 0.5) * 30 + 30;
-
-            poster.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-            poster.style.boxShadow = `
-                ${shadowX}px ${shadowY}px 50px rgba(0, 217, 255, ${0.25 * shadowIntensity}),
-                0 12px 30px rgba(0, 0, 0, 0.5)
-            `;
-        });
-
-        poster.addEventListener('mouseleave', () => {
-            poster.style.transform = 'rotateX(0) rotateY(0)';
-            poster.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.4)';
-        });
-    });
-
-    // Border Hover-Effekt für Recommendation Posters
-    recommendationPosters.forEach(poster => {
-        poster.addEventListener('mouseenter', () => {
-            poster.style.borderColor = 'rgba(0, 217, 255, 0.6)';
-        });
-
-        poster.addEventListener('mouseleave', () => {
-            poster.style.borderColor = 'rgba(0, 217, 255, 0)';
-        });
-    });
-}
-
-// ===== RANKINGS INITIALIZATION =====
-function initRankings() {
-    const container = document.getElementById('rankings-container');
-    const tabs = document.querySelectorAll('.rankings-tab-btn');
-    const rankingCategory = document.getElementById('ranking-category');
-
-    if (!container || tabs.length === 0) return;
-
-    // "movies" ist raus - Filme haben jetzt eine eigene Sektion (#filme).
-    // Der RANKINGS.movies-Datensatz bleibt bestehen, wird hier aber nicht
-    // mehr angeboten.
-    let currentCategory = 'series';
-
-    const categoryLabels = {
-        series: 'Serien',
-        anime: 'Anime'
-    };
-
-    // Funktion zum Konvertieren von Minuten zu h:min Format
-    function formatLength(length) {
-        // Wenn es schon "X Staffeln" ist, nicht konvertieren
-        if (length.includes('Staffel')) {
-            return length;
-        }
-
-        // Wenn es "XXXmin" ist, konvertieren
-        if (length.includes('min')) {
-            const minutes = parseInt(length);
-            const hours = Math.floor(minutes / 60);
-            const mins = minutes % 60;
-            return `${hours}h${mins}min`;
-        }
-
-        return length;
-    }
-
-    function renderRankings(category) {
-        const items = RANKINGS[category];
-        const top5 = items.slice(0, 5);
-        const allRecommendations = items.slice(5);
-        // Sort recommendations so favorites appear first
-        const recommendations = allRecommendations.sort((a, b) => {
-            if (a.isFavorite && !b.isFavorite) return -1;
-            if (!a.isFavorite && b.isFavorite) return 1;
-            return 0;
-        });
-
-        // Render Top 5
-        container.innerHTML = top5.map(item => `
-            <div class="ranking-item">
-                <div class="ranking-rank">${String(item.rank).padStart(2, '0')}</div>
-                <div class="ranking-poster">
-                    <img src="${item.poster}" alt="${item.title}" loading="lazy">
-                </div>
-                <div class="ranking-content">
-                    <a href="${item.imdb}" target="_blank" rel="noopener noreferrer" class="ranking-title">${item.title}</a>
-                    <p class="ranking-description">${item.description}</p>
-                    <div class="ranking-meta">
-                        <span class="ranking-rating"><span class="star">⭐</span> ${item.rating}</span>
-                        <span>${item.genre || ''}</span>
-                        <span>${item.platform}</span>
-                        <span>${formatLength(item.length)}</span>
-                        <span>${item.year}</span>
-                    </div>
-                </div>
-            </div>
-        `).join('');
-
-        // Render Recommendations Carousel with infinite scrolling
-        const carouselTrack = document.getElementById('carousel-track');
-        if (carouselTrack && recommendations.length > 0) {
-            // Create card HTML function
-            const createCardHTML = (item) => `
-                <a href="${item.imdb}" target="_blank" rel="noopener noreferrer" class="recommendation-card${item.isFavorite ? ' favorite' : ''}">
-                    <div class="recommendation-poster">
-                        <img src="${item.poster}" alt="${item.title}" loading="lazy">
-                        ${item.isFavorite ? '<div class="favorite-star"><i class="fas fa-star"></i></div>' : ''}
-                    </div>
-                    <div class="recommendation-info">
-                        <h4 class="recommendation-title">${item.title}</h4>
-                        <div class="recommendation-platform">
-                            <i class="fas fa-play-circle"></i> ${item.platform}
-                        </div>
-                    </div>
-                </a>
-            `;
-
-            // Render alle Karten - keine Duplikate nötig!
-            const cardsHTML = recommendations.map(createCardHTML).join('');
-            carouselTrack.innerHTML = cardsHTML;
-
-            // Reset carousel position when switching categories
-            scrollIndex = 0;
-
-            // Initialize infinite carousel with buttons
-            initInfiniteCarousel(carouselTrack, recommendations, recommendations.length);
-        }
-    }
-
-    function initInfiniteCarousel(track, items, itemCount) {
-        const prevBtn = document.getElementById('carousel-prev-btn');
-        const nextBtn = document.getElementById('carousel-next-btn');
-
-        if (!prevBtn || !nextBtn || !track) return;
-
-        // Remove old listeners
-        prevBtn.replaceWith(prevBtn.cloneNode(true));
-        nextBtn.replaceWith(nextBtn.cloneNode(true));
-
-        const newPrevBtn = document.getElementById('carousel-prev-btn');
-        const newNextBtn = document.getElementById('carousel-next-btn');
-
-        let scrollIndex = 0;
-        let isAnimating = false;
-        let cardWidth = 160;
-        let gap = 32;
-        let cardsPerView = 4; // Wie viele Karten passen in den Container
-
-        function measureCard() {
-            const firstCard = track.querySelector('.recommendation-card');
-            const carousel = document.getElementById('recommendations-carousel');
-            if (firstCard && firstCard.offsetWidth > 0) {
-                cardWidth = firstCard.offsetWidth;
-                const computedGap = window.getComputedStyle(track).gap;
-                gap = parseFloat(computedGap) || 32;
-
-                // Berechne wie viele Karten VOLLSTÄNDIG in den Container passen
-                const containerWidth = carousel.offsetWidth;
-                // Berechne wie viel Platz EINE Karte + Gap braucht
-                const spacePerCard = cardWidth + gap;
-                // Die letzte Karte braucht kein Gap danach, also:
-                // containerWidth = cardsPerView * cardWidth + (cardsPerView - 1) * gap
-                // cardsPerView = (containerWidth + gap) / spacePerCard
-                cardsPerView = Math.floor((containerWidth + gap) / spacePerCard);
-            }
-        }
-
-        function updatePosition(index) {
-            const offset = -(index * (cardWidth + gap));
-            track.style.transform = `translateX(${offset}px)`;
-        }
-
-        function updateButtonStates() {
-            // Re-measure in case viewport changed
-            measureCard();
-
-            // Prev: deaktivieren wenn am Anfang
-            newPrevBtn.disabled = scrollIndex === 0;
-            // Next: deaktivieren wenn das letzte Item sichtbar ist
-            newNextBtn.disabled = (scrollIndex + cardsPerView) > itemCount - 1;
-
-            // Update Progress Bar
-            const progressFill = document.getElementById('carousel-progress-fill');
-            if (progressFill) {
-                const progress = Math.min(((scrollIndex + cardsPerView) / itemCount) * 100, 100);
-                progressFill.style.width = progress + '%';
-            }
-        }
-
-        function scroll(direction) {
-            if (isAnimating) return;
-            isAnimating = true;
-
-            // Einfach weiterzählen
-            if (direction === 'next') {
-                scrollIndex++;
-            } else {
-                scrollIndex--;
-            }
-
-            track.style.transition = 'transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-            updatePosition(scrollIndex);
-
-            setTimeout(() => {
-                updateButtonStates();
-                isAnimating = false;
-            }, 500);
-        }
-
-        newNextBtn.addEventListener('click', () => scroll('next'));
-        newPrevBtn.addEventListener('click', () => scroll('prev'));
-
-        // Measure card size after a tick to ensure DOM is ready
-        setTimeout(() => {
-            measureCard();
-            updatePosition(scrollIndex);
-            updateButtonStates();
-        }, 10);
-
-        // Listen for viewport changes (F12 toggle, orientation change, etc.)
-        const resizeObserver = new ResizeObserver(() => {
-            measureCard();
-            updatePosition(scrollIndex);
-            updateButtonStates();
-        });
-        resizeObserver.observe(track);
-    }
-
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            tabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            currentCategory = tab.dataset.category;
-            renderRankings(currentCategory);
-            if (rankingCategory) {
-                rankingCategory.textContent = categoryLabels[currentCategory];
-            }
-            // Reinit 3D Tilt Effects nach Tab-Wechsel
-            setTimeout(() => {
-                init3DTilt();
-            }, 50);
-        });
-    });
-
-    renderRankings('series');
-    if (rankingCategory) {
-        rankingCategory.textContent = categoryLabels['series'];
-    }
-}
-
 // ===== INITIALIZATION =====
 document.addEventListener('DOMContentLoaded', function() {
     initVersionManagement();
@@ -1562,8 +1186,6 @@ document.addEventListener('DOMContentLoaded', function() {
     createGallery();
     setupCarouselNavigation();
     createClubCards();
-    initRankings();
-    init3DTilt();
 
     // NEU: Tinder Gallery für Mobile
     setTimeout(() => {
@@ -1719,3 +1341,97 @@ window.addEventListener('resize', () => {
         }
     }
 });
+
+// ===== FILMSEKTION: FILTER =====
+// Zwei Ebenen: Gattung (Filme/Serien/Anime) tauscht das Raster aus,
+// Stimmung filtert innerhalb der Filme und ist nur dort sichtbar.
+// Alles clientseitig ueber data-Attribute - die Karten stehen bereits
+// serverseitig im Markup. Ohne JS bleibt die vollstaendige Liste stehen.
+(function initFilmFilter() {
+    const sektion = document.getElementById('filme');
+    if (!sektion) return;
+
+    const karten = Array.from(sektion.querySelectorAll('[data-eintrag]'));
+    if (!karten.length) return;
+
+    const gattungChips = Array.from(sektion.querySelectorAll('[data-gattung]'));
+    const stimmungChips = Array.from(sektion.querySelectorAll('[data-stimmung]'));
+    const stimmungZeile = sektion.querySelector('[data-stimmung-zeile]');
+    const leer = sektion.querySelector('[data-empty]');
+    const spotlight = sektion.querySelector('[data-spotlight]');
+    const shuffleBtn = sektion.querySelector('[data-shuffle]');
+
+    let aktiveGattung = 'film';
+    let aktiveStimmung = 'alle';
+
+    function anwenden() {
+        let sichtbar = 0;
+
+        karten.forEach(karte => {
+            const gattungPasst = karte.dataset.gattung === aktiveGattung;
+            // Stimmung greift nur bei Filmen; Serien haben keine.
+            const stimmungPasst =
+                aktiveGattung !== 'film' ||
+                aktiveStimmung === 'alle' ||
+                karte.dataset.stimmung === aktiveStimmung;
+
+            const zeigen = gattungPasst && stimmungPasst;
+            karte.hidden = !zeigen;
+            if (zeigen) sichtbar++;
+        });
+
+        // Stimmungsfilter nur bei Filmen anbieten.
+        if (stimmungZeile) stimmungZeile.hidden = aktiveGattung !== 'film';
+
+        if (leer) leer.hidden = sichtbar > 0;
+        if (spotlight) spotlight.hidden = true;
+    }
+
+    function markiere(chips, attribut, wert) {
+        chips.forEach(chip => {
+            const aktiv = chip.dataset[attribut] === wert;
+            chip.classList.toggle('is-active', aktiv);
+            chip.setAttribute('aria-pressed', String(aktiv));
+        });
+    }
+
+    gattungChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            aktiveGattung = chip.dataset.gattung;
+            // Beim Gattungswechsel die Stimmung zuruecksetzen, sonst
+            // filtert eine unsichtbare Auswahl weiter mit.
+            aktiveStimmung = 'alle';
+            markiere(gattungChips, 'gattung', aktiveGattung);
+            markiere(stimmungChips, 'stimmung', 'alle');
+            anwenden();
+        });
+    });
+
+    stimmungChips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            aktiveStimmung = chip.dataset.stimmung;
+            markiere(stimmungChips, 'stimmung', aktiveStimmung);
+            anwenden();
+        });
+    });
+
+    // Zufall nur aus den gerade sichtbaren Karten - beruecksichtigt
+    // damit automatisch die aktive Gattung.
+    if (shuffleBtn && spotlight) {
+        shuffleBtn.addEventListener('click', () => {
+            const auswahl = karten.filter(k => !k.hidden);
+            if (!auswahl.length) return;
+
+            const treffer = auswahl[Math.floor(Math.random() * auswahl.length)];
+            spotlight.replaceChildren();
+
+            const kopie = treffer.cloneNode(true);
+            kopie.hidden = false;
+            kopie.classList.add('film-card--spotlight');
+            spotlight.appendChild(kopie);
+            spotlight.hidden = false;
+        });
+    }
+
+    anwenden();
+})();
