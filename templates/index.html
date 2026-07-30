@@ -72,7 +72,7 @@
 
             <div class="projects-grid">
                 {% for projekt in projekte %}
-                <article class="project-card fade-in">
+                <article class="project-card{% if projekt.breit %} project-card--wide{% endif %} fade-in">
                     <a class="project-link" href="{{ projekt.url }}"{% if projekt.url != '/' %} rel="noopener"{% endif %}>
                         <div class="project-media">
                             {% if projekt.hat_bild %}
@@ -81,7 +81,6 @@
                             {# Kein Bild hinterlegt - gestalteter Platzhalter statt Leerstelle. #}
                             <div class="project-fallback" aria-hidden="true">
                                 <span class="project-fallback-name">{{ projekt.name }}</span>
-                                <span class="project-fallback-cat">{{ projekt.kategorie }}</span>
                             </div>
                             {% endif %}
 

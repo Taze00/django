@@ -2831,11 +2831,8 @@ footer {
 .project-fallback {
     position: absolute;
     inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.6rem;
+    display: grid;
+    place-items: center;
     background-color: #0b0b0f;
     background-image:
         radial-gradient(circle at 50% 42%, rgba(0, 217, 255, 0.14), transparent 62%),
@@ -2858,15 +2855,6 @@ footer {
     color: var(--primary);
     text-shadow: 0 0 28px rgba(0, 217, 255, 0.35);
     padding-inline: 1rem;
-}
-
-.project-fallback-cat {
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-    text-transform: uppercase;
-    letter-spacing: var(--mono-track);
-    color: var(--text);
-    opacity: 0.55;
 }
 
 /* --- Statusbadge ------------------------------------------------------- */
@@ -2942,6 +2930,48 @@ footer {
 
 .project-card:hover .project-pill {
     border-color: rgba(0, 217, 255, 0.35);
+}
+
+/* --- Breite Karte ------------------------------------------------------ */
+/* Spannt sich ueber die volle Rasterbreite und legt Bild und Text
+   nebeneinander, damit keine halbleere Reihe entsteht.
+   Die Klasse haengt an den Daten (breit=True), nicht an der Position. */
+@media (min-width: 901px) {
+    .project-card--wide {
+        grid-column: 1 / -1;
+    }
+
+    .project-card--wide .project-link {
+        flex-direction: row;
+        align-items: stretch;
+    }
+
+    .project-card--wide .project-media {
+        flex: 0 0 40%;
+        height: auto;
+        min-height: 260px;
+    }
+
+    .project-card--wide .project-body {
+        flex: 1;
+        justify-content: center;
+        padding: 2.2rem 2.6rem;
+    }
+
+    /* Mehr Platz - der Name darf groesser stehen. */
+    .project-card--wide .project-fallback-name {
+        font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+    }
+
+    .project-card--wide .project-desc {
+        max-width: 60ch;
+    }
+
+    /* Der Inhalt ist hier vertikal zentriert; die Pills sollen dem Text
+       folgen statt ans Kartenende geschoben zu werden. */
+    .project-card--wide .project-tech {
+        margin-top: 0;
+    }
 }
 
 @media (max-width: 480px) {

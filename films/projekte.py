@@ -10,6 +10,11 @@ siehe .project-fallback in styles.css.
 
 `status` ist optional. Nur Eintraege mit gesetztem Status bekommen ein
 Badge.
+
+`breit` markiert eine Karte, die sich ueber die volle Rasterbreite
+spannt und Bild und Text nebeneinander zeigt. Das haengt an den Daten
+und nicht an der Position im Raster, damit es beim Umsortieren oder
+Ergaenzen nicht die falsche Karte trifft.
 """
 
 PROJEKTE = [
@@ -25,6 +30,7 @@ PROJEKTE = [
         "bild": "css/images/projects/corvis.png",
         "url": "/corvis/",
         "status": "",
+        "breit": False,
     },
     {
         "name": "Aurelia",
@@ -37,6 +43,7 @@ PROJEKTE = [
         "bild": "css/images/projects/aurelia.png",
         "url": "/aurelia/",
         "status": "",
+        "breit": False,
     },
     {
         "name": "Festival-Seite",
@@ -50,6 +57,7 @@ PROJEKTE = [
         "bild": "css/images/projects/festival.png",
         "url": "/festival/",
         "status": "",
+        "breit": False,
     },
     {
         "name": "Diese Seite",
@@ -62,6 +70,7 @@ PROJEKTE = [
         "bild": "css/images/projects/diese-seite.png",
         "url": "/",
         "status": "Im Umbau",
+        "breit": True,
     },
 ]
 
