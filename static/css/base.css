@@ -74,37 +74,100 @@
 
     /* --- Hero --------------------------------------------------------- */
     --hero-min-height: 100svh;
-    --hero-overlay-top: rgba(5, 5, 5, 0.45);
-    --hero-overlay-mid: rgba(5, 5, 5, 0.25);
-    --hero-overlay-bottom: rgba(5, 5, 5, 0.85);
-    --hero-image-filter: brightness(0.75) contrast(1.15) saturate(1.05);
+
+    /* Verlauf: oben fast klar, damit Skyline und Fernsehturm durchkommen;
+       nach unten kraeftig, damit der Text darauf lesbar bleibt. */
+    --hero-overlay-top: rgba(5, 5, 5, 0.10);
+    --hero-overlay-mid: rgba(5, 5, 5, 0.12);
+    --hero-overlay-bottom: rgba(5, 5, 5, 0.88);
+    --hero-image-filter: brightness(0.95) contrast(1.08) saturate(1.02);
 
     --hero-grain-opacity: 0.04;
     --hero-grain-size: 180px;
 
     /* Lichtspot: Position wird aus app.js gesetzt, Default = mittig.
-       Die Defaults gelten auch ohne JS und auf Touch-Geraeten. */
+       Die Defaults gelten auch ohne JS und auf Touch-Geraeten.
+       Neutrales Warmweiss - Cyan hatte dem Foto einen Gruenstich gegeben. */
     --hero-spot-x: 50%;
     --hero-spot-y: 42%;
     --hero-spot-size: 55vmax;
-    --hero-spot-color: rgba(0, 217, 255, 0.16);
-    --hero-spot-fade: rgba(0, 217, 255, 0);
+    --hero-spot-color: rgba(255, 250, 240, 0.10);
+    --hero-spot-fade: rgba(255, 250, 240, 0);
 
     --hero-title-size: clamp(2.6rem, 11vw, 7.5rem);
     --hero-title-leading: 0.95;
     --hero-title-tracking: -0.03em;
     --hero-subtitle-size: clamp(0.7rem, 1.6vw, 0.85rem);
     --hero-subtitle-tracking: 0.32em;
+    --hero-dot-size: 8px;
 
     --hero-line-stagger: 80ms;
     --hero-line-duration: 900ms;
     --hero-line-shift: 1.1em;
+    /* Luft im overflow-Fenster, damit line-height < 1 nicht abschneidet. */
+    --hero-line-bleed: 0.18em;
+
+    /* Textblock unten links; auf Mobile enger am Rand. */
+    --hero-pad-block-end: var(--space-xl);
+    --hero-pad-inline: var(--space-lg);
+
+    /* --- Header ------------------------------------------------------- */
+    --header-pad-block: var(--space-md);
+    --header-size: var(--text-xs);
+    --header-tracking: 0.18em;
+    --header-gap: var(--space-md);
 
     /* --- Buttons ------------------------------------------------------ */
     --btn-pad-y: var(--space-xs);
     --btn-pad-x: var(--space-md);
     --btn-size: var(--text-sm);
     --btn-tracking: 0.08em;
+}
+
+
+/* ==========================================================================
+   Header
+   Liegt transparent ueber dem Hero, ohne dessen Hoehe zu beeinflussen.
+   ========================================================================== */
+
+.site-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--header-gap);
+    padding: var(--header-pad-block) var(--hero-pad-inline);
+    font-family: var(--font-mono);
+    font-size: var(--header-size);
+    text-transform: uppercase;
+    letter-spacing: var(--header-tracking);
+}
+
+.site-logo {
+    color: var(--color-text-bright);
+    text-decoration: none;
+    font-weight: var(--weight-medium);
+}
+
+.site-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--header-gap);
+}
+
+.site-nav a {
+    color: var(--color-text);
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease);
+}
+
+.site-nav a:hover,
+.site-nav a:focus-visible {
+    color: var(--color-text-bright);
 }
 
 
@@ -157,11 +220,14 @@
    Ebenen von hinten nach vorn: Foto -> Verlauf -> Lichtspot -> Grain -> Text
    ========================================================================== */
 
+/* Inhalt sitzt unten links; die obere Bildhaelfte bleibt frei fuer
+   Skyline und Fernsehturm. */
 .hero {
     position: relative;
     min-height: var(--hero-min-height);
     display: grid;
     grid-template-rows: 1fr auto;
+    align-items: end;
     overflow: hidden;
     background-color: var(--color-bg);
     isolation: isolate;
@@ -220,12 +286,13 @@
 .hero-inner {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    align-items: flex-start;
+    justify-content: flex-end;
     width: 100%;
     max-width: var(--container-max);
     margin-inline: auto;
-    padding-inline: var(--container-pad);
-    padding-block: var(--space-2xl);
+    padding-inline: var(--hero-pad-inline);
+    padding-bottom: var(--hero-pad-block-end);
 }
 
 .hero-title {
@@ -240,10 +307,15 @@
 }
 
 /* Jede Zeile bekommt ein Fenster mit overflow:hidden, aus dem der Text
-   beim Laden nach oben hereinfaehrt. */
+   beim Laden nach oben hereinfaehrt.
+   Wichtig: line-height 0.95 macht die Zeilenbox kleiner als die Glyphen,
+   overflow:hidden wuerde also Ober- und Unterlaengen abschneiden. Das
+   Padding schafft Luft, der negative Margin nimmt sie optisch wieder raus. */
 .hero-line {
     display: block;
     overflow: hidden;
+    padding-block: var(--hero-line-bleed);
+    margin-block: calc(var(--hero-line-bleed) * -1);
 }
 
 .hero-line > span {
@@ -254,10 +326,6 @@
     animation-delay: calc(var(--hero-line-index, 0) * var(--hero-line-stagger));
 }
 
-.hero-title-accent {
-    color: var(--color-accent);
-}
-
 @keyframes hero-line-rise {
     to {
         transform: translateY(0);
@@ -266,6 +334,9 @@
 }
 
 .hero-subtitle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
     margin: var(--space-md) 0 0;
     font-family: var(--font-mono);
     font-size: var(--hero-subtitle-size);
@@ -273,8 +344,16 @@
     text-transform: uppercase;
     letter-spacing: var(--hero-subtitle-tracking);
     color: var(--color-text-muted);
-    /* Sperrung erzeugt rechts einen optischen Ueberhang - ausgleichen. */
-    text-indent: var(--hero-subtitle-tracking);
+}
+
+/* Einziger Farbakzent im Hero. */
+.hero-subtitle::before {
+    content: '';
+    flex: none;
+    width: var(--hero-dot-size);
+    height: var(--hero-dot-size);
+    border-radius: var(--radius-full);
+    background-color: var(--color-accent);
 }
 
 .hero-cta {
@@ -284,9 +363,12 @@
     margin-top: var(--space-lg);
 }
 
+/* Sitzt rechts unten, damit er dem linksbuendigen Textblock nicht
+   in die Quere kommt. */
 .hero-scroll {
-    justify-self: center;
-    margin-bottom: var(--space-lg);
+    justify-self: end;
+    padding-inline: var(--hero-pad-inline);
+    padding-bottom: var(--hero-pad-block-end);
     font-family: var(--font-mono);
     font-size: var(--text-xs);
     letter-spacing: 0.2em;
@@ -305,6 +387,18 @@
 
 @keyframes hero-fade-in {
     to { opacity: 1; }
+}
+
+/* Mobile: gleiche Verankerung unten links, nur enger am Rand. */
+@media (max-width: 640px) {
+    .hero {
+        --hero-pad-inline: var(--space-sm);
+        --hero-pad-block-end: var(--space-lg);
+    }
+
+    .site-header {
+        --hero-pad-inline: var(--space-sm);
+    }
 }
 
 /* Reduzierte Bewegung: nichts animiert sich, alles ist sofort da.
