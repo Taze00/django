@@ -16,24 +16,26 @@
 
 <body>
     <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="hero-bg" id="three-bg"></div>
+    <section id="home" class="hero" style="--hero-image: url('{% static 'css/images/header/berlin-crop.jpg' %}');">
+        <div class="hero-bg"></div>
         <div class="hero-overlay"></div>
+        <div class="hero-spot"></div>
+        <div class="hero-grain"></div>
 
-        <div class="container">
-            <div class="hero-content fade-in">
-                <h1>Ein Einblick in meine<br><span class="text-gradient">Gedankenwelt</span></h1>
-                <p class="hero-subtitle">Bachelor | Webdesign | Marketing</p>
-                <div class="hero-cta">
-                    <a href="#clubs" class="btn">Club Ranking</a>
-                    <a href="#gallery" class="btn btn-outline">Galerie ansehen</a>
-                </div>
+        <div class="hero-inner">
+            <h1 class="hero-title">
+                <span class="hero-line" style="--hero-line-index: 0;"><span>Ein Einblick</span></span>
+                <span class="hero-line" style="--hero-line-index: 1;"><span>in meine</span></span>
+                <span class="hero-line" style="--hero-line-index: 2;"><span class="hero-title-accent">Gedankenwelt</span></span>
+            </h1>
+            <p class="hero-subtitle" style="--hero-line-index: 3;">Bachelor · Webdesign · Marketing</p>
+            <div class="hero-cta" style="--hero-line-index: 4;">
+                <a href="#clubs" class="btn">Club Ranking</a>
+                <a href="#gallery" class="btn btn-outline">Galerie ansehen</a>
             </div>
         </div>
 
-        <div class="scroll-indicator">
-            <div class="scroll-arrow"></div>
-        </div>
+        <div class="hero-scroll" style="--hero-line-index: 5;">Scroll</div>
     </section>
 
     <!-- About Section -->

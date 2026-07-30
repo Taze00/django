@@ -67,7 +67,255 @@
 
     /* --- Bewegung ----------------------------------------------------- */
     --ease: cubic-bezier(0.25, 0.8, 0.25, 1);
+    --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
     --duration-fast: 150ms;
     --duration-base: 300ms;
     --duration-slow: 600ms;
+
+    /* --- Hero --------------------------------------------------------- */
+    --hero-min-height: 100svh;
+    --hero-overlay-top: rgba(5, 5, 5, 0.45);
+    --hero-overlay-mid: rgba(5, 5, 5, 0.25);
+    --hero-overlay-bottom: rgba(5, 5, 5, 0.85);
+    --hero-image-filter: brightness(0.75) contrast(1.15) saturate(1.05);
+
+    --hero-grain-opacity: 0.04;
+    --hero-grain-size: 180px;
+
+    /* Lichtspot: Position wird aus app.js gesetzt, Default = mittig.
+       Die Defaults gelten auch ohne JS und auf Touch-Geraeten. */
+    --hero-spot-x: 50%;
+    --hero-spot-y: 42%;
+    --hero-spot-size: 55vmax;
+    --hero-spot-color: rgba(0, 217, 255, 0.16);
+    --hero-spot-fade: rgba(0, 217, 255, 0);
+
+    --hero-title-size: clamp(2.6rem, 11vw, 7.5rem);
+    --hero-title-leading: 0.95;
+    --hero-title-tracking: -0.03em;
+    --hero-subtitle-size: clamp(0.7rem, 1.6vw, 0.85rem);
+    --hero-subtitle-tracking: 0.32em;
+
+    --hero-line-stagger: 80ms;
+    --hero-line-duration: 900ms;
+    --hero-line-shift: 1.1em;
+
+    /* --- Buttons ------------------------------------------------------ */
+    --btn-pad-y: var(--space-xs);
+    --btn-pad-x: var(--space-md);
+    --btn-size: var(--text-sm);
+    --btn-tracking: 0.08em;
+}
+
+
+/* ==========================================================================
+   Buttons
+   Vorlaeufig hier, weil der Hero sie braucht. Wandert spaeter in eine
+   eigene Komponenten-Datei, sobald weitere Sections umgebaut sind.
+   ========================================================================== */
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    padding: var(--btn-pad-y) var(--btn-pad-x);
+    border: 1px solid transparent;
+    border-radius: var(--radius-full);
+    background-color: var(--color-accent);
+    color: var(--color-bg);
+    font-family: var(--font-mono);
+    font-size: var(--btn-size);
+    letter-spacing: var(--btn-tracking);
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background-color var(--duration-fast) var(--ease),
+                border-color var(--duration-fast) var(--ease),
+                color var(--duration-fast) var(--ease);
+}
+
+.btn:hover,
+.btn:focus-visible {
+    background-color: var(--color-accent-dark);
+}
+
+.btn-outline {
+    background-color: transparent;
+    border-color: var(--color-border);
+    color: var(--color-text-bright);
+}
+
+.btn-outline:hover,
+.btn-outline:focus-visible {
+    background-color: transparent;
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+}
+
+
+/* ==========================================================================
+   Hero
+   Ebenen von hinten nach vorn: Foto -> Verlauf -> Lichtspot -> Grain -> Text
+   ========================================================================== */
+
+.hero {
+    position: relative;
+    min-height: var(--hero-min-height);
+    display: grid;
+    grid-template-rows: 1fr auto;
+    overflow: hidden;
+    background-color: var(--color-bg);
+    isolation: isolate;
+}
+
+/* Alle Deko-Ebenen liegen deckungsgleich uebereinander. */
+.hero-bg,
+.hero-overlay,
+.hero-spot,
+.hero-grain {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.hero-bg {
+    background-image: var(--hero-image);
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    filter: var(--hero-image-filter);
+    z-index: -4;
+}
+
+.hero-overlay {
+    background: linear-gradient(
+        to bottom,
+        var(--hero-overlay-top),
+        var(--hero-overlay-mid) 45%,
+        var(--hero-overlay-bottom)
+    );
+    z-index: -3;
+}
+
+/* Weicher Lichtspot. Folgt per --hero-spot-x/y dem Cursor (siehe app.js),
+   bleibt ohne JS und auf Touch mittig stehen. */
+.hero-spot {
+    background: radial-gradient(
+        circle var(--hero-spot-size) at var(--hero-spot-x) var(--hero-spot-y),
+        var(--hero-spot-color),
+        var(--hero-spot-fade) 60%
+    );
+    z-index: -2;
+}
+
+/* Feine Filmkorn-Textur ueber allem Bildmaterial. Das SVG steckt als
+   data-URI direkt in der Regel, damit kein zusaetzlicher Request noetig ist. */
+.hero-grain {
+    z-index: -1;
+    opacity: var(--hero-grain-opacity);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: var(--hero-grain-size) var(--hero-grain-size);
+    background-repeat: repeat;
+}
+
+.hero-inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    max-width: var(--container-max);
+    margin-inline: auto;
+    padding-inline: var(--container-pad);
+    padding-block: var(--space-2xl);
+}
+
+.hero-title {
+    font-family: var(--font-display);
+    font-weight: var(--weight-bold);
+    font-size: var(--hero-title-size);
+    line-height: var(--hero-title-leading);
+    letter-spacing: var(--hero-title-tracking);
+    color: var(--color-text-bright);
+    margin: 0;
+    text-wrap: balance;
+}
+
+/* Jede Zeile bekommt ein Fenster mit overflow:hidden, aus dem der Text
+   beim Laden nach oben hereinfaehrt. */
+.hero-line {
+    display: block;
+    overflow: hidden;
+}
+
+.hero-line > span {
+    display: block;
+    transform: translateY(var(--hero-line-shift));
+    opacity: 0;
+    animation: hero-line-rise var(--hero-line-duration) var(--ease-out-soft) forwards;
+    animation-delay: calc(var(--hero-line-index, 0) * var(--hero-line-stagger));
+}
+
+.hero-title-accent {
+    color: var(--color-accent);
+}
+
+@keyframes hero-line-rise {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.hero-subtitle {
+    margin: var(--space-md) 0 0;
+    font-family: var(--font-mono);
+    font-size: var(--hero-subtitle-size);
+    font-weight: var(--weight-regular);
+    text-transform: uppercase;
+    letter-spacing: var(--hero-subtitle-tracking);
+    color: var(--color-text-muted);
+    /* Sperrung erzeugt rechts einen optischen Ueberhang - ausgleichen. */
+    text-indent: var(--hero-subtitle-tracking);
+}
+
+.hero-cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-top: var(--space-lg);
+}
+
+.hero-scroll {
+    justify-self: center;
+    margin-bottom: var(--space-lg);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+}
+
+/* Subtitle, CTA und Scroll-Hinweis folgen der letzten Headline-Zeile. */
+.hero-subtitle,
+.hero-cta,
+.hero-scroll {
+    opacity: 0;
+    animation: hero-fade-in var(--hero-line-duration) var(--ease-out-soft) forwards;
+    animation-delay: calc(var(--hero-line-index, 0) * var(--hero-line-stagger));
+}
+
+@keyframes hero-fade-in {
+    to { opacity: 1; }
+}
+
+/* Reduzierte Bewegung: nichts animiert sich, alles ist sofort da.
+   Der Lichtspot bleibt sichtbar, wird aber in app.js nicht bewegt. */
+@media (prefers-reduced-motion: reduce) {
+    .hero-line > span,
+    .hero-subtitle,
+    .hero-cta,
+    .hero-scroll {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
 }
