@@ -1,7 +1,23 @@
+from django.conf import settings
 from django.shortcuts import render
 
+from films import kuratiert, letterboxd, tmdb
+
+
 def index(request):
-    return render(request, 'index.html')
+    filme = tmdb.mit_postern(kuratiert.get_filme())
+
+    # Faellt Letterboxd aus, ist das hier eine leere Liste und die
+    # Tagebuch-Zeile wird im Template uebersprungen. Die Seite bleibt
+    # in jedem Fall bei 200.
+    tagebuch = tmdb.mit_postern(letterboxd.get_recent_entries())
+
+    return render(request, 'index.html', {
+        'filme': filme,
+        'tagebuch': tagebuch,
+        'letterboxd_url': letterboxd.get_profile_url(),
+        'letterboxd_user': settings.LETTERBOXD_USERNAME,
+    })
 
 def freundin_page(request):
     return render(request, "schubi.html")

@@ -120,11 +120,10 @@
     <!-- Rankings Section -->
     <section id="rankings-section" class="rankings-section">
         <div class="container">
-            <h2 class="fade-in" id="ranking-title">Meine <span class="text-gradient">Top 5</span> <span id="ranking-category">Filme</span></h2>
+            <h2 class="fade-in" id="ranking-title">Meine <span class="text-gradient">Top 5</span> <span id="ranking-category">Serien</span></h2>
 
             <div class="rankings-tabs fade-in">
-                <button class="rankings-tab-btn active" data-category="movies">Filme</button>
-                <button class="rankings-tab-btn" data-category="series">Serien</button>
+                <button class="rankings-tab-btn active" data-category="series">Serien</button>
                 <button class="rankings-tab-btn" data-category="anime">Anime</button>
             </div>
 
@@ -151,6 +150,80 @@
         </div>
     </section>
 
+    <!-- Filmempfehlungen -->
+    {% if filme %}
+    <section id="filme" class="films-section">
+        <div class="container">
+            <div class="section-header fade-in">
+                <h2>Meine <span class="text-gradient">Filme</span></h2>
+            </div>
+
+            <p class="films-claim fade-in">Ich bewerte streng. Von <strong>204 Filmen</strong> haben drei fünf Sterne. Was hier über vier steht, meine ich ernst.</p>
+
+            <ul class="films-grid">
+                {% for film in filme %}
+                <li class="film-card fade-in">
+                    <div class="film-poster">
+                        {% if film.poster_url %}
+                        <img src="{{ film.poster_url }}" alt="Filmplakat: {{ film.titel }}" loading="lazy">
+                        {% else %}
+                        <span class="film-poster-fallback" aria-hidden="true">{{ film.titel|first }}</span>
+                        {% endif %}
+
+                        <div class="film-overlay">
+                            <p class="film-text">{{ film.mein_text }}</p>
+                            {% if film.letterboxd_slug %}
+                            <a class="film-link" href="https://letterboxd.com/film/{{ film.letterboxd_slug }}/" target="_blank" rel="noopener noreferrer">Auf Letterboxd &rarr;</a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="film-body">
+                        <h3 class="film-title">{{ film.titel }}</h3>
+                        <div class="film-meta">
+                            <span class="film-stars" aria-hidden="true" style="--rating: {{ film.meine_wertung }};"></span>
+                            <span class="visually-hidden">{{ film.meine_wertung }} von 5 Sternen</span>
+                            <span>{{ film.jahr }}</span>
+                            {% if film.regie %}<span>· {{ film.regie }}</span>{% endif %}
+                        </div>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+
+            {% if tagebuch %}
+            <div class="diary fade-in">
+                <div class="diary-head">
+                    <span>Zuletzt im Tagebuch</span>
+                    <a href="{{ letterboxd_url }}" target="_blank" rel="noopener noreferrer">letterboxd.com/{{ letterboxd_user }} &rarr;</a>
+                </div>
+
+                <ul class="diary-strip">
+                    {% for eintrag in tagebuch %}
+                    <li class="diary-item">
+                        <a href="{{ eintrag.link }}" target="_blank" rel="noopener noreferrer">
+                            {% if eintrag.poster_url %}
+                            <img src="{{ eintrag.poster_url }}" alt="" loading="lazy">
+                            {% else %}
+                            <span class="diary-fallback" aria-hidden="true">{{ eintrag.titel|first }}</span>
+                            {% endif %}
+                            <div class="diary-name">{{ eintrag.titel }}</div>
+                            <div class="diary-meta">{{ eintrag.jahr }}{% if eintrag.bewertung %} · {{ eintrag.bewertung }}★{% endif %}</div>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <p class="films-attribution">
+                Filmdaten und Plakate von <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">TMDB</a>.
+                Diese Seite nutzt die TMDB-API, wird aber weder von TMDB unterstützt noch zertifiziert.
+            </p>
+        </div>
+    </section>
+    {% endif %}
+
     <!-- Footer -->
     <footer id="contact">
         <div class="container">
@@ -175,6 +248,8 @@
                     <a href="/impressum" style="color: var(--primary);">Impressum</a>
                     &nbsp;·&nbsp;
                     <a href="/skills" style="color: var(--primary);">Skills & Portfolio</a>
+                    &nbsp;·&nbsp;
+                    <a href="#filme" style="color: var(--primary);">Filme</a>
                 </p>
                 <p class="copyright">&copy; {% now "Y" %} Alex Volkmann | Alle Rechte vorbehalten.</p>
             </div>

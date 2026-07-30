@@ -215,3 +215,15 @@ REGISTRATION_SECRET_KEY = os.environ.get(
     'DJANGO_REGISTRATION_KEY',
     'set-in-env',
 )
+
+
+# --- Filmsektion der Startseite ------------------------------------------
+
+# Oeffentliches Letterboxd-Profil, aus dem das Tagebuch gelesen wird.
+LETTERBOXD_USERNAME = "pushmo"
+
+# TMDB-Poster. Ohne Key bleibt die Sektion nutzbar, nur ohne Bilder -
+# der echte Wert steht in der gitignorten .env.
+TMDB_API_KEY = os.environ.get('TMDB_API_KEY', '')
+TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p'
+TMDB_POSTER_SIZE = 'w342'

@@ -1,0 +1,41 @@
+[
+  {
+    "titel": "Platzhalter Eins",
+    "jahr": 1999,
+    "regie": "Regie Nachname",
+    "laufzeit_min": 120,
+    "tmdb_id": 550,
+    "letterboxd_slug": "platzhalter-eins",
+    "meine_wertung": 4.5,
+    "stimmung": "mitnehmen",
+    "wo_zu_sehen": "Amazon Prime",
+    "mein_text": "Platzhaltertext, den Alex noch ersetzt. Hier stehen zwei bis vier Saetze darueber, warum der Film haengengeblieben ist. Kein Klappentext, sondern der eigene Eindruck.",
+    "highlight": true
+  },
+  {
+    "titel": "Platzhalter Zwei",
+    "jahr": 2013,
+    "regie": "Regie Nachname",
+    "laufzeit_min": 153,
+    "tmdb_id": 146233,
+    "letterboxd_slug": "platzhalter-zwei",
+    "meine_wertung": 3.5,
+    "stimmung": "nachdenken",
+    "wo_zu_sehen": "Netflix",
+    "mein_text": "Platzhaltertext, den Alex noch ersetzt. Ein Film, der eher lange nachhallt als im Moment zu packen. Die Sorte, ueber die man am naechsten Tag noch nachdenkt.",
+    "highlight": false
+  },
+  {
+    "titel": "Platzhalter Drei",
+    "jahr": 2021,
+    "regie": "Regie Nachname",
+    "laufzeit_min": 95,
+    "tmdb_id": 619730,
+    "letterboxd_slug": "platzhalter-drei",
+    "meine_wertung": 5.0,
+    "stimmung": "geheimtipp",
+    "wo_zu_sehen": "MUBI",
+    "mein_text": "Platzhaltertext, den Alex noch ersetzt. Kaum jemand kennt ihn, und genau deshalb steht er hier. Kurz, eigenwillig und deutlich besser als sein Ruf.",
+    "highlight": false
+  }
+]

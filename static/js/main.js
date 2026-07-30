@@ -1339,10 +1339,12 @@ function initRankings() {
 
     if (!container || tabs.length === 0) return;
 
-    let currentCategory = 'movies';
+    // "movies" ist raus - Filme haben jetzt eine eigene Sektion (#filme).
+    // Der RANKINGS.movies-Datensatz bleibt bestehen, wird hier aber nicht
+    // mehr angeboten.
+    let currentCategory = 'series';
 
     const categoryLabels = {
-        movies: 'Filme',
         series: 'Serien',
         anime: 'Anime'
     };
@@ -1543,9 +1545,9 @@ function initRankings() {
         });
     });
 
-    renderRankings('movies');
+    renderRankings('series');
     if (rankingCategory) {
-        rankingCategory.textContent = categoryLabels['movies'];
+        rankingCategory.textContent = categoryLabels['series'];
     }
 }
 

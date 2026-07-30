@@ -3334,3 +3334,315 @@ footer {
     }
 }
 
+
+/* ==========================================================================
+   FILMEMPFEHLUNGEN
+   Kuratierte Filme aus films/data/filme.json plus Letterboxd-Tagebuch.
+   Nutzt die vorhandenen Tokens des alten Systems; ergaenzt wurden nur
+   --font-mono und --mono-track (siehe unten), alles andere ist gemappt:
+   Neon -> --primary, Hover-Akzent -> --secondary, Timing -> --transition.
+   ========================================================================== */
+
+:root {
+    /* IBM Plex Mono wird im Template bereits geladen, es fehlte nur das
+       Token. Fuer Meta-Zeilen, Sterne und Jahreszahlen. */
+    --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+    --mono-track: 0.18em;
+    --film-radius: 8px;
+}
+
+/* Nur fuer Screenreader - die Sternwertung als Text, da die Sterne
+   selbst aria-hidden sind. */
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+#filme {
+    padding: 4rem 0;
+    background: linear-gradient(135deg, #0f0f1a 0%, #0a0a14 50%, #050505 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Derselbe weiche Lichtfleck wie in der Rankings-Sektion, nur
+   spiegelverkehrt - haelt die Seite optisch zusammen. */
+#filme::before {
+    content: '';
+    position: absolute;
+    top: -40%;
+    left: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(0, 217, 255, 0.05) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+#filme .container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Der Massstab-Satz steht bewusst gross und mittig, nicht als
+   Kleingedrucktes. */
+.films-claim {
+    max-width: 760px;
+    margin: 0 auto clamp(2.5rem, 5vw, 3.5rem);
+    text-align: center;
+    font-size: clamp(1rem, 2.2vw, 1.25rem);
+    line-height: 1.6;
+    color: var(--text);
+}
+
+.films-claim strong {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+/* --- Raster ----------------------------------------------------------- */
+/* auto-fill statt fester Spaltenzahl: funktioniert mit 3 wie mit 30. */
+.films-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
+    gap: clamp(1rem, 2.5vw, 1.6rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.film-card {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--gray);
+    border-radius: var(--film-radius);
+    background: rgba(15, 15, 15, 0.6);
+    transition: var(--transition);
+}
+
+.film-card:hover {
+    border-color: var(--primary);
+    transform: translateY(-6px);
+    box-shadow: var(--shadow);
+}
+
+.film-poster {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    background: var(--gray);
+}
+
+.film-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: var(--transition);
+}
+
+.film-card:hover .film-poster img {
+    transform: scale(1.05);
+    filter: brightness(0.35);
+}
+
+/* Ohne TMDB-Poster tritt der Anfangsbuchstabe an seine Stelle. */
+.film-poster-fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    color: var(--gray);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.film-body {
+    padding: 0.9rem 1rem 1.1rem;
+}
+
+.film-title {
+    margin: 0 0 0.35rem;
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    line-height: 1.25;
+    color: var(--text-bright);
+}
+
+.film-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--text);
+    opacity: 0.75;
+}
+
+/* Sterne als ein Element: der gefuellte Anteil wird ueber --rating
+   prozentual freigestellt, damit halbe Wertungen exakt stimmen. */
+.film-stars {
+    --fill: calc(var(--rating, 0) / 5 * 100%);
+    font-size: 0.9rem;
+    letter-spacing: 0.08em;
+    background-image: linear-gradient(to right,
+        var(--primary) var(--fill), rgba(255, 255, 255, 0.18) var(--fill));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.film-stars::before { content: '★★★★★'; }
+
+/* Text faehrt beim Hover von unten ueber das Poster. */
+.film-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    padding: 1rem;
+    background: linear-gradient(to top, rgba(5, 5, 5, 0.97) 55%, rgba(5, 5, 5, 0.65));
+    transform: translateY(101%);
+    transition: var(--transition);
+}
+
+.film-card:hover .film-overlay,
+.film-card:focus-within .film-overlay {
+    transform: translateY(0);
+}
+
+.film-text {
+    margin: 0;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: var(--text);
+}
+
+.film-link {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.film-link:hover { color: var(--secondary); }
+
+/* --- Tagebuch --------------------------------------------------------- */
+
+.diary {
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+    padding-top: clamp(1.5rem, 3vw, 2rem);
+    border-top: 1px solid var(--gray);
+}
+
+.diary-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+    color: var(--text);
+}
+
+.diary-head a {
+    color: var(--primary);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.diary-head a:hover { color: var(--secondary); }
+
+/* Waagerechter Streifen: scrollt statt umzubrechen, funktioniert
+   dadurch mit beliebig vielen Eintraegen. */
+.diary-strip {
+    display: flex;
+    gap: 0.8rem;
+    margin: 0;
+    padding: 0 0 0.8rem;
+    list-style: none;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    overscroll-behavior-x: contain;
+}
+
+.diary-item {
+    flex: 0 0 110px;
+    scroll-snap-align: start;
+}
+
+.diary-item a {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.diary-item img,
+.diary-item .diary-fallback {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    display: block;
+    border: 1px solid var(--gray);
+    border-radius: 4px;
+    transition: var(--transition);
+}
+
+.diary-item .diary-fallback {
+    display: grid;
+    place-items: center;
+    font-family: var(--font-display);
+    color: var(--gray);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.diary-item a:hover img { border-color: var(--primary); }
+
+.diary-name {
+    margin-top: 0.45rem;
+    font-size: 0.78rem;
+    line-height: 1.25;
+    color: var(--text-bright);
+}
+
+.diary-meta {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    color: var(--text);
+    opacity: 0.7;
+}
+
+.films-attribution {
+    margin: clamp(2rem, 4vw, 3rem) 0 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--gray);
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    line-height: 1.5;
+    text-align: center;
+    color: var(--text);
+    opacity: 0.65;
+}
+
+.films-attribution a { color: var(--primary); }
+
+@media (max-width: 600px) {
+    .films-grid {
+        grid-template-columns: repeat(auto-fill, minmax(min(140px, 100%), 1fr));
+    }
+}
