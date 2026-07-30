@@ -61,6 +61,56 @@
         </div>
     </section>
 
+    <!-- Was ich baue -->
+    {% if projekte %}
+    <section id="projekte" class="projects-section">
+        <div class="container">
+            <div class="section-header fade-in">
+                <h2>Was ich <span class="text-gradient">baue</span></h2>
+                <p>Vier Projekte, an denen ich gelernt habe, was ich kann und was noch nicht</p>
+            </div>
+
+            <div class="projects-grid">
+                {% for projekt in projekte %}
+                <article class="project-card fade-in">
+                    <a class="project-link" href="{{ projekt.url }}"{% if projekt.url != '/' %} rel="noopener"{% endif %}>
+                        <div class="project-media">
+                            {% if projekt.hat_bild %}
+                            <img src="{% static projekt.bild %}" alt="Vorschau: {{ projekt.name }}" loading="lazy">
+                            {% else %}
+                            {# Kein Bild hinterlegt - gestalteter Platzhalter statt Leerstelle. #}
+                            <div class="project-fallback" aria-hidden="true">
+                                <span class="project-fallback-name">{{ projekt.name }}</span>
+                                <span class="project-fallback-cat">{{ projekt.kategorie }}</span>
+                            </div>
+                            {% endif %}
+
+                            {% if projekt.status %}
+                            <span class="project-status">{{ projekt.status }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="project-body">
+                            <span class="project-cat">{{ projekt.kategorie }}</span>
+                            <h3 class="project-name">{{ projekt.name }}</h3>
+                            <p class="project-desc">{{ projekt.beschreibung }}</p>
+
+                            {% if projekt.tech %}
+                            <ul class="project-tech">
+                                {% for technik in projekt.tech %}
+                                <li class="project-pill">{{ technik }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </div>
+                    </a>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
     <!-- Club Ranking Section -->
     <section id="clubs" class="club-ranking">
         <div class="club-pattern"></div>
@@ -250,6 +300,8 @@
                     <a href="/impressum" style="color: var(--primary);">Impressum</a>
                     &nbsp;·&nbsp;
                     <a href="/skills" style="color: var(--primary);">Skills & Portfolio</a>
+                    &nbsp;·&nbsp;
+                    <a href="#projekte" style="color: var(--primary);">Projekte</a>
                     &nbsp;·&nbsp;
                     <a href="#filme" style="color: var(--primary);">Filme</a>
                 </p>

@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.shortcuts import render
 
-from films import kuratiert, letterboxd, tmdb
+from films import kuratiert, letterboxd, projekte, tmdb
 
 
 def index(request):
@@ -21,6 +21,7 @@ def index(request):
     tagebuch = tmdb.mit_postern_gemischt(letterboxd.get_recent_entries())
 
     return render(request, 'index.html', {
+        'projekte': projekte.get_projekte(),
         'eintraege': eintraege,
         'gattungen': kuratiert.get_gattungen(eintraege),
         'stimmungen': kuratiert.get_stimmungen(filme),
