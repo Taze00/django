@@ -2473,8 +2473,12 @@ footer {
    ========================================================================== */
 
 .regal {
-    /* Masse */
-    --regal-kachel-breite: 200px;
+    /* Masse.
+       Achtung beim Vergleich mit dem alten Raster: dort war 200px ein
+       Minimum (minmax(200px, 1fr)), die Spalten wurden auf ~226px
+       gestreckt. Hier ist der Wert eine feste Breite - 200px wirkten
+       deshalb schmaler als vorher. */
+    --regal-kachel-breite: 225px;
     --regal-abstand: 1.1rem;
     --regal-radius: var(--film-radius, 8px);
 
@@ -2495,9 +2499,17 @@ footer {
     --regal-pfeil-groesse: 40px;
     --regal-snap: proximity;
 
-    /* Abstand zum naechsten Regal. Ohne das verschwimmen mehrere
-       Regale zu einer einzigen langen Liste. */
-    margin-bottom: clamp(3rem, 6vw, 4.5rem);
+    /* Das Regal ist ein <section> und wuerde sonst das globale
+       section-Padding (clamp(4rem, 10vw, 6rem), siehe oben) erben -
+       das sind allein schon knapp 200px zwischen zwei Regalen. Regale
+       sind Teil einer Sektion, keine eigene. */
+    padding: 0;
+
+    /* Abstand zum naechsten Regal. Gross genug, um zwei Regale zu
+       trennen, klein genug, dass sie als Gruppe lesbar bleiben - die
+       vertikale Luft der Spur (--regal-luft) kommt beidseitig noch
+       obendrauf. */
+    margin-bottom: clamp(1.25rem, 2.5vw, 2rem);
 }
 
 .regal:last-child { margin-bottom: 0; }
@@ -2509,9 +2521,9 @@ footer {
     align-items: baseline;
     justify-content: space-between;
     gap: 1rem;
-    /* Luft nach oben trennt das Regal von dem darueber. */
-    margin: 0 0 0.9rem;
-    padding-top: clamp(0.5rem, 1.5vw, 1rem);
+    /* Nach unten nur wenig: die Spur bringt --regal-luft selbst mit.
+       Nach oben gar nichts - dafuer sorgt der margin des Vorgaengers. */
+    margin: 0 0 0.35rem;
 }
 
 .regal-titel {

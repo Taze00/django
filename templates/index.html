@@ -9,7 +9,7 @@
     <link rel="icon" href="{% static 'css/images/favicon.ico' %}" type="image/x-icon">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" as="style">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260805-1">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260805-2">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -177,8 +177,7 @@
             <p class="films-claim fade-in">Ich bewerte streng. Von <strong>204 Filmen</strong> haben drei fünf Sterne. Was hier über vier steht, meine ich ernst.</p>
 
             {% if stimmungen %}
-            {# Wirkt nur auf das Filme-Regal - Serien und Anime haben keine
-               Stimmung hinterlegt. #}
+            {% comment %}Wirkt nur auf das Filme-Regal - Serien und Anime haben keine Stimmung hinterlegt.{% endcomment %}
             <div class="films-filter films-filter--stimmung fade-in" role="group" aria-label="Filme nach Stimmung filtern">
                 <button type="button" class="films-chip is-active" data-stimmung="alle" aria-pressed="true">Alle</button>
                 {% for wert, label in stimmungen %}
@@ -256,6 +255,6 @@
     </footer>
 
     <script defer src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
-    <script defer src="{% static 'js/main.js' %}?v=20260805-1"></script>
+    <script defer src="{% static 'js/main.js' %}?v=20260805-2"></script>
 </body>
 </html>

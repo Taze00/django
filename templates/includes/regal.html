@@ -31,8 +31,7 @@ ueberschreiben (siehe REGAL-Block in styles.css).
         {% if zaehler %}<span class="regal-zaehler">{{ zaehler }}</span>{% endif %}
     </header>
 
-    {# Der Verlauf am rechten Rand haengt am Viewport, nicht an der Spur -
-       er soll beim Scrollen stehen bleiben. #}
+    {% comment %}Der Verlauf am rechten Rand haengt am Viewport, nicht an der Spur - er soll beim Scrollen stehen bleiben.{% endcomment %}
     <div class="regal-viewport" data-regal-viewport>
 
         <button type="button" class="regal-pfeil regal-pfeil--links"
@@ -40,8 +39,7 @@ ueberschreiben (siehe REGAL-Block in styles.css).
             <i class="fas fa-chevron-left" aria-hidden="true"></i>
         </button>
 
-        {# tabindex=0: die Spur ist selbst fokussierbar, damit Pfeiltasten
-           ohne Maus funktionieren. #}
+        {% comment %}tabindex=0: die Spur ist selbst fokussierbar, damit Pfeiltasten ohne Maus funktionieren.{% endcomment %}
         <ul class="regal-spur"
             data-regal-spur
             tabindex="0"
