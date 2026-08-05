@@ -2411,8 +2411,9 @@ footer {
     color: var(--text-bright);
 }
 
-/* Ausgeblendete Karten aus dem Raster nehmen. */
-.film-card[hidden] { display: none; }
+/* Ausgefilterte Kacheln aus der Spur nehmen - der Slot traegt die
+   Breite, sonst bliebe eine Luecke stehen. */
+.regal-slot[hidden] { display: none; }
 
 .films-empty[hidden] { display: none; }
 
@@ -2434,21 +2435,528 @@ footer {
 
 .films-spotlight[hidden] { display: none; }
 
-/* Im Spotlight ist der Text dauerhaft sichtbar, nicht erst bei Hover. */
-.films-spotlight .film-card--spotlight {
+/* Im Spotlight ist der Text dauerhaft sichtbar, nicht erst bei Hover.
+   Die Kachel steht hier allein, nicht in einer Spur - deshalb kein
+   Hover-Wachstum und kein abgedunkeltes Poster. */
+.films-spotlight .kachel--spotlight {
     border-color: var(--primary);
     box-shadow: var(--shadow);
+    transform: none;
 }
 
-.films-spotlight .film-overlay {
+.films-spotlight .kachel-overlay {
     position: static;
     transform: none;
     background: none;
     padding: 0.9rem 1rem 0;
 }
 
-.films-spotlight .film-poster img {
+.films-spotlight .kachel-poster img,
+.films-spotlight .kachel--spotlight:hover .kachel-poster img {
     filter: none;
+}
+
+/* ==========================================================================
+   REGAL (wiederverwendbares Bauteil)
+   ==========================================================================
+   Horizontal scrollbare Kachelreihe. Traegt ueber templates/includes/
+   kachel-*.html unterschiedliche Inhalte, das Verhalten bleibt gleich.
+
+   Alle Masse stehen als Variablen auf .regal und lassen sich pro Regal
+   ueberschreiben - entweder per Modifier-Klasse (siehe .regal--chronik)
+   oder inline: <section class="regal" style="--regal-kachel-breite: 260px">
+
+   Zusammenhang, der nicht offensichtlich ist: --regal-hover-skalierung
+   und --regal-luft haengen voneinander ab. Die Spur scrollt, also
+   schneidet overflow die vergroesserte Kachel ab, wenn das Padding zu
+   knapp ist. --regal-luft wird deshalb aus der Skalierung berechnet.
+   ========================================================================== */
+
+.regal {
+    /* Masse */
+    --regal-kachel-breite: 200px;
+    --regal-abstand: 1.1rem;
+    --regal-radius: var(--film-radius, 8px);
+
+    /* Hover: wie stark die Kachel anwaechst. */
+    --regal-hover-skalierung: 1.08;
+    --regal-hover-hub: -6px;
+
+    /* Vertikale Luft in der Spur, damit die skalierte Kachel nicht am
+       Rand des Scroll-Containers abgeschnitten wird. Die halbe
+       Zuwachshoehe reicht rechnerisch; der Zuschlag faengt Schatten und
+       den Hub nach oben mit ab. */
+    --regal-luft: calc(
+        (var(--regal-hover-skalierung) - 1) * var(--regal-kachel-breite) * 1.5 / 2 + 14px
+    );
+
+    /* Verlauf und Pfeile */
+    --regal-verlauf-breite: 4.5rem;
+    --regal-pfeil-groesse: 40px;
+    --regal-snap: proximity;
+
+    /* Abstand zum naechsten Regal. Ohne das verschwimmen mehrere
+       Regale zu einer einzigen langen Liste. */
+    margin-bottom: clamp(3rem, 6vw, 4.5rem);
+}
+
+.regal:last-child { margin-bottom: 0; }
+
+/* --- Titelzeile ------------------------------------------------------- */
+
+.regal-kopf {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    /* Luft nach oben trennt das Regal von dem darueber. */
+    margin: 0 0 0.9rem;
+    padding-top: clamp(0.5rem, 1.5vw, 1rem);
+}
+
+.regal-titel {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+    color: var(--text-bright);
+}
+
+.regal-untertitel {
+    margin: 0.35rem 0 0;
+    font-size: 0.82rem;
+    line-height: 1.4;
+    color: var(--text);
+    opacity: 0.7;
+}
+
+.regal-zaehler {
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+    color: var(--text);
+    opacity: 0.6;
+    white-space: nowrap;
+}
+
+/* --- Viewport: traegt Verlauf und Pfeile ------------------------------ */
+
+.regal-viewport {
+    position: relative;
+}
+
+/* Weicher Verlauf am rechten Rand - deutet an, dass es weitergeht.
+   Verschwindet, sobald das Ende erreicht ist (Klasse vom JS). */
+.regal-viewport::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: var(--regal-verlauf-breite);
+    background: linear-gradient(to left, var(--darker, #050505) 10%, transparent);
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.25s ease;
+    z-index: 2;
+}
+
+.regal-viewport.is-am-ende::after { opacity: 0; }
+
+/* --- Spur ------------------------------------------------------------- */
+
+.regal-spur {
+    display: flex;
+    gap: var(--regal-abstand);
+    margin: 0;
+    /* Die vertikale Luft ist Pflicht, siehe Kopfkommentar. */
+    padding: var(--regal-luft) 0;
+    list-style: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x var(--regal-snap);
+    scroll-behavior: smooth;
+    overscroll-behavior-x: contain;
+    /* Scrollbar ausblenden - gescrollt wird per Wisch, Pfeil oder Taste. */
+    scrollbar-width: none;
+}
+
+/* Die Kachel waechst auch zur Seite. Ohne diese Randstuecke wuerde die
+   erste bzw. letzte Kachel beim Hover am Containerrand abgeschnitten;
+   als ::before/::after statt padding, damit scroll-snap sauber auf der
+   ersten Kachel einrastet. */
+.regal-spur::before,
+.regal-spur::after {
+    content: '';
+    flex: 0 0 calc((var(--regal-hover-skalierung) - 1) * var(--regal-kachel-breite) / 2);
+}
+
+.regal-spur::-webkit-scrollbar { display: none; }
+
+.regal-spur:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 4px;
+    border-radius: var(--regal-radius);
+}
+
+.regal-slot {
+    flex: 0 0 var(--regal-kachel-breite);
+    scroll-snap-align: start;
+}
+
+/* --- Pfeile ----------------------------------------------------------- */
+
+.regal-pfeil {
+    position: absolute;
+    top: 50%;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: var(--regal-pfeil-groesse);
+    height: var(--regal-pfeil-groesse);
+    transform: translateY(-50%);
+    border: 1px solid var(--gray);
+    border-radius: 50%;
+    background: rgba(10, 10, 15, 0.85);
+    color: var(--text-bright);
+    font-size: 0.85rem;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease,
+                border-color 0.25s ease, background 0.25s ease;
+}
+
+.regal-pfeil--links  { left: calc(var(--regal-pfeil-groesse) / -2); }
+.regal-pfeil--rechts { right: calc(var(--regal-pfeil-groesse) / -2); }
+
+.regal-pfeil:hover,
+.regal-pfeil:focus-visible {
+    border-color: var(--primary);
+    background: var(--primary);
+    color: var(--darker);
+}
+
+/* Sichtbar nur, wenn in dieser Richtung ueberhaupt etwas liegt.
+   is-scrollbar setzt das JS, wenn die Inhalte breiter sind als der
+   Viewport - passt alles rein, bleiben beide Pfeile weg. */
+.regal-viewport.is-scrollbar:not(.is-am-anfang) .regal-pfeil--links,
+.regal-viewport.is-scrollbar:not(.is-am-ende) .regal-pfeil--rechts {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Auf Touch reicht Wischen. Pfeile ganz weg, damit sie keine Kachel
+   verdecken. */
+@media (hover: none) {
+    .regal-pfeil { display: none; }
+}
+
+/* --- Kachel: gemeinsames Verhalten ------------------------------------ */
+
+.kachel {
+    position: relative;
+    height: 100%;
+    border: 1px solid var(--gray);
+    border-radius: var(--regal-radius);
+    background: rgba(15, 15, 15, 0.6);
+    /* Der eigentliche Regal-Effekt: die Kachel waechst beim Hover und
+       legt sich vor ihre Nachbarn. transform-origin bleibt mittig,
+       damit sie zu beiden Seiten gleich uebersteht. */
+    transform: scale(1) translateY(0);
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+                border-color 0.28s ease,
+                box-shadow 0.28s ease;
+    z-index: 1;
+}
+
+.kachel:hover,
+.kachel:focus-within {
+    transform: scale(var(--regal-hover-skalierung)) translateY(var(--regal-hover-hub));
+    border-color: var(--primary);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.55);
+    z-index: 5;
+}
+
+/* Wer Bewegung reduziert haben will, bekommt nur den Rahmenwechsel. */
+@media (prefers-reduced-motion: reduce) {
+    .kachel,
+    .kachel:hover,
+    .kachel:focus-within {
+        transform: none;
+    }
+
+    .regal-spur { scroll-behavior: auto; }
+}
+
+.kachel-link-flaeche {
+    display: block;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
+}
+
+/* --- Kachel: Poster --------------------------------------------------- */
+
+.kachel-poster {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    background: var(--gray);
+    border-radius: var(--regal-radius) var(--regal-radius) 0 0;
+}
+
+.kachel-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: filter 0.28s ease;
+}
+
+.kachel:hover .kachel-poster img,
+.kachel:focus-within .kachel-poster img {
+    filter: brightness(0.45);
+}
+
+/* Ohne TMDB-Poster tritt der Anfangsbuchstabe an seine Stelle. */
+.kachel-poster-fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    color: var(--gray);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* Text faehrt beim Hover von unten ueber den unteren Teil des Posters.
+   Nur so hoch wie noetig - das Plakat soll lesbar bleiben. */
+.kachel-overlay {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.9rem;
+    background: linear-gradient(to top, rgba(5, 5, 5, 0.97) 60%, rgba(5, 5, 5, 0));
+    transform: translateY(101%);
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.kachel:hover .kachel-overlay,
+.kachel:focus-within .kachel-overlay {
+    transform: translateY(0);
+}
+
+.kachel-text {
+    margin: 0;
+    font-size: 0.76rem;
+    line-height: 1.45;
+    color: var(--text);
+}
+
+.kachel-link {
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.kachel-link:hover { color: var(--secondary); }
+
+/* --- Kachel: Textteil unter dem Bild ---------------------------------- */
+
+.kachel-body {
+    padding: 0.75rem 0.85rem 0.9rem;
+}
+
+.kachel-titel {
+    margin: 0 0 0.3rem;
+    font-family: var(--font-display);
+    font-size: 0.92rem;
+    line-height: 1.25;
+    color: var(--text-bright);
+}
+
+.kachel-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    color: var(--text);
+    opacity: 0.75;
+}
+
+/* Sterne wie im alten Raster: der gefuellte Anteil wird ueber --rating
+   prozentual freigestellt, damit halbe Wertungen exakt stimmen. */
+.kachel-sterne {
+    --fill: calc(var(--rating, 0) / 5 * 100%);
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    background-image: linear-gradient(to right,
+        var(--primary) var(--fill), rgba(255, 255, 255, 0.18) var(--fill));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.kachel-sterne::before { content: '★★★★★'; }
+
+/* --- Kachel: Chronik (Tagebuch) --------------------------------------- */
+/* Schmaler und flacher - eine Chronik, keine Empfehlung. */
+
+.regal--chronik {
+    --regal-kachel-breite: 130px;
+    --regal-abstand: 0.8rem;
+    --regal-hover-skalierung: 1.06;
+}
+
+.kachel--chronik .kachel-body {
+    padding: 0.6rem 0.65rem 0.7rem;
+}
+
+.kachel--chronik .kachel-titel {
+    font-size: 0.78rem;
+}
+
+.kachel--chronik .kachel-meta {
+    font-size: 0.6rem;
+}
+
+/* --- Kachel: Foto ----------------------------------------------------- */
+
+.kachel-bild {
+    position: relative;
+    overflow: hidden;
+    background: var(--gray);
+    border-radius: var(--regal-radius) var(--regal-radius) 0 0;
+}
+
+.kachel--foto {
+    margin: 0;
+}
+
+.kachel--foto .kachel-bild {
+    aspect-ratio: 4 / 5;
+}
+
+.kachel-bild img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.kachel-bild-fallback {
+    display: block;
+    aspect-ratio: 4 / 5;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* --- Kachel: Projekt -------------------------------------------------- */
+
+.regal--projekte {
+    --regal-kachel-breite: 300px;
+}
+
+.kachel--projekt .kachel-bild {
+    aspect-ratio: 16 / 10;
+}
+
+.kachel-fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.kachel-fallback-name {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+    color: var(--gray);
+}
+
+.kachel-status {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    padding: 0.25rem 0.6rem;
+    border-radius: 999px;
+    background: rgba(5, 5, 5, 0.85);
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+    color: var(--primary);
+}
+
+.kachel-kategorie {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+    color: var(--primary);
+}
+
+.kachel-beschreibung {
+    margin: 0.4rem 0 0;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: var(--text);
+    opacity: 0.85;
+}
+
+.kachel-tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin: 0.7rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+
+.kachel-pill {
+    padding: 0.2rem 0.5rem;
+    border: 1px solid var(--gray);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.56rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text);
+}
+
+/* --- Schmale Viewports ------------------------------------------------ */
+
+@media (max-width: 600px) {
+    .regal {
+        --regal-kachel-breite: 145px;
+        --regal-abstand: 0.8rem;
+        /* Auf dem Handy klebt die vergroesserte Kachel sonst am
+           Bildschirmrand. */
+        --regal-hover-skalierung: 1.04;
+    }
+
+    .regal--chronik { --regal-kachel-breite: 105px; }
+    .regal--projekte { --regal-kachel-breite: 240px; }
 }
 
 /* ==========================================================================
@@ -2522,226 +3030,24 @@ footer {
     font-weight: 600;
 }
 
-/* --- Raster ----------------------------------------------------------- */
-/* auto-fill statt fester Spaltenzahl: funktioniert mit 3 wie mit 30. */
-.films-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
-    gap: clamp(1rem, 2.5vw, 1.6rem);
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
+/* --- Quellenhinweis unter dem Tagebuch -------------------------------- */
 
-.film-card {
-    position: relative;
-    overflow: hidden;
-    border: 1px solid var(--gray);
-    border-radius: var(--film-radius);
-    background: rgba(15, 15, 15, 0.6);
-    transition: var(--transition);
-}
-
-.film-card:hover {
-    border-color: var(--primary);
-    transform: translateY(-6px);
-    box-shadow: var(--shadow);
-}
-
-.film-poster {
-    position: relative;
-    aspect-ratio: 2 / 3;
-    overflow: hidden;
-    background: var(--gray);
-}
-
-.film-poster img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    transition: var(--transition);
-}
-
-.film-card:hover .film-poster img {
-    transform: scale(1.05);
-    filter: brightness(0.35);
-}
-
-/* Ohne TMDB-Poster tritt der Anfangsbuchstabe an seine Stelle. */
-.film-poster-fallback {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    font-family: var(--font-display);
-    font-size: 2.5rem;
-    color: var(--gray);
-    background: rgba(255, 255, 255, 0.03);
-}
-
-.film-body {
-    padding: 0.9rem 1rem 1.1rem;
-}
-
-.film-title {
-    margin: 0 0 0.35rem;
-    font-family: var(--font-display);
-    font-size: 1.05rem;
-    line-height: 1.25;
-    color: var(--text-bright);
-}
-
-.film-meta {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
+.films-quelle {
+    margin: 1rem 0 0;
+    text-align: right;
     font-family: var(--font-mono);
-    font-size: 0.72rem;
-    color: var(--text);
-    opacity: 0.75;
-}
-
-/* Sterne als ein Element: der gefuellte Anteil wird ueber --rating
-   prozentual freigestellt, damit halbe Wertungen exakt stimmen. */
-.film-stars {
-    --fill: calc(var(--rating, 0) / 5 * 100%);
-    font-size: 0.9rem;
-    letter-spacing: 0.08em;
-    background-image: linear-gradient(to right,
-        var(--primary) var(--fill), rgba(255, 255, 255, 0.18) var(--fill));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-}
-
-.film-stars::before { content: '★★★★★'; }
-
-/* Text faehrt beim Hover von unten ueber das Poster. */
-.film-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    gap: 0.6rem;
-    padding: 1rem;
-    background: linear-gradient(to top, rgba(5, 5, 5, 0.97) 55%, rgba(5, 5, 5, 0.65));
-    transform: translateY(101%);
-    transition: var(--transition);
-}
-
-.film-card:hover .film-overlay,
-.film-card:focus-within .film-overlay {
-    transform: translateY(0);
-}
-
-.film-text {
-    margin: 0;
-    font-size: 0.85rem;
-    line-height: 1.5;
-    color: var(--text);
-}
-
-.film-link {
-    font-family: var(--font-mono);
-    font-size: 0.65rem;
+    font-size: 0.68rem;
     text-transform: uppercase;
     letter-spacing: var(--mono-track);
-    color: var(--primary);
-    text-decoration: none;
 }
 
-.film-link:hover { color: var(--secondary); }
-
-/* --- Tagebuch --------------------------------------------------------- */
-
-.diary {
-    margin-top: clamp(2.5rem, 5vw, 4rem);
-    padding-top: clamp(1.5rem, 3vw, 2rem);
-    border-top: 1px solid var(--gray);
-}
-
-.diary-head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1.2rem;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: var(--mono-track);
-    color: var(--text);
-}
-
-.diary-head a {
+.films-quelle a {
     color: var(--primary);
     text-decoration: none;
     transition: var(--transition);
 }
 
-.diary-head a:hover { color: var(--secondary); }
-
-/* Waagerechter Streifen: scrollt statt umzubrechen, funktioniert
-   dadurch mit beliebig vielen Eintraegen. */
-.diary-strip {
-    display: flex;
-    gap: 0.8rem;
-    margin: 0;
-    padding: 0 0 0.8rem;
-    list-style: none;
-    overflow-x: auto;
-    scroll-snap-type: x proximity;
-    overscroll-behavior-x: contain;
-}
-
-.diary-item {
-    flex: 0 0 110px;
-    scroll-snap-align: start;
-}
-
-.diary-item a {
-    display: block;
-    text-decoration: none;
-    color: inherit;
-}
-
-.diary-item img,
-.diary-item .diary-fallback {
-    width: 100%;
-    aspect-ratio: 2 / 3;
-    object-fit: cover;
-    display: block;
-    border: 1px solid var(--gray);
-    border-radius: 4px;
-    transition: var(--transition);
-}
-
-.diary-item .diary-fallback {
-    display: grid;
-    place-items: center;
-    font-family: var(--font-display);
-    color: var(--gray);
-    background: rgba(255, 255, 255, 0.03);
-}
-
-.diary-item a:hover img { border-color: var(--primary); }
-
-.diary-name {
-    margin-top: 0.45rem;
-    font-size: 0.78rem;
-    line-height: 1.25;
-    color: var(--text-bright);
-}
-
-.diary-meta {
-    font-family: var(--font-mono);
-    font-size: 0.62rem;
-    color: var(--text);
-    opacity: 0.7;
-}
+.films-quelle a:hover { color: var(--secondary); }
 
 .films-attribution {
     margin: clamp(2rem, 4vw, 3rem) 0 0;
@@ -2756,12 +3062,6 @@ footer {
 }
 
 .films-attribution a { color: var(--primary); }
-
-@media (max-width: 600px) {
-    .films-grid {
-        grid-template-columns: repeat(auto-fill, minmax(min(140px, 100%), 1fr));
-    }
-}
 
 /* ==========================================================================
    WAS ICH BAUE (Projekte)

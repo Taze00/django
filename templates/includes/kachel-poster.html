@@ -1,0 +1,45 @@
+{% load film_text %}{% comment %}
+Poster-Kachel - Filme, Serien, Anime.
+
+Erwartet in `kachel`: titel, jahr, meine_wertung, poster_url,
+optional mein_text, letterboxd_slug, wo_zu_sehen, episoden, regie,
+stimmung, gattung.
+
+Der Beschreibungstext sitzt nicht mehr unter der Kachel, sondern faehrt
+beim Hover als Overlay ueber den unteren Teil des Posters. Gekuerzt auf
+zwei Saetze - der volle Text bleibt in den Daten.
+{% endcomment %}
+
+<article class="kachel kachel--poster"
+         data-eintrag
+         {% if kachel.gattung %}data-gattung="{{ kachel.gattung }}"{% endif %}
+         {% if kachel.stimmung %}data-stimmung="{{ kachel.stimmung }}"{% endif %}>
+
+    <div class="kachel-poster">
+        {% if kachel.poster_url %}
+        <img src="{{ kachel.poster_url }}" alt="Plakat: {{ kachel.titel }}" loading="lazy">
+        {% else %}
+        <span class="kachel-poster-fallback" aria-hidden="true">{{ kachel.titel|first }}</span>
+        {% endif %}
+
+        {% if kachel.mein_text %}
+        <div class="kachel-overlay">
+            <p class="kachel-text">{{ kachel.mein_text|kurzfassung }}</p>
+            {% if kachel.letterboxd_slug %}
+            <a class="kachel-link" href="https://letterboxd.com/film/{{ kachel.letterboxd_slug }}/" target="_blank" rel="noopener noreferrer">Auf Letterboxd &rarr;</a>
+            {% elif kachel.wo_zu_sehen %}
+            <span class="kachel-link">{{ kachel.wo_zu_sehen }}</span>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="kachel-body">
+        <h4 class="kachel-titel">{{ kachel.titel }}</h4>
+        <div class="kachel-meta">
+            <span class="kachel-sterne" aria-hidden="true" style="--rating: {{ kachel.meine_wertung }};"></span>
+            <span class="visually-hidden">{{ kachel.meine_wertung }} von 5 Sternen</span>
+            <span>{{ kachel.jahr }}</span>
+        </div>
+    </div>
+</article>

@@ -11,8 +11,13 @@ def index(request):
         kuratiert.get_serien(), id_feld='tmdb_tv_id', medium='tv'
     )
 
-    # Ein gemeinsames Raster; die Gattung steckt als data-Attribut an der
-    # Karte und wird clientseitig gefiltert.
+    # Jede Gattung bekommt ihr eigenes Regal, deshalb getrennte Listen
+    # statt eines gemeinsamen Rasters mit Gattungsfilter.
+    serien_only = [e for e in serien if e.get('gattung') == 'serie']
+    anime = [e for e in serien if e.get('gattung') == 'anime']
+
+    # `eintraege` steuert weiterhin, ob die Sektion ueberhaupt gerendert
+    # wird - ohne einen einzigen Eintrag bleibt sie ganz weg.
     eintraege = filme + serien
 
     # Faellt Letterboxd aus, ist das hier eine leere Liste und die
@@ -23,7 +28,14 @@ def index(request):
     return render(request, 'index.html', {
         'projekte': projekte.get_projekte(),
         'eintraege': eintraege,
-        'gattungen': kuratiert.get_gattungen(eintraege),
+        'filme': filme,
+        'serien': serien_only,
+        'anime': anime,
+        # Zaehler als fertiger Text - im Template waere das eine
+        # unleserliche Filterkette.
+        'filme_zaehler': f'{len(filme)} Filme',
+        'serien_zaehler': f'{len(serien_only)} Serien',
+        'anime_zaehler': f'{len(anime)} Titel',
         'stimmungen': kuratiert.get_stimmungen(filme),
         'tagebuch': tagebuch,
         'letterboxd_url': letterboxd.get_profile_url(),

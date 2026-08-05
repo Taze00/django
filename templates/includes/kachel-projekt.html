@@ -1,0 +1,44 @@
+{% comment %}
+Projekt-Kachel - "Was ich baue".
+
+Erwartet in `kachel`: name, url, kategorie, beschreibung, optional
+hat_bild/bild, status, tech (Liste).
+
+Gleicher Datensatz wie das bisherige Projekt-Raster, nur als Kachel
+gefasst. Die Beschreibung steht hier unter der Kachel, nicht im Overlay -
+Projekte haben kein Poster, das man verdecken koennte.
+{% endcomment %}
+{% load static %}
+
+<article class="kachel kachel--projekt">
+    <a class="kachel-link-flaeche" href="{{ kachel.url }}"{% if kachel.url != '/' %} rel="noopener"{% endif %}>
+        <div class="kachel-bild">
+            {% if kachel.hat_bild %}
+            <img src="{% static kachel.bild %}" alt="Vorschau: {{ kachel.name }}" loading="lazy">
+            {% else %}
+            {# Kein Bild hinterlegt - gestalteter Platzhalter statt Leerstelle. #}
+            <div class="kachel-fallback" aria-hidden="true">
+                <span class="kachel-fallback-name">{{ kachel.name }}</span>
+            </div>
+            {% endif %}
+
+            {% if kachel.status %}
+            <span class="kachel-status">{{ kachel.status }}</span>
+            {% endif %}
+        </div>
+
+        <div class="kachel-body">
+            <span class="kachel-kategorie">{{ kachel.kategorie }}</span>
+            <h4 class="kachel-titel">{{ kachel.name }}</h4>
+            <p class="kachel-beschreibung">{{ kachel.beschreibung }}</p>
+
+            {% if kachel.tech %}
+            <ul class="kachel-tech">
+                {% for technik in kachel.tech %}
+                <li class="kachel-pill">{{ technik }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    </a>
+</article>

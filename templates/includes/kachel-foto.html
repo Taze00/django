@@ -1,0 +1,28 @@
+{% comment %}
+Foto-Kachel - Galerie/Momente.
+
+Erwartet in `kachel`: bild (Static-Pfad) oder bild_url, optional titel,
+untertitel, alt.
+
+Bewusst schlicht: das Bild traegt, Text nur als leise Zeile darunter.
+{% endcomment %}
+{% load static %}
+
+<figure class="kachel kachel--foto">
+    <div class="kachel-bild">
+        {% if kachel.bild_url %}
+        <img src="{{ kachel.bild_url }}" alt="{{ kachel.alt|default:kachel.titel }}" loading="lazy">
+        {% elif kachel.bild %}
+        <img src="{% static kachel.bild %}" alt="{{ kachel.alt|default:kachel.titel }}" loading="lazy">
+        {% else %}
+        <span class="kachel-bild-fallback" aria-hidden="true"></span>
+        {% endif %}
+    </div>
+
+    {% if kachel.titel or kachel.untertitel %}
+    <figcaption class="kachel-body">
+        {% if kachel.titel %}<h4 class="kachel-titel">{{ kachel.titel }}</h4>{% endif %}
+        {% if kachel.untertitel %}<div class="kachel-meta"><span>{{ kachel.untertitel }}</span></div>{% endif %}
+    </figcaption>
+    {% endif %}
+</figure>

@@ -1,0 +1,29 @@
+{% comment %}
+Chronik-Kachel - Letterboxd-Tagebuch.
+
+Erwartet in `kachel`: titel, jahr, link, optional poster_url, bewertung.
+
+Flacher als die Poster-Kachel: kein Hover-Text, kein Overlay. Das
+Tagebuch ist eine Chronik, keine Empfehlung - es zaehlt auf, was zuletzt
+lief. Schmaler gesetzt ueber .regal--chronik.
+{% endcomment %}
+
+<article class="kachel kachel--chronik">
+    <a class="kachel-link-flaeche" href="{{ kachel.link }}" target="_blank" rel="noopener noreferrer">
+        <div class="kachel-poster">
+            {% if kachel.poster_url %}
+            <img src="{{ kachel.poster_url }}" alt="Plakat: {{ kachel.titel }}" loading="lazy">
+            {% else %}
+            <span class="kachel-poster-fallback" aria-hidden="true">{{ kachel.titel|first }}</span>
+            {% endif %}
+        </div>
+
+        <div class="kachel-body">
+            <h4 class="kachel-titel">{{ kachel.titel }}</h4>
+            <div class="kachel-meta">
+                <span>{{ kachel.jahr }}</span>
+                {% if kachel.bewertung %}<span>· {{ kachel.bewertung }}★</span>{% endif %}
+            </div>
+        </div>
+    </a>
+</article>

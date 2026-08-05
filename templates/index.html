@@ -9,7 +9,7 @@
     <link rel="icon" href="{% static 'css/images/favicon.ico' %}" type="image/x-icon">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" as="style">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20250224-23">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260805-1">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -176,95 +176,41 @@
 
             <p class="films-claim fade-in">Ich bewerte streng. Von <strong>204 Filmen</strong> haben drei fünf Sterne. Was hier über vier steht, meine ich ernst.</p>
 
-            {% if gattungen %}
-            {# Ebene 1: Gattung. Tauscht das Raster aus. #}
-            <div class="films-filter films-filter--gattung fade-in" role="group" aria-label="Nach Gattung filtern">
-                {% for wert, label in gattungen %}
-                <button type="button"
-                        class="films-chip{% if forloop.first %} is-active{% endif %}"
-                        data-gattung="{{ wert }}"
-                        aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}">{{ label }}</button>
-                {% endfor %}
-                <button type="button" class="films-shuffle" data-shuffle>Überrasch mich</button>
-            </div>
-            {% endif %}
-
             {% if stimmungen %}
-            {# Ebene 2: Stimmung. Nur sichtbar, solange "Filme" aktiv ist. #}
-            <div class="films-filter films-filter--stimmung fade-in" data-stimmung-zeile role="group" aria-label="Nach Stimmung filtern">
+            {# Wirkt nur auf das Filme-Regal - Serien und Anime haben keine
+               Stimmung hinterlegt. #}
+            <div class="films-filter films-filter--stimmung fade-in" role="group" aria-label="Filme nach Stimmung filtern">
                 <button type="button" class="films-chip is-active" data-stimmung="alle" aria-pressed="true">Alle</button>
                 {% for wert, label in stimmungen %}
                 <button type="button" class="films-chip" data-stimmung="{{ wert }}" aria-pressed="false">{{ label }}</button>
                 {% endfor %}
+                <button type="button" class="films-shuffle" data-shuffle>Überrasch mich</button>
             </div>
             {% endif %}
 
             {# Zufallstreffer von "Ueberrasch mich"; per JS befuellt. #}
             <div class="films-spotlight" data-spotlight hidden aria-live="polite"></div>
 
-            <ul class="films-grid" data-grid>
-                {% for eintrag in eintraege %}
-                <li class="film-card fade-in"
-                    data-eintrag
-                    data-gattung="{{ eintrag.gattung }}"
-                    {% if eintrag.stimmung %}data-stimmung="{{ eintrag.stimmung }}"{% endif %}>
-                    <div class="film-poster">
-                        {% if eintrag.poster_url %}
-                        <img src="{{ eintrag.poster_url }}" alt="Plakat: {{ eintrag.titel }}" loading="lazy">
-                        {% else %}
-                        <span class="film-poster-fallback" aria-hidden="true">{{ eintrag.titel|first }}</span>
-                        {% endif %}
-
-                        <div class="film-overlay">
-                            <p class="film-text">{{ eintrag.mein_text }}</p>
-                            {% if eintrag.letterboxd_slug %}
-                            <a class="film-link" href="https://letterboxd.com/film/{{ eintrag.letterboxd_slug }}/" target="_blank" rel="noopener noreferrer">Auf Letterboxd &rarr;</a>
-                            {% elif eintrag.wo_zu_sehen %}
-                            <span class="film-link">{{ eintrag.wo_zu_sehen }}</span>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <div class="film-body">
-                        <h3 class="film-title">{{ eintrag.titel }}</h3>
-                        <div class="film-meta">
-                            <span class="film-stars" aria-hidden="true" style="--rating: {{ eintrag.meine_wertung }};"></span>
-                            <span class="visually-hidden">{{ eintrag.meine_wertung }} von 5 Sternen</span>
-                            <span>{{ eintrag.jahr }}</span>
-                            {# Serien zeigen Episoden statt Laufzeit/Regie. #}
-                            {% if eintrag.episoden %}<span>· {{ eintrag.episoden }}</span>
-                            {% elif eintrag.regie %}<span>· {{ eintrag.regie }}</span>{% endif %}
-                        </div>
-                    </div>
-                </li>
-                {% endfor %}
-            </ul>
+            {% if filme %}
+            {% include "includes/regal.html" with titel="Filme" items=filme kachel_typ="poster" regal_id="filme" zaehler=filme_zaehler %}
+            {% endif %}
 
             <p class="films-empty" data-empty hidden>Zu dieser Auswahl ist noch nichts eingetragen.</p>
 
-            {% if tagebuch %}
-            <div class="diary fade-in">
-                <div class="diary-head">
-                    <span>Zuletzt im Tagebuch</span>
-                    <a href="{{ letterboxd_url }}" target="_blank" rel="noopener noreferrer">letterboxd.com/{{ letterboxd_user }} &rarr;</a>
-                </div>
+            {% if serien %}
+            {% include "includes/regal.html" with titel="Serien" items=serien kachel_typ="poster" regal_id="serien" zaehler=serien_zaehler %}
+            {% endif %}
 
-                <ul class="diary-strip">
-                    {% for eintrag in tagebuch %}
-                    <li class="diary-item">
-                        <a href="{{ eintrag.link }}" target="_blank" rel="noopener noreferrer">
-                            {% if eintrag.poster_url %}
-                            <img src="{{ eintrag.poster_url }}" alt="" loading="lazy">
-                            {% else %}
-                            <span class="diary-fallback" aria-hidden="true">{{ eintrag.titel|first }}</span>
-                            {% endif %}
-                            <div class="diary-name">{{ eintrag.titel }}</div>
-                            <div class="diary-meta">{{ eintrag.jahr }}{% if eintrag.bewertung %} · {{ eintrag.bewertung }}★{% endif %}</div>
-                        </a>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </div>
+            {% if anime %}
+            {% include "includes/regal.html" with titel="Anime" items=anime kachel_typ="poster" regal_id="anime" zaehler=anime_zaehler %}
+            {% endif %}
+
+            {% if tagebuch %}
+            {% include "includes/regal.html" with titel="Zuletzt gesehen" items=tagebuch kachel_typ="chronik" regal_id="tagebuch" regal_klasse="regal--chronik" %}
+
+            <p class="films-quelle">
+                <a href="{{ letterboxd_url }}" target="_blank" rel="noopener noreferrer">letterboxd.com/{{ letterboxd_user }} &rarr;</a>
+            </p>
             {% endif %}
 
             <p class="films-attribution">
@@ -310,6 +256,6 @@
     </footer>
 
     <script defer src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
-    <script defer src="{% static 'js/main.js' %}?v=20250224-23"></script>
+    <script defer src="{% static 'js/main.js' %}?v=20260805-1"></script>
 </body>
 </html>

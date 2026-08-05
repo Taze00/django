@@ -1342,84 +1342,174 @@ window.addEventListener('resize', () => {
     }
 });
 
-// ===== FILMSEKTION: FILTER =====
-// Zwei Ebenen: Gattung (Filme/Serien/Anime) tauscht das Raster aus,
-// Stimmung filtert innerhalb der Filme und ist nur dort sichtbar.
-// Alles clientseitig ueber data-Attribute - die Karten stehen bereits
-// serverseitig im Markup. Ohne JS bleibt die vollstaendige Liste stehen.
-(function initFilmFilter() {
+// ===== REGAL =====
+// Ein Initializer fuer alle Regale auf der Seite. Findet sie ueber
+// [data-regal] - jedes neue Regal im Markup ist damit automatisch
+// bedienbar, ohne dass hier etwas dazukommt.
+//
+// Ohne JS bleibt die Spur ein normaler Scroll-Container: Wischen und
+// Trackpad funktionieren weiter, nur die Pfeile fehlen (sie sind per
+// CSS unsichtbar, bis is-scrollbar gesetzt ist).
+(function initRegale() {
+    const regale = document.querySelectorAll('[data-regal]');
+    if (!regale.length) return;
+
+    // Toleranz gegen Subpixel-Rundung: ohne die wird das Ende bei
+    // fraktionalen Breiten nie ganz erreicht und der Pfeil bleibt stehen.
+    const RAND = 2;
+
+    regale.forEach(regal => {
+        const viewport = regal.querySelector('[data-regal-viewport]');
+        const spur = regal.querySelector('[data-regal-spur]');
+        if (!viewport || !spur) return;
+
+        const zurueck = regal.querySelector('[data-regal-prev]');
+        const weiter = regal.querySelector('[data-regal-next]');
+
+        function zustand() {
+            // Wie weit rechts kann ueberhaupt gescrollt werden.
+            const maximum = spur.scrollWidth - spur.clientWidth;
+            const scrollbar = maximum > RAND;
+
+            viewport.classList.toggle('is-scrollbar', scrollbar);
+            viewport.classList.toggle('is-am-anfang', spur.scrollLeft <= RAND);
+            // Passt alles rein, gilt das Regal auch als "am Ende" - dann
+            // faellt der Verlauf am rechten Rand weg.
+            viewport.classList.toggle(
+                'is-am-ende', !scrollbar || spur.scrollLeft >= maximum - RAND
+            );
+
+            // Die Pfeile sind unsichtbar, sollen aber auch nicht in der
+            // Tab-Reihenfolge liegen, solange sie nichts tun.
+            const amAnfang = viewport.classList.contains('is-am-anfang');
+            const amEnde = viewport.classList.contains('is-am-ende');
+            if (zurueck) zurueck.tabIndex = scrollbar && !amAnfang ? 0 : -1;
+            if (weiter) weiter.tabIndex = scrollbar && !amEnde ? 0 : -1;
+        }
+
+        // Eine Seite = sichtbare Breite minus eine Kachel, damit beim
+        // Blaettern ein Rest stehen bleibt und der Zusammenhang haelt.
+        function seite() {
+            const slot = spur.querySelector('.regal-slot');
+            const kachel = slot ? slot.getBoundingClientRect().width : 200;
+            return Math.max(spur.clientWidth - kachel, kachel);
+        }
+
+        function blaettern(richtung) {
+            spur.scrollBy({ left: richtung * seite(), behavior: 'smooth' });
+        }
+
+        if (zurueck) zurueck.addEventListener('click', () => blaettern(-1));
+        if (weiter) weiter.addEventListener('click', () => blaettern(1));
+
+        spur.addEventListener('scroll', zustand, { passive: true });
+
+        // Tastatur: die Spur ist fokussierbar, Pfeiltasten scrollen.
+        spur.addEventListener('keydown', ereignis => {
+            const tasten = {
+                ArrowRight: () => blaettern(1),
+                ArrowLeft: () => blaettern(-1),
+                Home: () => spur.scrollTo({ left: 0, behavior: 'smooth' }),
+                End: () => spur.scrollTo({ left: spur.scrollWidth, behavior: 'smooth' })
+            };
+
+            const aktion = tasten[ereignis.key];
+            if (!aktion) return;
+
+            ereignis.preventDefault();
+            aktion();
+        });
+
+        // Breitenaenderung (Fenster, spaet geladene Poster) kann aus einem
+        // scrollbaren Regal ein volles machen und umgekehrt.
+        if (typeof ResizeObserver === 'function') {
+            new ResizeObserver(zustand).observe(spur);
+        } else {
+            window.addEventListener('resize', zustand);
+        }
+
+        // Werden Slots ein- oder ausgeblendet, aendert sich scrollWidth,
+        // ohne dass die Spur selbst ihre Masse aendert - der
+        // ResizeObserver schweigt dann. Der Filter meldet sich deshalb
+        // hier selbst zurueck.
+        regal.addEventListener('regal:aktualisieren', zustand);
+
+        zustand();
+    });
+})();
+
+// ===== FILMSEKTION: STIMMUNGSFILTER =====
+// Die Gattungen sind jetzt eigene Regale - gefiltert wird nur noch nach
+// Stimmung, und zwar ausschliesslich im Filme-Regal. Serien und Anime
+// bleiben unberuehrt stehen.
+(function initStimmungsfilter() {
     const sektion = document.getElementById('filme');
     if (!sektion) return;
 
-    const karten = Array.from(sektion.querySelectorAll('[data-eintrag]'));
+    const filmRegal = sektion.querySelector('[data-regal="filme"]');
+    if (!filmRegal) return;
+
+    const karten = Array.from(filmRegal.querySelectorAll('[data-eintrag]'));
     if (!karten.length) return;
 
-    const gattungChips = Array.from(sektion.querySelectorAll('[data-gattung]'));
-    const stimmungChips = Array.from(sektion.querySelectorAll('[data-stimmung]'));
-    const stimmungZeile = sektion.querySelector('[data-stimmung-zeile]');
+    const spur = filmRegal.querySelector('[data-regal-spur]');
+    const chips = Array.from(sektion.querySelectorAll('[data-stimmung]'));
     const leer = sektion.querySelector('[data-empty]');
     const spotlight = sektion.querySelector('[data-spotlight]');
     const shuffleBtn = sektion.querySelector('[data-shuffle]');
 
-    let aktiveGattung = 'film';
     let aktiveStimmung = 'alle';
 
     function anwenden() {
         let sichtbar = 0;
 
         karten.forEach(karte => {
-            const gattungPasst = karte.dataset.gattung === aktiveGattung;
-            // Stimmung greift nur bei Filmen; Serien haben keine.
-            const stimmungPasst =
-                aktiveGattung !== 'film' ||
+            const zeigen =
                 aktiveStimmung === 'alle' ||
                 karte.dataset.stimmung === aktiveStimmung;
 
-            const zeigen = gattungPasst && stimmungPasst;
-            karte.hidden = !zeigen;
+            // Der Slot traegt die Breite - die Karte selbst zu verstecken
+            // wuerde eine leere Luecke in der Spur hinterlassen.
+            const slot = karte.closest('.regal-slot') || karte;
+            slot.hidden = !zeigen;
             if (zeigen) sichtbar++;
         });
 
-        // Stimmungsfilter nur bei Filmen anbieten.
-        if (stimmungZeile) stimmungZeile.hidden = aktiveGattung !== 'film';
-
         if (leer) leer.hidden = sichtbar > 0;
         if (spotlight) spotlight.hidden = true;
+
+        // Nach dem Filtern kann die Spur weiter rechts stehen, als es
+        // jetzt noch Inhalt gibt - dann waere das Regal scheinbar leer.
+        if (spur) spur.scrollLeft = 0;
+
+        // Weniger Kacheln koennen heissen: passt jetzt ohne Scrollen.
+        // Pfeile und Verlauf muessen das erfahren.
+        filmRegal.dispatchEvent(new CustomEvent('regal:aktualisieren'));
     }
 
-    function markiere(chips, attribut, wert) {
+    function markiere(wert) {
         chips.forEach(chip => {
-            const aktiv = chip.dataset[attribut] === wert;
+            const aktiv = chip.dataset.stimmung === wert;
             chip.classList.toggle('is-active', aktiv);
             chip.setAttribute('aria-pressed', String(aktiv));
         });
     }
 
-    gattungChips.forEach(chip => {
-        chip.addEventListener('click', () => {
-            aktiveGattung = chip.dataset.gattung;
-            // Beim Gattungswechsel die Stimmung zuruecksetzen, sonst
-            // filtert eine unsichtbare Auswahl weiter mit.
-            aktiveStimmung = 'alle';
-            markiere(gattungChips, 'gattung', aktiveGattung);
-            markiere(stimmungChips, 'stimmung', 'alle');
-            anwenden();
-        });
-    });
-
-    stimmungChips.forEach(chip => {
+    chips.forEach(chip => {
         chip.addEventListener('click', () => {
             aktiveStimmung = chip.dataset.stimmung;
-            markiere(stimmungChips, 'stimmung', aktiveStimmung);
+            markiere(aktiveStimmung);
             anwenden();
         });
     });
 
-    // Zufall nur aus den gerade sichtbaren Karten - beruecksichtigt
-    // damit automatisch die aktive Gattung.
+    // Zufall nur aus den gerade sichtbaren Filmen.
     if (shuffleBtn && spotlight) {
         shuffleBtn.addEventListener('click', () => {
-            const auswahl = karten.filter(k => !k.hidden);
+            const auswahl = karten.filter(k => {
+                const slot = k.closest('.regal-slot') || k;
+                return !slot.hidden;
+            });
             if (!auswahl.length) return;
 
             const treffer = auswahl[Math.floor(Math.random() * auswahl.length)];
@@ -1427,7 +1517,7 @@ window.addEventListener('resize', () => {
 
             const kopie = treffer.cloneNode(true);
             kopie.hidden = false;
-            kopie.classList.add('film-card--spotlight');
+            kopie.classList.add('kachel--spotlight');
             spotlight.appendChild(kopie);
             spotlight.hidden = false;
         });

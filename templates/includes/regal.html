@@ -1,0 +1,67 @@
+{% comment %}
+Regal - horizontal scrollbare Reihe von Kacheln.
+
+Wiederverwendbares Bauteil. Traegt ueber `kachel_typ` unterschiedliche
+Inhalte, das Scroll- und Tastaturverhalten bleibt gleich.
+
+    {% include "includes/regal.html" with titel="Filme" items=filme kachel_typ="poster" zaehler="204 Filme" regal_id="filme" %}
+
+Parameter:
+    titel       Pflicht. Mono, uppercase, linksbuendig.
+    items       Pflicht. Liste; jedes Element geht als `kachel` ins Include.
+    kachel_typ  Pflicht. poster | foto | projekt | chronik
+    untertitel  Optional. Leise Zeile unter dem Titel.
+    zaehler     Optional. Rechts in der Titelzeile ("204 Filme").
+    regal_id    Optional. Fuer aria-labelledby und data-regal-Wert.
+    regal_klasse Optional. Modifier, z.B. "regal--chronik".
+
+Masse kommen aus CSS-Variablen auf .regal und lassen sich pro Regal
+ueberschreiben (siehe REGAL-Block in styles.css).
+{% endcomment %}
+
+<section class="regal {{ regal_klasse }}"
+         data-regal="{{ regal_id|default:'' }}"
+         {% if regal_id %}aria-labelledby="regal-titel-{{ regal_id }}"{% endif %}>
+
+    <header class="regal-kopf">
+        <div class="regal-kopf-text">
+            <h3 class="regal-titel"{% if regal_id %} id="regal-titel-{{ regal_id }}"{% endif %}>{{ titel }}</h3>
+            {% if untertitel %}<p class="regal-untertitel">{{ untertitel }}</p>{% endif %}
+        </div>
+        {% if zaehler %}<span class="regal-zaehler">{{ zaehler }}</span>{% endif %}
+    </header>
+
+    {# Der Verlauf am rechten Rand haengt am Viewport, nicht an der Spur -
+       er soll beim Scrollen stehen bleiben. #}
+    <div class="regal-viewport" data-regal-viewport>
+
+        <button type="button" class="regal-pfeil regal-pfeil--links"
+                data-regal-prev aria-label="{{ titel }}: zurueck blaettern" tabindex="-1">
+            <i class="fas fa-chevron-left" aria-hidden="true"></i>
+        </button>
+
+        {# tabindex=0: die Spur ist selbst fokussierbar, damit Pfeiltasten
+           ohne Maus funktionieren. #}
+        <ul class="regal-spur"
+            data-regal-spur
+            tabindex="0"
+            role="group"
+            aria-label="{{ titel }} - horizontal scrollbare Reihe, mit den Pfeiltasten bedienbar">
+            {% for kachel in items %}
+            <li class="regal-slot">
+                {% if kachel_typ == "poster" %}{% include "includes/kachel-poster.html" %}
+                {% elif kachel_typ == "foto" %}{% include "includes/kachel-foto.html" %}
+                {% elif kachel_typ == "projekt" %}{% include "includes/kachel-projekt.html" %}
+                {% elif kachel_typ == "chronik" %}{% include "includes/kachel-chronik.html" %}
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+
+        <button type="button" class="regal-pfeil regal-pfeil--rechts"
+                data-regal-next aria-label="{{ titel }}: weiter blaettern" tabindex="-1">
+            <i class="fas fa-chevron-right" aria-hidden="true"></i>
+        </button>
+
+    </div>
+</section>
