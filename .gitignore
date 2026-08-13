@@ -44,3 +44,6 @@ static/css/images/gallery/
 # Fitness app (auto-generated)
 static/fitness/
 staticfiles/
+
+# Design-Audit: generierte Screenshots (tools/shots.py)
+screenshots/
