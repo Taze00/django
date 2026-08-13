@@ -2482,6 +2482,10 @@ footer {
     --regal-abstand: 1.1rem;
     --regal-radius: var(--film-radius, 8px);
 
+    /* Seitliche Luft in der Spur, damit die wachsende erste und letzte
+       Kachel nicht am Rand beschnitten wird. */
+    --regal-seitenluft: calc((var(--regal-hover-skalierung) - 1) * var(--regal-kachel-breite) / 2);
+
     /* Hover: wie stark die Kachel anwaechst. */
     --regal-hover-skalierung: 1.08;
     --regal-hover-hub: -6px;
@@ -2585,8 +2589,12 @@ footer {
     display: flex;
     gap: var(--regal-abstand);
     margin: 0;
-    /* Die vertikale Luft ist Pflicht, siehe Kopfkommentar. */
-    padding: var(--regal-luft) 0;
+    /* Vertikal ist die Luft Pflicht (siehe Kopfkommentar). Seitlich
+       schafft sie Platz fuer die wachsende erste/letzte Kachel.
+       Wichtig als padding, nicht als Flex-Spacer: ein Spacer waere ein
+       Flex-Item und verschiebt den Startwert von scrollLeft - genau
+       daran haben Pfeile und Verlauf vorher falsch gerechnet. */
+    padding: var(--regal-luft) var(--regal-seitenluft);
     list-style: none;
     overflow-x: auto;
     overflow-y: hidden;
@@ -2595,16 +2603,6 @@ footer {
     overscroll-behavior-x: contain;
     /* Scrollbar ausblenden - gescrollt wird per Wisch, Pfeil oder Taste. */
     scrollbar-width: none;
-}
-
-/* Die Kachel waechst auch zur Seite. Ohne diese Randstuecke wuerde die
-   erste bzw. letzte Kachel beim Hover am Containerrand abgeschnitten;
-   als ::before/::after statt padding, damit scroll-snap sauber auf der
-   ersten Kachel einrastet. */
-.regal-spur::before,
-.regal-spur::after {
-    content: '';
-    flex: 0 0 calc((var(--regal-hover-skalierung) - 1) * var(--regal-kachel-breite) / 2);
 }
 
 .regal-spur::-webkit-scrollbar { display: none; }
