@@ -374,12 +374,18 @@ html.intro-laeuft .hero-skyline {
     overflow: hidden;
 
     /* Abstand von der rechten Kante des Containers bis zum Fensterrand.
-       Genau so weit laeuft das Foto aus der Sektion heraus - eine der
+       So weit koennte das Foto aus der Sektion herauslaufen - eine der
        wenigen Stellen, an denen die Seite ihre Box verlaesst.
        Die Werte spiegeln .container (90%, max 1300px, Innenabstand).
        100vw zaehlt die Scrollleiste mit; die paar Pixel zuviel schneidet
        das overflow:hidden der Sektion weg, ohne Querscrollen. */
     --about-bleed: calc((100vw - min(90vw, 1300px)) / 2 + clamp(1rem, 3vw, 2rem));
+
+    /* ...es laeuft aber nicht die ganze Strecke. Klebte das Foto am
+       Fensterrand, sah es abgeschnitten aus statt herausragend - der
+       Ueberhang liest sich erst als Absicht, wenn hinter ihm noch Rand
+       steht. Dieser Reststreifen bleibt frei. */
+    --about-rand: clamp(1rem, 2.5vw, 2.5rem);
 }
 
 .about-pattern {
@@ -476,14 +482,16 @@ html.intro-laeuft .hero-skyline {
 
 .about-image {
     position: relative;
-    /* Laeuft rechts aus dem Container heraus bis an den Fensterrand. */
-    margin-right: calc(var(--about-bleed) * -1);
-    border-radius: 4px 0 0 4px;
+    /* Laeuft rechts aus dem Container heraus - bis kurz vor den
+       Fensterrand, nicht bis an ihn heran. */
+    margin-right: calc((var(--about-bleed) - var(--about-rand)) * -1);
+    /* Der Rahmen laeuft jetzt rundherum: die rechte Kante steht frei im
+       Bild, statt an der Fensterkante abgeschnitten zu werden. */
+    border-radius: 4px;
     overflow: hidden;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     aspect-ratio: 5 / 6;
     border: 1px solid rgba(0, 217, 255, 0.1);
-    border-right: none;
 }
 
 /* Unter 1100px wird die dritte Spalte so schmal, dass Eckdaten und
@@ -505,7 +513,7 @@ html.intro-laeuft .hero-skyline {
         justify-self: end;
         /* Der Ueberhang gehoert zur Breite dazu, sonst rutscht das Foto
            auf dem Handy nur nach rechts, statt breiter zu werden. */
-        width: calc(min(100%, 26rem) + var(--about-bleed));
+        width: calc(min(100%, 26rem) + var(--about-bleed) - var(--about-rand));
     }
 
     /* Nebeneinander statt untereinander, solange die Breite da ist -
