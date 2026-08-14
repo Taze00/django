@@ -127,7 +127,7 @@
                 </div>
                 <div class="hero-cta">
                     <a href="#filme" class="btn">Filme</a>
-                    <a href="#clubs" class="btn btn-outline">Berlin</a>
+                    <a href="#berlin" class="btn btn-outline">Berlin</a>
                 </div>
             </div>
         </div>
@@ -182,116 +182,12 @@
         </div>
     </section>
 
-    <!-- Was ich baue -->
-    {% if projekte %}
-    <section id="projekte" class="projects-section">
-        <div class="container">
-            <div class="sektion-kopf">
-                {% include "includes/sektion-meta.html" with nummer="02" titel="Was ich baue" zusatz=projekte|length|stringformat:"s"|add:" Projekte" %}
-                <p class="sektion-einleitung">Zwei Sachen, die ich wirklich gebaut habe und die laufen – der Rest war Übung und ist es nicht wert, hier zu stehen.</p>
-            </div>
-
-            <div class="projects-grid">
-                {% for projekt in projekte %}
-                <article class="project-card{% if projekt.breit %} project-card--wide{% endif %} fade-in">
-                    <a class="project-link" href="{{ projekt.url }}"{% if projekt.url != '/' %} rel="noopener"{% endif %}>
-                        <div class="project-media">
-                            {% if projekt.hat_bild %}
-                            <img src="{% static projekt.bild %}" alt="Vorschau: {{ projekt.name }}" loading="lazy">
-                            {% else %}
-                            {# Kein Bild hinterlegt - gestalteter Platzhalter statt Leerstelle. #}
-                            <div class="project-fallback" aria-hidden="true">
-                                <span class="project-fallback-name">{{ projekt.name }}</span>
-                            </div>
-                            {% endif %}
-
-                            {% if projekt.status %}
-                            <span class="project-status">{{ projekt.status }}</span>
-                            {% endif %}
-                        </div>
-
-                        <div class="project-body">
-                            <span class="project-cat">{{ projekt.kategorie }}</span>
-                            <h3 class="project-name">{{ projekt.name }}</h3>
-                            <p class="project-desc">{{ projekt.beschreibung }}</p>
-
-                            {% if projekt.tech %}
-                            <ul class="project-tech">
-                                {% for technik in projekt.tech %}
-                                <li class="project-pill">{{ technik }}</li>
-                                {% endfor %}
-                            </ul>
-                            {% endif %}
-                        </div>
-                    </a>
-                </article>
-                {% endfor %}
-            </div>
-        </div>
-    </section>
-    {% endif %}
-
-    <!-- Club Ranking Section -->
-    <section id="clubs" class="club-ranking">
-        <div class="club-pattern"></div>
-        <div class="container club-container">
-            <div class="sektion-kopf">
-                {% include "includes/sektion-meta.html" with nummer="03" titel="Clubs" zusatz="Berlin" %}
-                <p class="sektion-einleitung">Meine persönliche Bewertung der besten Clubs in Berlin, basierend auf Atmosphäre, Sound und Lineup</p>
-            </div>
-
-            <div class="ranking-grid" id="ranking-grid">
-                <!-- Club cards will be added via JavaScript -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Gallery Section -->
-    <section id="gallery" class="gallery">
-        <div class="gallery-pattern"></div>
-        <div class="container gallery-container">
-            <div class="sektion-kopf">
-                {% include "includes/sektion-meta.html" with nummer="04" titel="Momente" zusatz="17 Bilder" %}
-                <p class="sektion-einleitung">Erkunde meine besten Erinnerungen aus Berlin</p>
-            </div>
-
-            <div class="gallery-grid" id="gallery-grid">
-                <!-- Gallery items will be inserted here by JavaScript -->
-            </div>
-
-            <!-- Carousel Navigation (hidden by default) -->
-            <div class="carousel-nav" id="carousel-nav" style="display: none;">
-                <button class="carousel-prev" id="carousel-prev" aria-label="Vorheriges Bild">
-                    <i class="fas fa-chevron-left"></i>
-                </button>
-                <button class="carousel-next" id="carousel-next" aria-label="Nächstes Bild">
-                    <i class="fas fa-chevron-right"></i>
-                </button>
-            </div>
-        </div>
-    </section>
-
-    <!-- Improved Modal -->
-    <div class="improved-modal" id="improved-modal">
-        <div class="improved-modal-content">
-            <button class="improved-modal-close" id="improved-modal-close" aria-label="Schließen">&times;</button>
-            <img class="improved-modal-media" id="improved-modal-media" alt="">
-            <button class="improved-modal-navigation improved-modal-prev" id="improved-modal-prev" aria-label="Vorheriges Bild">
-                <i class="fas fa-chevron-left"></i>
-            </button>
-            <button class="improved-modal-navigation improved-modal-next" id="improved-modal-next" aria-label="Nächstes Bild">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-            <div class="improved-modal-counter" id="improved-modal-counter">1 / 13</div>
-        </div>
-    </div>
-
     <!-- Filmempfehlungen -->
     {% if eintraege %}
     <section id="filme" class="films-section">
         <div class="container">
             <div class="sektion-kopf">
-                {% include "includes/sektion-meta.html" with nummer="05" titel="Filme" zusatz=statistik.gesehen|stringformat:"s"|add:" gesehen" %}
+                {% include "includes/sektion-meta.html" with nummer="02" titel="Filme" zusatz=statistik.gesehen|stringformat:"s"|add:" gesehen" %}
             </div>
 
             <p class="films-claim fade-in">Ich bewerte streng. Von <strong>{{ statistik.gesehen }} Filmen</strong> haben <strong>{{ statistik.volle_wertung }}</strong> die volle Wertung bekommen. Schnitt: {{ statistik.schnitt_kurz }}.</p>
@@ -405,11 +301,116 @@
     </section>
     {% endif %}
 
+    {% comment %}
+    Sektion BERLIN - Clubs und Momente gehoeren zusammen: dieselben
+    Abende, einmal als Wertung, einmal als Bild. Die Anker #clubs und
+    #gallery bleiben als Sprungziele im Inneren erhalten, damit alte
+    Links und Lesezeichen weiter treffen.
+    {% endcomment %}
+    <section id="berlin" class="berlin">
+        <div class="club-pattern"></div>
+        <div class="container berlin-container">
+            <div class="sektion-kopf">
+                {% include "includes/sektion-meta.html" with nummer="03" titel="Berlin" zusatz="Clubs &amp; Momente" %}
+                <p class="sektion-schlagzeile">Wochenenden, die ich bewerte wie Filme.</p>
+                <p class="sektion-einleitung">Sechs Clubs, 17 Abende, ein Handy voller Beweise.</p>
+            </div>
+
+            <div id="clubs" class="berlin-clubs">
+                <div class="ranking-grid" id="ranking-grid">
+                    <!-- Club cards will be added via JavaScript -->
+                </div>
+            </div>
+
+            <div id="gallery" class="berlin-momente">
+                <p class="berlin-marke">Die Abende dazu</p>
+
+                <div class="gallery-grid" id="gallery-grid">
+                    <!-- Gallery items will be inserted here by JavaScript -->
+                </div>
+
+                <!-- Carousel Navigation (hidden by default) -->
+                <div class="carousel-nav" id="carousel-nav" style="display: none;">
+                    <button class="carousel-prev" id="carousel-prev" aria-label="Vorheriges Bild">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="carousel-next" id="carousel-next" aria-label="Nächstes Bild">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Improved Modal -->
+    <div class="improved-modal" id="improved-modal">
+        <div class="improved-modal-content">
+            <button class="improved-modal-close" id="improved-modal-close" aria-label="Schließen">&times;</button>
+            <img class="improved-modal-media" id="improved-modal-media" alt="">
+            <button class="improved-modal-navigation improved-modal-prev" id="improved-modal-prev" aria-label="Vorheriges Bild">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="improved-modal-navigation improved-modal-next" id="improved-modal-next" aria-label="Nächstes Bild">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+            <div class="improved-modal-counter" id="improved-modal-counter">1 / 13</div>
+        </div>
+    </div>
+
+    <!-- Was ich baue -->
+    {% if projekte %}
+    <section id="projekte" class="projects-section">
+        <div class="container">
+            <div class="sektion-kopf">
+                {% include "includes/sektion-meta.html" with nummer="04" titel="Was ich baue" zusatz=projekte|length|stringformat:"s"|add:" Projekte" %}
+                <p class="sektion-einleitung">Zwei Sachen, die ich wirklich gebaut habe und die laufen – der Rest war Übung und ist es nicht wert, hier zu stehen.</p>
+            </div>
+
+            <div class="projects-grid">
+                {% for projekt in projekte %}
+                <article class="project-card{% if projekt.breit %} project-card--wide{% endif %} fade-in">
+                    <a class="project-link" href="{{ projekt.url }}"{% if projekt.url != '/' %} rel="noopener"{% endif %}>
+                        <div class="project-media">
+                            {% if projekt.hat_bild %}
+                            <img src="{% static projekt.bild %}" alt="Vorschau: {{ projekt.name }}" loading="lazy">
+                            {% else %}
+                            {# Kein Bild hinterlegt - gestalteter Platzhalter statt Leerstelle. #}
+                            <div class="project-fallback" aria-hidden="true">
+                                <span class="project-fallback-name">{{ projekt.name }}</span>
+                            </div>
+                            {% endif %}
+
+                            {% if projekt.status %}
+                            <span class="project-status">{{ projekt.status }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="project-body">
+                            <span class="project-cat">{{ projekt.kategorie }}</span>
+                            <h3 class="project-name">{{ projekt.name }}</h3>
+                            <p class="project-desc">{{ projekt.beschreibung }}</p>
+
+                            {% if projekt.tech %}
+                            <ul class="project-tech">
+                                {% for technik in projekt.tech %}
+                                <li class="project-pill">{{ technik }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </div>
+                    </a>
+                </article>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+
     <!-- Footer -->
     <footer id="contact">
         <div class="container">
             <div class="footer-content fade-in">
-                {% include "includes/sektion-meta.html" with nummer="06" titel="Kontakt" %}
+                {% include "includes/sektion-meta.html" with nummer="05" titel="Kontakt" %}
                 <p>Lass uns in Verbindung bleiben oder tausche dich mit mir über die Berliner Clubszene aus.</p>
                 <div class="social-links">
                     <a href="https://www.instagram.com/a_.volkmann/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram">
