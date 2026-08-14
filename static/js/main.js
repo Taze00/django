@@ -1525,3 +1525,115 @@ window.addEventListener('resize', () => {
 
     anwenden();
 })();
+
+
+// ===== SEITENKOPF: NAVIGATION =====
+// Drei Aufgaben: Hintergrund ab dem Scrollen, Burger unter 768px und
+// Hervorhebung des Abschnitts, in dem man gerade steht.
+//
+// Bewusst ohne Framework-Markup - die Nav haengt nur an data-Attributen
+// im Template und an den bereits vorhandenen Sektions-IDs.
+(function initSeitenkopf() {
+    const kopf = document.querySelector('[data-kopf]');
+    if (!kopf) return;
+
+    const nav = kopf.querySelector('[data-nav]');
+    const burger = kopf.querySelector('[data-burger]');
+    const links = Array.from(kopf.querySelectorAll('[data-nav-link]'));
+
+    // --- Hintergrund ---------------------------------------------------
+    // Ueber dem Hero transparent, danach dunkel. 40px, damit schon die
+    // erste Mausraddrehung umschaltet.
+    const SCHWELLE = 40;
+
+    function kopfZustand() {
+        kopf.classList.toggle('is-gescrollt', window.scrollY > SCHWELLE);
+    }
+
+    window.addEventListener('scroll', kopfZustand, { passive: true });
+    kopfZustand();
+
+    // --- Burger --------------------------------------------------------
+    function menue(offen) {
+        if (!nav || !burger) return;
+        nav.classList.toggle('is-offen', offen);
+        // Der Balken deckt mit, solange das Panel offen steht.
+        kopf.classList.toggle('is-menue-offen', offen);
+        burger.setAttribute('aria-expanded', String(offen));
+        burger.setAttribute('aria-label', offen ? 'Menü schließen' : 'Menü öffnen');
+    }
+
+    if (burger && nav) {
+        burger.addEventListener('click', () => {
+            menue(!nav.classList.contains('is-offen'));
+        });
+
+        // Nach dem Sprung soll das Panel nicht offen ueber dem Ziel stehen.
+        links.forEach(link => link.addEventListener('click', () => menue(false)));
+
+        document.addEventListener('keydown', ereignis => {
+            if (ereignis.key === 'Escape') menue(false);
+        });
+    }
+
+    // --- Aktiver Abschnitt ---------------------------------------------
+    const ziele = links
+        .map(link => {
+            const id = link.getAttribute('href');
+            return { link, sektion: id && id.startsWith('#') ? document.querySelector(id) : null };
+        })
+        .filter(ziel => ziel.sektion);
+
+    if (!ziele.length || typeof IntersectionObserver !== 'function') return;
+
+    // Aktiv ist der Abschnitt, der gerade den groessten Teil des
+    // Viewports fuellt - nicht der, der ein schmales Band beruehrt.
+    //
+    // Ein Band scheitert an zwei Stellen: Nach einem Ankersprung liegt
+    // die Zielsektion wegen scroll-margin-top bei 88px, waehrend die
+    // Vorgaengersektion mit ein paar Pixeln noch ins Band ragt und
+    // faelschlich aktiv bleibt. Und der Footer ist so kurz, dass er am
+    // Seitenende gar nicht erst bis ins Band hochreicht.
+    //
+    // Der sichtbare Anteil hat beide Faelle von selbst richtig.
+    const anteil = new Map();
+
+    function markiere() {
+        let treffer = null;
+        let groesster = 0;
+
+        // Dokumentreihenfolge entscheidet bei Gleichstand.
+        ziele.forEach(ziel => {
+            const hoehe = anteil.get(ziel.sektion) || 0;
+            if (hoehe > groesster) {
+                groesster = hoehe;
+                treffer = ziel;
+            }
+        });
+
+        ziele.forEach(ziel => {
+            const aktiv = ziel === treffer;
+            ziel.link.classList.toggle('is-aktiv', aktiv);
+            if (aktiv) {
+                ziel.link.setAttribute('aria-current', 'true');
+            } else {
+                ziel.link.removeAttribute('aria-current');
+            }
+        });
+    }
+
+    // Der Kopf verdeckt die obersten 72px - die zaehlen nicht als sichtbar.
+    // Viele Schwellen, damit auch Abschnitte, die laenger sind als der
+    // Viewport, beim Scrollen regelmaessig neu melden.
+    const beobachter = new IntersectionObserver(eintraege => {
+        eintraege.forEach(eintrag => {
+            anteil.set(eintrag.target, eintrag.isIntersecting ? eintrag.intersectionRect.height : 0);
+        });
+        markiere();
+    }, {
+        rootMargin: '-72px 0px 0px 0px',
+        threshold: Array.from({ length: 21 }, (unused, i) => i / 20)
+    });
+
+    ziele.forEach(ziel => beobachter.observe(ziel.sektion));
+})();

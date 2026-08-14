@@ -958,7 +958,12 @@ footer {
         text-align: center;
     }
 
-    header {
+    /* Die alte Navigation der Impressum-Seite (#header) bleibt auf Mobil
+       ausgeblendet - ihr Burger haengt an JS, das es hier nicht mehr gibt.
+       Vorher stand hier ein pauschales `header { display: none }`. Das traf
+       aber jedes <header>: auch die Regal-Titel (includes/regal.html) und
+       jetzt den neuen Seitenkopf. Deshalb auf die ID eingegrenzt. */
+    #header {
         display: none !important;
     }
 
@@ -2641,8 +2646,14 @@ footer {
                 border-color 0.25s ease, background 0.25s ease;
 }
 
-.regal-pfeil--links  { left: calc(var(--regal-pfeil-groesse) / -2); }
-.regal-pfeil--rechts { right: calc(var(--regal-pfeil-groesse) / -2); }
+/* Die Pfeile liegen komplett ausserhalb der Spur, nicht halb darueber.
+   Vorher (-Groesse/2 = -20px) sass der linke Pfeil bei 84-124px, die
+   erste Kachel beginnt bei 104px - 20px Ueberlappung auf dem Poster.
+   Platz dafuer ist der Aussenrand des Containers: bei 1440px liegen
+   104px zwischen Viewport- und Inhaltskante, bei 769px noch 61px.
+   Darunter greift die Regel am Ende des Blocks und blendet sie aus. */
+.regal-pfeil--links  { left: calc((var(--regal-pfeil-groesse) + 0.5rem) * -1); }
+.regal-pfeil--rechts { right: calc((var(--regal-pfeil-groesse) + 0.5rem) * -1); }
 
 .regal-pfeil:hover,
 .regal-pfeil:focus-visible {
@@ -2661,8 +2672,10 @@ footer {
 }
 
 /* Auf Touch reicht Wischen. Pfeile ganz weg, damit sie keine Kachel
-   verdecken. */
-@media (hover: none) {
+   verdecken. Unter 768px zusaetzlich unabhaengig vom Eingabegeraet:
+   dort ist der Aussenrand des Containers zu schmal, die Pfeile wuerden
+   aus dem Viewport ragen. */
+@media (hover: none), (max-width: 768px) {
     .regal-pfeil { display: none; }
 }
 
@@ -3287,4 +3300,264 @@ footer {
 @media (max-width: 480px) {
     .project-body { padding: 1.2rem 1.2rem 1.4rem; }
     .project-media { height: 170px; }
+}
+
+
+/* ==========================================================================
+   SEITENKOPF - fixierte Hauptnavigation
+   --------------------------------------------------------------------------
+   Vorher hatte die Seite gar keine Navigation: 9400px Laenge, und der
+   einzige Sprung zwischen Sektionen waren zwei Hero-Buttons und die
+   Footer-Links.
+
+   Aufbau: .seitenkopf ist fix am oberen Rand und traegt keinen eigenen
+   Hintergrund, solange man im Hero steht. Ab 40px Scroll setzt main.js
+   .is-gescrollt und der Balken wird dunkel mit backdrop-filter.
+
+   Die linke Kante: .seitenkopf-innen ist ein .container - dieselben
+   Masse wie der Hero-Inhalt. Das Logo sitzt damit ohne Sonderregel auf
+   derselben Kante wie die Hero-Headline.
+   ========================================================================== */
+
+.seitenkopf {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    border-bottom: 1px solid transparent;
+    transition: background 0.3s ease, backdrop-filter 0.3s ease,
+                border-color 0.3s ease;
+}
+
+.seitenkopf.is-gescrollt {
+    background: rgba(5, 5, 5, 0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Bei offenem Mobilmenue muss auch der Balken selbst decken - sonst
+   steht ein transparenter Streifen ueber einem deckenden Panel. */
+.seitenkopf.is-menue-offen {
+    background: var(--darker);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border-bottom-color: transparent;
+}
+
+.seitenkopf-innen {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    height: 72px;
+}
+
+.seitenkopf-logo {
+    font-family: var(--font-display);
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    color: var(--text-bright);
+    white-space: nowrap;
+}
+
+.seitenkopf-logo:hover {
+    color: var(--primary);
+}
+
+/* --- Linkliste -------------------------------------------------------- */
+
+.hauptnav-liste {
+    display: flex;
+    align-items: center;
+    gap: clamp(1rem, 2.2vw, 2rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* Mono/uppercase wie die uebrigen Meta-Zeilen der Seite
+   (.regal-titel, .project-cat) - die Nav fuegt keine neue Schriftrolle ein. */
+.hauptnav-link {
+    position: relative;
+    display: block;
+    padding: 0.4rem 0;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+    color: var(--text);
+    white-space: nowrap;
+}
+
+.hauptnav-link:hover,
+.hauptnav-link:focus-visible {
+    color: var(--text-bright);
+}
+
+/* Der Balken liegt immer da, nur unsichtbar - so springt beim Wechsel
+   des aktiven Abschnitts nichts in der Hoehe. */
+.hauptnav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: var(--primary);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s ease;
+}
+
+.hauptnav-link.is-aktiv {
+    color: var(--primary);
+}
+
+.hauptnav-link.is-aktiv::after {
+    transform: scaleX(1);
+}
+
+/* --- Burger ----------------------------------------------------------- */
+
+.seitenkopf-burger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+
+.seitenkopf-burger-strich {
+    display: block;
+    width: 24px;
+    height: 2px;
+    margin: 0 auto;
+    background: var(--text-bright);
+    border-radius: 2px;
+    transition: transform 0.25s ease, opacity 0.2s ease;
+}
+
+/* Offen: aus den drei Strichen wird ein X. */
+.seitenkopf-burger[aria-expanded="true"] .seitenkopf-burger-strich:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.seitenkopf-burger[aria-expanded="true"] .seitenkopf-burger-strich:nth-child(2) {
+    opacity: 0;
+}
+
+.seitenkopf-burger[aria-expanded="true"] .seitenkopf-burger-strich:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+/* --- Sprunglink ------------------------------------------------------- */
+
+.skip-link {
+    position: absolute;
+    top: -100px;
+    left: 1rem;
+    z-index: 1100;
+    padding: 0.7rem 1.1rem;
+    background: var(--primary);
+    color: var(--darker);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+    border-radius: 4px;
+    transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+    top: 1rem;
+    color: var(--darker);
+}
+
+/* --- Ankersprung ------------------------------------------------------ */
+
+/* Ohne das verschwindet der Sektionskopf beim Ankersprung unter dem
+   fixierten Balken. 72px Kopfhoehe plus Luft. */
+section[id],
+footer[id] {
+    scroll-margin-top: 88px;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .hauptnav-link::after,
+    .seitenkopf-burger-strich { transition: none; }
+}
+
+/* --- Mobil ------------------------------------------------------------ */
+
+@media (max-width: 768px) {
+    .seitenkopf-innen {
+        height: 64px;
+    }
+
+    .seitenkopf-burger {
+        display: flex;
+    }
+
+    /* Aufklappendes Panel unter dem Balken. display statt Transform:
+       geschlossen soll die Liste weder Platz belegen noch fokussierbar
+       sein.
+
+       Deckend, nicht transluzent: mit rgba(5,5,5,0.97) plus
+       backdrop-filter schienen Fotos und Kartenkanten sichtbar durch die
+       Liste - ueber der Galerie wird das unlesbar. Ein Menue verdeckt. */
+    .hauptnav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--darker);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .hauptnav.is-offen {
+        display: block;
+    }
+
+    .hauptnav-liste {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0;
+        padding: 0.5rem clamp(1rem, 3vw, 2rem) 1.25rem;
+    }
+
+    .hauptnav-link {
+        padding: 0.95rem 0;
+        font-size: 0.8rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .hauptnav-liste li:last-child .hauptnav-link {
+        border-bottom: 0;
+    }
+
+    /* Der Unterstrich ergibt in der Liste keinen Sinn - dort markiert
+       die Farbe allein den aktiven Abschnitt. */
+    .hauptnav-link::after {
+        display: none;
+    }
+
+    section[id],
+    footer[id] {
+        scroll-margin-top: 78px;
+    }
 }

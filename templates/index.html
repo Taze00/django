@@ -9,12 +9,45 @@
     <link rel="icon" href="{% static 'css/images/favicon.ico' %}" type="image/x-icon">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" as="style">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260805-2">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260814-1">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
+    <a class="skip-link" href="#about">Zum Inhalt springen</a>
+
+    {% comment %}
+    Fixierte Hauptnavigation. Liegt ueber dem Hero und wird erst beim
+    Scrollen dunkel (Klasse is-gescrollt, siehe main.js). Der Logo-Text
+    steht im selben .container wie der Hero-Inhalt und sitzt damit exakt
+    auf dessen linker Kante.
+    {% endcomment %}
+    <header class="seitenkopf" data-kopf>
+        <div class="container seitenkopf-innen">
+            <a class="seitenkopf-logo" href="#home">Alex Volkmann</a>
+
+            <button type="button" class="seitenkopf-burger" data-burger
+                    aria-expanded="false" aria-controls="hauptnavigation"
+                    aria-label="Menü öffnen">
+                <span class="seitenkopf-burger-strich"></span>
+                <span class="seitenkopf-burger-strich"></span>
+                <span class="seitenkopf-burger-strich"></span>
+            </button>
+
+            <nav class="hauptnav" id="hauptnavigation" data-nav aria-label="Hauptnavigation">
+                <ul class="hauptnav-liste">
+                    <li><a class="hauptnav-link" data-nav-link href="#about">Über mich</a></li>
+                    <li><a class="hauptnav-link" data-nav-link href="#projekte">Projekte</a></li>
+                    <li><a class="hauptnav-link" data-nav-link href="#clubs">Clubs</a></li>
+                    <li><a class="hauptnav-link" data-nav-link href="#gallery">Momente</a></li>
+                    <li><a class="hauptnav-link" data-nav-link href="#filme">Filme</a></li>
+                    <li><a class="hauptnav-link" data-nav-link href="#contact">Kontakt</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
     <!-- Hero Section -->
     <section id="home" class="hero">
         <div class="hero-bg" id="three-bg"></div>
@@ -255,6 +288,6 @@
     </footer>
 
     <script defer src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
-    <script defer src="{% static 'js/main.js' %}?v=20260805-2"></script>
+    <script defer src="{% static 'js/main.js' %}?v=20260814-1"></script>
 </body>
 </html>
