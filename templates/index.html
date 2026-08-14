@@ -22,10 +22,15 @@
     Der Vorhang liegt ueber allem und sperrt das Scrollen. Klemmt er,
     ist die Seite unerreichbar. Das Netz dagegen steht deshalb hier und
     nicht in main.js: es greift auch dann, wenn main.js gar nicht laedt,
-    einen Syntaxfehler hat oder die Aufraeum-Funktion wirft. Nach drei
+    einen Syntaxfehler hat oder die Aufraeum-Funktion wirft. Nach 3,5
     Sekunden raeumt es notfalls selbst auf - die DOM-Schritte laufen
     ausserhalb des try, damit ein Fehler in introBeenden() sie nicht
     verschluckt.
+
+    3500 und nicht 3000: das Intro selbst braucht rund 2,35s und ist auf
+    einer langsamen Verbindung erst nach 2,9s durch. Bei 3000 haette das
+    Netz regelmaessig ein gesundes Intro angeschnitten, statt einen
+    haengenden Vorhang abzufangen - wofuer es da ist.
     {% endcomment %}
     <script>
     (function () {
@@ -63,7 +68,7 @@
             try {
                 document.dispatchEvent(new CustomEvent('intro:fertig'));
             } catch (e) {}
-        }, 3000);
+        }, 3500);
     })();
     </script>
 </head>
