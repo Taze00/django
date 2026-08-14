@@ -265,8 +265,9 @@ html.intro-laeuft .hero-skyline {
 }
 
 /* --- Namenszug ---------------------------------------------------------
-   ALEX klein und gesperrt, VOLKMANN gross und eng darunter: der
-   Groessensprung traegt den Hero, nicht ein Satz. */
+   ALEX gross und eng, VOLKMANN klein und gesperrt darunter: der
+   Groessensprung traegt den Hero, nicht ein Satz. Der Rufname fuehrt -
+   ein turmhoher Nachname war mehr Plakat als Vorstellung. */
 .hero-name {
     margin: 0;
     line-height: 1;
@@ -279,22 +280,22 @@ html.intro-laeuft .hero-skyline {
 }
 
 .hero-vorname {
-    font-size: clamp(1rem, 2.2vw, 1.6rem);
-    font-weight: 500;
-    letter-spacing: 0.14em;
-    color: var(--text);
-    opacity: 0.7;
-}
-
-.hero-nachname {
-    /* Der Zeilenabstand haelt VOLKMANN direkt unter ALEX; die
-       Sperrung von ALEX schiebt sonst optisch auseinander. */
-    margin-top: 0.15em;
     font-size: clamp(3rem, 11vw, 8rem);
     font-weight: 700;
     letter-spacing: -0.035em;
     line-height: 0.95;
     color: var(--text-bright);
+}
+
+.hero-nachname {
+    /* Die Sperrung haengt rechts hinter dem letzten Buchstaben ein
+       Leerfeld an - links steht die Zeile trotzdem auf der Kante. */
+    margin-top: 0.6em;
+    font-size: clamp(0.95rem, 2vw, 1.35rem);
+    font-weight: 500;
+    letter-spacing: 0.42em;
+    color: var(--text);
+    opacity: 0.7;
 }
 
 /* Die Buchstaben muessen einzeln animierbar sein, duerfen aber wie
@@ -4221,10 +4222,10 @@ html.intro-laeuft .intro.is-faehrt-weg {
    Normalzustand - auch dann, wenn das Sicherheitsnetz geraeumt hat und
    sonst niemand mehr aufraeumt.
 
-   Die Reihenfolge steht hier im CSS, nicht in main.js: ALEX, dann die
-   Buchstaben von VOLKMANN einzeln, dann der Strich, die drei Metazeilen
+   Die Reihenfolge steht hier im CSS, nicht in main.js: die Buchstaben
+   von ALEX einzeln, dann VOLKMANN, dann der Strich, die Metazeilen
    und zuletzt die Buttons. */
-html.intro-laeuft .hero-vorname,
+html.intro-laeuft .hero-nachname,
 html.intro-laeuft .hero-meta-zeile,
 html.intro-laeuft .hero-cta {
     opacity: 0;
@@ -4242,7 +4243,7 @@ html.intro-laeuft .hero-strich {
     opacity: 0;
 }
 
-html.intro-laeuft .hero-content.is-eingefahren .hero-vorname,
+html.intro-laeuft .hero-content.is-eingefahren .hero-nachname,
 html.intro-laeuft .hero-content.is-eingefahren .hero-meta-zeile,
 html.intro-laeuft .hero-content.is-eingefahren .hero-cta {
     opacity: 1;
@@ -4261,6 +4262,12 @@ html.intro-laeuft .hero-content.is-eingefahren .hero-buchstabe {
     transition: opacity 0.55s ease var(--hero-verzug),
                 transform 0.65s cubic-bezier(0.22, 0.61, 0.36, 1) var(--hero-verzug),
                 filter 0.55s ease var(--hero-verzug);
+}
+
+/* VOLKMANN erst, wenn ALEX ausbuchstabiert ist - der letzte Buchstabe
+   startet bei 280ms. */
+html.intro-laeuft .hero-content.is-eingefahren .hero-nachname {
+    --hero-verzug: 430ms;
 }
 
 /* Der Strich waechst von links auf seine 54px - Breite statt
@@ -4291,7 +4298,7 @@ html.intro-laeuft .hero-content.is-eingefahren .hero-cta {
     }
 
     /* Alles steht sofort da, und die Skyline steht still. */
-    html.intro-laeuft .hero-vorname,
+    html.intro-laeuft .hero-nachname,
     html.intro-laeuft .hero-buchstabe,
     html.intro-laeuft .hero-meta-zeile,
     html.intro-laeuft .hero-cta {

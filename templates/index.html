@@ -111,19 +111,21 @@
 
         <div class="container">
             <div class="hero-content fade-in">
-                {% comment %}VOLKMANN steht Buchstabe fuer Buchstabe im
-                Markup, damit jeder einzeln einfahren kann - wie im Intro.
-                Vorgelesen wird trotzdem das ganze Wort (aria-label), nicht
-                die Buchstabenkette.{% endcomment %}
+                {% comment %}ALEX traegt den Hero und steht deshalb Buchstabe
+                fuer Buchstabe im Markup, damit jeder einzeln einfahren kann -
+                wie im Intro. Die Buchstabenkette ist fuer Screenreader
+                ausgeblendet, daneben steht das Wort einmal am Stueck: ein
+                aria-label an einem schlichten <span> wird nicht von jedem
+                Vorleseprogramm beachtet.{% endcomment %}
                 <h1 class="hero-name">
-                    <span class="hero-vorname">Alex</span>
-                    <span class="hero-nachname" aria-label="Volkmann"><span class="hero-buchstabe" style="--i:0" aria-hidden="true">V</span><span class="hero-buchstabe" style="--i:1" aria-hidden="true">o</span><span class="hero-buchstabe" style="--i:2" aria-hidden="true">l</span><span class="hero-buchstabe" style="--i:3" aria-hidden="true">k</span><span class="hero-buchstabe" style="--i:4" aria-hidden="true">m</span><span class="hero-buchstabe" style="--i:5" aria-hidden="true">a</span><span class="hero-buchstabe" style="--i:6" aria-hidden="true">n</span><span class="hero-buchstabe" style="--i:7" aria-hidden="true">n</span></span>
+                    <span class="visually-hidden">Alex Volkmann</span>
+                    <span class="hero-vorname" aria-hidden="true"><span class="hero-buchstabe" style="--i:0">A</span><span class="hero-buchstabe" style="--i:1">l</span><span class="hero-buchstabe" style="--i:2">e</span><span class="hero-buchstabe" style="--i:3">x</span></span>
+                    <span class="hero-nachname" aria-hidden="true">Volkmann</span>
                 </h1>
                 <div class="hero-strich" aria-hidden="true"></div>
                 <div class="hero-meta">
                     <p class="hero-meta-zeile" style="--i:0">Werder, Brandenburg</p>
-                    <p class="hero-meta-zeile" style="--i:1">Berlin am Wochenende</p>
-                    <p class="hero-meta-zeile" style="--i:2">B.Sc. Wirtschaftsinformatik</p>
+                    <p class="hero-meta-zeile" style="--i:1">B.Sc. Wirtschaftsinformatik</p>
                 </div>
                 <div class="hero-cta">
                     <a href="#filme" class="btn">Filme</a>
