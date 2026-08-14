@@ -3194,7 +3194,11 @@ footer {
     list-style: none;
 }
 
-.project-pill {
+/* Gemeinsam mit .skills-chip: die Skills unter den Karten sollen
+   dieselben Chips sein, nicht bloss aehnliche. Eine Regel fuer beide,
+   damit sie nicht auseinanderlaufen, wenn eine davon angefasst wird. */
+.project-pill,
+.skills-chip {
     padding: 0.28rem 0.7rem;
     border: 1px solid var(--gray);
     border-radius: 999px;
@@ -3254,6 +3258,58 @@ footer {
 @media (max-width: 480px) {
     .project-body { padding: 1.2rem 1.2rem 1.4rem; }
     .project-media { height: 170px; }
+}
+
+/* --- Skills ------------------------------------------------------------
+   Unter den Projektkarten, im selben Behaelter - kein eigener
+   Sektionskopf: das ist keine zweite Sektion, sondern die zweite
+   Haelfte derselben Antwort auf "was ich baue".
+
+   Bewusst nur Nennung: keine Balken, keine Prozente, keine Logos. Ein
+   Balken auf 70% behauptet eine Genauigkeit, die es bei
+   Selbsteinschaetzung nicht gibt, und Tech-Logos ziehen mehr
+   Aufmerksamkeit auf sich als die Namen daneben. */
+.skills-block {
+    display: grid;
+    gap: clamp(1.6rem, 3vw, 2.2rem);
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+    padding-top: clamp(2rem, 4vw, 2.8rem);
+    border-top: 1px solid rgba(0, 217, 255, 0.12);
+}
+
+/* Die Gruppenmarke im Ton der Sektions-Metazeilen: Monospace, klein,
+   gesperrt, Grossbuchstaben. Kleiner und gedeckter als die Metazeile
+   der Sektion selbst - sie ordnet sich ihr unter. */
+.skills-marke {
+    margin: 0 0 0.85rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: var(--mono-track);
+    line-height: 1.5;
+    text-transform: uppercase;
+    color: var(--primary);
+    opacity: 0.75;
+}
+
+.skills-liste {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.skills-chip:hover {
+    border-color: rgba(0, 217, 255, 0.35);
+    color: var(--text-bright);
+}
+
+@media (max-width: 480px) {
+    .skills-marke {
+        font-size: 0.66rem;
+    }
 }
 
 

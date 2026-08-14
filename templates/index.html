@@ -422,7 +422,12 @@
     <section id="projekte" class="projects-section">
         <div class="container">
             <div class="sektion-kopf">
-                {% include "includes/sektion-meta.html" with nummer="04" titel="Was ich baue" zusatz=projekte|length|stringformat:"s"|add:" Projekte" %}
+                {% comment %}
+                Kein Projektzaehler mehr im Zusatz: unter den Karten steht
+                jetzt der Skills-Block, die Zahl beschriebe also nur noch
+                die halbe Sektion.
+                {% endcomment %}
+                {% include "includes/sektion-meta.html" with nummer="04" titel="Was ich baue" zusatz="Projekte und Skills" %}
                 <p class="sektion-einleitung">Zwei Sachen, die ich wirklich gebaut habe und die laufen – der Rest war Übung und ist es nicht wert, hier zu stehen.</p>
             </div>
 
@@ -462,6 +467,27 @@
                 </article>
                 {% endfor %}
             </div>
+
+            {% comment %}
+            Skills unter den Karten: nur Nennung, keine Niveaus. Die Chips
+            tragen bewusst dieselbe Optik wie die Tech-Pills in den
+            Projektkarten darueber - beides sind Techniken, das soll als
+            ein Block lesbar sein.
+            {% endcomment %}
+            {% if skills %}
+            <div class="skills-block">
+                {% for gruppe in skills %}
+                <div class="skills-gruppe">
+                    <h3 class="skills-marke">{{ gruppe.marke }}</h3>
+                    <ul class="skills-liste">
+                        {% for eintrag in gruppe.eintraege %}
+                        <li class="skills-chip">{{ eintrag }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
         </div>
     </section>
     {% endif %}

@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.shortcuts import render
 
-from films import kuratiert, letterboxd, projekte, statistik, tmdb
+from films import kuratiert, letterboxd, projekte, skills, statistik, tmdb
 from films.models import Film, normalisiere
 
 
@@ -40,6 +40,7 @@ def index(request):
 
     return render(request, 'index.html', {
         'projekte': projekte.get_projekte(),
+        'skills': skills.get_skills(),
         'statistik': statistik.hole_statistik(),
         'empfehlungen': empfehlungen,
         # Zaehler als fertiger Text - im Template waere das eine
