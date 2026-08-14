@@ -180,17 +180,84 @@
         </div>
     </section>
 
-    <!-- Filmempfehlungen -->
-    {% if eintraege %}
+    {% comment %}Die Sektion steht, sobald irgendeiner der drei Bloecke
+    Inhalt hat. Frueher hing sie an `eintraege` (kuratierte Filme plus
+    Serien) - mit dem Umzug von Serien und Anime waere sie ganz
+    verschwunden, sobald filme.json fehlt, obwohl Empfehlungen und
+    Tagebuch aus der Datenbank kommen und da waeren.{% endcomment %}
+    {% if filme or empfehlungen or tagebuch %}
     <section id="filme" class="films-section">
         <div class="container">
             <div class="sektion-kopf">
                 {% include "includes/sektion-meta.html" with nummer="02" titel="Filme" zusatz=statistik.gesehen|stringformat:"s"|add:" gesehen" %}
             </div>
 
+            {% comment %}
+            ------------------------------------------------------------
+            BLOCK 1 - MEINE FUENF
+            Der schwerste Block: Neonschild, ein Satz, fuenf grosse
+            Poster. Das sind die einzigen Filme mit eigenen Texten.
+            ------------------------------------------------------------
+            {% endcomment %}
+            {% if filme %}
+            <div class="filmblock filmblock--fuenf">
+                {% comment %}Kein <h2>: die Metazeile der Sektion ist bereits
+                die Ueberschrift. Das Schild traegt das optische Gewicht,
+                die Gliederung soll nicht doppelt zaehlen.{% endcomment %}
+                <h3 class="neonschild">Meine <span class="neonschild-zahl">Fünf</span></h3>
+
+                <p class="fuenf-satz">
+                    Von {{ statistik.gesehen }} Filmen haben genau
+                    {{ statistik.volle_wertung }} die volle Wertung.
+                    Schnitt: {{ statistik.schnitt_kurz }}.
+                </p>
+
+                {% include "includes/regal.html" with titel="Meine Fünf" items=filme kachel_typ="poster" regal_id="filme" regal_klasse="regal--kern regal--neon" kopf_aus=True %}
+            </div>
+            {% endif %}
+
+            {% comment %}
+            ------------------------------------------------------------
+            BLOCK 2 - EMPFEHLUNGEN
+            Leichter als Block 1: kleinere Kacheln, keine Texte, nur
+            eine Marke in Monospace. Alles ab 3,5 ausser den fuenf.
+            ------------------------------------------------------------
+            {% endcomment %}
+            {% if empfehlungen %}
+            <div class="filmblock filmblock--empfehlungen">
+                <div class="filmblock-kopf">
+                    <h3 class="filmblock-marke">Empfehlungen <span class="filmblock-trenner" aria-hidden="true">—</span> {{ empfehlungen_zaehler }}</h3>
+                </div>
+
+                {% include "includes/regal.html" with titel="Empfehlungen" items=empfehlungen kachel_typ="poster" regal_id="empfehlungen" regal_klasse="regal--empfehlungen" kopf_aus=True %}
+            </div>
+            {% endif %}
+
+            {# Serien und Anime standen hier - sie stehen jetzt auf /filme/. #}
+
+            {% comment %}
+            ------------------------------------------------------------
+            BLOCK 3 - ZULETZT GESEHEN
+            Das Laufband aus Letterboxd, unveraendert - nur mit den
+            kleinsten Kacheln der Sektion. Es ist Chronik, keine
+            Empfehlung: was hier steht, steht hier, weil ich es gesehen
+            habe, nicht weil es gut war.
+            ------------------------------------------------------------
+            {% endcomment %}
+            {% if tagebuch %}
+            <div class="filmblock filmblock--chronik">
+                {% include "includes/regal.html" with titel="Zuletzt gesehen" items=tagebuch kachel_typ="chronik" regal_id="tagebuch" regal_klasse="regal--chronik" %}
+
+                <p class="films-quelle">
+                    <a href="{{ letterboxd_url }}" target="_blank" rel="noopener noreferrer">letterboxd.com/{{ letterboxd_user }} &rarr;</a>
+                </p>
+            </div>
+            {% endif %}
+
+            {% comment %}Noch lose: Satz, Verteilung und Suche. Der
+            Abschlusskasten fasst sie im naechsten Schritt zusammen.{% endcomment %}
             <p class="films-claim fade-in">Ich bewerte streng. Von <strong>{{ statistik.gesehen }} Filmen</strong> haben <strong>{{ statistik.volle_wertung }}</strong> die volle Wertung bekommen. Schnitt: {{ statistik.schnitt_kurz }}.</p>
 
-            {# Belegt den Satz darueber - deshalb steht sie direkt darunter. #}
             {% include "includes/wertungsverteilung.html" %}
 
             {% comment %}
@@ -239,44 +306,6 @@
                 <p class="filmsuche-leer" data-filmsuche-leer hidden aria-live="polite"></p>
             </div>
 
-            {% if stimmungen %}
-            {% comment %}Wirkt nur auf das Filme-Regal - Serien und Anime haben keine Stimmung hinterlegt.{% endcomment %}
-            <div class="films-filter films-filter--stimmung fade-in" role="group" aria-label="Filme nach Stimmung filtern">
-                <button type="button" class="films-chip is-active" data-stimmung="alle" aria-pressed="true">Alle</button>
-                {% for wert, label in stimmungen %}
-                <button type="button" class="films-chip" data-stimmung="{{ wert }}" aria-pressed="false">{{ label }}</button>
-                {% endfor %}
-                <button type="button" class="films-shuffle" data-shuffle>Überrasch mich</button>
-            </div>
-            {% endif %}
-
-            {# Zufallstreffer von "Ueberrasch mich"; per JS befuellt. #}
-            <div class="films-spotlight" data-spotlight hidden aria-live="polite"></div>
-
-            {% if filme %}
-            {% include "includes/regal.html" with titel="Filme" items=filme kachel_typ="poster" regal_id="filme" zaehler=filme_zaehler regal_klasse="regal--kern" %}
-            {% endif %}
-
-            {% if empfehlungen %}
-            {% comment %}Alles ab 4.0 aus dem Letterboxd-Bestand, absteigend.
-            Gleiche Kacheln wie Serien und Anime - die fuenf oben bleiben die
-            mit Text.{% endcomment %}
-            {% include "includes/regal.html" with titel="Wenn du was suchen willst" items=empfehlungen kachel_typ="poster" regal_id="empfehlungen" zaehler=empfehlungen_zaehler %}
-            {% endif %}
-
-            <p class="films-empty" data-empty hidden>Zu dieser Auswahl ist noch nichts eingetragen.</p>
-
-            {% comment %}Serien und Anime standen hier als zwei weitere
-            Posterreihen. Sie sind auf /filme/ gezogen - dort gehoeren sie
-            zum Bestand, hier streckten sie nur die Sektion.{% endcomment %}
-
-            {% if tagebuch %}
-            {% include "includes/regal.html" with titel="Zuletzt gesehen" items=tagebuch kachel_typ="chronik" regal_id="tagebuch" regal_klasse="regal--chronik" %}
-
-            <p class="films-quelle">
-                <a href="{{ letterboxd_url }}" target="_blank" rel="noopener noreferrer">letterboxd.com/{{ letterboxd_user }} &rarr;</a>
-            </p>
-            {% endif %}
 
             {% comment %}Abschluss der Sektion: von der kuratierten Auswahl
             zum ganzen Bestand.{% endcomment %}

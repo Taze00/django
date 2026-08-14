@@ -14,6 +14,12 @@ Parameter:
     zaehler     Optional. Rechts in der Titelzeile ("204 Filme").
     regal_id    Optional. Fuer aria-labelledby und data-regal-Wert.
     regal_klasse Optional. Modifier, z.B. "regal--chronik".
+    kopf_aus    Optional. Laesst die Titelzeile weg - fuer Bloecke, die
+                schon eine eigene Kopfzeile mitbringen (etwa mit einem
+                Knopf daneben, den dieses Bauteil nicht kennt). `titel`
+                bleibt Pflicht: er wird dann zum aria-label der Sektion,
+                damit die Reihe benannt bleibt, auch wenn nichts mehr
+                sichtbar ueber ihr steht.
 
 Masse kommen aus CSS-Variablen auf .regal und lassen sich pro Regal
 ueberschreiben (siehe REGAL-Block in styles.css).
@@ -21,8 +27,9 @@ ueberschreiben (siehe REGAL-Block in styles.css).
 
 <section class="regal {{ regal_klasse }}"
          data-regal="{{ regal_id|default:'' }}"
-         {% if regal_id %}aria-labelledby="regal-titel-{{ regal_id }}"{% endif %}>
+         {% if kopf_aus %}aria-label="{{ titel }}"{% elif regal_id %}aria-labelledby="regal-titel-{{ regal_id }}"{% endif %}>
 
+    {% if not kopf_aus %}
     <header class="regal-kopf">
         <div class="regal-kopf-text">
             <h3 class="regal-titel"{% if regal_id %} id="regal-titel-{{ regal_id }}"{% endif %}>{{ titel }}</h3>
@@ -30,6 +37,7 @@ ueberschreiben (siehe REGAL-Block in styles.css).
         </div>
         {% if zaehler %}<span class="regal-zaehler">{{ zaehler }}</span>{% endif %}
     </header>
+    {% endif %}
 
     {% comment %}Der Verlauf am rechten Rand haengt am Viewport, nicht an der Spur - er soll beim Scrollen stehen bleiben.{% endcomment %}
     <div class="regal-viewport" data-regal-viewport>

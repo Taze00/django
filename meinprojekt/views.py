@@ -47,7 +47,6 @@ def index(request):
         'empfehlungen_zaehler': f'{len(empfehlungen)} Filme ab 3,5',
         'filme': filme,
         'filme_zaehler': f'{len(filme)} Filme',
-        'stimmungen': kuratiert.get_stimmungen(filme),
         'tagebuch': tagebuch,
         'letterboxd_url': letterboxd.get_profile_url(),
         'letterboxd_user': settings.LETTERBOXD_USERNAME,

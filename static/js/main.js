@@ -934,93 +934,12 @@ window.galleryItems = galleryItems;
     });
 })();
 
-// ===== FILMSEKTION: STIMMUNGSFILTER =====
-// Die Gattungen sind jetzt eigene Regale - gefiltert wird nur noch nach
-// Stimmung, und zwar ausschliesslich im Filme-Regal. Serien und Anime
-// bleiben unberuehrt stehen.
-(function initStimmungsfilter() {
-    const sektion = document.getElementById('filme');
-    if (!sektion) return;
-
-    const filmRegal = sektion.querySelector('[data-regal="filme"]');
-    if (!filmRegal) return;
-
-    const karten = Array.from(filmRegal.querySelectorAll('[data-eintrag]'));
-    if (!karten.length) return;
-
-    const spur = filmRegal.querySelector('[data-regal-spur]');
-    const chips = Array.from(sektion.querySelectorAll('[data-stimmung]'));
-    const leer = sektion.querySelector('[data-empty]');
-    const spotlight = sektion.querySelector('[data-spotlight]');
-    const shuffleBtn = sektion.querySelector('[data-shuffle]');
-
-    let aktiveStimmung = 'alle';
-
-    function anwenden() {
-        let sichtbar = 0;
-
-        karten.forEach(karte => {
-            const zeigen =
-                aktiveStimmung === 'alle' ||
-                karte.dataset.stimmung === aktiveStimmung;
-
-            // Der Slot traegt die Breite - die Karte selbst zu verstecken
-            // wuerde eine leere Luecke in der Spur hinterlassen.
-            const slot = karte.closest('.regal-slot') || karte;
-            slot.hidden = !zeigen;
-            if (zeigen) sichtbar++;
-        });
-
-        if (leer) leer.hidden = sichtbar > 0;
-        if (spotlight) spotlight.hidden = true;
-
-        // Nach dem Filtern kann die Spur weiter rechts stehen, als es
-        // jetzt noch Inhalt gibt - dann waere das Regal scheinbar leer.
-        if (spur) spur.scrollLeft = 0;
-
-        // Weniger Kacheln koennen heissen: passt jetzt ohne Scrollen.
-        // Pfeile und Verlauf muessen das erfahren.
-        filmRegal.dispatchEvent(new CustomEvent('regal:aktualisieren'));
-    }
-
-    function markiere(wert) {
-        chips.forEach(chip => {
-            const aktiv = chip.dataset.stimmung === wert;
-            chip.classList.toggle('is-active', aktiv);
-            chip.setAttribute('aria-pressed', String(aktiv));
-        });
-    }
-
-    chips.forEach(chip => {
-        chip.addEventListener('click', () => {
-            aktiveStimmung = chip.dataset.stimmung;
-            markiere(aktiveStimmung);
-            anwenden();
-        });
-    });
-
-    // Zufall nur aus den gerade sichtbaren Filmen.
-    if (shuffleBtn && spotlight) {
-        shuffleBtn.addEventListener('click', () => {
-            const auswahl = karten.filter(k => {
-                const slot = k.closest('.regal-slot') || k;
-                return !slot.hidden;
-            });
-            if (!auswahl.length) return;
-
-            const treffer = auswahl[Math.floor(Math.random() * auswahl.length)];
-            spotlight.replaceChildren();
-
-            const kopie = treffer.cloneNode(true);
-            kopie.hidden = false;
-            kopie.classList.add('kachel--spotlight');
-            spotlight.appendChild(kopie);
-            spotlight.hidden = false;
-        });
-    }
-
-    anwenden();
-})();
+// ===== FILMSEKTION =====
+// Der Stimmungsfilter stand hier: vier Chips, die die fuenf kuratierten
+// Filme nach Stimmung aussortierten. Bei fuenf Filmen filterte er von
+// fuenf auf ein oder zwei - eine Bedienung, die weniger zeigte als das
+// Nichtstun. Mit dem Umbau auf vier Bloecke ist er weg; "Ueberrasch
+// mich" ist geblieben und sitzt jetzt bei den Empfehlungen.
 
 
 // ===== SEITENKOPF: NAVIGATION =====

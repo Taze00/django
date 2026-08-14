@@ -2154,6 +2154,79 @@ footer {
 }
 
 /* ==========================================================================
+   FILMSEKTION - vier Bloecke mit absteigendem Gewicht
+   ==========================================================================
+   Frueher neun Bloecke nebeneinander: Satz, Verteilung, Suche, Chips,
+   fuenf Regale. Alle gleich laut, keiner erklaerte den naechsten - man
+   scrollte durch Posterreihen und wusste bei keiner, was sie soll.
+
+   Jetzt vier, und das Gewicht faellt von oben nach unten. Die
+   Kachelbreite traegt diese Ordnung mit und ist deshalb der wichtigste
+   Wert hier: 240 - 165 - 130. Wer sie aendert, aendert die Hierarchie.
+   ========================================================================== */
+
+.filmblock {
+    margin-bottom: clamp(3.5rem, 7vw, 5.5rem);
+}
+
+.filmblock:last-child { margin-bottom: 0; }
+
+/* --- Block 1: Meine Fuenf --------------------------------------------- */
+
+/* 240px: bei 1440px Fensterbreite stehen damit alle fuenf nebeneinander,
+   ohne dass die Spur scrollen muss - der Container misst dort 1300px,
+   fuenf Kacheln plus vier Abstaende brauchen 1270px. Darunter wird die
+   Reihe scrollbar wie jedes andere Regal. */
+.regal--kern {
+    --regal-kachel-breite: 240px;
+}
+
+.fuenf-satz {
+    max-width: 46ch;
+    margin: 1.4rem 0 clamp(1.75rem, 3.5vw, 2.5rem);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--text);
+    opacity: 0.85;
+}
+
+/* --- Block 2: Empfehlungen -------------------------------------------- */
+
+/* Deutlich kleiner als die fuenf: der Abstand in der Groesse ist die
+   Aussage. Diese Filme sind gut, aber sie haben keinen eigenen Text. */
+.regal--empfehlungen {
+    --regal-kachel-breite: 165px;
+    --regal-abstand: 0.9rem;
+}
+
+/* Kopfzeile mit Platz fuer den Knopf rechts. Das Regal-Bauteil bringt
+   seine eigene Titelzeile nicht mit (kopf_aus) - es kennt keinen
+   Knopf. */
+.filmblock-kopf {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: clamp(1.25rem, 2.5vw, 1.75rem);
+}
+
+.filmblock-marke {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: var(--mono-track);
+    text-transform: uppercase;
+    color: var(--text-bright);
+}
+
+.filmblock-trenner {
+    opacity: 0.4;
+}
+
+
+/* ==========================================================================
    PROGRAMMKINO - Neonrahmen und Leuchtschrift
    ==========================================================================
    Die gestalterische Klammer der Filmsektion. Die Seite ist ohnehin
@@ -3602,12 +3675,10 @@ html.lenis body {
 
 /* --- Kernregal: die Filme mit eigenem Text ----------------------------- */
 
-/* Die fuenf Filme sind der Kern der Sektion. Groessere Kacheln als
-   Serien und Anime, damit die Reihe sich abhebt und der Text im Overlay
-   Platz hat, ohne gekuerzt zu werden. */
-.regal--kern {
-    --regal-kachel-breite: 260px;
-}
+/* Die Breite von .regal--kern steht jetzt oben im Block "FILMSEKTION",
+   zusammen mit den beiden anderen Kachelbreiten - die drei Werte sind
+   die Hierarchie der Sektion und gehoeren nebeneinander. Hier stand
+   dieselbe Regel mit 260px ein zweites Mal und gewann als spaetere. */
 
 /* Kleiner Hinweis, dass hinter der Kachel ein Text steckt. Auf Touch
    gibt es kein Hover - ohne die Marke waere nicht erkennbar, dass hier
