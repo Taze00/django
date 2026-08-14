@@ -214,10 +214,13 @@
     <section id="filme" class="films-section">
         <div class="container">
             <div class="sektion-kopf">
-                {% include "includes/sektion-meta.html" with nummer="05" titel="Filme" zusatz="204 gesehen" %}
+                {% include "includes/sektion-meta.html" with nummer="05" titel="Filme" zusatz=statistik.gesehen|stringformat:"s"|add:" gesehen" %}
             </div>
 
-            <p class="films-claim fade-in">Ich bewerte streng. Von <strong>204 Filmen</strong> haben drei fünf Sterne. Was hier über vier steht, meine ich ernst.</p>
+            <p class="films-claim fade-in">Ich bewerte streng. Von <strong>{{ statistik.gesehen }} Filmen</strong> haben <strong>{{ statistik.volle_wertung }}</strong> die volle Wertung bekommen. Schnitt: {{ statistik.schnitt_kurz }}.</p>
+
+            {# Belegt den Satz darueber - deshalb steht sie direkt darunter. #}
+            {% include "includes/wertungsverteilung.html" %}
 
             {% comment %}
             Filmsuche. Der Index wird einmal von /api/filme/index.json geholt,
@@ -272,6 +275,13 @@
 
             {% if filme %}
             {% include "includes/regal.html" with titel="Filme" items=filme kachel_typ="poster" regal_id="filme" zaehler=filme_zaehler regal_klasse="regal--kern" %}
+            {% endif %}
+
+            {% if empfehlungen %}
+            {% comment %}Alles ab 4.0 aus dem Letterboxd-Bestand, absteigend.
+            Gleiche Kacheln wie Serien und Anime - die fuenf oben bleiben die
+            mit Text.{% endcomment %}
+            {% include "includes/regal.html" with titel="Wenn du was suchen willst" items=empfehlungen kachel_typ="poster" regal_id="empfehlungen" zaehler=empfehlungen_zaehler %}
             {% endif %}
 
             <p class="films-empty" data-empty hidden>Zu dieser Auswahl ist noch nichts eingetragen.</p>

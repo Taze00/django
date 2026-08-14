@@ -3661,3 +3661,132 @@ html.lenis body {
         white-space: normal;
     }
 }
+
+/* --- Wertungsverteilung ------------------------------------------------ */
+
+.verteilung {
+    margin: 0 0 clamp(2.5rem, 5vw, 3.5rem);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: clamp(1.5rem, 4vw, 3rem);
+}
+
+.verteilung-grafik {
+    display: flex;
+    align-items: flex-end;
+    gap: clamp(0.35rem, 1vw, 0.7rem);
+    /* Feste Hoehe: die Balken rechnen in Prozent davon. */
+    height: 150px;
+}
+
+.verteilung-spalte {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    width: clamp(26px, 4vw, 40px);
+    height: 100%;
+}
+
+/* Die Saeule traegt die volle Hoehe, der Balken darin waechst. Ohne den
+   Rahmen haetten die Balken keinen gemeinsamen Fusspunkt. */
+.verteilung-saeule {
+    display: flex;
+    align-items: flex-end;
+    width: 100%;
+    flex: 1 1 auto;
+}
+
+/* Startet flach und waechst beim Sichtbarwerden - dieselbe Mechanik wie
+   die Club-Balken: Zielhoehe steht in data-hoehe, das JS setzt sie.
+   Ohne JS greift die Regel weiter unten und sie stehen sofort richtig. */
+.verteilung-balken {
+    width: 100%;
+    height: 0;
+    min-height: 2px;
+    border-radius: 2px 2px 0 0;
+    background: var(--gray);
+    transition: height 0.9s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.verteilung-anzahl {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    color: var(--text);
+    opacity: 0.55;
+}
+
+.verteilung-stufe {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    color: var(--text);
+    opacity: 0.5;
+}
+
+/* Der Gipfel ist die Pointe: hier liegt der Bestand, nicht bei den
+   guten Wertungen. Deshalb als einziger Balken im Akzent. */
+.verteilung-spalte.is-gipfel .verteilung-balken {
+    background: var(--primary);
+}
+
+.verteilung-spalte.is-gipfel .verteilung-anzahl,
+.verteilung-spalte.is-gipfel .verteilung-stufe {
+    color: var(--primary);
+    opacity: 1;
+}
+
+/* --- Zahlen daneben ---------------------------------------------------- */
+
+.verteilung-zahlen {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin: 0;
+    padding: 0;
+}
+
+.verteilung-zahl {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: var(--mono-track);
+    text-transform: uppercase;
+    color: var(--text);
+    opacity: 0.75;
+}
+
+.verteilung-zahl b {
+    font-weight: 500;
+    color: var(--text-bright);
+}
+
+/* Ohne JS und bei reduzierter Bewegung stehen die Balken sofort auf
+   ihrer Hoehe, statt unsichtbar zu bleiben. Die Hoehe liefert dann eine
+   CSS-Variable, die das Template mitgibt. */
+@media (prefers-reduced-motion: reduce) {
+    .verteilung-balken {
+        transition: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .verteilung {
+        gap: 1.5rem;
+    }
+
+    .verteilung-grafik {
+        height: 120px;
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .verteilung-spalte {
+        width: auto;
+        flex: 1 1 0;
+    }
+
+    .verteilung-anzahl {
+        font-size: 0.55rem;
+    }
+}

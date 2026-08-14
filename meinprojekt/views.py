@@ -1,7 +1,8 @@
 from django.conf import settings
 from django.shortcuts import render
 
-from films import kuratiert, letterboxd, projekte, tmdb
+from films import kuratiert, letterboxd, projekte, statistik, tmdb
+from films.models import Film
 
 
 def index(request):
@@ -25,8 +26,20 @@ def index(request):
     # in jedem Fall bei 200.
     tagebuch = tmdb.mit_postern_gemischt(letterboxd.get_recent_entries())
 
+    # Empfehlungen: alles ab 4.0 aus dem Letterboxd-Bestand, absteigend.
+    # Poster stehen fuer genau diese Auswahl in der Datenbank - sie
+    # werden mit `import_letterboxd --poster-ab 4.0` geholt und nicht
+    # fuer alle 216 Filme.
+    empfehlungen = list(
+        Film.objects.filter(gesehen=True, wertung__gte=4.0)
+        .order_by('-wertung', 'titel')
+    )
+
     return render(request, 'index.html', {
         'projekte': projekte.get_projekte(),
+        'statistik': statistik.hole_statistik(),
+        'empfehlungen': empfehlungen,
+        'empfehlungen_zaehler': f'{len(empfehlungen)} Filme',
         'eintraege': eintraege,
         'filme': filme,
         'serien': serien_only,

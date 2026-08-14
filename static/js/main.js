@@ -1656,3 +1656,40 @@ function initReveals() {
             // Bleibt versteckt. Die Sektion funktioniert ohne die Suche.
         });
 })();
+
+
+// ===== WERTUNGSVERTEILUNG =====
+// Balken wachsen beim Sichtbarwerden von 0 auf ihre Hoehe. Gleiche
+// Mechanik wie die Club-Balken: die Zielhoehe steht im Markup, hier wird
+// sie nur gesetzt, animiert wird per CSS-Transition.
+(function initVerteilung() {
+    const grafik = document.querySelector('[data-verteilung]');
+    if (!grafik) return;
+
+    const balken = grafik.querySelectorAll('.verteilung-balken');
+    if (!balken.length) return;
+
+    function setze() {
+        balken.forEach(b => {
+            b.style.height = b.dataset.hoehe || '0%';
+        });
+    }
+
+    // Bewegung reduziert: sofort auf Endhoehe, ohne Beobachter.
+    if (BEWEGUNG_REDUZIERT) {
+        setze();
+        return;
+    }
+
+    const beobachter = new IntersectionObserver(eintraege => {
+        eintraege.forEach(eintrag => {
+            if (!eintrag.isIntersecting) return;
+            // Kurz warten, damit die Bewegung nach dem Reveal der Sektion
+            // einsetzt und nicht mit ihm zusammenfaellt.
+            setTimeout(setze, 200);
+            beobachter.unobserve(eintrag.target);
+        });
+    }, { threshold: 0.25 });
+
+    beobachter.observe(grafik);
+})();

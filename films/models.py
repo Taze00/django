@@ -97,3 +97,13 @@ class Film(models.Model):
         if not self.poster_pfad:
             return None
         return f"https://image.tmdb.org/t/p/w342{self.poster_pfad}"
+
+    @property
+    def meine_wertung(self):
+        """Alias fuer die Kachel-Templates.
+
+        includes/kachel-poster.html bedient auch die kuratierten Listen
+        aus films/data/, die dieses Feld so nennen. Mit dem Alias laesst
+        sich ein Film-Objekt ohne Umbau derselben Kachel uebergeben.
+        """
+        return self.wertung

@@ -1,0 +1,46 @@
+{% comment %}
+Wertungsverteilung - die Grafik, die den Satz darueber belegt.
+
+Erwartet `statistik` aus films/statistik.py. Alle Zahlen kommen aus der
+Datenbank, keine steht hier fest.
+
+Die Balken starten auf Hoehe 0 und wachsen beim Sichtbarwerden - dieselbe
+Mechanik wie die Club-Balken: die Zielhoehe steht in data-hoehe, das JS
+setzt sie, die CSS-Transition macht den Rest. Ohne JS stehen sie sofort
+auf voller Hoehe (siehe .verteilung-balken in styles.css).
+
+Die Skala laeuft ueber alle zehn halben Stufen von 0.5 bis 5.0. Auch die
+leeren: dass bei 1.0 kein einziger Film steht, ist eine Aussage.
+{% endcomment %}
+
+<figure class="verteilung" data-verteilung>
+    <div class="verteilung-grafik">
+        {% for stufe in statistik.verteilung %}
+        <div class="verteilung-spalte{% if stufe.gipfel %} is-gipfel{% endif %}">
+            <span class="verteilung-anzahl">{{ stufe.anzahl }}</span>
+            <div class="verteilung-saeule">
+                <div class="verteilung-balken"
+                     data-hoehe="{{ stufe.anteil }}%"
+                     role="img"
+                     aria-label="{{ stufe.anzahl }} Filme mit {{ stufe.stufe }} Sternen"></div>
+            </div>
+            <span class="verteilung-stufe">{{ stufe.stufe }}</span>
+        </div>
+        {% endfor %}
+    </div>
+
+    <figcaption class="verteilung-zahlen">
+        <span class="verteilung-zahl">
+            <b>{{ statistik.gesehen }}</b> gesehen
+        </span>
+        <span class="verteilung-zahl">
+            Schnitt <b>{{ statistik.schnitt_anzeige }}</b>
+        </span>
+        <span class="verteilung-zahl">
+            <b>{{ statistik.volle_wertung }}</b> mit voller Wertung
+        </span>
+        <span class="verteilung-zahl">
+            <b>{{ statistik.ab_vier_prozent }}%</b> ab vier Sternen
+        </span>
+    </figcaption>
+</figure>
