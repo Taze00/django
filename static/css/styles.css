@@ -3015,17 +3015,35 @@ footer {
     height: 72px;
 }
 
-.seitenkopf-logo {
-    font-family: var(--font-display);
-    font-size: 1.05rem;
-    font-weight: 600;
-    letter-spacing: 0.3px;
-    color: var(--text-bright);
-    white-space: nowrap;
+/* Die Marke ist der Hero-Strich als Miniatur. Der Link selbst bekommt
+   Innenabstand, damit die Trefferflaeche 44px hoch bleibt - der Strich
+   allein waere ein 3px hohes Ziel. */
+.seitenkopf-marke {
+    display: flex;
+    align-items: center;
+    padding: 1.25rem 0.25rem;
+    margin-left: -0.25rem;
 }
 
-.seitenkopf-logo:hover {
-    color: var(--primary);
+.seitenkopf-marke-strich {
+    display: block;
+    width: 26px;
+    height: 3px;
+    background: var(--primary);
+    transition: width 0.3s cubic-bezier(0.22, 0.61, 0.36, 1),
+                box-shadow 0.3s ease;
+}
+
+.seitenkopf-marke:hover .seitenkopf-marke-strich,
+.seitenkopf-marke:focus-visible .seitenkopf-marke-strich {
+    width: 38px;
+    box-shadow: 0 0 12px rgba(0, 217, 255, 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .seitenkopf-marke-strich {
+        transition: none;
+    }
 }
 
 /* --- Linkliste -------------------------------------------------------- */

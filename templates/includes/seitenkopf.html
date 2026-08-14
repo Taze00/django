@@ -15,7 +15,14 @@ Leere.
 
 <header class="seitenkopf" data-kopf>
     <div class="container seitenkopf-innen">
-        <a class="seitenkopf-logo" href="{{ basis }}#home">Alex Volkmann</a>
+        {% comment %}Kein ausgeschriebener Name mehr: im Hero steht er drei
+        Zeilen tiefer in Grossbuchstaben, links oben stand er ein zweites
+        Mal. Stattdessen ein Zeichen - der Strich unter dem Namenszug als
+        Miniatur. Es ist der einzige geometrische Akzent der Seite, damit
+        ist die Marke die Seite selbst und nicht ein fremdes Logo.{% endcomment %}
+        <a class="seitenkopf-marke" href="{{ basis }}#home" aria-label="Zum Seitenanfang">
+            <span class="seitenkopf-marke-strich" aria-hidden="true"></span>
+        </a>
 
         <button type="button" class="seitenkopf-burger" data-burger
                 aria-expanded="false" aria-controls="hauptnavigation"
