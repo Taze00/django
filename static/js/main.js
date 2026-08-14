@@ -1253,7 +1253,7 @@ window.addEventListener('resize', () => {
 
 
 // ===== BEWEGUNGSSCHICHT =====
-// Traegheits-Scroll, Scroll-Reveals, Koernung und Mauszeiger.
+// Traegheits-Scroll, Scroll-Reveals und Koernung.
 //
 // Eine gemeinsame Abfrage fuer alle vier: wer Bewegung reduziert haben
 // will, bekommt die Seite statisch - aber vollstaendig sichtbar.
@@ -1370,65 +1370,6 @@ function initReveals() {
         beobachter.observe(el);
     });
 }
-
-
-// ===== MAUSZEIGER =====
-// Ein Punkt, der dem Systemzeiger nachlaeuft. Der echte Zeiger bleibt
-// sichtbar - ihn zu verstecken wuerde die Trefferrueckmeldung an eine
-// Animation haengen, die per Definition hinterherhinkt.
-(function initZeiger() {
-    const punkt = document.querySelector('[data-zeiger]');
-    if (!punkt) return;
-
-    const feinerZeiger = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-
-    // Touch oder reduzierte Bewegung: Element ganz raus, nicht nur
-    // ausblenden - dann laeuft auch keine Animationsschleife.
-    if (!feinerZeiger || BEWEGUNG_REDUZIERT) {
-        punkt.remove();
-        return;
-    }
-
-    // Nachlauf: 0.18 ist spuerbar, ohne dass der Punkt zurueckbleibt.
-    const NACHLAUF = 0.18;
-
-    let zielX = 0, zielY = 0;
-    let x = 0, y = 0;
-    let laeuft = false;
-
-    // Was den Punkt aufgehen laesst.
-    const GROSS = 'a, button, .project-card, .club-card, .gallery-item, .kachel, .films-chip, .regal-pfeil';
-
-    document.addEventListener('mousemove', ereignis => {
-        zielX = ereignis.clientX;
-        zielY = ereignis.clientY;
-
-        if (!laeuft) {
-            // Beim ersten Mal ohne Nachlauf setzen, sonst faehrt der Punkt
-            // aus der Ecke quer ueber den Schirm.
-            x = zielX;
-            y = zielY;
-            laeuft = true;
-            punkt.classList.add('is-aktiv');
-            requestAnimationFrame(takt);
-        }
-
-        punkt.classList.toggle('is-gross', !!ereignis.target.closest(GROSS));
-    }, { passive: true });
-
-    // Verlaesst die Maus das Fenster, soll kein Punkt stehen bleiben.
-    document.addEventListener('mouseleave', () => punkt.classList.remove('is-aktiv'));
-    document.addEventListener('mouseenter', () => {
-        if (laeuft) punkt.classList.add('is-aktiv');
-    });
-
-    function takt() {
-        x += (zielX - x) * NACHLAUF;
-        y += (zielY - y) * NACHLAUF;
-        punkt.style.transform = `translate(${x}px, ${y}px)`;
-        requestAnimationFrame(takt);
-    }
-})();
 
 
 // ===== KACHEL-TEXT AUF TOUCH =====
@@ -1933,10 +1874,12 @@ function initReveals() {
     const zaehler = vorhang.querySelector('[data-intro-zaehler]');
     const heroInhalt = document.querySelector('.hero-content');
 
-    const VERSATZ = 35;        // Abstand zwischen zwei Buchstaben
-    const BUCHSTABE_DAUER = 450;
-    const PAUSE = 200;         // bei 100 kurz stehen bleiben
-    const VORHANG_DAUER = 600; // muss zur CSS-Transition passen
+    // Gesamt rund 2,4s. Der Zaehler haengt an aufbauDauer und kommt
+    // damit weiterhin genau mit dem letzten Buchstaben bei 100 an.
+    const VERSATZ = 55;        // Abstand zwischen zwei Buchstaben
+    const BUCHSTABE_DAUER = 550;
+    const PAUSE = 400;         // bei 100 stehen bleiben
+    const VORHANG_DAUER = 800; // muss zur CSS-Transition passen
 
     let beendet = false;
 
@@ -1962,23 +1905,16 @@ function initReveals() {
     };
 
     // --- Buchstaben ------------------------------------------------------
-    const text = (name.textContent || '').trim();
-    name.textContent = '';
-
-    const buchstaben = [];
-    for (const zeichen of text) {
-        const span = document.createElement('span');
-        span.className = 'intro-buchstabe';
-        if (zeichen === ' ') {
-            span.classList.add('intro-buchstabe--luecke');
-        } else {
-            span.textContent = zeichen;
-        }
-        // Der Name steht schon in aria-label am Absatz - die Einzelteile
-        // wuerden sonst Buchstabe fuer Buchstabe vorgelesen.
-        span.setAttribute('aria-hidden', 'true');
-        name.appendChild(span);
-        buchstaben.push(span);
+    // Sie stehen bereits einzeln im Markup, jeder von Anfang an auf
+    // opacity 0. Vorher wurden sie hier aus dem Text zerlegt - dabei
+    // stand der fertige Schriftzug einen Wimpernschlag lang sichtbar da,
+    // bevor das Zerlegen ihn wieder unsichtbar machte.
+    const buchstaben = Array.from(name.querySelectorAll('.intro-buchstabe'));
+    if (!buchstaben.length) {
+        // Ohne Buchstaben gibt es nichts aufzubauen - dann sofort weiter,
+        // statt hinter einem leeren Vorhang zu warten.
+        window.introBeenden();
+        return;
     }
 
     const aufbauDauer = (buchstaben.length - 1) * VERSATZ + BUCHSTABE_DAUER;

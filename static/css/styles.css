@@ -3190,7 +3190,7 @@ footer[id] {
 /* ==========================================================================
    BEWEGUNGSSCHICHT
    --------------------------------------------------------------------------
-   Traegheits-Scroll, Scroll-Reveals, Koernung und Mauszeiger. Struktur,
+   Traegheits-Scroll, Scroll-Reveals und Koernung. Struktur,
    Farben und Inhalte bleiben unberuehrt - hier steht nur, wie sich die
    Seite bewegt und anfuehlt.
 
@@ -3262,45 +3262,6 @@ html.lenis body {
     opacity: 0.04;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23r)'/%3E%3C/svg%3E");
     background-repeat: repeat;
-}
-
-/* --- Mauszeiger -------------------------------------------------------- */
-
-/* Startet unsichtbar und ausserhalb: ohne das sitzt der Punkt bis zur
-   ersten Mausbewegung sichtbar in der linken oberen Ecke. */
-.zeiger {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 9500;
-    width: 10px;
-    height: 10px;
-    margin: -5px 0 0 -5px;
-    border-radius: 50%;
-    background: var(--primary);
-    pointer-events: none;
-    opacity: 0;
-    transition: width 0.25s ease, height 0.25s ease, margin 0.25s ease,
-                background 0.25s ease, opacity 0.25s ease;
-}
-
-.zeiger.is-aktiv {
-    opacity: 1;
-}
-
-/* Ueber Links und Karten: groesser und halbtransparent. */
-.zeiger.is-gross {
-    width: 38px;
-    height: 38px;
-    margin: -19px 0 0 -19px;
-    background: rgba(0, 217, 255, 0.35);
-}
-
-/* Kein Zeiger auf Touch und keiner, wenn Bewegung reduziert werden soll -
-   ein nachlaufender Punkt ist genau die Art Bewegung, die dort stoert.
-   Das JS entfernt das Element zusaetzlich ganz. */
-@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
-    .zeiger { display: none; }
 }
 
 /* --- Sektions-Metazeilen ----------------------------------------------- */
@@ -4127,7 +4088,7 @@ html.intro-laeuft .intro {
    und beschleunigt - der Vorhang faellt nicht, er wird weggezogen. */
 html.intro-laeuft .intro.is-faehrt-weg {
     transform: translateY(-100%);
-    transition: transform 0.6s cubic-bezier(0.6, 0, 0.9, 0.2);
+    transition: transform 0.8s cubic-bezier(0.6, 0, 0.9, 0.2);
 }
 
 .intro-inhalt {

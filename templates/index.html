@@ -76,7 +76,12 @@
     {% endcomment %}
     <div class="intro" data-intro role="presentation">
         <div class="intro-inhalt">
-            <p class="intro-name" data-intro-name aria-label="Alex Volkmann">Alex Volkmann</p>
+            {% comment %}Die Buchstaben stehen einzeln im Markup und nicht
+            erst durch JS zerlegt. Sonst stand der fertige Schriftzug einen
+            Wimpernschlag lang sichtbar da, bevor das Zerlegen ihn wieder
+            unsichtbar machte. So sind sie ab dem ersten Aufbau auf
+            opacity 0 - unabhaengig davon, wann main.js laeuft.{% endcomment %}
+            <p class="intro-name" data-intro-name aria-label="Alex Volkmann"><span class="intro-buchstabe" aria-hidden="true">A</span><span class="intro-buchstabe" aria-hidden="true">l</span><span class="intro-buchstabe" aria-hidden="true">e</span><span class="intro-buchstabe" aria-hidden="true">x</span><span class="intro-buchstabe intro-buchstabe--luecke" aria-hidden="true"></span><span class="intro-buchstabe" aria-hidden="true">V</span><span class="intro-buchstabe" aria-hidden="true">o</span><span class="intro-buchstabe" aria-hidden="true">l</span><span class="intro-buchstabe" aria-hidden="true">k</span><span class="intro-buchstabe" aria-hidden="true">m</span><span class="intro-buchstabe" aria-hidden="true">a</span><span class="intro-buchstabe" aria-hidden="true">n</span><span class="intro-buchstabe" aria-hidden="true">n</span></p>
             <p class="intro-zaehler" data-intro-zaehler aria-hidden="true">00</p>
         </div>
     </div>
@@ -87,12 +92,6 @@
     keine Klicks ab. Das Rauschen kommt aus einem SVG-Filter im CSS, es
     liegt also keine Bilddatei dahinter.{% endcomment %}
     <div class="koernung" aria-hidden="true"></div>
-
-    {% comment %}Folgt dem Systemzeiger mit leichter Verzoegerung. Ersetzt
-    ihn nicht - der echte Zeiger bleibt sichtbar, sonst haengt die
-    Trefferrueckmeldung an einer Animation. Auf Touch entfernt das JS das
-    Element wieder.{% endcomment %}
-    <div class="zeiger" data-zeiger aria-hidden="true"></div>
 
     {% include "includes/seitenkopf.html" %}
 
