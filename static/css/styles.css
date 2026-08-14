@@ -2050,26 +2050,12 @@ footer {
 }
 
 
-/* --- Filter (zwei Ebenen) --------------------------------------------- */
+/* --- Sternefilter auf /filme/ ------------------------------------------
+   Die Chips filtern dort das Raster nach Wertung. Auf der Startseite
+   gab es sie auch einmal, als Stimmungsfilter ueber den fuenf
+   kuratierten Filmen - der ist mit dem Umbau auf vier Bloecke weg. */
 
-.films-filter {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
-.films-filter[hidden] { display: none; }
-
-/* Die zweite Ebene sitzt optisch etwas zurueck. */
-.films-filter--stimmung {
-    margin-bottom: 2rem;
-    opacity: 0.9;
-}
-
-.films-chip,
-.films-shuffle {
+.films-chip {
     padding: 0.45rem 1.1rem;
     border: 1px solid var(--gray);
     border-radius: 999px;
@@ -2084,74 +2070,48 @@ footer {
 }
 
 .films-chip:hover,
-.films-shuffle:hover,
-.films-chip:focus-visible,
-.films-shuffle:focus-visible {
+.films-chip:focus-visible {
     border-color: var(--primary);
     color: var(--text-bright);
 }
 
 .films-chip.is-active {
-    background: var(--primary);
     border-color: var(--primary);
-    color: var(--darker);
-}
-
-.films-shuffle {
-    color: var(--secondary);
-    border-color: var(--secondary);
-}
-
-.films-shuffle:hover {
-    background: var(--secondary);
-    border-color: var(--secondary);
+    background: rgba(0, 217, 255, 0.12);
     color: var(--text-bright);
 }
 
-/* Ausgefilterte Kacheln aus der Spur nehmen - der Slot traegt die
-   Breite, sonst bliebe eine Luecke stehen. */
-.regal-slot[hidden] { display: none; }
+/* --- "Ueberrasch mich" -------------------------------------------------
+   Steht in der Kopfzeile der Empfehlungen, neben der Marke. Cyan statt
+   des frueheren Rot: die Filmsektion ist jetzt durchgehend Neon in der
+   Akzentfarbe, ein roter Knopf mittendrin waere ein Fremdkoerper. */
 
-.films-empty[hidden] { display: none; }
-
-.films-empty {
-    margin: 2rem 0 0;
-    text-align: center;
+.films-shuffle {
+    padding: 0.45rem 1.1rem;
+    border: 1px solid rgba(0, 217, 255, 0.5);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--primary);
     font-family: var(--font-mono);
-    font-size: 0.8rem;
-    color: var(--text);
-    opacity: 0.7;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color 0.25s ease, color 0.25s ease,
+                border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* --- "Ueberrasch mich" ------------------------------------------------ */
+.films-shuffle[hidden] { display: none; }
 
-.films-spotlight {
-    max-width: 260px;
-    margin: 0 auto 2rem;
-}
-
-.films-spotlight[hidden] { display: none; }
-
-/* Im Spotlight ist der Text dauerhaft sichtbar, nicht erst bei Hover.
-   Die Kachel steht hier allein, nicht in einer Spur - deshalb kein
-   Hover-Wachstum und kein abgedunkeltes Poster. */
-.films-spotlight .kachel--spotlight {
+.films-shuffle:hover,
+.films-shuffle:focus-visible {
     border-color: var(--primary);
-    box-shadow: var(--shadow);
-    transform: none;
+    color: var(--darker);
+    background: var(--primary);
+    box-shadow: 0 0 18px rgba(0, 217, 255, 0.45);
 }
 
-.films-spotlight .kachel-overlay {
-    position: static;
-    transform: none;
-    background: none;
-    padding: 0.9rem 1rem 0;
-}
-
-.films-spotlight .kachel-poster img,
-.films-spotlight .kachel--spotlight:hover .kachel-poster img {
-    filter: none;
-}
 
 /* ==========================================================================
    FILMSEKTION - vier Bloecke mit absteigendem Gewicht
@@ -2223,6 +2183,36 @@ footer {
 
 .filmblock-trenner {
     opacity: 0.4;
+}
+
+/* --- "Ueberrasch mich": der Treffer leuchtet kurz auf -------------------
+   Dieselbe Sprache wie das Neonschild darueber, nur an einer Kachel und
+   nur fuer zwei Sekunden. Kein Modal, kein Seitenwechsel - der Film
+   steht schon im Regal, er wird nur angestrahlt.
+
+   Der Rahmen bleibt die ganze Zeit stehen, das Leuchten pulst zweimal
+   darunter durch: so ist auch nach dem Ausklingen noch zu sehen,
+   welcher Film gemeint war. */
+@keyframes kachel-ueberrascht {
+    0%   { box-shadow: 0 0 0 rgba(0, 217, 255, 0); }
+    12%  { box-shadow: 0 0 34px 4px rgba(0, 217, 255, 0.65); }
+    34%  { box-shadow: 0 0 12px 1px rgba(0, 217, 255, 0.25); }
+    52%  { box-shadow: 0 0 30px 3px rgba(0, 217, 255, 0.55); }
+    100% { box-shadow: 0 0 14px 1px rgba(0, 217, 255, 0.22); }
+}
+
+.kachel.is-ueberrascht {
+    border-color: var(--primary);
+    animation: kachel-ueberrascht 2.6s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    /* Der Hinweis bleibt - er ist die Antwort auf den Klick, nicht
+       Zierde. Nur das Pulsen faellt weg. */
+    .kachel.is-ueberrascht {
+        animation: none;
+        box-shadow: 0 0 18px 2px rgba(0, 217, 255, 0.45);
+    }
 }
 
 /* --- Block 4: Abschlusskasten ----------------------------------------- */

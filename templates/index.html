@@ -227,6 +227,15 @@
             <div class="filmblock filmblock--empfehlungen">
                 <div class="filmblock-kopf">
                     <h3 class="filmblock-marke">Empfehlungen <span class="filmblock-trenner" aria-hidden="true">—</span> {{ empfehlungen_zaehler }}</h3>
+
+                    {% comment %}Sucht einen Film aus genau diesem Regal
+                    und faehrt ihn an. Kein Modal, kein Seitenwechsel -
+                    der Film steht ja schon da. Ohne JavaScript hat der
+                    Knopf nichts zu tun, deshalb blendet main.js ihn erst
+                    ein.{% endcomment %}
+                    <button type="button" class="films-shuffle" data-ueberrasch hidden>
+                        Überrasch mich
+                    </button>
                 </div>
 
                 {% include "includes/regal.html" with titel="Empfehlungen" items=empfehlungen kachel_typ="poster" regal_id="empfehlungen" regal_klasse="regal--empfehlungen" kopf_aus=True %}

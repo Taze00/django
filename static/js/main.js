@@ -934,12 +934,110 @@ window.galleryItems = galleryItems;
     });
 })();
 
-// ===== FILMSEKTION =====
-// Der Stimmungsfilter stand hier: vier Chips, die die fuenf kuratierten
-// Filme nach Stimmung aussortierten. Bei fuenf Filmen filterte er von
-// fuenf auf ein oder zwei - eine Bedienung, die weniger zeigte als das
-// Nichtstun. Mit dem Umbau auf vier Bloecke ist er weg; "Ueberrasch
-// mich" ist geblieben und sitzt jetzt bei den Empfehlungen.
+// ===== FILMSEKTION: "UEBERRASCH MICH" =====
+// Waehlt einen zufaelligen Film aus dem Empfehlungsregal und faehrt ihn
+// an: das Regal scrollt ihn in die Mitte, die Seite scrollt zu ihm,
+// wenn er nicht ohnehin im Bild ist, und er leuchtet kurz auf.
+//
+// Kein Modal und kein Seitenwechsel - der Film steht schon da, es geht
+// nur darum, ihn zu zeigen. Vorher wurde stattdessen eine Kopie der
+// Kachel in einen eigenen Kasten ueber dem Regal gehaengt; damit stand
+// derselbe Film zweimal auf der Seite, und das Regal, aus dem er kam,
+// blieb unberuehrt.
+//
+// Der Stimmungsfilter stand hier ebenfalls: vier Chips, die die fuenf
+// kuratierten Filme nach Stimmung aussortierten. Bei fuenf Filmen
+// filterte er von fuenf auf ein oder zwei - eine Bedienung, die weniger
+// zeigte als das Nichtstun. Mit dem Umbau auf vier Bloecke ist er weg.
+(function initUeberrasch() {
+    const knopf = document.querySelector('[data-ueberrasch]');
+    if (!knopf) return;
+
+    const regal = document.querySelector('[data-regal="empfehlungen"]');
+    if (!regal) return;
+
+    const spur = regal.querySelector('[data-regal-spur]');
+    const kacheln = Array.from(regal.querySelectorAll('[data-eintrag]'));
+    if (!spur || !kacheln.length) return;
+
+    // Erst jetzt sichtbar: ohne JavaScript haette der Knopf nichts zu
+    // tun, und ein Knopf, der nichts tut, ist schlimmer als keiner.
+    knopf.hidden = false;
+
+    // Bewusst als Funktion und nicht als Konstante hier oben:
+    // BEWEGUNG_REDUZIERT steht weiter unten in dieser Datei, und diese
+    // IIFE laeuft sofort - ein Zugriff von hier aus liefe in die
+    // temporale Totzone und wuerde alles danach mitreissen.
+    const weich = () =>
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches
+            ? 'auto'
+            : 'smooth';
+
+    let leuchtet = null;   // haengt gerade im Licht
+    let zuletzt = null;    // zuletzt gezogen, auch wenn das Licht aus ist
+    let aufraeumen = null;
+
+    function anfahren(kachel) {
+        // Waagerecht: die Kachel in die Mitte der Spur. Nur die Spur
+        // bewegt sich, nicht die Seite - sie traegt data-lenis-prevent.
+        const ziel = kachel.offsetLeft - (spur.clientWidth - kachel.offsetWidth) / 2;
+        spur.scrollTo({
+            left: Math.max(0, ziel),
+            behavior: weich()
+        });
+
+        // Senkrecht nur, wenn das Regal nicht ohnehin im Bild steht.
+        // Sonst ruckte die Seite bei jedem Klick, obwohl schon alles zu
+        // sehen ist.
+        const kasten = regal.getBoundingClientRect();
+        const drin = kasten.top >= 80 && kasten.bottom <= window.innerHeight;
+        if (!drin) {
+            // Laeuft Lenis, muss der Sprung durch Lenis gehen - sonst
+            // sind es zwei Animationen auf derselben Position.
+            if (window.lenis) {
+                window.lenis.scrollTo(regal, { offset: KOPF_VERSATZ });
+            } else {
+                window.scrollTo({
+                    top: regal.getBoundingClientRect().top + window.scrollY + KOPF_VERSATZ,
+                    behavior: weich()
+                });
+            }
+        }
+    }
+
+    function hervorheben(kachel) {
+        // Ein vorheriger Treffer leuchtet sonst weiter, waehrend der
+        // naechste schon anfaengt.
+        if (aufraeumen) clearTimeout(aufraeumen);
+        if (leuchtet) leuchtet.classList.remove('is-ueberrascht');
+
+        // Neu anstossen: dieselbe Klasse ein zweites Mal zu setzen
+        // startet die Animation nicht neu. Ein erzwungener Umbruch
+        // dazwischen tut es.
+        void kachel.offsetWidth;
+        kachel.classList.add('is-ueberrascht');
+
+        leuchtet = kachel;
+        zuletzt = kachel;
+        aufraeumen = setTimeout(() => {
+            kachel.classList.remove('is-ueberrascht');
+            leuchtet = null;
+        }, 2600);
+    }
+
+    knopf.addEventListener('click', () => {
+        // Nicht zweimal hintereinander derselbe Film - bei 40 Kacheln
+        // faellt eine Wiederholung sofort auf und sieht kaputt aus.
+        let auswahl = kacheln;
+        if (kacheln.length > 1 && zuletzt) {
+            auswahl = kacheln.filter(k => k !== zuletzt);
+        }
+
+        const treffer = auswahl[Math.floor(Math.random() * auswahl.length)];
+        anfahren(treffer);
+        hervorheben(treffer);
+    });
+})();
 
 
 // ===== SEITENKOPF: NAVIGATION =====
