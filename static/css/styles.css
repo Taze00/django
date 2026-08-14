@@ -3479,17 +3479,31 @@ html.lenis body {
 
 /* --- Filmsuche --------------------------------------------------------- */
 
+/* Abgesetzte Flaeche statt eines nackten Eingabefelds: vorher sah die
+   Suche aus wie ein vergessenes Formularrudiment mitten in der Sektion. */
 .filmsuche {
     position: relative;
-    max-width: 30rem;
+    max-width: 34rem;
     margin: 0 0 clamp(2.5rem, 5vw, 3.5rem);
+    padding: 1.35rem 1.5rem 1.5rem;
+    border: 1px solid var(--gray);
+    border-radius: calc(var(--film-radius) * 1.5);
+    background: rgba(255, 255, 255, 0.02);
+    transition: border-color 0.25s ease, background 0.25s ease;
+}
+
+/* Beim Fokus passiert sichtbar etwas - am ganzen Block, nicht nur im
+   Feld. */
+.filmsuche:focus-within {
+    border-color: rgba(0, 217, 255, 0.45);
+    background: rgba(0, 217, 255, 0.035);
 }
 
 .filmsuche-label {
     display: block;
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.75rem;
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.78rem;
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: var(--mono-track);
@@ -3500,27 +3514,48 @@ html.lenis body {
     position: relative;
 }
 
+.filmsuche-lupe {
+    position: absolute;
+    top: 50%;
+    left: 1.05rem;
+    width: 18px;
+    height: 18px;
+    transform: translateY(-50%);
+    color: var(--text);
+    opacity: 0.5;
+    pointer-events: none;
+    transition: color 0.25s ease, opacity 0.25s ease;
+}
+
+.filmsuche:focus-within .filmsuche-lupe {
+    color: var(--primary);
+    opacity: 1;
+}
+
+/* Groesser als vorher, mit Platz fuer die Lupe links und das Kreuz
+   rechts - die Polsterung links muss breiter sein als die Lupe, sonst
+   laeuft der Platzhalter hinein. */
 .filmsuche-feld {
     width: 100%;
-    padding: 0.85rem 2.6rem 0.85rem 1rem;
+    padding: 1.05rem 3rem 1.05rem 3.1rem;
     border: 1px solid var(--gray);
     border-radius: var(--film-radius);
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(0, 0, 0, 0.35);
     color: var(--text-bright);
     font-family: var(--font-body);
-    font-size: 1rem;
-    transition: border-color 0.25s ease, background 0.25s ease;
+    font-size: 1.05rem;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .filmsuche-feld::placeholder {
     color: var(--text);
-    opacity: 0.45;
+    opacity: 0.4;
 }
 
 .filmsuche-feld:focus {
     outline: none;
     border-color: var(--primary);
-    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.12);
 }
 
 /* Das Kreuz zum Leeren. Eigener Knopf statt des browsereigenen: der
@@ -3530,7 +3565,7 @@ html.lenis body {
 .filmsuche-leeren {
     position: absolute;
     top: 50%;
-    right: 0.5rem;
+    right: 0.7rem;
     width: 30px;
     height: 30px;
     padding: 0;
@@ -3547,7 +3582,7 @@ html.lenis body {
     position: absolute;
     top: 50%;
     left: 50%;
-    width: 11px;
+    width: 12px;
     height: 1px;
     background: var(--text);
     transition: background 0.2s ease;
@@ -3559,6 +3594,17 @@ html.lenis body {
 .filmsuche-leeren:hover::before,
 .filmsuche-leeren:hover::after { background: var(--primary); }
 
+/* Sagt, worauf sich die Suche bezieht. */
+.filmsuche-umfang {
+    margin: 0.7rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+    color: var(--text);
+    opacity: 0.55;
+}
+
 /* --- Trefferliste ------------------------------------------------------ */
 
 /* Liegt ueber dem Folgeinhalt statt ihn wegzuschieben - beim Tippen soll
@@ -3566,6 +3612,8 @@ html.lenis body {
 .filmsuche-treffer {
     position: absolute;
     z-index: 20;
+    /* Unter dem ganzen Block. Auf halber Hoehe angesetzt verdeckte die
+       Liste die Umfangszeile nur zur Haelfte - das sah nach Fehler aus. */
     top: calc(100% + 0.4rem);
     right: 0;
     left: 0;
@@ -3664,20 +3712,27 @@ html.lenis body {
 
 /* --- Wertungsverteilung ------------------------------------------------ */
 
+/* Die Grafik ist der Beweis fuer "Ich bewerte streng" und nimmt deshalb
+   die volle Containerbreite ein - vorher stand sie als schmale Fussnote
+   neben dem Satz und las sich wie Kleingedrucktes.
+
+   Zwei Spalten: die Balken nehmen den Platz, der uebrig bleibt, der
+   Zahlenblock rechts eine feste Breite. Unter 900px stapeln sie. */
 .verteilung {
-    margin: 0 0 clamp(2.5rem, 5vw, 3.5rem);
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    gap: clamp(1.5rem, 4vw, 3rem);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: clamp(2rem, 5vw, 4rem);
+    margin: 0 0 clamp(3rem, 6vw, 4rem);
 }
 
 .verteilung-grafik {
-    display: flex;
-    align-items: flex-end;
-    gap: clamp(0.35rem, 1vw, 0.7rem);
-    /* Feste Hoehe: die Balken rechnen in Prozent davon. */
-    height: 150px;
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    align-items: end;
+    gap: clamp(0.5rem, 1.2vw, 1rem);
+    /* Richtwert fuer den hoechsten Balken. */
+    height: 180px;
 }
 
 .verteilung-spalte {
@@ -3685,8 +3740,7 @@ html.lenis body {
     flex-direction: column;
     align-items: center;
     justify-content: flex-end;
-    gap: 0.35rem;
-    width: clamp(26px, 4vw, 40px);
+    gap: 0.4rem;
     height: 100%;
 }
 
@@ -3700,38 +3754,45 @@ html.lenis body {
 }
 
 /* Startet flach und waechst beim Sichtbarwerden - dieselbe Mechanik wie
-   die Club-Balken: Zielhoehe steht in data-hoehe, das JS setzt sie.
-   Ohne JS greift die Regel weiter unten und sie stehen sofort richtig. */
+   die Club-Balken: Zielhoehe steht in data-hoehe, das JS setzt sie. */
 .verteilung-balken {
     width: 100%;
     height: 0;
-    min-height: 2px;
-    border-radius: 2px 2px 0 0;
+    min-height: 3px;
+    border-radius: 3px 3px 0 0;
     background: var(--gray);
     transition: height 0.9s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
 .verteilung-anzahl {
     font-family: var(--font-mono);
-    font-size: 0.62rem;
+    font-size: 0.72rem;
     color: var(--text);
     opacity: 0.55;
 }
 
 .verteilung-stufe {
     font-family: var(--font-mono);
-    font-size: 0.62rem;
+    font-size: 0.68rem;
     color: var(--text);
     opacity: 0.5;
 }
 
 /* Der Gipfel ist die Pointe: hier liegt der Bestand, nicht bei den
-   guten Wertungen. Deshalb als einziger Balken im Akzent. */
+   guten Wertungen. Akzentfarbe, groessere Zahl und ein Schimmer, damit
+   er auf den ersten Blick auffaellt und nicht erst beim Lesen. */
 .verteilung-spalte.is-gipfel .verteilung-balken {
     background: var(--primary);
+    box-shadow: 0 0 24px rgba(0, 217, 255, 0.35);
 }
 
-.verteilung-spalte.is-gipfel .verteilung-anzahl,
+.verteilung-spalte.is-gipfel .verteilung-anzahl {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--primary);
+    opacity: 1;
+}
+
 .verteilung-spalte.is-gipfel .verteilung-stufe {
     color: var(--primary);
     opacity: 1;
@@ -3739,56 +3800,78 @@ html.lenis body {
 
 /* --- Zahlen daneben ---------------------------------------------------- */
 
+/* Eigener Block statt Kleingedrucktem: abgesetzte Flaeche, grosse Zahl
+   ueber kleiner Beschriftung. */
 .verteilung-zahlen {
     display: flex;
     flex-direction: column;
-    gap: 0.45rem;
+    gap: 1.1rem;
+    width: max-content;
     margin: 0;
-    padding: 0;
+    padding: 1.4rem 1.6rem;
+    border: 1px solid var(--gray);
+    border-left: 2px solid var(--primary);
+    border-radius: var(--film-radius);
+    background: rgba(255, 255, 255, 0.02);
 }
 
+/* Wert oben, Beschriftung darunter. Das Markup liefert beide jetzt in
+   dieser Reihenfolge, deshalb normales column. */
 .verteilung-zahl {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.64rem;
+    line-height: 1.3;
     letter-spacing: var(--mono-track);
     text-transform: uppercase;
     color: var(--text);
-    opacity: 0.75;
+    opacity: 0.65;
 }
 
 .verteilung-zahl b {
-    font-weight: 500;
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: 0;
     color: var(--text-bright);
+    opacity: 1;
 }
 
 /* Ohne JS und bei reduzierter Bewegung stehen die Balken sofort auf
-   ihrer Hoehe, statt unsichtbar zu bleiben. Die Hoehe liefert dann eine
-   CSS-Variable, die das Template mitgibt. */
+   ihrer Hoehe, statt unsichtbar zu bleiben. */
 @media (prefers-reduced-motion: reduce) {
     .verteilung-balken {
         transition: none;
     }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 900px) {
     .verteilung {
-        gap: 1.5rem;
+        grid-template-columns: 1fr;
+        gap: 1.75rem;
     }
 
-    .verteilung-grafik {
-        height: 120px;
+    .verteilung-zahlen {
         width: 100%;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.1rem 1.5rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .verteilung-grafik {
+        height: 140px;
+        gap: 0.3rem;
     }
 
-    .verteilung-spalte {
-        width: auto;
-        flex: 1 1 0;
-    }
-
-    .verteilung-anzahl {
-        font-size: 0.55rem;
-    }
+    .verteilung-anzahl { font-size: 0.6rem; }
+    .verteilung-stufe  { font-size: 0.58rem; }
+    .verteilung-spalte.is-gipfel .verteilung-anzahl { font-size: 0.88rem; }
+    .verteilung-zahl b { font-size: 1.3rem; }
 }
 
 /* ==========================================================================
@@ -3999,4 +4082,10 @@ html.lenis body {
     .filmsteuerung-zaehler {
         margin-left: 0;
     }
+}
+
+/* Fuehler unter dem Raster auf /filme/: loest das Nachladen aus, sobald
+   er in Sichtweite kommt. Nimmt selbst keinen Platz ein. */
+.filmraster-fuehler {
+    height: 1px;
 }

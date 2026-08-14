@@ -46,7 +46,10 @@ PROJEKTE = [
         "bild": "css/images/projects/diese-seite.png",
         "url": "/",
         "status": "Im Umbau",
-        "breit": False,
+        # Ebenfalls breit: als schmale Karte stand links ein kleines
+        # Farbfeld und rechts daneben blieb die halbe Reihe leer. Zwei
+        # Karten im selben Format untereinander lesen sich als Paar.
+        "breit": True,
     },
 ]
 

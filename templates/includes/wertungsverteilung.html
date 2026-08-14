@@ -29,18 +29,24 @@ leeren: dass bei 1.0 kein einziger Film steht, ist eine Aussage.
         {% endfor %}
     </div>
 
+    {% comment %}Immer Wert zuerst, Beschriftung danach - sonst stand die
+    Beschriftung mal ueber und mal unter der Zahl.{% endcomment %}
     <figcaption class="verteilung-zahlen">
         <span class="verteilung-zahl">
-            <b>{{ statistik.gesehen }}</b> gesehen
+            <b>{{ statistik.gesehen }}</b>
+            <span>gesehen</span>
         </span>
         <span class="verteilung-zahl">
-            Schnitt <b>{{ statistik.schnitt_anzeige }}</b>
+            <b>{{ statistik.schnitt_anzeige }}</b>
+            <span>Schnitt</span>
         </span>
         <span class="verteilung-zahl">
-            <b>{{ statistik.volle_wertung }}</b> mit voller Wertung
+            <b>{{ statistik.volle_wertung }}</b>
+            <span>mit voller Wertung</span>
         </span>
         <span class="verteilung-zahl">
-            <b>{{ statistik.ab_vier_prozent }}%</b> ab vier Sternen
+            <b>{{ statistik.ab_vier_prozent }}%</b>
+            <span>ab vier Sternen</span>
         </span>
     </figcaption>
 </figure>
