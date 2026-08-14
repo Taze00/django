@@ -312,26 +312,26 @@ html.intro-laeuft .hero-skyline {
 .hero-strich {
     width: 54px;
     height: 2px;
-    margin: clamp(1.5rem, 3vw, 2.25rem) 0 clamp(1.25rem, 2.5vw, 1.75rem);
+    margin: clamp(1.75rem, 3.5vw, 2.5rem) 0 clamp(1.75rem, 3vw, 2.25rem);
     background: var(--primary);
 }
 
 .hero-meta {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.75rem;
 }
 
 .hero-meta-zeile {
     margin: 0;
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.8rem;
     font-weight: 500;
     letter-spacing: var(--mono-track);
     line-height: 1.4;
     text-transform: uppercase;
     color: var(--text);
-    opacity: 0.7;
+    opacity: 0.9;
 }
 
 .scroll-indicator {
@@ -3332,20 +3332,64 @@ html.lenis body {
     margin-bottom: clamp(2rem, 4vw, 3rem);
 }
 
+/* Die Metazeilen sind das Erkennungsmerkmal der Seite - Monospace,
+   gesperrt, in Grossbuchstaben. Sie waren mit 0.72rem und Deckkraft
+   0.75 so leise, dass sie neben Schlagzeile und Fliesstext untergingen.
+   Jetzt 0.8rem (rund 13px), fast voll deckend und mit Luft davor und
+   dahinter. */
 .sektion-meta {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
     gap: 0.6rem;
-    margin: 0 0 1rem;
+    margin: 0 0 1.6rem;
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.8rem;
     font-weight: 500;
     letter-spacing: var(--mono-track);
     line-height: 1.5;
     text-transform: uppercase;
     color: var(--text);
-    opacity: 0.75;
+    opacity: 0.92;
+}
+
+/* --- Anspringen wie eine Neonroehre ------------------------------------
+   Zwei, drei kurze Zuckungen in der Helligkeit beim Sichtbarwerden, dann
+   steht die Zeile ruhig. Bewusst einmalig: sechs dauerhaft flackernde
+   Zeilen auf einer Seite waeren nicht nur anstrengend, dauerhaftes
+   Flackern kann fuer manche Menschen gesundheitlich problematisch sein.
+
+   Animiert wird `filter`, nicht `opacity`. Die Metazeilen sitzen in
+   Behaeltern, die beim Scrollen selbst ueber opacity einfahren
+   ([data-reveal]) - und im Hero ueber die Intro-Staffelung. Zwei
+   Mechaniken auf derselben Eigenschaft wuerden sich ueberschreiben. */
+@keyframes metazeile-anspringen {
+    0%   { filter: brightness(0.22); }
+    7%   { filter: brightness(1.75) drop-shadow(0 0 7px rgba(0, 217, 255, 0.45)); }
+    11%  { filter: brightness(0.3); }
+    19%  { filter: brightness(1.6) drop-shadow(0 0 6px rgba(0, 217, 255, 0.4)); }
+    26%  { filter: brightness(0.28); }
+    40%  { filter: brightness(1.55) drop-shadow(0 0 9px rgba(0, 217, 255, 0.35)); }
+    52%  { filter: brightness(0.85); }
+    64%  { filter: brightness(1.15); }
+    100% { filter: none; }
+}
+
+/* Die Klasse setzt ein eigener Beobachter in main.js (initMetazeilen) -
+   nicht der Behaelter-Reveal: die Zeilen sollen anspringen, sobald sie
+   selbst im Bild sind. Der Verzug laesst den Behaelter erst zu Ende
+   einblenden, damit nicht Einblenden und Zucken uebereinanderliegen. */
+.sektion-meta.is-angesprungen {
+    animation: metazeile-anspringen 1.2s ease-out 0.4s both;
+}
+
+/* Im Hero vergibt main.js die Klasse nur, wenn kein Intro laeuft (zweiter
+   Aufruf in derselben Sitzung) - dort steht der Hero sofort da. Laeuft
+   das Intro, haengt das Anspringen weiter unten an dessen Staffelung.
+   Die Zeilen springen nacheinander an, nicht im Chor. */
+.hero-meta-zeile.is-angesprungen {
+    animation: metazeile-anspringen 1.2s ease-out
+               calc(0.35s + var(--i, 0) * 0.12s) both;
 }
 
 /* Die Nummer traegt den Akzent, damit die Zeile eine Ankerstelle hat -
@@ -3404,7 +3448,7 @@ html.lenis body {
 
     .sektion-meta {
         gap: 0.45rem;
-        font-size: 0.66rem;
+        font-size: 0.75rem;
     }
 }
 
@@ -4279,6 +4323,14 @@ html.intro-laeuft .hero-content.is-eingefahren .hero-strich {
 
 html.intro-laeuft .hero-content.is-eingefahren .hero-meta-zeile {
     --hero-verzug: calc(780ms + var(--i) * 90ms);
+
+    /* Die Roehre springt an, sobald die Zeile ihre Endposition erreicht
+       hat - deshalb der eigene Verzug plus die Dauer des Einfahrens.
+       Im Hero laeuft das ueber die Intro-Staffelung statt ueber den
+       Beobachter aus main.js: der Hero steht beim Laden schon im Bild
+       und wuerde sonst hinter dem Vorhang anspringen. */
+    animation: metazeile-anspringen 1.2s ease-out
+               calc(var(--hero-verzug) + 450ms) both;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -4298,6 +4350,14 @@ html.intro-laeuft .hero-content.is-eingefahren .hero-meta-zeile {
         opacity: 1;
         transform: none;
         filter: none;
+    }
+
+    /* Kein Anspringen. main.js vergibt die Klasse dann ohnehin nicht
+       mehr, der Hero haengt aber allein am CSS. */
+    .sektion-meta.is-angesprungen,
+    .hero-meta-zeile.is-angesprungen,
+    html.intro-laeuft .hero-content.is-eingefahren .hero-meta-zeile {
+        animation: none;
     }
 
     html.intro-laeuft .hero-strich {

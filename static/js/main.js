@@ -806,6 +806,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Nach createGallery/createClubListe: Galeriekacheln und Clubzeilen
     // entstehen erst dort, vorher gaebe es nichts zu beobachten.
     initReveals();
+    initMetazeilen();
 
     setTimeout(() => {
         window.galleryModal = new ImprovedGallery();
@@ -1249,6 +1250,42 @@ function initReveals() {
         el.setAttribute('data-reveal', '');
         beobachter.observe(el);
     });
+}
+
+
+// ===== METAZEILEN: ANSPRINGEN WIE EINE NEONROEHRE =====
+// Die Sektions-Metazeilen zucken beim Sichtbarwerden zwei-, dreimal in
+// der Helligkeit und stehen dann ruhig. Einmalig, nicht dauerhaft -
+// deshalb wird jede Zeile nach dem ersten Mal nicht mehr beobachtet.
+//
+// Ein eigener Beobachter statt der Reveal-Mechanik: die Zeile soll
+// anspringen, wenn sie selbst im Bild ist, nicht wenn ihr Behaelter es
+// ist.
+//
+// Die Hero-Metazeilen kommen nur dazu, wenn kein Intro laeuft - beim
+// zweiten Aufruf in derselben Sitzung. Laeuft eins, wuerden sie hinter
+// dem Vorhang anspringen; dann haengt das Anspringen im CSS an der
+// Intro-Staffelung (.is-eingefahren) statt an dieser Klasse.
+function initMetazeilen() {
+    if (BEWEGUNG_REDUZIERT) return;
+    if (typeof IntersectionObserver !== 'function') return;
+
+    const wahl = document.documentElement.classList.contains('intro-laeuft')
+        ? '.sektion-meta'
+        : '.sektion-meta, .hero-meta-zeile';
+
+    const zeilen = document.querySelectorAll(wahl);
+    if (!zeilen.length) return;
+
+    const beobachter = new IntersectionObserver(eintraege => {
+        eintraege.forEach(eintrag => {
+            if (!eintrag.isIntersecting) return;
+            eintrag.target.classList.add('is-angesprungen');
+            beobachter.unobserve(eintrag.target);
+        });
+    }, { threshold: 0.6 });
+
+    zeilen.forEach(zeile => beobachter.observe(zeile));
 }
 
 
