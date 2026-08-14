@@ -68,13 +68,21 @@ async () => {
 """
 
 # Bilder, die noch im Flug sind, abwarten - sonst landen graue Kacheln
-# im Screenshot. decode() faengt auch die gerade erst angestossenen.
+# im Screenshot.
+#
+# Das Limit ist Pflicht, nicht Vorsicht: decode() auf einem Bild mit
+# loading="lazy", das ausserhalb des Viewports steht, loest sich unter
+# Umstaenden nie auf - weder erfuellt noch abgelehnt. Ein .catch() hilft
+# dagegen nicht, und page.evaluate() hat von sich aus kein Zeitlimit.
+# Genau daran hing der 390px-Lauf minutenlang (ein TMDB-Poster weit
+# unten auf der Seite).
 BILDER_ABWARTEN = """
-() => Promise.all(
-  Array.from(document.images)
-    .filter(img => !img.complete)
-    .map(img => img.decode().catch(() => null))
-)
+() => {
+  const offen = Array.from(document.images).filter(img => !img.complete);
+  const fertig = Promise.all(offen.map(img => img.decode().catch(() => null)));
+  const limit = new Promise(r => setTimeout(() => r('limit'), 8000));
+  return Promise.race([fertig, limit]).then(e => e === 'limit' ? offen.length : 0);
+}
 """
 
 
@@ -89,7 +97,9 @@ def seite_vorbereiten(page, url: str, wartezeit: float) -> None:
         pass
 
     page.evaluate(DURCHSCROLLEN)
-    page.evaluate(BILDER_ABWARTEN)
+    haengend = page.evaluate(BILDER_ABWARTEN)
+    if haengend:
+        print(f"  ..  {haengend} Bild(er) nicht fertig geladen, weiter nach Limit")
 
     # Die geforderte Ruhepause: Animationen auslaufen lassen.
     page.wait_for_timeout(int(wartezeit * 1000))
