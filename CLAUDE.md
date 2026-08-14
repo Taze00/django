@@ -43,6 +43,35 @@ docker compose restart django-dev
 - **Secrets** stehen in der gitignorten `.env` (nicht im Code). `SECRET_KEY` ist rotiert.
 - **Logs ansehen:** `docker compose logs django-dev`
 
+## Werkzeuge und Fallen
+> Dieser Abschnitt gilt **repo-weit**, nicht nur für CORVIS — er betrifft vor allem die Portfolio-Seiten (`templates/index.html`, `static/css/styles.css`, `static/js/main.js`).
+
+- **Screenshots: `tools/shots.py`** — Playwright für Python, kein Node auf dieser Maschine. Macht Full-Page und Einzelsektionen in 1440px und 390px nach `screenshots/` (gitignored).
+  ```
+  python3 tools/shots.py                                   # Startseite, beide Breiten
+  python3 tools/shots.py --url http://localhost:8000/filme/ --out screenshots/filme
+  ```
+  **Immer laufen lassen und die Bilder tatsächlich ansehen, bevor etwas als fertig gemeldet wird.**
+
+- **Leere Kacheln im Screenshot sind meist ein Aufnahmefehler, kein Seitenfehler.** Chromium rasterisiert bei langen Seiten die *erste* Full-Page-Aufnahme unvollständig — Bilder weit unterhalb des Viewports fehlen, obwohl sie geladen und sichtbar sind, und welche fehlen wechselt von Lauf zu Lauf. `shots.py` nimmt deshalb zweimal auf und behält die zweite. Vor der Fehlersuche an der Seite: mit einem **Viewport**-Screenshot gegenprüfen.
+
+- **Textersetzungen mit `index()`: erst prüfen, dass das Ende hinter dem Anfang liegt.**
+  ```python
+  start = s.index(ANFANGSMARKE)
+  ende  = s.index(ENDMARKE)
+  assert start < ende, "Endmarke liegt vor der Anfangsmarke - Abbruch"
+  s = s[:start] + neu + s[ende:]
+  ```
+  `index()` liefert immer das *erste* Vorkommen. Liegt die Endmarke davor, wird der Bereich **dupliziert statt entfernt** — die Datei bleibt syntaktisch gültig, und in CSS/JS gewinnt die spätere Kopie, die Änderung wirkt also folgenlos. Ist zweimal passiert (`.verteilung`/`.filmsuche` in `styles.css`, `initReveals` in `main.js`).
+
+- **Nach jedem größeren CSS-/JS-Eingriff nachzählen**, ob Regeln oder Funktionen doppelt stehen:
+  ```
+  grep -c "^\.verteilung {" static/css/styles.css     # muss 1 sein
+  grep -c "function initReveals" static/js/main.js    # muss 1 sein
+  ```
+
+- **Das Sicherheitsnetz des Ladebildschirms steht als Inline-Skript im `<head>` von `index.html`**, nicht in `main.js` — damit es auch greift, wenn `main.js` gar nicht lädt oder einen Syntaxfehler hat. Es räumt den Vorhang nach 3,5s notfalls selbst weg; die DOM-Schritte liegen außerhalb des `try`, damit ein Fehler in `introBeenden()` sie nicht verschluckt. **Nicht nach `main.js` verschieben** — der Vorhang sperrt das Scrollen, ein hängender Vorhang macht die Seite unerreichbar.
+
 ## Arbeits-Konventionen
 - **Pro Feature ein Commit** (nicht in Batches), mit `Co-Authored-By`-Trailer.
 - **Bei Bugs/Fehlern: erst Logs/Fehler holen, nie raten.**
