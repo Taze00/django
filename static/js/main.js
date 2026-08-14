@@ -12,7 +12,7 @@ const CONFIG = {
 // ===== DOM ELEMENTS =====
 const elements = {
     galleryGrid: document.getElementById('gallery-grid'),
-    rankingGrid: document.getElementById('ranking-grid'),
+    clubListe: document.getElementById('clubliste'),
     fadeElements: document.querySelectorAll('.fade-in'),
     threeBgContainer: document.getElementById('three-bg')
 };
@@ -388,142 +388,77 @@ function setupCarouselNavigation() {
 }
 
 
-// ===== CLUB CARDS FUNCTIONS =====
-function createClubCards() {
-    if (!elements.rankingGrid) return;
-    
-    elements.rankingGrid.innerHTML = '';
-    
-    // Prüfe ob Mobile
-    const isMobile = window.innerWidth <= 768;
-    
-    clubData.forEach(club => {
-        const colDiv = document.createElement('div');
-        colDiv.className = 'col-lg-4 col-md-6 col-sm-12';
-        
-        const clubCard = document.createElement('div');
-        clubCard.className = 'club-card fade-in';
-        
-        if (isMobile) {
-            // Mobile Struktur
-            const avgRating = Math.round((club.ratings.atmosphere + club.ratings.sound + club.ratings.lineup) / 3);
-            
-            clubCard.innerHTML = `
-                <div class="club-card-header">
-                    <div class="club-thumbnail">
-                        <img src="${club.image}" alt="${club.name}">
-                    </div>
-                    <div class="club-list-info">
-                        <h3>${club.name}</h3>
-                        <div class="club-quick-rating">
-                            <span class="stars">${getStarsFromRating(avgRating)}</span>
-                            <span>${avgRating}%</span>
-                        </div>
-                    </div>
-                    <div class="club-expand-icon">
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                </div>
-                <div class="club-details-mobile">
-                    <div class="club-details-image">
-                        <img src="${club.image}" alt="${club.name}">
-                        ${club.badge ? `<div class="club-badge-mobile">${club.badge}</div>` : ''}
-                    </div>
-                    <p class="club-desc-mobile">${club.description}</p>
-                    <div class="club-ratings-mobile">
-                        <div class="rating-item-mobile">
-                            <div class="rating-header-mobile">
-                                <span class="rating-title-mobile">Atmosphäre</span>
-                                <span class="rating-value-mobile">${club.ratings.atmosphere}%</span>
-                            </div>
-                            <div class="rating-bar-mobile">
-                                <div class="rating-fill-mobile atmosphere" style="width: 0%" data-width="${club.ratings.atmosphere}%"></div>
-                            </div>
-                        </div>
-                        <div class="rating-item-mobile">
-                            <div class="rating-header-mobile">
-                                <span class="rating-title-mobile">Sound</span>
-                                <span class="rating-value-mobile">${club.ratings.sound}%</span>
-                            </div>
-                            <div class="rating-bar-mobile">
-                                <div class="rating-fill-mobile sound" style="width: 0%" data-width="${club.ratings.sound}%"></div>
-                            </div>
-                        </div>
-                        <div class="rating-item-mobile">
-                            <div class="rating-header-mobile">
-                                <span class="rating-title-mobile">Lineup</span>
-                                <span class="rating-value-mobile">${club.ratings.lineup}%</span>
-                            </div>
-                            <div class="rating-bar-mobile">
-                                <div class="rating-fill-mobile lineup" style="width: 0%" data-width="${club.ratings.lineup}%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Event Listener für Mobile hinzufügen
-            setTimeout(() => {
-                const header = clubCard.querySelector('.club-card-header');
-                if (header) {
-                    header.addEventListener('click', () => {
-                        toggleMobileClubDetails(clubCard);
-                    });
-                }
-            }, 100);
-        } else {
-            // Desktop Struktur
-            clubCard.innerHTML = `
-                <div class="club-image">
-                    <img src="${club.image}" alt="${club.name}" loading="lazy">
-                    <div class="club-badge">${club.badge}</div>
-                </div>
-                <div class="club-content">
-                    <h3 class="club-name">${club.name}</h3>
-                    <p class="club-desc">${club.description}</p>
-                    
-                    <div class="rating-container">
-                        <div class="rating-header">
-                            <span class="rating-title">Atmosphäre</span>
-                            <span class="rating-value">${club.ratings.atmosphere}%</span>
-                        </div>
-                        <div class="rating-bar">
-                            <div class="rating-fill atmosphere-fill" data-width="${club.ratings.atmosphere}%"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="rating-container">
-                        <div class="rating-header">
-                            <span class="rating-title">Sound</span>
-                            <span class="rating-value">${club.ratings.sound}%</span>
-                        </div>
-                        <div class="rating-bar">
-                            <div class="rating-fill sound-fill" data-width="${club.ratings.sound}%"></div>
-                        </div>
-                    </div>
-                    
-                    <div class="rating-container">
-                        <div class="rating-header">
-                            <span class="rating-title">Lineup</span>
-                            <span class="rating-value">${club.ratings.lineup}%</span>
-                        </div>
-                        <div class="rating-bar">
-                            <div class="rating-fill lineup-fill" data-width="${club.ratings.lineup}%"></div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-        
-        colDiv.appendChild(clubCard);
-        elements.rankingGrid.appendChild(colDiv);
+// ===== CLUBLISTE =====
+// Die Clubs standen als Karten mit Foto, Sternebadge und drei farbigen
+// Fortschrittsbalken. Drei Balken je Karte, sechs Karten - achtzehn
+// Balken, die alle ungefaehr gleich weit ausschlugen und deshalb nichts
+// unterschieden. Die Rangfolge, um die es geht, war daraus nicht
+// ablesbar: die Karten standen in Eingabereihenfolge im Raster.
+//
+// Jetzt eine nummerierte Liste, sortiert nach der Gesamtzahl. Das Foto
+// und die drei Einzelwerte kommen beim Darueberfahren dazu - auf
+// Zeigegeraeten per Hover, sonst per Antippen.
+function createClubListe() {
+    const liste = elements.clubListe;
+    if (!liste) return;
+
+    // Die Gesamtzahl ist der gerundete Schnitt der drei Einzelwerte -
+    // sie steht nirgends in den Daten, sonst koennten beide auseinander
+    // laufen.
+    const rang = clubData
+        .map(club => ({
+            club,
+            gesamt: Math.round(
+                (club.ratings.atmosphere + club.ratings.sound + club.ratings.lineup) / 3
+            )
+        }))
+        .sort((a, b) => b.gesamt - a.gesamt);
+
+    liste.innerHTML = '';
+
+    rang.forEach((eintrag, i) => {
+        const { club, gesamt } = eintrag;
+        const nummer = String(i + 1).padStart(2, '0');
+
+        const zeile = document.createElement('li');
+        zeile.className = 'clubliste-zeile';
+
+        // Ein <button>, damit die Details auch mit der Tastatur
+        // erreichbar sind - auf einem Zeigegeraet kommen sie sonst nur
+        // beim Darueberfahren.
+        zeile.innerHTML = `
+            <button type="button" class="clubliste-knopf" aria-expanded="false">
+                <span class="clubliste-nr">${nummer}</span>
+                <span class="clubliste-bild">
+                    <img src="${club.image}" alt="" width="52" height="32" loading="lazy">
+                </span>
+                <span class="clubliste-name">${club.name}</span>
+                <span class="clubliste-werte" aria-hidden="true">ATM ${club.ratings.atmosphere} &middot; SND ${club.ratings.sound} &middot; LNP ${club.ratings.lineup}</span>
+                <span class="visually-hidden">Atmosphäre ${club.ratings.atmosphere}, Sound ${club.ratings.sound}, Lineup ${club.ratings.lineup}</span>
+                <span class="clubliste-gesamt">${gesamt}</span>
+            </button>
+        `;
+
+        const knopf = zeile.querySelector('.clubliste-knopf');
+        knopf.addEventListener('click', () => oeffneClubZeile(zeile));
+
+        liste.appendChild(zeile);
     });
-    
-    setTimeout(() => {
-        document.querySelectorAll('.club-card').forEach(card => {
-            card.classList.add('active');
-        });
-    }, 300);
+}
+
+// Immer nur eine Zeile offen: sechs aufgeklappte Zeilen sind wieder die
+// Kartenwand, die die Liste ersetzt hat.
+function oeffneClubZeile(zeile) {
+    const offen = zeile.classList.contains('is-offen');
+
+    document.querySelectorAll('.clubliste-zeile.is-offen').forEach(andere => {
+        if (andere === zeile) return;
+        andere.classList.remove('is-offen');
+        andere.querySelector('.clubliste-knopf').setAttribute('aria-expanded', 'false');
+    });
+
+    zeile.classList.toggle('is-offen', !offen);
+    zeile.querySelector('.clubliste-knopf').setAttribute('aria-expanded', String(!offen));
 }
 
 // ===== TOP LISTS TOGGLE FUNCTION =====
@@ -540,32 +475,6 @@ function toggleDetails(element) {
     
     // Toggle current detail
     details.classList.toggle('show');
-}
-
-// ===== RATING BARS ANIMATION =====
-function animateRatingBars() {
-    if (!document.querySelector('.club-card')) return;
-    
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const ratingFills = entry.target.querySelectorAll('.rating-fill');
-                
-                ratingFills.forEach(fill => {
-                    const width = fill.getAttribute('data-width');
-                    setTimeout(() => {
-                        fill.style.width = width;
-                    }, 200);
-                });
-                
-                observer.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.2 });
-    
-    document.querySelectorAll('.club-card').forEach(card => {
-        observer.observe(card);
-    });
 }
 
 // ===== SMOOTH SCROLLING =====
@@ -892,19 +801,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     createGallery();
     setupCarouselNavigation();
-    createClubCards();
+    createClubListe();
 
-    // Nach createGallery/createClubCards: Galeriekacheln und Clubkarten
+    // Nach createGallery/createClubListe: Galeriekacheln und Clubzeilen
     // entstehen erst dort, vorher gaebe es nichts zu beobachten.
     initReveals();
 
     setTimeout(() => {
         window.galleryModal = new ImprovedGallery();
     }, 600);
-
-    setTimeout(() => {
-        animateRatingBars();
-    }, 1000);
 });
 
 // Initialize when page loads
@@ -925,71 +830,9 @@ window.addEventListener('load', () => {
 
 // Make functions globally available
 window.createGallery = createGallery;
-window.createClubCards = createClubCards;
+window.createClubListe = createClubListe;
 window.toggleDetails = toggleDetails;
 window.galleryItems = galleryItems;
-
-// Helper Function für Mobile Club Cards
-function getStarsFromRating(rating) {
-    const fullStars = Math.floor(rating / 20);
-    const halfStar = (rating % 20) >= 10;
-    const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-    
-    return '★'.repeat(fullStars) + 
-           (halfStar ? '☆' : '') + 
-           '☆'.repeat(emptyStars);
-}
-
-function toggleMobileClubDetails(card) {
-    const isExpanded = card.classList.contains('expanded');
-    
-    // Schließe alle anderen Cards
-    document.querySelectorAll('.club-card.expanded').forEach(otherCard => {
-        if (otherCard !== card) {
-            otherCard.classList.remove('expanded');
-        }
-    });
-    
-    // Toggle aktuelle Card
-    card.classList.toggle('expanded');
-    
-    // Animiere die Rating-Bars wenn geöffnet
-    if (!isExpanded) {
-        setTimeout(() => {
-            animateMobileRatingBars(card);
-        }, 200);
-        
-        // Smooth scroll zur Card
-        setTimeout(() => {
-            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        }, 100);
-    }
-}
-
-function animateMobileRatingBars(card) {
-    const fills = card.querySelectorAll('.rating-fill-mobile');
-    fills.forEach(fill => {
-        const width = fill.getAttribute('data-width');
-        fill.style.width = width;
-    });
-}
-
-// Track current layout state
-let currentLayout = window.innerWidth <= 768 ? 'mobile' : 'desktop';
-
-window.addEventListener('resize', () => {
-    const newLayout = window.innerWidth <= 768 ? 'mobile' : 'desktop';
-    
-    if (currentLayout !== newLayout) {
-        currentLayout = newLayout;
-        
-        // Club Cards neu erstellen
-        createClubCards();
-        setTimeout(() => {
-            animateRatingBars();
-        }, 500);
-            }
-});
 
 // ===== REGAL =====
 // Ein Initializer fuer alle Regale auf der Seite. Findet sie ueber
@@ -1347,7 +1190,7 @@ function initReveals() {
     // Reihen, deren Kinder nacheinander erscheinen.
     const GRUPPEN = [
         ['.projects-grid', '.project-card'],
-        ['.ranking-grid', ':scope > *'],
+        ['.clubliste', ':scope > *'],
         ['.gallery-grid', '.gallery-item'],
         ['.films-filter', ':scope > *'],
         ['.social-links', ':scope > *']
@@ -1365,6 +1208,7 @@ function initReveals() {
         '.sektion-kopf',
         '.about-text',
         '.about-image',
+        '.berlin-marke',
         '.films-claim',
         '.regal',
         '.films-quelle',

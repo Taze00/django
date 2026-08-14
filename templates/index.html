@@ -317,9 +317,10 @@
             </div>
 
             <div id="clubs" class="berlin-clubs">
-                <div class="ranking-grid" id="ranking-grid">
-                    <!-- Club cards will be added via JavaScript -->
-                </div>
+                {% comment %}Die Zeilen kommen aus main.js (createClubListe) -
+                dort stehen auch die Daten. <ol>, weil die Reihenfolge die
+                Aussage ist: sortiert nach Gesamtzahl.{% endcomment %}
+                <ol class="clubliste" id="clubliste"></ol>
             </div>
 
             <div id="gallery" class="berlin-momente">
