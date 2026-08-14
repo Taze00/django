@@ -142,6 +142,33 @@
                 Zu dieser Auswahl steht nichts im Bestand.
             </p>
 
+            {% comment %}Serien und Anime. Sie standen bis eben auf der
+            Startseite und gehoeren hierher: die Seite ist der ganze
+            Bestand, sie sind ein Teil davon.
+
+            Bewusst unter dem Filmraster und mit eigener Ueberschrift -
+            Sortierung und Sternefilter darueber wirken auf das Raster,
+            nicht auf diese beiden Regale. Stuenden sie dazwischen, sahen
+            sie aus, als gehoerten sie dazu.{% endcomment %}
+            {% if serien or anime %}
+            <div class="filmseite-weiteres">
+                <div class="sektion-kopf">
+                    {% include "includes/sektion-meta.html" with titel="Ausserdem" zusatz="Serien &amp; Anime" %}
+                    <p class="sektion-einleitung">
+                        Nicht im Bestand oben mitgezählt – eigene Liste, eigene Wertungen.
+                    </p>
+                </div>
+
+                {% if serien %}
+                {% include "includes/regal.html" with titel="Serien" items=serien kachel_typ="poster" regal_id="serien" %}
+                {% endif %}
+
+                {% if anime %}
+                {% include "includes/regal.html" with titel="Anime" items=anime kachel_typ="poster" regal_id="anime" %}
+                {% endif %}
+            </div>
+            {% endif %}
+
             <p class="filmseite-zurueck">
                 <a href="/#filme">&larr; Zurück zur Startseite</a>
             </p>

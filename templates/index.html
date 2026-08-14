@@ -266,13 +266,9 @@
 
             <p class="films-empty" data-empty hidden>Zu dieser Auswahl ist noch nichts eingetragen.</p>
 
-            {% if serien %}
-            {% include "includes/regal.html" with titel="Serien" items=serien kachel_typ="poster" regal_id="serien" zaehler=serien_zaehler %}
-            {% endif %}
-
-            {% if anime %}
-            {% include "includes/regal.html" with titel="Anime" items=anime kachel_typ="poster" regal_id="anime" zaehler=anime_zaehler %}
-            {% endif %}
+            {% comment %}Serien und Anime standen hier als zwei weitere
+            Posterreihen. Sie sind auf /filme/ gezogen - dort gehoeren sie
+            zum Bestand, hier streckten sie nur die Sektion.{% endcomment %}
 
             {% if tagebuch %}
             {% include "includes/regal.html" with titel="Zuletzt gesehen" items=tagebuch kachel_typ="chronik" regal_id="tagebuch" regal_klasse="regal--chronik" %}

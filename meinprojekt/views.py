@@ -6,20 +6,10 @@ from films.models import Film, normalisiere
 
 
 def index(request):
-    # Filme und Serien holen ihre Poster von verschiedenen TMDB-Endpunkten.
+    # Nur noch die fuenf kuratierten Kinofilme. Serien und Anime haben
+    # die Startseite verlassen und stehen jetzt auf /filme/ (siehe
+    # films.views.uebersicht) - die Daten sind dieselben geblieben.
     filme = tmdb.mit_postern(kuratiert.get_filme())
-    serien = tmdb.mit_postern(
-        kuratiert.get_serien(), id_feld='tmdb_tv_id', medium='tv'
-    )
-
-    # Jede Gattung bekommt ihr eigenes Regal, deshalb getrennte Listen
-    # statt eines gemeinsamen Rasters mit Gattungsfilter.
-    serien_only = [e for e in serien if e.get('gattung') == 'serie']
-    anime = [e for e in serien if e.get('gattung') == 'anime']
-
-    # `eintraege` steuert weiterhin, ob die Sektion ueberhaupt gerendert
-    # wird - ohne einen einzigen Eintrag bleibt sie ganz weg.
-    eintraege = filme + serien
 
     # Faellt Letterboxd aus, ist das hier eine leere Liste und die
     # Tagebuch-Zeile wird im Template uebersprungen. Die Seite bleibt
@@ -52,16 +42,11 @@ def index(request):
         'projekte': projekte.get_projekte(),
         'statistik': statistik.hole_statistik(),
         'empfehlungen': empfehlungen,
-        'empfehlungen_zaehler': f'{len(empfehlungen)} Filme',
-        'eintraege': eintraege,
-        'filme': filme,
-        'serien': serien_only,
-        'anime': anime,
         # Zaehler als fertiger Text - im Template waere das eine
         # unleserliche Filterkette.
+        'empfehlungen_zaehler': f'{len(empfehlungen)} Filme ab 3,5',
+        'filme': filme,
         'filme_zaehler': f'{len(filme)} Filme',
-        'serien_zaehler': f'{len(serien_only)} Serien',
-        'anime_zaehler': f'{len(anime)} Titel',
         'stimmungen': kuratiert.get_stimmungen(filme),
         'tagebuch': tagebuch,
         'letterboxd_url': letterboxd.get_profile_url(),

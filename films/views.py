@@ -6,7 +6,7 @@ from django.db.models import F
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from films import poster, statistik, suchindex
+from films import kuratiert, poster, statistik, suchindex, tmdb
 from films.models import Film
 
 
@@ -71,7 +71,20 @@ def uebersicht(request):
         Film.objects.filter(gesehen=True)
         .order_by(F("wertung").desc(nulls_last=True), "titel")
     )
+
+    # Serien und Anime standen frueher als eigene Regale auf der
+    # Startseite. Dort trugen sie nichts zur Filmauswahl bei und
+    # streckten die Sektion um zwei weitere Posterreihen ohne Aussage.
+    # Hier sind sie richtig: die Seite ist der ganze Bestand, und sie
+    # sind ein Teil davon. Die Daten bleiben unveraendert in
+    # films/data/serien.json.
+    serien = tmdb.mit_postern(
+        kuratiert.get_serien(), id_feld="tmdb_tv_id", medium="tv"
+    )
+
     return render(request, "filme.html", {
         "filme": filme,
+        "serien": [e for e in serien if e.get("gattung") == "serie"],
+        "anime": [e for e in serien if e.get("gattung") == "anime"],
         "statistik": statistik.hole_statistik(),
     })
