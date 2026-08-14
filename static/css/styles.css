@@ -2225,6 +2225,88 @@ footer {
     opacity: 0.4;
 }
 
+/* --- Block 4: Abschlusskasten ----------------------------------------- */
+
+/* Der leichteste Block und der einzige mit Rahmen. Drei Dinge, die
+   vorher einzeln herumstanden, sitzen jetzt zusammen: Verteilung, Satz
+   und Suche. Sie gehoeren zusammen, weil sie dasselbe tun - sie fuehren
+   von der Auswahl darueber zum ganzen Bestand.
+
+   Der Rahmen ist die Klammer, die das sagt. Ohne ihn waeren es wieder
+   drei Sachen nebeneinander, nur enger gestellt. */
+.abschluss {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr) minmax(15rem, 0.9fr);
+    align-items: center;
+    gap: clamp(1.5rem, 3vw, 2.75rem);
+    /* Kein eigener margin-top: der Abstand kommt vom margin-bottom des
+       Blocks davor. Beides zusammen waeren zwei Blockabstaende
+       untereinander - der Kasten trieb dadurch elf Zeilen tief ab. */
+    padding: clamp(1.5rem, 3vw, 2rem);
+    border: 1px solid var(--gray);
+    border-radius: calc(var(--film-radius) * 1.5);
+    background: rgba(255, 255, 255, 0.015);
+}
+
+.abschluss-satz {
+    margin: 0 0 0.6rem;
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--text-bright);
+}
+
+/* Die Belege zum Satz. Monospace wie die uebrigen Metazeilen - es sind
+   Zahlen, keine Prosa. */
+.abschluss-zahlen {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1.7;
+    letter-spacing: var(--mono-track);
+    text-transform: uppercase;
+    color: var(--text);
+    opacity: 0.75;
+}
+
+.abschluss-aktionen {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+}
+
+.abschluss-knopf {
+    justify-content: center;
+    text-align: center;
+}
+
+/* Die kleine Verteilung: nur die Balken, rund 52px hoch. Zahlen und
+   Skalenbeschriftung entfallen (siehe wertungsverteilung.html) - auf
+   52px waeren sie unlesbar, und der Text steht daneben im Kasten. */
+.verteilung--klein {
+    display: block;
+    margin: 0;
+}
+
+.verteilung--klein .verteilung-grafik {
+    height: 52px;
+    gap: 3px;
+}
+
+.verteilung--klein .verteilung-balken {
+    border-radius: 2px 2px 0 0;
+}
+
+@media (max-width: 900px) {
+    /* Untereinander, sobald die drei Spalten zu schmal werden. Die
+       Grafik bleibt oben: sie ist die Illustration zum Satz darunter. */
+    .abschluss {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1.75rem;
+    }
+}
+
 
 /* ==========================================================================
    PROGRAMMKINO - Neonrahmen und Leuchtschrift
@@ -3790,6 +3872,40 @@ html.lenis body {
 .filmsuche:focus-within {
     border-color: rgba(0, 217, 255, 0.45);
     background: rgba(0, 217, 255, 0.035);
+}
+
+/* Die Suche verliert ihren eigenen grossen Block: sie war zu gross und
+   stand zu allein. Hier ist sie eine Zeile mit Beschriftung. */
+.filmsuche--klein {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+}
+
+.filmsuche--klein:focus-within {
+    border: 0;
+    background: none;
+}
+
+.filmsuche--klein .filmsuche-label {
+    margin-bottom: 0.5rem;
+    font-size: 0.7rem;
+    opacity: 0.75;
+}
+
+.filmsuche--klein .filmsuche-feld {
+    padding-top: 0.7rem;
+    padding-bottom: 0.7rem;
+    font-size: 0.9rem;
+}
+
+/* Ohne Rahmen am Block braucht das Feld einen eigenen sichtbaren
+   Zustand - vorher trug den der Kasten drumherum. */
+.filmsuche--klein .filmsuche-feld:focus {
+    border-color: var(--primary);
 }
 
 .filmsuche-label {

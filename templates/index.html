@@ -254,67 +254,85 @@
             </div>
             {% endif %}
 
-            {% comment %}Noch lose: Satz, Verteilung und Suche. Der
-            Abschlusskasten fasst sie im naechsten Schritt zusammen.{% endcomment %}
-            <p class="films-claim fade-in">Ich bewerte streng. Von <strong>{{ statistik.gesehen }} Filmen</strong> haben <strong>{{ statistik.volle_wertung }}</strong> die volle Wertung bekommen. Schnitt: {{ statistik.schnitt_kurz }}.</p>
-
-            {% include "includes/wertungsverteilung.html" %}
-
             {% comment %}
-            Filmsuche. Der Index wird einmal von /api/filme/index.json geholt,
-            danach sucht der Browser allein - kein Ladezustand, keine
-            Verzoegerung, kein Abruf je Tastendruck.
+            ------------------------------------------------------------
+            BLOCK 4 - ABSCHLUSSKASTEN
+            Der leichteste Block, und der einzige mit Rahmen. Er fasst
+            drei Dinge zusammen, die vorher einzeln herumstanden: die
+            Verteilung (war ein eigener grosser Block), der Satz dazu,
+            und die Suche (hatte einen eigenen Kasten, war zu gross und
+            stand zu allein).
 
-            Ohne JavaScript bleibt der Block weg: main.js blendet ihn erst
-            ein, wenn der Index da ist. Ein Suchfeld, das nichts tut, waere
-            schlimmer als keines.
+            Sie gehoeren zusammen, weil sie dasselbe tun: sie fuehren
+            von der Auswahl darueber zum ganzen Bestand.
+            ------------------------------------------------------------
             {% endcomment %}
-            <div class="filmsuche" data-filmsuche hidden>
-                <label class="filmsuche-label" for="filmsuche-feld">Hab ich den gesehen?</label>
-
-                <div class="filmsuche-feld-zeile">
-                    {% comment %}Lupe als Inline-SVG - kein Icon-Font noetig,
-                    und sie faerbt sich mit dem Feld beim Fokus.{% endcomment %}
-                    <svg class="filmsuche-lupe" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-                        <circle cx="9" cy="9" r="6" fill="none" stroke="currentColor" stroke-width="1.6"/>
-                        <line x1="13.5" y1="13.5" x2="18" y2="18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-                    </svg>
-
-                    <input type="search" id="filmsuche-feld" class="filmsuche-feld"
-                           data-filmsuche-feld
-                           placeholder="Titel eintippen"
-                           autocomplete="off" spellcheck="false"
-                           role="combobox" aria-expanded="false"
-                           aria-controls="filmsuche-treffer"
-                           aria-describedby="filmsuche-hinweis">
-                    <button type="button" class="filmsuche-leeren" data-filmsuche-leeren hidden>
-                        <span class="visually-hidden">Suche leeren</span>
-                    </button>
+            <div class="abschluss">
+                <div class="abschluss-grafik">
+                    {% include "includes/wertungsverteilung.html" with klein=True %}
                 </div>
 
-                <p class="filmsuche-umfang">{{ statistik.gesehen }} Filme durchsuchbar</p>
+                <div class="abschluss-text">
+                    <p class="abschluss-satz">Ich bewerte streng.</p>
+                    <p class="abschluss-zahlen">
+                        Gipfel bei {{ statistik.gipfel_stufe }} <span aria-hidden="true">—</span>
+                        {{ statistik.gipfel_anzahl }} Filme /
+                        nur {{ statistik.ab_vier_prozent }}% ab vier Sternen
+                    </p>
+                </div>
 
-                <p class="visually-hidden" id="filmsuche-hinweis">
-                    Ergebnisse erscheinen beim Tippen. Mit Pfeil hoch und runter
-                    auswaehlen, mit Escape leeren.
-                </p>
+                <div class="abschluss-aktionen">
+                    {% comment %}
+                    Filmsuche. Der Index wird einmal von /api/filme/index.json
+                    geholt, danach sucht der Browser allein - kein Ladezustand,
+                    keine Verzoegerung, kein Abruf je Tastendruck.
 
-                <ul class="filmsuche-treffer" id="filmsuche-treffer"
-                    data-filmsuche-treffer role="listbox"
-                    aria-label="Suchergebnisse"></ul>
+                    Ohne JavaScript bleibt der Block weg: main.js blendet ihn
+                    erst ein, wenn der Index da ist. Ein Suchfeld, das nichts
+                    tut, waere schlimmer als keines. Der Knopf darunter steht
+                    auch dann - er ist ein Link, er braucht kein JS.
+                    {% endcomment %}
+                    <div class="filmsuche filmsuche--klein" data-filmsuche hidden>
+                        <label class="filmsuche-label" for="filmsuche-feld">Hab ich den gesehen?</label>
 
-                <p class="filmsuche-leer" data-filmsuche-leer hidden aria-live="polite"></p>
+                        <div class="filmsuche-feld-zeile">
+                            {% comment %}Lupe als Inline-SVG - kein Icon-Font
+                            noetig, und sie faerbt sich mit dem Feld beim
+                            Fokus.{% endcomment %}
+                            <svg class="filmsuche-lupe" viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+                                <circle cx="9" cy="9" r="6" fill="none" stroke="currentColor" stroke-width="1.6"/>
+                                <line x1="13.5" y1="13.5" x2="18" y2="18" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+                            </svg>
+
+                            <input type="search" id="filmsuche-feld" class="filmsuche-feld"
+                                   data-filmsuche-feld
+                                   placeholder="Titel eintippen"
+                                   autocomplete="off" spellcheck="false"
+                                   role="combobox" aria-expanded="false"
+                                   aria-controls="filmsuche-treffer"
+                                   aria-describedby="filmsuche-hinweis">
+                            <button type="button" class="filmsuche-leeren" data-filmsuche-leeren hidden>
+                                <span class="visually-hidden">Suche leeren</span>
+                            </button>
+                        </div>
+
+                        <p class="visually-hidden" id="filmsuche-hinweis">
+                            Ergebnisse erscheinen beim Tippen. Mit Pfeil hoch und runter
+                            auswaehlen, mit Escape leeren.
+                        </p>
+
+                        <ul class="filmsuche-treffer" id="filmsuche-treffer"
+                            data-filmsuche-treffer role="listbox"
+                            aria-label="Suchergebnisse"></ul>
+
+                        <p class="filmsuche-leer" data-filmsuche-leer hidden aria-live="polite"></p>
+                    </div>
+
+                    <a class="btn abschluss-knopf" href="/filme/">
+                        Alle {{ statistik.gesehen }} Filme <span aria-hidden="true">&rarr;</span>
+                    </a>
+                </div>
             </div>
-
-
-            {% comment %}Abschluss der Sektion: von der kuratierten Auswahl
-            zum ganzen Bestand.{% endcomment %}
-            <p class="filme-alle">
-                <a class="filme-alle-link" href="/filme/">
-                    Alle {{ statistik.gesehen }} Filme ansehen &rarr;
-                    <span class="filme-alle-zusatz">sortierbar, filterbar, durchsuchbar</span>
-                </a>
-            </p>
 
             <p class="films-attribution">
                 Filmdaten und Plakate von <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">TMDB</a>.

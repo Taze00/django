@@ -11,24 +11,32 @@ auf voller Hoehe (siehe .verteilung-balken in styles.css).
 
 Die Skala laeuft ueber alle zehn halben Stufen von 0.5 bis 5.0. Auch die
 leeren: dass bei 1.0 kein einziger Film steht, ist eine Aussage.
+
+Parameter:
+    klein   Optional. Kleine Fassung fuer den Abschlusskasten der
+            Startseite: nur die Balken, rund 52px hoch. Beschriftungen
+            und Kennzahlen entfallen - auf 52px waeren sie unlesbar, und
+            im Kasten steht der Text daneben. Die aria-labels der Balken
+            bleiben, die Grafik bleibt also vorlesbar.
 {% endcomment %}
 
-<figure class="verteilung" data-verteilung>
+<figure class="verteilung{% if klein %} verteilung--klein{% endif %}" data-verteilung>
     <div class="verteilung-grafik">
         {% for stufe in statistik.verteilung %}
         <div class="verteilung-spalte{% if stufe.gipfel %} is-gipfel{% endif %}">
-            <span class="verteilung-anzahl">{{ stufe.anzahl }}</span>
+            {% if not klein %}<span class="verteilung-anzahl">{{ stufe.anzahl }}</span>{% endif %}
             <div class="verteilung-saeule">
                 <div class="verteilung-balken"
                      data-hoehe="{{ stufe.anteil }}%"
                      role="img"
                      aria-label="{{ stufe.anzahl }} Filme mit {{ stufe.stufe }} Sternen"></div>
             </div>
-            <span class="verteilung-stufe">{{ stufe.stufe }}</span>
+            {% if not klein %}<span class="verteilung-stufe">{{ stufe.stufe }}</span>{% endif %}
         </div>
         {% endfor %}
     </div>
 
+    {% if not klein %}
     {% comment %}Immer Wert zuerst, Beschriftung danach - sonst stand die
     Beschriftung mal ueber und mal unter der Zahl.{% endcomment %}
     <figcaption class="verteilung-zahlen">
@@ -49,4 +57,5 @@ leeren: dass bei 1.0 kein einziger Film steht, ist eine Aussage.
             <span>ab vier Sternen</span>
         </span>
     </figcaption>
+    {% endif %}
 </figure>
