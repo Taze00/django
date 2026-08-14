@@ -9,13 +9,24 @@
     <link rel="icon" href="{% static 'css/images/favicon.ico' %}" type="image/x-icon">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" as="style">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260814-1">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260814-2">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 
 <body>
     <a class="skip-link" href="#about">Zum Inhalt springen</a>
+
+    {% comment %}Koernung ueber der ganzen Seite. Rein dekorativ, faengt
+    keine Klicks ab. Das Rauschen kommt aus einem SVG-Filter im CSS, es
+    liegt also keine Bilddatei dahinter.{% endcomment %}
+    <div class="koernung" aria-hidden="true"></div>
+
+    {% comment %}Folgt dem Systemzeiger mit leichter Verzoegerung. Ersetzt
+    ihn nicht - der echte Zeiger bleibt sichtbar, sonst haengt die
+    Trefferrueckmeldung an einer Animation. Auf Touch entfernt das JS das
+    Element wieder.{% endcomment %}
+    <div class="zeiger" data-zeiger aria-hidden="true"></div>
 
     {% comment %}
     Fixierte Hauptnavigation. Liegt ueber dem Hero und wird erst beim
@@ -75,7 +86,7 @@
         <div class="container">
             <div class="about-grid">
                 <div class="about-text fade-in">
-                    <h2>Über <span class="text-gradient">Mich</span></h2>
+                    {% include "includes/sektion-meta.html" with nummer="01" titel="Über mich" zusatz="Werder, Brandenburg" %}
                     <p>Hi, ich bin Alex und das ist meine Website, die eigentlich nie fertig wird.</p>
                     <p>Ich bin 26, lebe in Werder und habe meinen Bachelor in Wirtschaftsinformatik abgeschlossen. In meiner Freizeit arbeite ich gerne an Webprojekten und probiere neue Technologien aus. Ich interessiere mich ziemlich schnell für neue Themen, am liebsten würde ich alle zwei Wochen was Neues lernen, was natürlich komplett unrealistisch ist, aber das Interesse ist da.</p>
                     <p>Am Wochenende bin ich meistens in Berlin unterwegs. Clubs, Bars mit Freunden und den Fernsehturm bestaunen. Manche Momente davon landen dann hier auf der Seite, als Foto, als Gedanke oder als Club-Review, den ich nachts in mein Handy getippt habe.</p>
@@ -98,9 +109,9 @@
     {% if projekte %}
     <section id="projekte" class="projects-section">
         <div class="container">
-            <div class="section-header fade-in">
-                <h2>Was ich <span class="text-gradient">baue</span></h2>
-                <p>Vier Projekte, an denen ich gelernt habe, was ich kann und was noch nicht</p>
+            <div class="sektion-kopf">
+                {% include "includes/sektion-meta.html" with nummer="02" titel="Was ich baue" zusatz=projekte|length|stringformat:"s"|add:" Projekte" %}
+                <p class="sektion-einleitung">Vier Projekte, an denen ich gelernt habe, was ich kann und was noch nicht</p>
             </div>
 
             <div class="projects-grid">
@@ -147,9 +158,9 @@
     <section id="clubs" class="club-ranking">
         <div class="club-pattern"></div>
         <div class="container club-container">
-            <div class="section-header fade-in">
-                <h2>Berlin Club <span class="text-gradient">Ranking</span></h2>
-                <p>Meine persönliche Bewertung der besten Clubs in Berlin, basierend auf Atmosphäre, Sound und Lineup</p>
+            <div class="sektion-kopf">
+                {% include "includes/sektion-meta.html" with nummer="03" titel="Clubs" zusatz="Berlin" %}
+                <p class="sektion-einleitung">Meine persönliche Bewertung der besten Clubs in Berlin, basierend auf Atmosphäre, Sound und Lineup</p>
             </div>
 
             <div class="ranking-grid" id="ranking-grid">
@@ -162,9 +173,9 @@
     <section id="gallery" class="gallery">
         <div class="gallery-pattern"></div>
         <div class="container gallery-container">
-            <div class="section-header fade-in">
-                <h2>Meine <span class="text-gradient">Momente</span></h2>
-                <p>Erkunde meine besten Erinnerungen aus Berlin</p>
+            <div class="sektion-kopf">
+                {% include "includes/sektion-meta.html" with nummer="04" titel="Momente" zusatz="17 Bilder" %}
+                <p class="sektion-einleitung">Erkunde meine besten Erinnerungen aus Berlin</p>
             </div>
 
             <div class="gallery-grid" id="gallery-grid">
@@ -202,8 +213,8 @@
     {% if eintraege %}
     <section id="filme" class="films-section">
         <div class="container">
-            <div class="section-header fade-in">
-                <h2>Meine <span class="text-gradient">Filme</span></h2>
+            <div class="sektion-kopf">
+                {% include "includes/sektion-meta.html" with nummer="05" titel="Filme" zusatz="204 gesehen" %}
             </div>
 
             <p class="films-claim fade-in">Ich bewerte streng. Von <strong>204 Filmen</strong> haben drei fünf Sterne. Was hier über vier steht, meine ich ernst.</p>
@@ -256,7 +267,7 @@
     <footer id="contact">
         <div class="container">
             <div class="footer-content fade-in">
-                <h2>Kontakt</h2>
+                {% include "includes/sektion-meta.html" with nummer="06" titel="Kontakt" %}
                 <p>Lass uns in Verbindung bleiben oder tausche dich mit mir über die Berliner Clubszene aus.</p>
                 <div class="social-links">
                     <a href="https://www.instagram.com/a_.volkmann/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram">
@@ -287,6 +298,9 @@
     </footer>
 
     <script defer src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
-    <script defer src="{% static 'js/main.js' %}?v=20260814-1"></script>
+    {% comment %}Lenis liegt lokal, nicht am CDN - eine Abhaengigkeit weniger
+    zur Laufzeit. defer haelt die Reihenfolge: Lenis vor main.js.{% endcomment %}
+    <script defer src="{% static 'js/vendor/lenis.min.js' %}?v=20260814-2"></script>
+    <script defer src="{% static 'js/main.js' %}?v=20260814-2"></script>
 </body>
 </html>

@@ -1,0 +1,28 @@
+{% comment %}
+Sektions-Metazeile - der Kopf jeder Sektion.
+
+Ersetzt die frueheren zentrierten Ueberschriften mit cyanem zweiten Wort
+und Unterstrich. Nimmt das Muster auf, das die Filmsektion in ihren
+Regalkoepfen schon nutzt ("FILME ... 3 FILME"): Monospace, klein,
+gedeckt, linksbuendig auf der Kante der Hero-Headline.
+
+    {% include "includes/sektion-meta.html" with nummer="01" titel="Über mich" zusatz="Werder, Brandenburg" %}
+
+Parameter:
+    nummer  Pflicht. Zweistellig, z.B. "01".
+    titel   Pflicht. Der Sektionsname.
+    zusatz  Optional. Ort, Anzahl - was die Sektion einordnet.
+
+Bleibt ein <h2>: die Sektionen brauchen weiterhin eine Ueberschrift in
+der Dokumentgliederung, auch wenn sie jetzt wie eine Meta-Zeile aussieht.
+{% endcomment %}
+
+<h2 class="sektion-meta">
+    <span class="sektion-meta-nr">{{ nummer }}</span>
+    <span class="sektion-meta-trenner" aria-hidden="true">—</span>
+    <span class="sektion-meta-titel">{{ titel }}</span>
+    {% if zusatz %}
+    <span class="sektion-meta-trenner" aria-hidden="true">—</span>
+    <span class="sektion-meta-zusatz">{{ zusatz }}</span>
+    {% endif %}
+</h2>

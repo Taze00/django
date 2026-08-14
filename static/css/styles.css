@@ -169,55 +169,6 @@ section {
 }
 
 /* Utility Classes */
-.section-header {
-    text-align: center;
-    margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
-}
-
-@media (max-width: 480px) {
-    .section-header {
-        margin-bottom: 1.5rem;
-    }
-
-    .section-header h2 {
-        font-size: clamp(1.5rem, 5vw, 2rem);
-        margin-bottom: 0.25rem;
-    }
-
-    .section-header p {
-        margin: 0.8rem auto 0;
-        font-size: 0.9rem;
-    }
-}
-
-.section-header h2 {
-    position: relative;
-    display: inline-block;
-    font-size: clamp(2rem, 6vw, 3rem);
-    margin-bottom: 0.5rem;
-}
-
-.section-header h2::after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background: var(--primary);
-    box-shadow: 0 0 15px rgba(0, 217, 255, 0.3);
-}
-
-.section-header p {
-    max-width: 700px;
-    margin: 1.5rem auto 0;
-    color: var(--primary);
-    font-weight: 500;
-    letter-spacing: 0.5px;
-}
-
-@media (max-width: 768px) {
-}
 
 .text-gradient {
     color: var(--primary);
@@ -955,9 +906,6 @@ footer {
     /* Verstecke das normale Grid auf Mobile */
 
     /* Bild/Video in der Karte */
-    .gallery h2::after{
-        background: var(--primary);
-    }
 
     .gallery {
         /* background: linear-gradient(135deg, #fd297b 0%, #ff655b 50%, #fdc468 100%); */
@@ -2703,10 +2651,12 @@ footer {
 
 /* Der Massstab-Satz steht bewusst gross und mittig, nicht als
    Kleingedrucktes. */
+/* Linksbuendig wie die Einleitungen der uebrigen Sektionen - die
+   Metazeile darueber steht links, ein zentrierter Satz darunter bricht
+   die Kante. */
 .films-claim {
     max-width: 760px;
-    margin: 0 auto clamp(2.5rem, 5vw, 3.5rem);
-    text-align: center;
+    margin: 0 0 clamp(2.5rem, 5vw, 3.5rem);
     font-size: clamp(1rem, 2.2vw, 1.25rem);
     line-height: 1.6;
     color: var(--text);
@@ -3155,12 +3105,12 @@ footer[id] {
     scroll-margin-top: 88px;
 }
 
-html {
-    scroll-behavior: smooth;
-}
+/* Kein globales scroll-behavior: smooth. Ankersprünge laufen ueber
+   initSmoothScrolling() in main.js - via Lenis, sonst als Rueckfall
+   ueber window.scrollTo(). Zwei Smooth-Mechanismen auf derselben
+   Position wuerden gegeneinander animieren. */
 
 @media (prefers-reduced-motion: reduce) {
-    html { scroll-behavior: auto; }
     .hauptnav-link::after,
     .seitenkopf-burger-strich { transition: none; }
 }
@@ -3223,5 +3173,197 @@ html {
     section[id],
     footer[id] {
         scroll-margin-top: 78px;
+    }
+}
+
+
+/* ==========================================================================
+   BEWEGUNGSSCHICHT
+   --------------------------------------------------------------------------
+   Traegheits-Scroll, Scroll-Reveals, Koernung und Mauszeiger. Struktur,
+   Farben und Inhalte bleiben unberuehrt - hier steht nur, wie sich die
+   Seite bewegt und anfuehlt.
+
+   Alles hier ist an prefers-reduced-motion gebunden: wer das gesetzt hat,
+   bekommt die Seite ohne Bewegung, ohne dass etwas unsichtbar bleibt.
+   ========================================================================== */
+
+/* --- Lenis (Traegheits-Scroll) ---------------------------------------- */
+
+html.lenis,
+html.lenis body {
+    height: auto;
+}
+
+/* Solange Lenis laeuft, darf der Browser nicht zusaetzlich smooth
+   scrollen - sonst kaempfen zwei Animationen um dieselbe Position.
+   Das html { scroll-behavior: smooth } aus dem Seitenkopf-Block wird
+   hier gezielt ausgehebelt. */
+.lenis {
+    scroll-behavior: auto !important;
+}
+
+/* Die Regale scrollen selbst horizontal - Lenis muss die Finger davon
+   lassen (data-lenis-prevent steht am Element). */
+.lenis [data-lenis-prevent] {
+    overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+    overflow: hidden;
+}
+
+/* --- Scroll-Reveals ---------------------------------------------------- */
+
+/* data-reveal setzt das JS, nicht das Markup - ohne JS bleibt die Seite
+   dadurch vollstaendig sichtbar statt dauerhaft auf opacity 0. */
+[data-reveal] {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) var(--reveal-verzug, 0ms),
+                transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) var(--reveal-verzug, 0ms);
+}
+
+[data-reveal].is-sichtbar {
+    opacity: 1;
+    transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    [data-reveal],
+    [data-reveal].is-sichtbar {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
+
+/* --- Koernung ---------------------------------------------------------- */
+
+/* Liegt ueber allem, auch ueber dem Seitenkopf, und faengt nichts ab.
+   Das Rauschen ist ein feTurbulence-SVG als Data-URI - kein Bild-Asset,
+   keine zusaetzliche Anfrage. 200x200 kacheln reicht, das Muster
+   wiederholt sich bei dieser Deckkraft unsichtbar. */
+.koernung {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    pointer-events: none;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23r)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+}
+
+/* --- Mauszeiger -------------------------------------------------------- */
+
+/* Startet unsichtbar und ausserhalb: ohne das sitzt der Punkt bis zur
+   ersten Mausbewegung sichtbar in der linken oberen Ecke. */
+.zeiger {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 9500;
+    width: 10px;
+    height: 10px;
+    margin: -5px 0 0 -5px;
+    border-radius: 50%;
+    background: var(--primary);
+    pointer-events: none;
+    opacity: 0;
+    transition: width 0.25s ease, height 0.25s ease, margin 0.25s ease,
+                background 0.25s ease, opacity 0.25s ease;
+}
+
+.zeiger.is-aktiv {
+    opacity: 1;
+}
+
+/* Ueber Links und Karten: groesser und halbtransparent. */
+.zeiger.is-gross {
+    width: 38px;
+    height: 38px;
+    margin: -19px 0 0 -19px;
+    background: rgba(0, 217, 255, 0.35);
+}
+
+/* Kein Zeiger auf Touch und keiner, wenn Bewegung reduziert werden soll -
+   ein nachlaufender Punkt ist genau die Art Bewegung, die dort stoert.
+   Das JS entfernt das Element zusaetzlich ganz. */
+@media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+    .zeiger { display: none; }
+}
+
+/* --- Sektions-Metazeilen ----------------------------------------------- */
+
+/* Ersetzt die frueheren zentrierten Ueberschriften. Linksbuendig auf der
+   Kante der Hero-Headline - beide liegen im selben .container, deshalb
+   braucht es dafuer keine Sonderregel.
+
+   Bleibt ein <h2> (siehe includes/sektion-meta.html): die Gliederung der
+   Seite soll erhalten bleiben, auch wenn die Zeile nicht mehr wie eine
+   Ueberschrift aussieht. */
+.sektion-kopf {
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.sektion-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin: 0 0 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: var(--mono-track);
+    line-height: 1.5;
+    text-transform: uppercase;
+    color: var(--text);
+    opacity: 0.75;
+}
+
+/* Die Nummer traegt den Akzent, damit die Zeile eine Ankerstelle hat -
+   sonst ist alles gleich gedeckt und die Reihenfolge geht unter. */
+.sektion-meta-nr {
+    color: var(--primary);
+    opacity: 0.9;
+}
+
+.sektion-meta-trenner {
+    opacity: 0.4;
+}
+
+.sektion-meta-titel {
+    color: var(--text-bright);
+}
+
+.sektion-meta-zusatz {
+    opacity: 0.75;
+}
+
+/* Die frueher zentrierte Unterzeile der Sektionen. Linksbuendig unter
+   der Metazeile, gedeckt statt cyan - die Metazeile fuehrt jetzt. */
+.sektion-einleitung {
+    max-width: 46ch;
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--text);
+    opacity: 0.75;
+}
+
+/* Im Footer steht sonst alles zentriert - die Metazeile nicht. */
+.footer-content .sektion-meta {
+    justify-content: center;
+}
+
+@media (max-width: 480px) {
+    .sektion-kopf {
+        margin-bottom: 1.75rem;
+    }
+
+    .sektion-meta {
+        gap: 0.45rem;
+        font-size: 0.66rem;
     }
 }

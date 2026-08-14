@@ -533,18 +533,27 @@ function animateRatingBars() {
 }
 
 // ===== SMOOTH SCROLLING =====
+// Ankersprünge. Laeuft Lenis, muss der Sprung durch Lenis gehen -
+// window.scrollTo() waere eine zweite Animation auf derselben Position.
+// Der Versatz haelt das Ziel unter dem fixierten Kopf frei.
+const KOPF_VERSATZ = -88;
+
 function initSmoothScrolling() {
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function(e) {
-            e.preventDefault();
-            
             const targetId = this.getAttribute('href');
             if (targetId === '#') return;
-            
+
             const targetElement = document.querySelector(targetId);
-            if (targetElement) {
+            if (!targetElement) return;
+
+            e.preventDefault();
+
+            if (window.lenis) {
+                window.lenis.scrollTo(targetElement, { offset: KOPF_VERSATZ });
+            } else {
                 window.scrollTo({
-                    top: targetElement.offsetTop,
+                    top: targetElement.offsetTop + KOPF_VERSATZ,
                     behavior: 'smooth'
                 });
             }
@@ -844,11 +853,14 @@ document.addEventListener('DOMContentLoaded', function() {
     enhanceLogo();
     initScrollEvents();
     initSmoothScrolling();
-    initEnhancedScrollAnimations();
 
     createGallery();
     setupCarouselNavigation();
     createClubCards();
+
+    // Nach createGallery/createClubCards: Galeriekacheln und Clubkarten
+    // entstehen erst dort, vorher gaebe es nichts zu beobachten.
+    initReveals();
 
     setTimeout(() => {
         window.galleryModal = new ImprovedGallery();
@@ -927,47 +939,6 @@ function animateMobileRatingBars(card) {
 }
 
 // Track current layout state
-// ===== ENHANCED SCROLL ANIMATIONS =====
-function initEnhancedScrollAnimations() {
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '0px 0px -100px 0px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('active');
-                observer.unobserve(entry.target);
-            }
-        });
-    }, observerOptions);
-
-    document.querySelectorAll('.fade-in').forEach(element => {
-        observer.observe(element);
-    });
-
-    // Gallery items with enhanced animation
-    document.querySelectorAll('.gallery-item').forEach((item, index) => {
-        const itemObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    setTimeout(() => {
-                        entry.target.style.opacity = '1';
-                        entry.target.style.transform = 'translateY(0)';
-                    }, index * 50);
-                    itemObserver.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
-
-        item.style.opacity = '0';
-        item.style.transform = 'translateY(20px)';
-        item.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        itemObserver.observe(item);
-    });
-}
-
 let currentLayout = window.innerWidth <= 768 ? 'mobile' : 'desktop';
 
 window.addEventListener('resize', () => {
@@ -1278,4 +1249,177 @@ window.addEventListener('resize', () => {
     });
 
     ziele.forEach(ziel => beobachter.observe(ziel.sektion));
+})();
+
+
+// ===== BEWEGUNGSSCHICHT =====
+// Traegheits-Scroll, Scroll-Reveals, Koernung und Mauszeiger.
+//
+// Eine gemeinsame Abfrage fuer alle vier: wer Bewegung reduziert haben
+// will, bekommt die Seite statisch - aber vollstaendig sichtbar.
+const BEWEGUNG_REDUZIERT = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+
+// ===== TRAEGHEITS-SCROLL (LENIS) =====
+(function initTraegheitsScroll() {
+    if (BEWEGUNG_REDUZIERT) return;
+    if (typeof window.Lenis !== 'function') return;
+
+    // Kurz gehalten: das Nachlaufen soll spuerbar sein, aber nicht
+    // bremsen. Lenis' Standard (1.2s) fuehlt sich auf einer 9500px
+    // langen Seite zaeh an.
+    const lenis = new window.Lenis({
+        duration: 0.8,
+        easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+        smoothWheel: true,
+        // Auf Touch bleibt das native Scrollen - Lenis dort fuehlt sich
+        // gegenueber der Systemphysik falsch an.
+        smoothTouch: false
+    });
+
+    function takt(zeit) {
+        lenis.raf(zeit);
+        requestAnimationFrame(takt);
+    }
+    requestAnimationFrame(takt);
+
+    window.lenis = lenis;
+})();
+
+
+// ===== SCROLL-REVEALS =====
+// Ein Beobachter fuer die ganze Seite. Elemente starten 24px tiefer und
+// unsichtbar und fahren beim Sichtbarwerden auf ihre Endposition.
+//
+// Gruppen (Kacheln, Karten, Listenpunkte) bekommen 80ms Versatz pro
+// Element, damit sie nacheinander erscheinen. Jedes Element genau einmal -
+// danach wird es nicht mehr beobachtet.
+function initReveals() {
+    // Bewegung reduziert: nichts verstecken, nichts animieren. Ohne das
+    // frueh zurueckzugeben, bliebe die Seite auf opacity 0 stehen.
+    if (BEWEGUNG_REDUZIERT) return;
+
+    const VERSATZ_MS = 80;
+    // Deckel gegen absurde Wartezeiten: bei 17 Galeriekacheln waere das
+    // letzte Element sonst erst nach 1,3s da.
+    const VERSATZ_MAX = 8;
+
+    // Reihen, deren Kinder nacheinander erscheinen.
+    const GRUPPEN = [
+        ['.projects-grid', '.project-card'],
+        ['.ranking-grid', ':scope > *'],
+        ['.gallery-grid', '.gallery-item'],
+        ['.films-filter', ':scope > *'],
+        ['.social-links', ':scope > *']
+    ];
+
+    // Einzelstuecke - erscheinen als Block, ohne Versatz.
+    //
+    // Regale bewusst als Ganzes: ihre Kacheln liegen zum Teil rechts
+    // ausserhalb des Viewports, einzeln beobachtet wuerden die erst beim
+    // seitlichen Scrollen auftauchen.
+    const EINZELN = [
+        '.hero-content',
+        '.sektion-kopf',
+        '.about-text',
+        '.about-image',
+        '.films-claim',
+        '.regal',
+        '.films-quelle',
+        '.films-attribution',
+        '.footer-content'
+    ];
+
+    const ziele = [];
+
+    GRUPPEN.forEach(([behaelterWahl, kindWahl]) => {
+        document.querySelectorAll(behaelterWahl).forEach(behaelter => {
+            behaelter.querySelectorAll(kindWahl).forEach((kind, i) => {
+                kind.style.setProperty('--reveal-verzug', `${Math.min(i, VERSATZ_MAX) * VERSATZ_MS}ms`);
+                ziele.push(kind);
+            });
+        });
+    });
+
+    EINZELN.forEach(wahl => {
+        document.querySelectorAll(wahl).forEach(el => ziele.push(el));
+    });
+
+    if (!ziele.length) return;
+
+    const beobachter = new IntersectionObserver(eintraege => {
+        eintraege.forEach(eintrag => {
+            if (!eintrag.isIntersecting) return;
+            // `active` fuer das alte .fade-in-CSS, das andere Seiten
+            // (impressum.html) weiter nutzen.
+            eintrag.target.classList.add('is-sichtbar', 'active');
+            beobachter.unobserve(eintrag.target);
+        });
+    }, { threshold: 0.1, rootMargin: '0px 0px -80px 0px' });
+
+    ziele.forEach(el => {
+        // Erst jetzt verstecken. Waere das Attribut schon im Markup,
+        // bliebe die Seite ohne JS dauerhaft leer.
+        el.setAttribute('data-reveal', '');
+        beobachter.observe(el);
+    });
+}
+
+
+// ===== MAUSZEIGER =====
+// Ein Punkt, der dem Systemzeiger nachlaeuft. Der echte Zeiger bleibt
+// sichtbar - ihn zu verstecken wuerde die Trefferrueckmeldung an eine
+// Animation haengen, die per Definition hinterherhinkt.
+(function initZeiger() {
+    const punkt = document.querySelector('[data-zeiger]');
+    if (!punkt) return;
+
+    const feinerZeiger = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+    // Touch oder reduzierte Bewegung: Element ganz raus, nicht nur
+    // ausblenden - dann laeuft auch keine Animationsschleife.
+    if (!feinerZeiger || BEWEGUNG_REDUZIERT) {
+        punkt.remove();
+        return;
+    }
+
+    // Nachlauf: 0.18 ist spuerbar, ohne dass der Punkt zurueckbleibt.
+    const NACHLAUF = 0.18;
+
+    let zielX = 0, zielY = 0;
+    let x = 0, y = 0;
+    let laeuft = false;
+
+    // Was den Punkt aufgehen laesst.
+    const GROSS = 'a, button, .project-card, .club-card, .gallery-item, .kachel, .films-chip, .regal-pfeil';
+
+    document.addEventListener('mousemove', ereignis => {
+        zielX = ereignis.clientX;
+        zielY = ereignis.clientY;
+
+        if (!laeuft) {
+            // Beim ersten Mal ohne Nachlauf setzen, sonst faehrt der Punkt
+            // aus der Ecke quer ueber den Schirm.
+            x = zielX;
+            y = zielY;
+            laeuft = true;
+            punkt.classList.add('is-aktiv');
+            requestAnimationFrame(takt);
+        }
+
+        punkt.classList.toggle('is-gross', !!ereignis.target.closest(GROSS));
+    }, { passive: true });
+
+    // Verlaesst die Maus das Fenster, soll kein Punkt stehen bleiben.
+    document.addEventListener('mouseleave', () => punkt.classList.remove('is-aktiv'));
+    document.addEventListener('mouseenter', () => {
+        if (laeuft) punkt.classList.add('is-aktiv');
+    });
+
+    function takt() {
+        x += (zielX - x) * NACHLAUF;
+        y += (zielY - y) * NACHLAUF;
+        punkt.style.transform = `translate(${x}px, ${y}px)`;
+        requestAnimationFrame(takt);
+    }
 })();
