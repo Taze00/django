@@ -11,7 +11,11 @@ from django.db.models import Avg, Count
 
 from films.models import Film
 
-CACHE_KEY = "films:statistik:v1"
+# v2: gipfel_stufe und gipfel_anzahl sind dazugekommen. Der Schluessel
+# muss mit, sonst liefert ein warmer Cache bis zu einer Stunde lang das
+# alte Dict ohne die neuen Felder - im Template stuenden dann leere
+# Stellen, ohne dass etwas kaputt aussieht.
+CACHE_KEY = "films:statistik:v2"
 CACHE_SECONDS = 60 * 60
 
 # Die volle Skala in halben Schritten. Bewusst alle zehn Stufen und
@@ -58,6 +62,12 @@ def baue_statistik():
     def mit_komma(wert, stellen):
         return f"{wert:.{stellen}f}".replace(".", ",")
 
+    # Der Gipfel als eigene Werte, nicht nur als Flag in der Verteilung:
+    # der Abschlusskasten der Startseite nennt ihn im Text ("Gipfel bei
+    # 2,5 - 74 Filme"), und dafuer muesste das Template sonst die
+    # Verteilung durchlaufen und die Stufe mit dem Flag heraussuchen.
+    gipfel = next((s for s in verteilung if s["gipfel"]), None)
+
     return {
         "gesehen": Film.objects.filter(gesehen=True).count(),
         "schnitt_anzeige": mit_komma(schnitt, 2),
@@ -68,6 +78,8 @@ def baue_statistik():
         "volle_wertung": volle,
         "ab_vier": ab_vier,
         "ab_vier_prozent": round(ab_vier / anzahl_bewertet * 100) if anzahl_bewertet else 0,
+        "gipfel_stufe": mit_komma(gipfel["stufe"], 1) if gipfel else "",
+        "gipfel_anzahl": gipfel["anzahl"] if gipfel else 0,
         "verteilung": verteilung,
     }
 

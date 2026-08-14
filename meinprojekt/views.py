@@ -26,10 +26,14 @@ def index(request):
     # in jedem Fall bei 200.
     tagebuch = tmdb.mit_postern_gemischt(letterboxd.get_recent_entries())
 
-    # Empfehlungen: alles ab 4.0 aus dem Letterboxd-Bestand, absteigend.
-    # Poster stehen fuer genau diese Auswahl in der Datenbank - sie
-    # werden mit `import_letterboxd --poster-ab 4.0` geholt und nicht
-    # fuer alle 216 Filme.
+    # Empfehlungen: alles ab 3.5 aus dem Letterboxd-Bestand, absteigend.
+    # Die Grenze lag bei 4.0 und liess 17 Filme uebrig - zu wenig fuer
+    # ein Regal, durch das sich das Blaettern lohnt. Ab 3.5 sind es 40.
+    #
+    # Poster holt der Import nur fuer Filme ab einer Wertung
+    # (`import_letterboxd --poster-ab`), nicht fuer alle 216. Fuer die
+    # 3.5er sind sie da - wer die Grenze weiter senkt, muss vorher
+    # nachsehen, sonst fuellt sich das Regal mit Platzhaltern.
     # Die fuenf kuratierten Filme haben alle 5.0 und stuenden sonst
     # gleich zweimal untereinander - einmal oben mit Text, einmal hier
     # ohne. Ausgeschlossen wird ueber normalisierten Titel und Jahr:
@@ -39,7 +43,7 @@ def index(request):
         (normalisiere(e.get('titel')), e.get('jahr')) for e in filme
     }
     empfehlungen = [
-        f for f in Film.objects.filter(gesehen=True, wertung__gte=4.0)
+        f for f in Film.objects.filter(gesehen=True, wertung__gte=3.5)
                                .order_by('-wertung', 'titel')
         if (f.titel_normalisiert, f.jahr) not in kuratierte
     ]
