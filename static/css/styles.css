@@ -277,6 +277,14 @@ section {
     background: var(--darker);
     position: relative;
     overflow: hidden;
+
+    /* Abstand von der rechten Kante des Containers bis zum Fensterrand.
+       Genau so weit laeuft das Foto aus der Sektion heraus - eine der
+       wenigen Stellen, an denen die Seite ihre Box verlaesst.
+       Die Werte spiegeln .container (90%, max 1300px, Innenabstand).
+       100vw zaehlt die Scrollleiste mit; die paar Pixel zuviel schneidet
+       das overflow:hidden der Sektion weg, ohne Querscrollen. */
+    --about-bleed: calc((100vw - min(90vw, 1300px)) / 2 + clamp(1rem, 3vw, 2rem));
 }
 
 .about-pattern {
@@ -292,11 +300,33 @@ section {
     z-index: 0;
 }
 
+/* Der Einstiegssatz steht als eigene Zeile ueber allen drei Spalten -
+   gross genug, dass man ihn liest, bevor man entscheidet, ob man den
+   Rest liest. */
+.about-kopf {
+    position: relative;
+    z-index: 1;
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+.about-lead {
+    max-width: 26ch;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.7rem, 4.2vw, 2.9rem);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--text-bright);
+}
+
+/* Eckdaten - Fliesstext - Foto. Die Textspalte bleibt schmal genug zum
+   Lesen, das Foto bekommt den Rest samt Ueberhang. */
 .about-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 0.55fr) minmax(0, 1.25fr) minmax(0, 1.4fr);
     gap: clamp(2rem, 5vw, 4rem);
-    align-items: center;
+    align-items: start;
     position: relative;
     z-index: 1;
 }
@@ -305,13 +335,102 @@ section {
     position: relative;
 }
 
+/* Mehr Luft zwischen den Absaetzen als sonst: die vier Absaetze waren
+   vorher eine Wand ohne Einstiegspunkte. */
+.about-text p {
+    margin: 0;
+    line-height: 1.8;
+}
+
+.about-text p + p {
+    margin-top: clamp(1.75rem, 3vw, 2.5rem);
+}
+
+/* Die harten Fakten als Datenblatt, in der Monospace der Metazeilen.
+   Beschriftung ueber dem Wert, Trennlinien statt Kasten - so bleibt die
+   Spalte auf der linken Kante des Containers stehen. */
+.about-eckdaten {
+    margin: 0;
+    font-family: var(--font-mono);
+}
+
+.about-eckdaten-posten {
+    padding: 0.85rem 0;
+    border-top: 1px solid var(--gray);
+}
+
+.about-eckdaten-posten:last-child {
+    border-bottom: 1px solid var(--gray);
+}
+
+.about-eckdaten dt {
+    font-size: 0.62rem;
+    letter-spacing: var(--mono-track);
+    text-transform: uppercase;
+    color: var(--text);
+    opacity: 0.55;
+}
+
+.about-eckdaten dd {
+    margin: 0.45rem 0 0;
+    font-size: 0.88rem;
+    line-height: 1.45;
+    color: var(--text-bright);
+    overflow-wrap: break-word;
+}
+
 .about-image {
     position: relative;
-    border-radius: 4px;
+    /* Laeuft rechts aus dem Container heraus bis an den Fensterrand. */
+    margin-right: calc(var(--about-bleed) * -1);
+    border-radius: 4px 0 0 4px;
     overflow: hidden;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    aspect-ratio: 1/1;
+    aspect-ratio: 5 / 6;
     border: 1px solid rgba(0, 217, 255, 0.1);
+    border-right: none;
+}
+
+/* Unter 1100px wird die dritte Spalte so schmal, dass Eckdaten und
+   Fliesstext zerbrechen. Ab hier gestapelt: Satz (steht ohnehin
+   darueber), Foto, Eckdaten, Fliesstext. Der Ueberhang nach rechts
+   bleibt, er wird nur kleiner. */
+@media (max-width: 1100px) {
+    .about-grid {
+        grid-template-columns: 1fr;
+        gap: clamp(2rem, 5vw, 3rem);
+    }
+
+    /* Ueber die volle Breite waere das hochkante Foto turmhoch: darum
+       gedeckelt und rechts angeschlagen, damit der Ueberhang bleibt.
+       Auf schmalen Handys greift der Deckel nicht, dort steht es wie
+       gehabt ueber die ganze Breite. */
+    .about-image {
+        order: 1;
+        justify-self: end;
+        /* Der Ueberhang gehoert zur Breite dazu, sonst rutscht das Foto
+           auf dem Handy nur nach rechts, statt breiter zu werden. */
+        width: calc(min(100%, 26rem) + var(--about-bleed));
+    }
+
+    /* Nebeneinander statt untereinander, solange die Breite da ist -
+       eine Zeile Datenblatt statt einer langen Liste. */
+    .about-eckdaten {
+        order: 2;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+        column-gap: 2rem;
+        border-bottom: 1px solid var(--gray);
+    }
+
+    .about-eckdaten-posten:last-child {
+        border-bottom: none;
+    }
+
+    .about-text {
+        order: 3;
+        max-width: 62ch;
+    }
 }
 
 .about-image img {
@@ -888,17 +1007,6 @@ footer {
 }
 
 @media (max-width: 768px) {
-    .about-grid {
-        grid-template-columns: 1fr;
-        gap: 3rem;
-    }
-
-    .about-image {
-        order: -1;
-        max-width: 500px;
-        margin: 0 auto;
-    }
-
     .hero-cta {
         flex-direction: column;
         align-items: stretch;
@@ -1254,10 +1362,6 @@ footer {
         top: 10px;
         right: 10px;
         font-size: 1.5rem;
-    }
-
-    .about-image {
-        max-width: 100%;
     }
 
 }

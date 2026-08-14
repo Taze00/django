@@ -127,10 +127,30 @@
     <section id="about" class="about">
         <div class="about-pattern"></div>
         <div class="container">
+            <div class="about-kopf fade-in">
+                {% include "includes/sektion-meta.html" with nummer="01" titel="Über mich" zusatz="Werder, Brandenburg" %}
+                <p class="about-lead">Hi, ich bin Alex und das ist meine Website, die eigentlich nie fertig wird.</p>
+            </div>
             <div class="about-grid">
+                <dl class="about-eckdaten fade-in">
+                    <div class="about-eckdaten-posten">
+                        <dt>Alter</dt>
+                        <dd>26</dd>
+                    </div>
+                    <div class="about-eckdaten-posten">
+                        <dt>Ort</dt>
+                        <dd>Werder, Brandenburg</dd>
+                    </div>
+                    <div class="about-eckdaten-posten">
+                        <dt>Abschluss</dt>
+                        <dd>Wirtschaftsinformatik, B.Sc.</dd>
+                    </div>
+                    <div class="about-eckdaten-posten">
+                        <dt>Wochenende</dt>
+                        <dd>Berlin</dd>
+                    </div>
+                </dl>
                 <div class="about-text fade-in">
-                    {% include "includes/sektion-meta.html" with nummer="01" titel="Über mich" zusatz="Werder, Brandenburg" %}
-                    <p>Hi, ich bin Alex und das ist meine Website, die eigentlich nie fertig wird.</p>
                     <p>Ich bin 26, lebe in Werder und habe meinen Bachelor in Wirtschaftsinformatik abgeschlossen. In meiner Freizeit arbeite ich gerne an Webprojekten und probiere neue Technologien aus. Ich interessiere mich ziemlich schnell für neue Themen, am liebsten würde ich alle zwei Wochen was Neues lernen, was natürlich komplett unrealistisch ist, aber das Interesse ist da.</p>
                     <p>Am Wochenende bin ich meistens in Berlin unterwegs. Clubs, Bars mit Freunden und den Fernsehturm bestaunen. Manche Momente davon landen dann hier auf der Seite, als Foto, als Gedanke oder als Club-Review, den ich nachts in mein Handy getippt habe.</p>
                     <p>Diese Seite ist mein digitales Sammelsurium. Kein durchdachtes Portfolio mit Mission Statement, eher ein Ort für alles, was mir durch den Kopf geht und was ich nicht vergessen will.</p>
