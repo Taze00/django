@@ -4089,3 +4089,140 @@ html.lenis body {
 .filmraster-fuehler {
     height: 1px;
 }
+
+/* ==========================================================================
+   LADEBILDSCHIRM
+   --------------------------------------------------------------------------
+   Sichtbar nur, solange <html> die Klasse intro-laeuft traegt. Die setzt
+   das Inline-Skript im Kopf, bevor die Seite zum ersten Mal aufgebaut
+   wird - laeuft kein Intro, ist der Vorhang von Anfang an weg und blitzt
+   nicht kurz auf.
+
+   Alles Verbergen haengt an dieser Klasse. Faellt sie weg - regulaer oder
+   durch das Sicherheitsnetz - ist die Seite in ihrem Normalzustand,
+   sichtbar und bedienbar, ohne dass noch etwas aufgeraeumt werden muss.
+   ========================================================================== */
+
+.intro {
+    display: none;
+}
+
+html.intro-laeuft {
+    /* Waehrend des Vorhangs wird nicht gescrollt. */
+    overflow: hidden;
+}
+
+html.intro-laeuft .intro {
+    display: grid;
+    place-items: center;
+    position: fixed;
+    inset: 0;
+    /* Ueber allem, auch ueber Koernung (9000) und Zeiger (9500). */
+    z-index: 10000;
+    background: var(--darker);
+    transform: translateY(0);
+}
+
+/* Faehrt nach oben weg statt auszublenden. Die Kurve startet langsam
+   und beschleunigt - der Vorhang faellt nicht, er wird weggezogen. */
+html.intro-laeuft .intro.is-faehrt-weg {
+    transform: translateY(-100%);
+    transition: transform 0.6s cubic-bezier(0.6, 0, 0.9, 0.2);
+}
+
+.intro-inhalt {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 0 1.5rem;
+}
+
+/* Deutlich groesser als alles andere auf der Seite. */
+.intro-name {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2.5rem, 9vw, 7rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--text-bright);
+    text-align: center;
+}
+
+/* Ein Buchstabe. Faehrt von unten ein und wird dabei scharf. */
+.intro-buchstabe {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(0.55em);
+    filter: blur(10px);
+    transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1),
+                filter 0.45s ease;
+}
+
+.intro-buchstabe.is-da {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+}
+
+/* Das Leerzeichen zwischen den Woertern - ohne Breite fiele es weg. */
+.intro-buchstabe--luecke {
+    width: 0.32em;
+}
+
+/* Dieselbe Schrift, Groesse und Farbe wie die Sektions-Metazeilen. */
+.intro-zaehler {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: var(--mono-track);
+    text-transform: uppercase;
+    color: var(--text);
+    opacity: 0.75;
+    font-variant-numeric: tabular-nums;
+}
+
+/* --- Hero waehrend des Vorhangs ---------------------------------------- */
+
+/* Verborgen wird ausschliesslich ueber html.intro-laeuft. Faellt die
+   Klasse weg, gelten beide Regeln nicht mehr und der Hero steht in
+   seinem Normalzustand - auch dann, wenn das Sicherheitsnetz geraeumt
+   hat und sonst niemand mehr aufraeumt. */
+html.intro-laeuft .hero-content > *,
+html.intro-laeuft .hero-content h1 .hero-zeile {
+    opacity: 0;
+    transform: translateY(32px);
+}
+
+html.intro-laeuft .hero-content.is-eingefahren > *,
+html.intro-laeuft .hero-content.is-eingefahren h1 .hero-zeile {
+    opacity: 1;
+    transform: none;
+    transition: opacity 0.7s ease var(--hero-verzug, 0ms),
+                transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) var(--hero-verzug, 0ms);
+}
+
+/* Die beiden Kopfzeilen sind jetzt Bloecke statt durch <br> getrennt. */
+.hero-zeile {
+    display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .intro,
+    html.intro-laeuft .intro {
+        display: none;
+    }
+
+    html.intro-laeuft {
+        overflow: visible;
+    }
+
+    html.intro-laeuft .hero-content > *,
+    html.intro-laeuft .hero-content h1 .hero-zeile {
+        opacity: 1;
+        transform: none;
+    }
+}

@@ -120,6 +120,14 @@ def ansicht_schiessen(browser, name: str, konfig: dict, url: str,
         has_touch=konfig["mobil"],
         locale="de-DE",
     )
+    # Der Ladebildschirm der Startseite laeuft nur beim ersten Besuch je
+    # Sitzung. Fuer Screenshots wird er uebersprungen: sonst zeigte jede
+    # Aufnahme den Vorhang statt der Seite, und das Scrollen waere
+    # waehrenddessen gesperrt. Geprueft wird das Intro mit eigenen Proben.
+    kontext.add_init_script(
+        "try { sessionStorage.setItem('intro-gesehen', '1'); } catch (e) {}"
+    )
+
     page = kontext.new_page()
 
     print(f"\n[{name}px] {url}")

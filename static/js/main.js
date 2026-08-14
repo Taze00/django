@@ -1261,7 +1261,11 @@ const BEWEGUNG_REDUZIERT = window.matchMedia('(prefers-reduced-motion: reduce)')
 
 
 // ===== TRAEGHEITS-SCROLL (LENIS) =====
-(function initTraegheitsScroll() {
+// Startet nicht mehr von selbst: laeuft ein Ladebildschirm, wuerde sonst
+// waehrenddessen gescrollt. Aufgerufen wird das entweder sofort (kein
+// Intro) oder wenn der Vorhang weg ist - siehe ganz unten.
+function starteTraegheitsScroll() {
+    if (window.lenis) return;              // schon gestartet
     if (BEWEGUNG_REDUZIERT) return;
     if (typeof window.Lenis !== 'function') return;
 
@@ -1284,7 +1288,7 @@ const BEWEGUNG_REDUZIERT = window.matchMedia('(prefers-reduced-motion: reduce)')
     requestAnimationFrame(takt);
 
     window.lenis = lenis;
-})();
+}
 
 
 // ===== SCROLL-REVEALS =====
@@ -1319,7 +1323,9 @@ function initReveals() {
     // ausserhalb des Viewports, einzeln beobachtet wuerden die erst beim
     // seitlichen Scrollen auftauchen.
     const EINZELN = [
-        '.hero-content',
+        // .hero-content fehlt hier bewusst: den fahrt das Intro ein
+        // (siehe unten). Zwei Mechaniken auf denselben Elementen wuerden
+        // sich gegenseitig ueberschreiben.
         '.sektion-kopf',
         '.about-text',
         '.about-image',
@@ -1900,4 +1906,125 @@ function initReveals() {
     // eine Behauptung.
     sortiere(sortierung.value);
     wende_an();
+})();
+
+
+// ===== LADEBILDSCHIRM =====
+// Ablauf: Buchstaben einzeln herein, Zaehler auf 100, kurze Pause,
+// Vorhang faehrt nach oben weg, Hero faehrt ein.
+//
+// Ob ueberhaupt etwas laeuft, hat das Inline-Skript im Kopf entschieden
+// (Klasse intro-laeuft auf <html>). Hier wird nichts mehr geprueft ausser
+// dem Vorhandensein des Vorhangs - sonst koennten beide Stellen zu
+// unterschiedlichen Ergebnissen kommen.
+(function initIntro() {
+    const wurzel = document.documentElement;
+    const vorhang = document.querySelector('[data-intro]');
+    const laeuft = wurzel.classList.contains('intro-laeuft');
+
+    // Kein Intro auf dieser Seite oder in dieser Sitzung: Lenis sofort,
+    // Hero ohne Sonderbehandlung.
+    if (!vorhang || !laeuft) {
+        starteTraegheitsScroll();
+        return;
+    }
+
+    const name = vorhang.querySelector('[data-intro-name]');
+    const zaehler = vorhang.querySelector('[data-intro-zaehler]');
+    const heroInhalt = document.querySelector('.hero-content');
+
+    const VERSATZ = 35;        // Abstand zwischen zwei Buchstaben
+    const BUCHSTABE_DAUER = 450;
+    const PAUSE = 200;         // bei 100 kurz stehen bleiben
+    const VORHANG_DAUER = 600; // muss zur CSS-Transition passen
+
+    let beendet = false;
+
+    // --- Aufraeumen -----------------------------------------------------
+    // Global, damit das Sicherheitsnetz im Kopf es aufrufen kann.
+    // Mehrfachaufruf ist ungefaehrlich.
+    window.introBeenden = function introBeenden() {
+        if (beendet) return;
+        beendet = true;
+
+        clearTimeout(window.__introNetz);
+
+        wurzel.classList.remove('intro-laeuft');
+        if (vorhang.parentNode) vorhang.parentNode.removeChild(vorhang);
+
+        try {
+            sessionStorage.setItem('intro-gesehen', '1');
+        } catch (e) {
+            // Privater Modus: dann laeuft das Intro eben erneut.
+        }
+
+        document.dispatchEvent(new CustomEvent('intro:fertig'));
+    };
+
+    // --- Buchstaben ------------------------------------------------------
+    const text = (name.textContent || '').trim();
+    name.textContent = '';
+
+    const buchstaben = [];
+    for (const zeichen of text) {
+        const span = document.createElement('span');
+        span.className = 'intro-buchstabe';
+        if (zeichen === ' ') {
+            span.classList.add('intro-buchstabe--luecke');
+        } else {
+            span.textContent = zeichen;
+        }
+        // Der Name steht schon in aria-label am Absatz - die Einzelteile
+        // wuerden sonst Buchstabe fuer Buchstabe vorgelesen.
+        span.setAttribute('aria-hidden', 'true');
+        name.appendChild(span);
+        buchstaben.push(span);
+    }
+
+    const aufbauDauer = (buchstaben.length - 1) * VERSATZ + BUCHSTABE_DAUER;
+
+    buchstaben.forEach((span, i) => {
+        setTimeout(() => span.classList.add('is-da'), i * VERSATZ);
+    });
+
+    // --- Zaehler ---------------------------------------------------------
+    // Laeuft ueber die Dauer des Buchstabenaufbaus, nicht in festen
+    // Schritten - so kommt er zusammen mit dem letzten Buchstaben an.
+    const start = performance.now();
+
+    function zaehlen(jetzt) {
+        const anteil = Math.min((jetzt - start) / aufbauDauer, 1);
+        zaehler.textContent = String(Math.round(anteil * 100)).padStart(2, '0');
+        if (anteil < 1) requestAnimationFrame(zaehlen);
+    }
+    requestAnimationFrame(zaehlen);
+
+    // --- Vorhang und Hero -------------------------------------------------
+    setTimeout(() => {
+        // Hero vorbereiten, solange der Vorhang noch davor liegt.
+        if (heroInhalt) {
+            const teile = [
+                ...heroInhalt.querySelectorAll('h1 .hero-zeile'),
+                ...Array.from(heroInhalt.children).filter(el => el.tagName !== 'H1')
+            ];
+            teile.forEach((el, i) => {
+                el.style.setProperty('--hero-verzug', `${i * 90}ms`);
+            });
+        }
+
+        vorhang.classList.add('is-faehrt-weg');
+
+        // Kurz nach dem Anfahren des Vorhangs, damit der Hero hinter der
+        // Kante hervorkommt statt erst danach.
+        setTimeout(() => {
+            if (heroInhalt) heroInhalt.classList.add('is-eingefahren');
+        }, 150);
+
+        setTimeout(() => {
+            window.introBeenden();
+        }, VORHANG_DAUER);
+    }, aufbauDauer + PAUSE);
+
+    // Lenis erst, wenn der Vorhang weg ist.
+    document.addEventListener('intro:fertig', starteTraegheitsScroll, { once: true });
 })();
