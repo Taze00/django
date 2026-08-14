@@ -1693,3 +1693,172 @@ function initReveals() {
 
     beobachter.observe(grafik);
 })();
+
+
+// ===== SEITE /filme/: SORTIEREN, FILTERN, POSTER NACHLADEN =====
+// Alle Filme stehen bereits im Markup. Sortiert und gefiltert wird
+// deshalb hier, ohne Serverrunde - bei gut zweihundert Kacheln ist das
+// schneller als jede Anfrage und funktioniert ohne Nachladen.
+(function initFilmraster() {
+    const raster = document.querySelector('[data-filmraster]');
+    if (!raster) return;
+
+    const steuerung = document.querySelector('[data-filmsteuerung]');
+    const sortierung = steuerung.querySelector('[data-sortierung]');
+    const chips = Array.from(steuerung.querySelectorAll('[data-filter]'));
+    const zaehler = steuerung.querySelector('[data-zaehler]');
+    const leerHinweis = document.querySelector('[data-raster-leer]');
+
+    const kacheln = Array.from(raster.children);
+
+    // Werte einmal auslesen statt bei jeder Sortierung neu aus dem DOM.
+    const daten = kacheln.map(el => ({
+        el,
+        wertung: el.dataset.wertung ? parseFloat(el.dataset.wertung) : null,
+        jahr: el.dataset.jahr ? parseInt(el.dataset.jahr, 10) : null,
+        gesehen: el.dataset.gesehen || '',
+        titel: el.dataset.titel || ''
+    }));
+
+    // --- Sortieren ------------------------------------------------------
+    // Ohne Wert immer ans Ende, egal in welche Richtung sortiert wird -
+    // ein fehlendes Jahr ist keine Null.
+    function vergleiche(a, b, feld) {
+        if (feld === 'titel') return a.titel.localeCompare(b.titel, 'de');
+
+        const wertA = a[feld];
+        const wertB = b[feld];
+        const leerA = wertA === null || wertA === '';
+        const leerB = wertB === null || wertB === '';
+
+        if (leerA && leerB) return a.titel.localeCompare(b.titel, 'de');
+        if (leerA) return 1;
+        if (leerB) return -1;
+        if (wertA === wertB) return a.titel.localeCompare(b.titel, 'de');
+
+        return wertA < wertB ? 1 : -1;
+    }
+
+    function sortiere(feld) {
+        const reihenfolge = daten.slice().sort((a, b) => vergleiche(a, b, feld));
+        // Ein DocumentFragment statt 216 einzelner Einfuegungen.
+        const stapel = document.createDocumentFragment();
+        reihenfolge.forEach(d => stapel.appendChild(d.el));
+        raster.appendChild(stapel);
+    }
+
+    // --- Filtern --------------------------------------------------------
+    const FILTER = {
+        alle: () => true,
+        ab4: d => d.wertung !== null && d.wertung >= 4,
+        ab3: d => d.wertung !== null && d.wertung >= 3 && d.wertung < 4,
+        unter3: d => d.wertung !== null && d.wertung < 3,
+        ohne: d => d.wertung === null
+    };
+
+    let aktiverFilter = 'alle';
+
+    function wende_an() {
+        const pruefe = FILTER[aktiverFilter] || FILTER.alle;
+        let sichtbar = 0;
+
+        daten.forEach(d => {
+            const zeigen = pruefe(d);
+            d.el.hidden = !zeigen;
+            if (zeigen) sichtbar++;
+        });
+
+        zaehler.textContent = sichtbar === daten.length
+            ? `${daten.length} Filme`
+            : `${sichtbar} von ${daten.length}`;
+
+        leerHinweis.hidden = sichtbar > 0;
+
+        // Neu sichtbare Kacheln brauchen ihr Poster.
+        beobachteOffene();
+    }
+
+    sortierung.addEventListener('change', () => {
+        sortiere(sortierung.value);
+        beobachteOffene();
+    });
+
+    chips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            aktiverFilter = chip.dataset.filter;
+            chips.forEach(c => {
+                const aktiv = c === chip;
+                c.classList.toggle('is-active', aktiv);
+                c.setAttribute('aria-pressed', String(aktiv));
+            });
+            wende_an();
+        });
+    });
+
+    // --- Poster nachladen ------------------------------------------------
+    // Erst wenn eine Kachel in Sichtweite kommt. Die IDs werden kurz
+    // gesammelt und gebuendelt angefragt - beim Scrollen durch ein Raster
+    // waeren es sonst zweihundert Einzelanfragen.
+    const offen = new Set();
+    let sammlung = [];
+    let zeitgeber = null;
+
+    function fordere_an() {
+        if (!sammlung.length) return;
+        const ids = sammlung.splice(0, 8);
+
+        fetch(`/api/filme/poster?ids=${ids.join(',')}`)
+            .then(a => (a.ok ? a.json() : Promise.reject(a.status)))
+            .then(treffer => {
+                Object.entries(treffer).forEach(([id, url]) => {
+                    const kachel = raster.querySelector(`[data-film="${id}"]`);
+                    if (!kachel) return;
+
+                    if (url) {
+                        const bild = document.createElement('img');
+                        bild.src = url;
+                        bild.alt = 'Plakat: ' + kachel.querySelector('.filmkachel-titel').textContent;
+                        bild.loading = 'lazy';
+                        bild.decoding = 'async';
+                        kachel.querySelector('.filmkachel-poster').replaceChildren(bild);
+                    }
+                    // Kein Poster bei TMDB: der Anfangsbuchstabe bleibt stehen.
+                    offen.delete(id);
+                });
+
+                // Was ueber die Buendelgrenze hinausging, kommt gleich dran.
+                if (sammlung.length) zeitgeber = setTimeout(fordere_an, 150);
+            })
+            .catch(() => { /* Ohne Poster bleibt der Buchstabe stehen. */ });
+    }
+
+    function melde(id) {
+        if (offen.has(id) || sammlung.includes(id)) return;
+        sammlung.push(id);
+        clearTimeout(zeitgeber);
+        zeitgeber = setTimeout(fordere_an, 120);
+    }
+
+    const posterBeobachter = new IntersectionObserver(eintraege => {
+        eintraege.forEach(eintrag => {
+            if (!eintrag.isIntersecting) return;
+            posterBeobachter.unobserve(eintrag.target);
+            melde(eintrag.target.dataset.film);
+        });
+    }, { rootMargin: '300px 0px' });
+
+    function beobachteOffene() {
+        daten.forEach(d => {
+            if (d.el.hidden) return;
+            if (d.el.querySelector('.filmkachel-poster img')) return;
+            posterBeobachter.observe(d.el);
+        });
+    }
+
+    // --- Start ----------------------------------------------------------
+    // Beim Start einmal sortieren, nicht nur filtern: sonst bliebe die
+    // Reihenfolge aus der Datenbank stehen und die Auswahl im Feld waere
+    // eine Behauptung.
+    sortiere(sortierung.value);
+    wende_an();
+})();

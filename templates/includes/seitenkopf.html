@@ -1,0 +1,39 @@
+{% comment %}
+Fixierte Hauptnavigation. Liegt ueber dem Hero und wird erst beim
+Scrollen dunkel (Klasse is-gescrollt, siehe main.js). Der Logo-Text
+steht im selben .container wie der Seiteninhalt und sitzt damit exakt
+auf dessen linker Kante.
+
+    {% include "includes/seitenkopf.html" %}            auf der Startseite
+    {% include "includes/seitenkopf.html" with basis="/" %}   auf Unterseiten
+
+`basis` wird den Sprungzielen vorangestellt. Auf der Startseite leer,
+die Anker zeigen dann auf die eigenen Sektionen. Auf einer Unterseite
+"/", damit dieselben Links zurueck zur Startseite fuehren statt ins
+Leere.
+{% endcomment %}
+
+<header class="seitenkopf" data-kopf>
+    <div class="container seitenkopf-innen">
+        <a class="seitenkopf-logo" href="{{ basis }}#home">Alex Volkmann</a>
+
+        <button type="button" class="seitenkopf-burger" data-burger
+                aria-expanded="false" aria-controls="hauptnavigation"
+                aria-label="Menü öffnen">
+            <span class="seitenkopf-burger-strich"></span>
+            <span class="seitenkopf-burger-strich"></span>
+            <span class="seitenkopf-burger-strich"></span>
+        </button>
+
+        <nav class="hauptnav" id="hauptnavigation" data-nav aria-label="Hauptnavigation">
+            <ul class="hauptnav-liste">
+                <li><a class="hauptnav-link" data-nav-link href="{{ basis }}#about">Über mich</a></li>
+                <li><a class="hauptnav-link" data-nav-link href="{{ basis }}#projekte">Projekte</a></li>
+                <li><a class="hauptnav-link" data-nav-link href="{{ basis }}#clubs">Clubs</a></li>
+                <li><a class="hauptnav-link" data-nav-link href="{{ basis }}#gallery">Momente</a></li>
+                <li><a class="hauptnav-link" data-nav-link href="{{ basis }}#filme">Filme</a></li>
+                <li><a class="hauptnav-link" data-nav-link href="{{ basis }}#contact">Kontakt</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>

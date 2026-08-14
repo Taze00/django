@@ -28,36 +28,7 @@
     Element wieder.{% endcomment %}
     <div class="zeiger" data-zeiger aria-hidden="true"></div>
 
-    {% comment %}
-    Fixierte Hauptnavigation. Liegt ueber dem Hero und wird erst beim
-    Scrollen dunkel (Klasse is-gescrollt, siehe main.js). Der Logo-Text
-    steht im selben .container wie der Hero-Inhalt und sitzt damit exakt
-    auf dessen linker Kante.
-    {% endcomment %}
-    <header class="seitenkopf" data-kopf>
-        <div class="container seitenkopf-innen">
-            <a class="seitenkopf-logo" href="#home">Alex Volkmann</a>
-
-            <button type="button" class="seitenkopf-burger" data-burger
-                    aria-expanded="false" aria-controls="hauptnavigation"
-                    aria-label="Menü öffnen">
-                <span class="seitenkopf-burger-strich"></span>
-                <span class="seitenkopf-burger-strich"></span>
-                <span class="seitenkopf-burger-strich"></span>
-            </button>
-
-            <nav class="hauptnav" id="hauptnavigation" data-nav aria-label="Hauptnavigation">
-                <ul class="hauptnav-liste">
-                    <li><a class="hauptnav-link" data-nav-link href="#about">Über mich</a></li>
-                    <li><a class="hauptnav-link" data-nav-link href="#projekte">Projekte</a></li>
-                    <li><a class="hauptnav-link" data-nav-link href="#clubs">Clubs</a></li>
-                    <li><a class="hauptnav-link" data-nav-link href="#gallery">Momente</a></li>
-                    <li><a class="hauptnav-link" data-nav-link href="#filme">Filme</a></li>
-                    <li><a class="hauptnav-link" data-nav-link href="#contact">Kontakt</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+    {% include "includes/seitenkopf.html" %}
 
     <!-- Hero Section -->
     <section id="home" class="hero">
@@ -301,6 +272,15 @@
                 <a href="{{ letterboxd_url }}" target="_blank" rel="noopener noreferrer">letterboxd.com/{{ letterboxd_user }} &rarr;</a>
             </p>
             {% endif %}
+
+            {% comment %}Abschluss der Sektion: von der kuratierten Auswahl
+            zum ganzen Bestand.{% endcomment %}
+            <p class="filme-alle">
+                <a class="filme-alle-link" href="/filme/">
+                    Alle {{ statistik.gesehen }} Filme ansehen &rarr;
+                    <span class="filme-alle-zusatz">sortierbar, filterbar, durchsuchbar</span>
+                </a>
+            </p>
 
             <p class="films-attribution">
                 Filmdaten und Plakate von <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">TMDB</a>.

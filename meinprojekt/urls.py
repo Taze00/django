@@ -22,7 +22,7 @@ from django.views.static import serve
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from . import views
 from fitness.views import register
-from films.views import suchindex_json
+from films.views import poster_json, suchindex_json, uebersicht as filme_uebersicht
 
 
 urlpatterns = [
@@ -37,6 +37,9 @@ urlpatterns = [
     # Suchindex der Filmsektion - einmal geholt, danach sucht der Browser
     # allein, ohne weitere Serveranfrage.
     path('api/filme/index.json', suchindex_json, name='filme_suchindex'),
+    # Poster nur fuer die Kacheln, die gerade in Sichtweite kommen.
+    path('api/filme/poster', poster_json, name='filme_poster'),
+    path('filme/', filme_uebersicht, name='filme_uebersicht'),
     # CORVIS App (React frontend)
     path('corvis-app/', views.fitness_page, name='fitness_page'),
     re_path(r'^corvis-app/.*$', views.fitness_page, name='fitness_catch_all'),

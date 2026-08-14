@@ -3790,3 +3790,213 @@ html.lenis body {
         font-size: 0.55rem;
     }
 }
+
+/* ==========================================================================
+   SEITE /filme/ - der ganze Bestand als Raster
+   ========================================================================== */
+
+/* Die Seite hat keinen Hero, unter dem der fixierte Kopf liegen koennte -
+   ohne diesen Abstand staende die Ueberschrift dahinter. */
+.filmseite {
+    padding: calc(72px + clamp(2.5rem, 6vw, 4.5rem)) 0 clamp(4rem, 8vw, 6rem);
+}
+
+/* --- Steuerung --------------------------------------------------------- */
+
+.filmsteuerung {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: clamp(1rem, 3vw, 2.5rem);
+    margin-bottom: clamp(1.75rem, 4vw, 2.5rem);
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.filmsteuerung-gruppe {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filmsteuerung-label {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+    color: var(--text);
+    opacity: 0.6;
+}
+
+.filmsteuerung-auswahl {
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
+    border: 1px solid var(--gray);
+    border-radius: var(--film-radius);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-bright);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    cursor: pointer;
+    /* Eigener Pfeil - der browsereigene sieht ueberall anders aus. */
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--text) 50%),
+                      linear-gradient(135deg, var(--text) 50%, transparent 50%);
+    background-position: calc(100% - 15px) 52%, calc(100% - 10px) 52%;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+}
+
+.filmsteuerung-auswahl:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.filmsteuerung-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.filmsteuerung-zaehler {
+    margin: 0 0 0.35rem auto;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+    color: var(--text);
+    opacity: 0.6;
+}
+
+/* --- Raster ------------------------------------------------------------ */
+
+.filmraster {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: clamp(0.9rem, 2vw, 1.4rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.filmkachel-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    color: var(--text-bright);
+    text-decoration: none;
+}
+
+.filmkachel-poster {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    border: 1px solid var(--gray);
+    border-radius: var(--film-radius);
+    background: rgba(255, 255, 255, 0.03);
+    transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.filmkachel-link:hover .filmkachel-poster {
+    border-color: var(--primary);
+    transform: translateY(-3px);
+}
+
+.filmkachel-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Anfangsbuchstabe, solange kein Poster da ist - und dauerhaft, wenn
+   TMDB keins kennt. */
+.filmkachel-fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    color: var(--gray);
+}
+
+.filmkachel-titel {
+    font-size: 0.82rem;
+    line-height: 1.3;
+}
+
+.filmkachel-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    color: var(--text);
+    opacity: 0.7;
+}
+
+/* Ausgefilterte Kacheln verschwinden ganz aus dem Fluss, damit das
+   Raster keine Luecken behaelt. */
+.filmkachel[hidden] {
+    display: none;
+}
+
+.filmraster-leer {
+    margin: 2rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+    color: var(--text);
+    opacity: 0.7;
+}
+
+.filmseite-zurueck {
+    margin: clamp(3rem, 6vw, 4.5rem) 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+}
+
+/* --- Abschluss der Filmsektion auf der Startseite ---------------------- */
+
+.filme-alle {
+    margin: clamp(2rem, 4vw, 3rem) 0 0;
+    padding-top: clamp(1.5rem, 3vw, 2rem);
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.filme-alle-link {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+    color: var(--text-bright);
+    text-decoration: none;
+}
+
+.filme-alle-link:hover {
+    color: var(--primary);
+}
+
+.filme-alle-zusatz {
+    font-size: 0.68rem;
+    color: var(--text);
+    opacity: 0.6;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+@media (max-width: 600px) {
+    .filmraster {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    }
+
+    .filmsteuerung-zaehler {
+        margin-left: 0;
+    }
+}

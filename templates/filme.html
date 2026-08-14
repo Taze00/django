@@ -1,0 +1,146 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Alle Filme | Alex Volkmann</title>
+    <meta name="description" content="Alle {{ statistik.gesehen }} Filme, die ich gesehen habe – sortierbar nach Wertung, Jahr und Sehdatum.">
+
+    <link rel="icon" href="{% static 'css/images/favicon.ico' %}" type="image/x-icon">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" as="style">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260814-3">
+</head>
+
+<body class="seite-filme">
+    <a class="skip-link" href="#raster">Zum Inhalt springen</a>
+
+    {% comment %}Dieselbe Bewegungsschicht wie die Startseite.{% endcomment %}
+    <div class="koernung" aria-hidden="true"></div>
+    <div class="zeiger" data-zeiger aria-hidden="true"></div>
+
+    {% comment %}basis="/" - die Anker zeigen zurueck auf die Startseite,
+    nicht auf Sektionen, die es hier nicht gibt.{% endcomment %}
+    {% include "includes/seitenkopf.html" with basis="/" %}
+
+    <main class="filmseite">
+        <div class="container">
+
+            <div class="sektion-kopf">
+                {% include "includes/sektion-meta.html" with titel="Alle Filme" zusatz=statistik.gesehen|stringformat:"s"|add:" gesehen" als_h1=True %}
+                {% comment %}Punkt statt Komma zwischen den Zahlen: "Schnitt 2,83,
+                5 mit voller Wertung" liest sich wie eine Aufzaehlung im
+                Dezimaltrenner.{% endcomment %}
+                <p class="sektion-einleitung">
+                    Der ganze Bestand aus meinem Letterboxd. Schnitt {{ statistik.schnitt_anzeige }} –
+                    {{ statistik.volle_wertung }} Filme mit voller Wertung.
+                </p>
+            </div>
+
+            {% comment %}Dieselbe Suche wie auf der Startseite - main.js
+            findet sie ueber data-filmsuche und braucht hier nichts
+            Eigenes.{% endcomment %}
+            <div class="filmsuche" data-filmsuche hidden>
+                <label class="filmsuche-label" for="filmsuche-feld">Hab ich den gesehen?</label>
+
+                <div class="filmsuche-feld-zeile">
+                    <input type="search" id="filmsuche-feld" class="filmsuche-feld"
+                           data-filmsuche-feld
+                           placeholder="Titel eintippen"
+                           autocomplete="off" spellcheck="false"
+                           role="combobox" aria-expanded="false"
+                           aria-controls="filmsuche-treffer"
+                           aria-describedby="filmsuche-hinweis">
+                    <button type="button" class="filmsuche-leeren" data-filmsuche-leeren hidden>
+                        <span class="visually-hidden">Suche leeren</span>
+                    </button>
+                </div>
+
+                <p class="visually-hidden" id="filmsuche-hinweis">
+                    Ergebnisse erscheinen beim Tippen. Mit Pfeil hoch und runter
+                    auswaehlen, mit Escape leeren.
+                </p>
+
+                <ul class="filmsuche-treffer" id="filmsuche-treffer"
+                    data-filmsuche-treffer role="listbox"
+                    aria-label="Suchergebnisse"></ul>
+
+                <p class="filmsuche-leer" data-filmsuche-leer hidden aria-live="polite"></p>
+            </div>
+
+            {% comment %}Sortierung und Filter wirken im Browser auf das
+            fertige Raster - alle Filme stehen bereits im Markup.{% endcomment %}
+            <div class="filmsteuerung" data-filmsteuerung>
+                <div class="filmsteuerung-gruppe">
+                    <label class="filmsteuerung-label" for="filme-sortierung">Sortieren</label>
+                    <select class="filmsteuerung-auswahl" id="filme-sortierung" data-sortierung>
+                        <option value="wertung">Wertung</option>
+                        <option value="jahr">Jahr</option>
+                        <option value="gesehen">Sehdatum</option>
+                        <option value="titel">Titel</option>
+                    </select>
+                </div>
+
+                <div class="filmsteuerung-gruppe">
+                    <span class="filmsteuerung-label" id="filme-filter-label">Sterne</span>
+                    <div class="filmsteuerung-chips" role="group" aria-labelledby="filme-filter-label">
+                        <button type="button" class="films-chip is-active" data-filter="alle" aria-pressed="true">Alle</button>
+                        <button type="button" class="films-chip" data-filter="ab4" aria-pressed="false">ab 4,0</button>
+                        <button type="button" class="films-chip" data-filter="ab3" aria-pressed="false">3,0 – 3,5</button>
+                        <button type="button" class="films-chip" data-filter="unter3" aria-pressed="false">unter 3,0</button>
+                        <button type="button" class="films-chip" data-filter="ohne" aria-pressed="false">ohne Wertung</button>
+                    </div>
+                </div>
+
+                <p class="filmsteuerung-zaehler" data-zaehler aria-live="polite"></p>
+            </div>
+
+            <ul class="filmraster" id="raster" data-filmraster>
+                {% for film in filme %}
+                <li class="filmkachel"
+                    data-film="{{ film.id }}"
+                    data-wertung="{{ film.wertung|default_if_none:'' }}"
+                    data-jahr="{{ film.jahr|default_if_none:'' }}"
+                    data-gesehen="{{ film.gesehen_am|date:'Y-m-d'|default:'' }}"
+                    data-titel="{{ film.titel_normalisiert }}">
+
+                    <a class="filmkachel-link" href="{{ film.letterboxd_uri }}"
+                       target="_blank" rel="noopener noreferrer">
+
+                        <div class="filmkachel-poster">
+                            {% if film.poster_url %}
+                            <img src="{{ film.poster_url }}" alt="Plakat: {{ film.titel }}" loading="lazy" decoding="async">
+                            {% else %}
+                            {# Wird nachgeladen, sobald die Kachel in Sichtweite kommt. #}
+                            <span class="filmkachel-fallback" aria-hidden="true">{{ film.titel|first }}</span>
+                            {% endif %}
+                        </div>
+
+                        <span class="filmkachel-titel">{{ film.titel }}</span>
+                        <span class="filmkachel-meta">
+                            {% if film.wertung %}
+                            <span class="kachel-sterne" aria-hidden="true" style="--rating: {{ film.wertung }};"></span>
+                            <span class="visually-hidden">{{ film.wertung }} von 5 Sternen</span>
+                            {% endif %}
+                            {% if film.jahr %}<span class="filmkachel-jahr">{{ film.jahr }}</span>{% endif %}
+                        </span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+
+            <p class="filmraster-leer" data-raster-leer hidden>
+                Zu dieser Auswahl steht nichts im Bestand.
+            </p>
+
+            <p class="filmseite-zurueck">
+                <a href="/#filme">&larr; Zurück zur Startseite</a>
+            </p>
+        </div>
+    </main>
+
+    <script defer src="{% static 'js/vendor/lenis.min.js' %}?v=20260814-3"></script>
+    <script defer src="{% static 'js/main.js' %}?v=20260814-3"></script>
+</body>
+</html>
