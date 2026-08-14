@@ -22,12 +22,16 @@ const galleryItems = [
     {
         id: 1,
         image: '/static/css/images/gallery/alex1.jpeg',
+        breite: 1170,
+        hoehe: 874,
         title: 'Geburtstagsfeier',
         category: 'clubs'
     },
     {
         id: 2,
         image: '/static/css/images/gallery/alex2.png',
+        breite: 1196,
+        hoehe: 1312,
         title: 'Weiße Socken zu den Schuhen',
         category: 'clubs'
     },
@@ -35,30 +39,40 @@ const galleryItems = [
         id: 3,
         type: 'video',
         source: '/static/css/images/gallery/alex10.mp4',
+        breite: 480,
+        hoehe: 848,
         title: 'Klassischer Handschlag',
         category: 'clubs'
     },
     {
         id: 4,
         image: '/static/css/images/gallery/alex3.jpeg',
+        breite: 1200,
+        hoehe: 1600,
         title: 'Potsdam Oktoberfest',
         category: 'clubs'
     },
     {
         id: 5,
         image: '/static/css/images/gallery/alex4.jpeg',
+        breite: 1152,
+        hoehe: 1154,
         title: 'Baumblüte',
         category: 'people'
     },
     {
         id: 6,
         image: '/static/css/images/gallery/alex5.jpeg',
+        breite: 900,
+        hoehe: 1600,
         title: 'Abend mit Freunden',
         category: 'architecture'
     },
     {
         id: 7,
         image: '/static/css/images/gallery/alex6.JPG',
+        breite: 1152,
+        hoehe: 1343,
         title: 'Ready machen für Berlin',
         category: 'clubs'
     },
@@ -66,18 +80,24 @@ const galleryItems = [
         id: 8,
         type: 'video',
         source: '/static/css/images/gallery/alex11.mp4',
+        breite: 480,
+        hoehe: 848,
         title: 'World Club Dome abkühlen',
         category: 'clubs'
     },
     {
         id: 9,
         image: '/static/css/images/gallery/alex7.jpeg',
+        breite: 777,
+        hoehe: 1420,
         title: 'SMS Festival',
         category: 'people'
     },
     {
         id: 10,
         image: '/static/css/images/gallery/alex8.jpeg',
+        breite: 1200,
+        hoehe: 1600,
         title: 'Malle',
         category: 'architecture'
     },
@@ -85,42 +105,56 @@ const galleryItems = [
         id: 11,
         type: 'video',
         source: '/static/css/images/gallery/alex12.mp4',
+        breite: 480,
+        hoehe: 848,
         title: 'Aftern nach Geburtstag',
         category: 'clubs'
     },
     {
         id: 12,
         image: '/static/css/images/gallery/alex9.jpeg',
+        breite: 1152,
+        hoehe: 2048,
         title: 'World Club Dome',
         category: 'architecture'
     },
     {
         id: 13,
         image: '/static/css/images/gallery/alex13.jpeg',
+        breite: 1152,
+        hoehe: 2048,
         title: 'Berlin Bar',
         category: 'architecture'
     },
     {
         id: 14,
         image: '/static/css/images/gallery/alex14.jpg',
+        breite: 1510,
+        hoehe: 1366,
         title: 'Aftern nach Geburtstag',
         category: 'clubs'
     },
     {
         id: 15,
         image: '/static/css/images/gallery/alex15.jpeg',
+        breite: 1152,
+        hoehe: 2048,
         title: 'Aftern nach Geburtstag',
         category: 'clubs'
     },
     {
         id: 16,
         image: '/static/css/images/gallery/alex16.jpeg',
+        breite: 1536,
+        hoehe: 2048,
         title: 'Berlin Moment',
         category: 'clubs'
     },
     {
         id: 17,
         image: '/static/css/images/gallery/alex11.jpeg',
+        breite: 900,
+        hoehe: 1600,
         title: 'Berlin Nacht',
         category: 'clubs'
     }
@@ -309,15 +343,18 @@ function createGallery() {
         const galleryItem = document.createElement('div');
         galleryItem.className = 'gallery-item';
 
+        // breite/hoehe als Attribut, nicht als Stil: daraus leitet der
+        // Browser das Seitenverhaeltnis ab und haelt den Platz frei,
+        // bevor die Datei da ist. Ohne das faenden die Masonry-Spalten
+        // erst nach dem Laden ihre Hoehe - und wuerden dabei springen.
         if (item.type === 'video') {
             const video = document.createElement('video');
             video.src = item.source;
             video.muted = true;
             video.loop = true;
             video.playsInline = true;
-            video.style.width = '100%';
-            video.style.height = '100%';
-            video.style.objectFit = 'cover';
+            video.width = item.breite;
+            video.height = item.hoehe;
             galleryItem.appendChild(video);
 
             video.addEventListener('canplay', () => video.play().catch(() => {}), { once: true });
@@ -332,9 +369,8 @@ function createGallery() {
             img.alt = item.title || 'Gallery image';
             img.loading = 'lazy';
             img.decoding = 'async';
-            img.style.width = '100%';
-            img.style.height = '100%';
-            img.style.objectFit = 'cover';
+            img.width = item.breite;
+            img.height = item.hoehe;
             galleryItem.appendChild(img);
         }
 
