@@ -2,7 +2,7 @@ from django.conf import settings
 from django.shortcuts import render
 
 from films import kuratiert, letterboxd, projekte, statistik, tmdb
-from films.models import Film
+from films.models import Film, normalisiere
 
 
 def index(request):
@@ -30,10 +30,19 @@ def index(request):
     # Poster stehen fuer genau diese Auswahl in der Datenbank - sie
     # werden mit `import_letterboxd --poster-ab 4.0` geholt und nicht
     # fuer alle 216 Filme.
-    empfehlungen = list(
-        Film.objects.filter(gesehen=True, wertung__gte=4.0)
-        .order_by('-wertung', 'titel')
-    )
+    # Die fuenf kuratierten Filme haben alle 5.0 und stuenden sonst
+    # gleich zweimal untereinander - einmal oben mit Text, einmal hier
+    # ohne. Ausgeschlossen wird ueber normalisierten Titel und Jahr:
+    # filme.json fuehrt Letterboxd-Slugs, die Datenbank boxd.it-URIs,
+    # eine gemeinsame Kennung gibt es nicht.
+    kuratierte = {
+        (normalisiere(e.get('titel')), e.get('jahr')) for e in filme
+    }
+    empfehlungen = [
+        f for f in Film.objects.filter(gesehen=True, wertung__gte=4.0)
+                               .order_by('-wertung', 'titel')
+        if (f.titel_normalisiert, f.jahr) not in kuratierte
+    ]
 
     return render(request, 'index.html', {
         'projekte': projekte.get_projekte(),
