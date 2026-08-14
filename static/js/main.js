@@ -1256,10 +1256,11 @@ function initReveals() {
 }
 
 
-// ===== METAZEILEN: ANSPRINGEN WIE EINE NEONROEHRE =====
-// Die Sektions-Metazeilen zucken beim Sichtbarwerden zwei-, dreimal in
-// der Helligkeit und stehen dann ruhig. Einmalig, nicht dauerhaft -
-// deshalb wird jede Zeile nach dem ersten Mal nicht mehr beobachtet.
+// ===== ANSPRINGEN WIE EINE NEONROEHRE =====
+// Die Sektions-Metazeilen und das Neonschild der Filmsektion zucken
+// beim Sichtbarwerden zwei-, dreimal in der Helligkeit und stehen dann
+// ruhig. Einmalig, nicht dauerhaft - deshalb wird jedes Element nach
+// dem ersten Mal nicht mehr beobachtet.
 //
 // Ein eigener Beobachter statt der Reveal-Mechanik: die Zeile soll
 // anspringen, wenn sie selbst im Bild ist, nicht wenn ihr Behaelter es
@@ -1273,9 +1274,13 @@ function initMetazeilen() {
     if (BEWEGUNG_REDUZIERT) return;
     if (typeof IntersectionObserver !== 'function') return;
 
+    // Das Neonschild der Filmsektion haengt am selben Beobachter: es
+    // springt nach derselben Regel an (einmal, beim Sichtbarwerden),
+    // nur mit einer groesseren Geste - welche, entscheidet das CSS
+    // ueber die Klasse, nicht dieses JS.
     const wahl = document.documentElement.classList.contains('intro-laeuft')
-        ? '.sektion-meta'
-        : '.sektion-meta, .hero-meta-zeile';
+        ? '.sektion-meta, .neonschild'
+        : '.sektion-meta, .neonschild, .hero-meta-zeile';
 
     const zeilen = document.querySelectorAll(wahl);
     if (!zeilen.length) return;
