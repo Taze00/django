@@ -1973,17 +1973,9 @@ function initReveals() {
 
     // --- Vorhang und Hero -------------------------------------------------
     setTimeout(() => {
-        // Hero vorbereiten, solange der Vorhang noch davor liegt.
-        if (heroInhalt) {
-            const teile = [
-                ...heroInhalt.querySelectorAll('h1 .hero-zeile'),
-                ...Array.from(heroInhalt.children).filter(el => el.tagName !== 'H1')
-            ];
-            teile.forEach((el, i) => {
-                el.style.setProperty('--hero-verzug', `${i * 90}ms`);
-            });
-        }
-
+        // Die Staffelung des Heros steht vollstaendig im CSS (Namenszug,
+        // Buchstaben, Strich, Metazeilen, Buttons). Hier faellt nur noch
+        // der Startschuss ueber .is-eingefahren.
         vorhang.classList.add('is-faehrt-weg');
 
         // Kurz nach dem Anfahren des Vorhangs, damit der Hero hinter der

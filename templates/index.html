@@ -102,18 +102,32 @@
 
     <!-- Hero Section -->
     <section id="home" class="hero">
+        {% comment %}Die Skyline liegt in einer eigenen Ebene unter dem
+        Sternenfeld: nur sie zoomt, das Canvas von three.js bleibt
+        unangetastet.{% endcomment %}
+        <div class="hero-skyline" aria-hidden="true"></div>
         <div class="hero-bg" id="three-bg"></div>
         <div class="hero-overlay"></div>
 
         <div class="container">
             <div class="hero-content fade-in">
-                {% comment %}Zwei Zeilen statt <br>, damit sie einzeln
-                gestaffelt einfahren koennen.{% endcomment %}
-                <h1><span class="hero-zeile">Ein Einblick in meine</span><span class="hero-zeile text-gradient">Gedankenwelt</span></h1>
-                <p class="hero-subtitle">Bachelor | Webdesign | Marketing</p>
+                {% comment %}VOLKMANN steht Buchstabe fuer Buchstabe im
+                Markup, damit jeder einzeln einfahren kann - wie im Intro.
+                Vorgelesen wird trotzdem das ganze Wort (aria-label), nicht
+                die Buchstabenkette.{% endcomment %}
+                <h1 class="hero-name">
+                    <span class="hero-vorname">Alex</span>
+                    <span class="hero-nachname" aria-label="Volkmann"><span class="hero-buchstabe" style="--i:0" aria-hidden="true">V</span><span class="hero-buchstabe" style="--i:1" aria-hidden="true">o</span><span class="hero-buchstabe" style="--i:2" aria-hidden="true">l</span><span class="hero-buchstabe" style="--i:3" aria-hidden="true">k</span><span class="hero-buchstabe" style="--i:4" aria-hidden="true">m</span><span class="hero-buchstabe" style="--i:5" aria-hidden="true">a</span><span class="hero-buchstabe" style="--i:6" aria-hidden="true">n</span><span class="hero-buchstabe" style="--i:7" aria-hidden="true">n</span></span>
+                </h1>
+                <div class="hero-strich" aria-hidden="true"></div>
+                <div class="hero-meta">
+                    <p class="hero-meta-zeile" style="--i:0">Werder, Brandenburg</p>
+                    <p class="hero-meta-zeile" style="--i:1">Berlin am Wochenende</p>
+                    <p class="hero-meta-zeile" style="--i:2">B.Sc. Wirtschaftsinformatik</p>
+                </div>
                 <div class="hero-cta">
-                    <a href="#clubs" class="btn">Club Ranking</a>
-                    <a href="#gallery" class="btn btn-outline">Galerie ansehen</a>
+                    <a href="#filme" class="btn">Filme</a>
+                    <a href="#clubs" class="btn btn-outline">Berlin</a>
                 </div>
             </div>
         </div>

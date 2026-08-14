@@ -196,24 +196,66 @@ section {
     background: var(--darker);
 }
 
+/* Die Skyline. Eigene Ebene unter dem Sternenfeld, weil nur sie zoomt -
+   laege das Bild weiter auf .hero-bg, wuerde das Canvas von three.js
+   mitskaliert.
+
+   Frueher stand hier brightness(0.8): vom Foto blieb praktisch nur die
+   Silhouette des Fernsehturms. Jetzt aufgehellt, die Lesbarkeit macht
+   der Verlauf darueber. */
+.hero-skyline {
+    position: absolute;
+    inset: 0;
+    background: url('./images/header/berlin-crop.jpg') center 60% / cover no-repeat;
+    filter: brightness(1.5) contrast(1.12) saturate(0.9);
+    transform-origin: center 65%;
+    animation: skyline-zoom 20s ease-in-out infinite alternate;
+    will-change: transform;
+    z-index: 0;
+}
+
+/* Sehr langsam heran und wieder zurueck - man soll es nicht sehen,
+   sondern nur merken, dass das Bild nicht ganz still steht. */
+@keyframes skyline-zoom {
+    from { transform: scale(1); }
+    to   { transform: scale(1.06); }
+}
+
+/* Waehrend der Vorhang liegt, steht auch die Skyline still - der Zoom
+   soll nicht schon hinter dem Vorhang halb durchgelaufen sein. */
+html.intro-laeuft .hero-skyline {
+    animation-play-state: paused;
+}
+
 .hero-bg {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: url('./images/header/berlin-crop.jpg') center/cover no-repeat;
-    filter: brightness(0.8) contrast(1.2) saturate(1.1);
     z-index: 0;
 }
 
+/* Zwei Verlaeufe statt einer gleichmaessigen Abdunklung: senkrecht
+   nimmt die Deckung nach unten ab, damit die Haeuser als Silhouetten
+   stehen bleiben, und waagerecht liegt links ein Schleier unter dem
+   Text - dort steht die Schrift, dort braucht es die Deckung. */
 .hero-overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(to bottom, rgba(5, 5, 5, 0.4), rgba(5, 5, 5, 0.2), rgba(5, 5, 5, 0.5));
+    background:
+        linear-gradient(to right,
+            rgba(5, 5, 5, 0.82) 0%,
+            rgba(5, 5, 5, 0.55) 40%,
+            rgba(5, 5, 5, 0.1) 72%,
+            rgba(5, 5, 5, 0) 100%),
+        linear-gradient(to top,
+            rgba(5, 5, 5, 0.15) 0%,
+            rgba(5, 5, 5, 0.4) 45%,
+            rgba(5, 5, 5, 0.78) 100%);
     z-index: 0;
 }
 
@@ -222,21 +264,75 @@ section {
     z-index: 2;
 }
 
-.hero-title {
-    margin-bottom: 1.5rem;
+/* --- Namenszug ---------------------------------------------------------
+   ALEX klein und gesperrt, VOLKMANN gross und eng darunter: der
+   Groessensprung traegt den Hero, nicht ein Satz. */
+.hero-name {
+    margin: 0;
+    line-height: 1;
 }
 
-.hero-subtitle {
-    font-size: clamp(1rem, 2.5vw, 1.2rem);
-    margin-bottom: 2rem;
-    opacity: 0.9;
+.hero-vorname,
+.hero-nachname {
+    display: block;
+    text-transform: uppercase;
+}
+
+.hero-vorname {
+    font-size: clamp(1rem, 2.2vw, 1.6rem);
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    color: var(--text);
+    opacity: 0.7;
+}
+
+.hero-nachname {
+    /* Der Zeilenabstand haelt VOLKMANN direkt unter ALEX; die
+       Sperrung von ALEX schiebt sonst optisch auseinander. */
+    margin-top: 0.15em;
+    font-size: clamp(3rem, 11vw, 8rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 0.95;
+    color: var(--text-bright);
+}
+
+/* Die Buchstaben muessen einzeln animierbar sein, duerfen aber wie
+   ein Wort umbrechen - deshalb inline-block statt block. */
+.hero-buchstabe {
+    display: inline-block;
+}
+
+.hero-strich {
+    width: 54px;
+    height: 2px;
+    margin: clamp(1.5rem, 3vw, 2.25rem) 0 clamp(1.25rem, 2.5vw, 1.75rem);
+    background: var(--primary);
+}
+
+.hero-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.hero-meta-zeile {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: var(--mono-track);
+    line-height: 1.4;
+    text-transform: uppercase;
+    color: var(--text);
+    opacity: 0.7;
 }
 
 .hero-cta {
     display: flex;
     flex-wrap: wrap;
     gap: clamp(0.8rem, 2vw, 1.2rem);
-    margin-top: 1.5rem;
+    margin-top: clamp(2rem, 4vw, 2.75rem);
 }
 
 .scroll-indicator {
@@ -1234,23 +1330,12 @@ footer {
         padding: clamp(3rem, 8vw, 4rem) 0;
     }
 
+    /* Linksbuendig wie der Rest der Seite - der Namenszug steht auf
+       derselben Kante wie die Sektionen darunter. */
     .hero-content {
-        text-align: center;
-        padding: 2rem 1rem;
+        text-align: left;
+        padding: 0;
     }
-
-    .hero-title {
-        font-size: clamp(1.4rem, 4vw, 2.2rem) !important;
-        line-height: 1.2;
-        word-break: break-word;
-        margin-bottom: 1rem;
-    }
-
-    .hero-subtitle {
-        font-size: clamp(0.9rem, 2.5vw, 1rem);
-        margin-bottom: 1.5rem;
-    }
-
 
     .club-ranking {
         padding-top: 4rem;
@@ -1264,7 +1349,7 @@ footer {
     
     .hero-cta {
         flex-direction: column;
-        align-items: center;
+        align-items: stretch;
         gap: 1rem;
         width: 100%;
     }
@@ -4262,26 +4347,67 @@ html.intro-laeuft .intro.is-faehrt-weg {
 /* --- Hero waehrend des Vorhangs ---------------------------------------- */
 
 /* Verborgen wird ausschliesslich ueber html.intro-laeuft. Faellt die
-   Klasse weg, gelten beide Regeln nicht mehr und der Hero steht in
-   seinem Normalzustand - auch dann, wenn das Sicherheitsnetz geraeumt
-   hat und sonst niemand mehr aufraeumt. */
-html.intro-laeuft .hero-content > *,
-html.intro-laeuft .hero-content h1 .hero-zeile {
+   Klasse weg, gelten die Regeln nicht mehr und der Hero steht in seinem
+   Normalzustand - auch dann, wenn das Sicherheitsnetz geraeumt hat und
+   sonst niemand mehr aufraeumt.
+
+   Die Reihenfolge steht hier im CSS, nicht in main.js: ALEX, dann die
+   Buchstaben von VOLKMANN einzeln, dann der Strich, die drei Metazeilen
+   und zuletzt die Buttons. */
+html.intro-laeuft .hero-vorname,
+html.intro-laeuft .hero-meta-zeile,
+html.intro-laeuft .hero-cta {
     opacity: 0;
-    transform: translateY(32px);
+    transform: translateY(24px);
 }
 
-html.intro-laeuft .hero-content.is-eingefahren > *,
-html.intro-laeuft .hero-content.is-eingefahren h1 .hero-zeile {
+html.intro-laeuft .hero-buchstabe {
+    opacity: 0;
+    transform: translateY(0.35em);
+    filter: blur(10px);
+}
+
+html.intro-laeuft .hero-strich {
+    width: 0;
+    opacity: 0;
+}
+
+html.intro-laeuft .hero-content.is-eingefahren .hero-vorname,
+html.intro-laeuft .hero-content.is-eingefahren .hero-meta-zeile,
+html.intro-laeuft .hero-content.is-eingefahren .hero-cta {
     opacity: 1;
     transform: none;
-    transition: opacity 0.7s ease var(--hero-verzug, 0ms),
-                transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) var(--hero-verzug, 0ms);
+    transition: opacity 0.6s ease var(--hero-verzug, 0ms),
+                transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) var(--hero-verzug, 0ms);
 }
 
-/* Die beiden Kopfzeilen sind jetzt Bloecke statt durch <br> getrennt. */
-.hero-zeile {
-    display: block;
+/* 40ms Abstand von Buchstabe zu Buchstabe, aus dem Unscharfen von
+   unten herein. --i steht im Markup an jedem Span. */
+html.intro-laeuft .hero-content.is-eingefahren .hero-buchstabe {
+    --hero-verzug: calc(160ms + var(--i) * 40ms);
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition: opacity 0.55s ease var(--hero-verzug),
+                transform 0.65s cubic-bezier(0.22, 0.61, 0.36, 1) var(--hero-verzug),
+                filter 0.55s ease var(--hero-verzug);
+}
+
+/* Der Strich waechst von links auf seine 54px - Breite statt
+   Verschiebung, damit die linke Kante steht. */
+html.intro-laeuft .hero-content.is-eingefahren .hero-strich {
+    width: 54px;
+    opacity: 1;
+    transition: width 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) 620ms,
+                opacity 0.3s ease 620ms;
+}
+
+html.intro-laeuft .hero-content.is-eingefahren .hero-meta-zeile {
+    --hero-verzug: calc(780ms + var(--i) * 90ms);
+}
+
+html.intro-laeuft .hero-content.is-eingefahren .hero-cta {
+    --hero-verzug: 1120ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -4294,9 +4420,22 @@ html.intro-laeuft .hero-content.is-eingefahren h1 .hero-zeile {
         overflow: visible;
     }
 
-    html.intro-laeuft .hero-content > *,
-    html.intro-laeuft .hero-content h1 .hero-zeile {
+    /* Alles steht sofort da, und die Skyline steht still. */
+    html.intro-laeuft .hero-vorname,
+    html.intro-laeuft .hero-buchstabe,
+    html.intro-laeuft .hero-meta-zeile,
+    html.intro-laeuft .hero-cta {
         opacity: 1;
         transform: none;
+        filter: none;
+    }
+
+    html.intro-laeuft .hero-strich {
+        width: 54px;
+        opacity: 1;
+    }
+
+    .hero-skyline {
+        animation: none;
     }
 }
