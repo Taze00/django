@@ -30,34 +30,7 @@ PROJEKTE = [
         "bild": "css/images/projects/corvis.png",
         "url": "/corvis/",
         "status": "",
-        "breit": False,
-    },
-    {
-        "name": "Aurelia",
-        "kategorie": "Technik-Demo",
-        "beschreibung": (
-            "Übungsstück für WebGL: eine Marke erfunden, um eigene Shader und "
-            "eine am Scrollverlauf hängende Choreografie zu bauen."
-        ),
-        "tech": ["Three.js", "WebGL", "GSAP", "ScrollTrigger", "Canvas"],
-        "bild": "css/images/projects/aurelia.png",
-        "url": "/aurelia/",
-        "status": "",
-        "breit": False,
-    },
-    {
-        "name": "Festival-Seite",
-        "kategorie": "Single Page",
-        "beschreibung": (
-            "Packliste fürs Festivalwochenende, entstanden weil ich jedes Mal "
-            "was vergessen habe. Kategorien, Fortschritt, Filter – der Stand "
-            "bleibt im Browser."
-        ),
-        "tech": ["HTML", "CSS", "Vanilla JS", "localStorage"],
-        "bild": "css/images/projects/festival.png",
-        "url": "/festival/",
-        "status": "",
-        "breit": False,
+        "breit": True,
     },
     {
         "name": "Diese Seite",
@@ -70,7 +43,7 @@ PROJEKTE = [
         "bild": "css/images/projects/diese-seite.png",
         "url": "/",
         "status": "Im Umbau",
-        "breit": True,
+        "breit": False,
     },
 ]
 

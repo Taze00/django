@@ -1423,3 +1423,42 @@ function initReveals() {
         requestAnimationFrame(takt);
     }
 })();
+
+
+// ===== KACHEL-TEXT AUF TOUCH =====
+// Auf Desktop faehrt der Text per :hover ueber das Poster. Auf Touch
+// gibt es kein Hover - dort schaltet ein Tipp auf die Kachel um.
+//
+// Der Knopf steckt im Markup (kachel-poster.html) und ist per CSS nur
+// sichtbar, wo (hover: none) gilt. Hier haengt nur das Verhalten dran.
+(function initKachelText() {
+    const schalter = document.querySelectorAll('[data-kachel-schalter]');
+    if (!schalter.length) return;
+
+    function schliesse(ausser) {
+        document.querySelectorAll('.kachel.is-offen').forEach(kachel => {
+            if (kachel === ausser) return;
+            kachel.classList.remove('is-offen');
+            const knopf = kachel.querySelector('[data-kachel-schalter]');
+            if (knopf) knopf.setAttribute('aria-expanded', 'false');
+        });
+    }
+
+    schalter.forEach(knopf => {
+        knopf.addEventListener('click', () => {
+            const kachel = knopf.closest('.kachel');
+            if (!kachel) return;
+
+            const offen = !kachel.classList.contains('is-offen');
+            // Immer nur eine Kachel offen - zwei gleichzeitig lesen sich
+            // in einer scrollenden Reihe wie ein Fehler.
+            schliesse(kachel);
+            kachel.classList.toggle('is-offen', offen);
+            knopf.setAttribute('aria-expanded', String(offen));
+        });
+    });
+
+    document.addEventListener('keydown', ereignis => {
+        if (ereignis.key === 'Escape') schliesse(null);
+    });
+})();

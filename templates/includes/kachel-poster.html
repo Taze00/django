@@ -1,17 +1,23 @@
-{% load film_text %}{% comment %}
+{% comment %}
 Poster-Kachel - Filme, Serien, Anime.
 
-Erwartet in `kachel`: titel, jahr, meine_wertung, poster_url,
-optional mein_text, letterboxd_slug, wo_zu_sehen, episoden, regie,
-stimmung, gattung.
+Erwartet in `kachel`: titel, jahr, poster_url, optional meine_wertung,
+mein_text, letterboxd_slug, wo_zu_sehen, episoden, regie, stimmung,
+gattung.
 
-Der Beschreibungstext sitzt nicht mehr unter der Kachel, sondern faehrt
-beim Hover als Overlay ueber den unteren Teil des Posters. Gekuerzt auf
-zwei Saetze - der volle Text bleibt in den Daten.
+Der Text faehrt beim Hover als Overlay ueber den unteren Teil des
+Posters. Auf Touch gibt es kein Hover - dort schaltet der Knopf
+.kachel-schalter das Overlay per Tipp um (siehe main.js). Der Knopf
+liegt ueber dem Poster und ist nur da sichtbar, wo Hover fehlt.
+
+Volltext, nicht gekuerzt: die Filmtexte sind der Kern der Sektion und
+sollen ganz zu lesen sein, nicht angerissen.
 {% endcomment %}
 
+{% with textid=kachel.letterboxd_slug|default:kachel.titel|slugify %}
 <article class="kachel kachel--poster"
          data-eintrag
+         {% if kachel.mein_text %}data-hat-text{% endif %}
          {% if kachel.gattung %}data-gattung="{{ kachel.gattung }}"{% endif %}
          {% if kachel.stimmung %}data-stimmung="{{ kachel.stimmung }}"{% endif %}>
 
@@ -23,23 +29,38 @@ zwei Saetze - der volle Text bleibt in den Daten.
         {% endif %}
 
         {% if kachel.mein_text %}
-        <div class="kachel-overlay">
-            <p class="kachel-text">{{ kachel.mein_text|kurzfassung }}</p>
+        <div class="kachel-overlay" id="kachel-text-{{ textid }}">
+            <p class="kachel-text">{{ kachel.mein_text }}</p>
             {% if kachel.letterboxd_slug %}
             <a class="kachel-link" href="https://letterboxd.com/film/{{ kachel.letterboxd_slug }}/" target="_blank" rel="noopener noreferrer">Auf Letterboxd &rarr;</a>
             {% elif kachel.wo_zu_sehen %}
             <span class="kachel-link">{{ kachel.wo_zu_sehen }}</span>
             {% endif %}
         </div>
+
+        {% comment %}Zeigt an, dass hinter der Kachel ein Text steckt -
+        ohne den Hinweis waere auf Touch nicht erkennbar, dass es hier
+        etwas anzutippen gibt.{% endcomment %}
+        <span class="kachel-hinweis" aria-hidden="true"></span>
+
+        <button type="button" class="kachel-schalter"
+                data-kachel-schalter
+                aria-expanded="false"
+                aria-controls="kachel-text-{{ textid }}">
+            <span class="visually-hidden">Text zu {{ kachel.titel }} anzeigen</span>
+        </button>
         {% endif %}
     </div>
 
     <div class="kachel-body">
         <h4 class="kachel-titel">{{ kachel.titel }}</h4>
         <div class="kachel-meta">
+            {% if kachel.meine_wertung %}
             <span class="kachel-sterne" aria-hidden="true" style="--rating: {{ kachel.meine_wertung }};"></span>
             <span class="visually-hidden">{{ kachel.meine_wertung }} von 5 Sternen</span>
+            {% endif %}
             <span>{{ kachel.jahr }}</span>
         </div>
     </div>
 </article>
+{% endwith %}

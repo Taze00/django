@@ -1,41 +1,42 @@
 [
   {
-    "titel": "Platzhalter Eins",
+    "titel": "The Sixth Sense",
     "jahr": 1999,
-    "regie": "Regie Nachname",
-    "laufzeit_min": 120,
+    "regie": "M. Night Shyamalan",
+    "tmdb_id": 745,
+    "letterboxd_slug": "the-sixth-sense",
+    "mein_text": "Wahrscheinlich mein Lieblingsfilm. Ich hatte das erste und einzige Mal in meinem Leben Gänsehaut bei einem Film und schauspielerisch das beste Kind."
+  },
+  {
+    "titel": "Whiplash",
+    "jahr": 2014,
+    "regie": "Damien Chazelle",
+    "tmdb_id": 244786,
+    "letterboxd_slug": "whiplash-2014",
+    "mein_text": "Ich weiß, wie viele Menschen wissen, dass genau das der Weg zum Erfolg ist und dies die Grenze zwischen Gut und Böse, zwischen Erfolg und Tod die Moral spaltet."
+  },
+  {
+    "titel": "Fight Club",
+    "jahr": 1999,
+    "regie": "David Fincher",
     "tmdb_id": 550,
-    "letterboxd_slug": "platzhalter-eins",
-    "meine_wertung": 4.5,
-    "stimmung": "mitnehmen",
-    "wo_zu_sehen": "Amazon Prime",
-    "mein_text": "Platzhaltertext, den Alex noch ersetzt. Hier stehen zwei bis vier Saetze darueber, warum der Film haengengeblieben ist. Kein Klappentext, sondern der eigene Eindruck.",
-    "highlight": true
+    "letterboxd_slug": "fight-club",
+    "mein_text": "Ich fand es war ein besonderes Gedankenspiel, Menschen mal am Nullpunkt ankommen zu lassen. Denn wenn man wirklich nichts mehr zu verlieren hat, fängt man erst richtig an zu leben."
   },
   {
-    "titel": "Platzhalter Zwei",
-    "jahr": 2013,
-    "regie": "Regie Nachname",
-    "laufzeit_min": 153,
-    "tmdb_id": 146233,
-    "letterboxd_slug": "platzhalter-zwei",
-    "meine_wertung": 3.5,
-    "stimmung": "nachdenken",
-    "wo_zu_sehen": "Netflix",
-    "mein_text": "Platzhaltertext, den Alex noch ersetzt. Ein Film, der eher lange nachhallt als im Moment zu packen. Die Sorte, ueber die man am naechsten Tag noch nachdenkt.",
-    "highlight": false
+    "titel": "The Pursuit of Happyness",
+    "jahr": 2006,
+    "regie": "Gabriele Muccino",
+    "tmdb_id": 1402,
+    "letterboxd_slug": "the-pursuit-of-happyness",
+    "mein_text": "Ich fand es sehr schön und emotional. Obwohl alles wirklich alles schiefläuft und es nicht schlechter um ihn stehen könnte, gibt er nicht auf, gerade weil die Liebe zu seinem Sohn ihn antreibt, selbst wenn er für sich selbst vielleicht längst aufgegeben hätte."
   },
   {
-    "titel": "Platzhalter Drei",
-    "jahr": 2021,
-    "regie": "Regie Nachname",
-    "laufzeit_min": 95,
-    "tmdb_id": 619730,
-    "letterboxd_slug": "platzhalter-drei",
-    "meine_wertung": 5.0,
-    "stimmung": "geheimtipp",
-    "wo_zu_sehen": "MUBI",
-    "mein_text": "Platzhaltertext, den Alex noch ersetzt. Kaum jemand kennt ihn, und genau deshalb steht er hier. Kurz, eigenwillig und deutlich besser als sein Ruf.",
-    "highlight": false
+    "titel": "Pulp Fiction",
+    "jahr": 1994,
+    "regie": "Quentin Tarantino",
+    "tmdb_id": 680,
+    "letterboxd_slug": "pulp-fiction",
+    "mein_text": "Dieser Film hat mich fasziniert, weil er ganz anders ist als alle anderen. Die nicht-lineare Erzählweise und der einzigartige Dialogstil machen ihn unvergleichbar mit jedem anderen Film. Es macht sehr Spaß, solche Art von Film zu gucken."
   }
 ]

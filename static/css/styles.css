@@ -2216,6 +2216,11 @@ footer {
     overflow-x: auto;
     overflow-y: hidden;
     scroll-snap-type: x var(--regal-snap);
+    /* Ohne das rastet die erste Kachel an der Containerkante ein und
+       ignoriert das seitliche Padding - scrollLeft steht dann im Ruhezustand
+       bei 10 statt 0, das Regal gilt nicht als "am Anfang" und der linke
+       Pfeil erscheint, obwohl links nichts liegt. */
+    scroll-padding-inline: var(--regal-seitenluft);
     scroll-behavior: smooth;
     overscroll-behavior-x: contain;
     /* Scrollbar ausblenden - gescrollt wird per Wisch, Pfeil oder Taste. */
@@ -2713,9 +2718,14 @@ footer {
     overflow: hidden;
 }
 
+/* Hoechstens zwei Spalten. Bei 320px Mindestbreite ergaben sich auf
+   1440px drei Spalten - seit nur noch zwei Projekte hier stehen, stand
+   die schmale Karte dann allein in einer Reihe und zwei Drittel daneben
+   blieben leer. Mit 400px passen nie mehr als zwei nebeneinander, die
+   einzelne Karte fuellt also eine halbe Reihe statt einer drittel. */
 .projects-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
     gap: clamp(1.5rem, 3vw, 2rem);
 }
 
@@ -3366,4 +3376,103 @@ html.lenis body {
         gap: 0.45rem;
         font-size: 0.66rem;
     }
+}
+
+/* --- Kernregal: die Filme mit eigenem Text ----------------------------- */
+
+/* Die fuenf Filme sind der Kern der Sektion. Groessere Kacheln als
+   Serien und Anime, damit die Reihe sich abhebt und der Text im Overlay
+   Platz hat, ohne gekuerzt zu werden. */
+.regal--kern {
+    --regal-kachel-breite: 260px;
+}
+
+/* Kleiner Hinweis, dass hinter der Kachel ein Text steckt. Auf Touch
+   gibt es kein Hover - ohne die Marke waere nicht erkennbar, dass hier
+   etwas anzutippen ist. */
+.kachel-hinweis {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(5, 5, 5, 0.72);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    pointer-events: none;
+    opacity: 0.85;
+    transition: opacity 0.28s ease, transform 0.28s ease;
+}
+
+/* Das Pluszeichen aus zwei Strichen - kein Icon-Font noetig. */
+.kachel-hinweis::before,
+.kachel-hinweis::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background: var(--primary);
+    transition: transform 0.28s ease;
+}
+
+.kachel-hinweis::before {
+    width: 9px;
+    height: 1px;
+    transform: translate(-50%, -50%);
+}
+
+.kachel-hinweis::after {
+    width: 1px;
+    height: 9px;
+    transform: translate(-50%, -50%);
+}
+
+/* Offen: aus dem Plus wird ein Kreuz. */
+.kachel:hover .kachel-hinweis::after,
+.kachel:focus-within .kachel-hinweis::after,
+.kachel.is-offen .kachel-hinweis::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+}
+
+/* Der Knopf liegt ueber dem Poster und schaltet den Text per Tipp um.
+   Nur dort, wo Hover fehlt - sonst uebernimmt der Hover und der Knopf
+   wuerde Klicks auf den Letterboxd-Link abfangen. */
+.kachel-schalter {
+    display: none;
+    position: absolute;
+    inset: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+}
+
+@media (hover: none) {
+    .kachel-schalter {
+        display: block;
+    }
+
+    /* Ist der Text offen, muss der Link darunter erreichbar bleiben -
+       sonst liegt der Schalter darueber und schluckt den Tipp. */
+    .kachel.is-offen .kachel-schalter {
+        inset: 0 0 45% 0;
+    }
+}
+
+/* Angetippt: dasselbe Bild wie beim Hover. */
+.kachel.is-offen .kachel-overlay {
+    transform: translateY(0);
+}
+
+.kachel.is-offen .kachel-poster img {
+    filter: brightness(0.45);
+}
+
+/* Der Text kann laenger sein als das Poster hoch ist - dann scrollt das
+   Overlay in sich, statt ueber die Kachel hinauszuwachsen. */
+.kachel-overlay {
+    max-height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
 }

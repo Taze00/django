@@ -111,7 +111,7 @@
         <div class="container">
             <div class="sektion-kopf">
                 {% include "includes/sektion-meta.html" with nummer="02" titel="Was ich baue" zusatz=projekte|length|stringformat:"s"|add:" Projekte" %}
-                <p class="sektion-einleitung">Vier Projekte, an denen ich gelernt habe, was ich kann und was noch nicht</p>
+                <p class="sektion-einleitung">Zwei Sachen, die ich wirklich gebaut habe und die laufen – der Rest war Übung und ist es nicht wert, hier zu stehen.</p>
             </div>
 
             <div class="projects-grid">
@@ -234,7 +234,7 @@
             <div class="films-spotlight" data-spotlight hidden aria-live="polite"></div>
 
             {% if filme %}
-            {% include "includes/regal.html" with titel="Filme" items=filme kachel_typ="poster" regal_id="filme" zaehler=filme_zaehler %}
+            {% include "includes/regal.html" with titel="Filme" items=filme kachel_typ="poster" regal_id="filme" zaehler=filme_zaehler regal_klasse="regal--kern" %}
             {% endif %}
 
             <p class="films-empty" data-empty hidden>Zu dieser Auswahl ist noch nichts eingetragen.</p>
