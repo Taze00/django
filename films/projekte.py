@@ -27,7 +27,10 @@ PROJEKTE = [
             "einen Tag pausierst."
         ),
         "tech": ["Django", "DRF", "PostgreSQL", "JWT", "React", "Vite", "Zustand"],
-        "bild": "css/images/projects/corvis.png",
+        # JPEG statt PNG: die Vorlage ist ein Screenshot mit weichen
+        # Farbverlaeufen, als PNG blieb sie auch mit reduzierter Palette
+        # ueber 230 KB. Als JPEG q92 sind es 73 KB bei gleicher Wirkung.
+        "bild": "css/images/projects/corvis.jpg",
         "url": "/corvis/",
         "status": "",
         "breit": True,
