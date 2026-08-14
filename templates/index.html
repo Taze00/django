@@ -315,6 +315,15 @@
             </div>
 
             <div id="clubs" class="berlin-clubs">
+                {% comment %}Spaltenkopf. Die Zahl rechts stand vorher ohne
+                jede Beschriftung da - niemand konnte wissen, dass 92 ein
+                Schnitt aus hundert ist und nicht Besuche, Euro oder
+                Minuten.{% endcomment %}
+                <p class="clubliste-kopf">
+                    <span>Platz &amp; Club</span>
+                    <span>Schnitt / 100</span>
+                </p>
+
                 {% comment %}Die Zeilen kommen aus main.js (createClubListe) -
                 dort stehen auch die Daten. <ol>, weil die Reihenfolge die
                 Aussage ist: sortiert nach Gesamtzahl.{% endcomment %}

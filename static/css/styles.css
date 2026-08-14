@@ -632,6 +632,25 @@ html.intro-laeuft .hero-skyline {
 
    Haarlinien nur zwischen den Zeilen - kein Rahmen aussen, sonst waere
    es wieder eine Karte, nur eine grosse. */
+/* Spaltenkopf. Steht in derselben Mono-Sprache wie die uebrigen
+   Metazeilen, aber leiser - er benennt die Liste, er fuehrt sie nicht.
+   Der Innenabstand spiegelt den der Zeilenknoepfe, damit "Platz & Club"
+   ueber der Nummer und "Schnitt / 100" ueber der Zahl steht. */
+.clubliste-kopf {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0 0 0.6rem;
+    padding: 0 0.25rem 0.75rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: var(--mono-track);
+    text-transform: uppercase;
+    color: var(--text);
+    opacity: 0.45;
+}
+
 .clubliste {
     list-style: none;
     margin: 0;
@@ -651,7 +670,7 @@ html.intro-laeuft .hero-skyline {
     align-items: center;
     gap: 0 1.1rem;
     width: 100%;
-    padding: 1.15rem 0.25rem;
+    padding: 0.85rem 0.25rem;
     background: none;
     border: 0;
     text-align: left;
@@ -660,7 +679,10 @@ html.intro-laeuft .hero-skyline {
     cursor: pointer;
     transition: background-color 0.25s ease;
 
-    --clubbild: 52px;
+    /* 52x32 war zu klein, um einen Raum wiederzuerkennen - bei einem
+       dunklen Clubfoto blieb ein grauer Fleck. Die Hoehe kommt jetzt
+       vom Bild, deshalb weniger Innenabstand als vorher (1.15rem). */
+    --clubbild: 120px;
 }
 
 .clubliste-nr {
@@ -680,9 +702,9 @@ html.intro-laeuft .hero-skyline {
     grid-area: bild;
     display: block;
     width: var(--clubbild);
-    height: 32px;
+    height: 72px;
     overflow: hidden;
-    border-radius: 2px;
+    border-radius: 3px;
 }
 
 .clubliste-bild img {
@@ -784,19 +806,26 @@ html.intro-laeuft .hero-skyline {
    1fr - deshalb muessen ihre Kinder overflow und min-height 0 haben,
    sonst halten sie die Reihe von innen auf. */
 @media (max-width: 640px) {
+    /* Foto und Werte stehen unter dem Namen, nicht unter der Nummer:
+       stuenden sie in Spalte eins, wuerde das 120px breite Foto die
+       Spalte der Nummer auf seine Breite aufziehen - und zwischen "01"
+       und dem Clubnamen klaffte in jeder Zeile eine Handbreit Leere,
+       auch in den zugeklappten. Die leeren Zellen (".") halten die
+       Spalte schmal. */
     .clubliste-knopf {
         grid-template-columns: auto 1fr auto;
-        grid-template-rows: auto 0fr;
+        grid-template-rows: auto 0fr 0fr;
         grid-template-areas:
-            "nr   name  gesamt"
-            "bild werte werte";
+            "nr name  gesamt"
+            ".  bild  bild"
+            ".  werte werte";
         gap: 0 0.9rem;
         padding: 0.95rem 0.25rem;
         transition: grid-template-rows 0.3s cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     .clubliste-zeile.is-offen .clubliste-knopf {
-        grid-template-rows: auto 1fr;
+        grid-template-rows: auto 1fr 1fr;
     }
 
     .clubliste-bild,
@@ -806,20 +835,26 @@ html.intro-laeuft .hero-skyline {
         overflow: hidden;
     }
 
+    /* Dieselbe Groesse wie auf dem Desktop - der Platz ist da, seit das
+       Foto unter dem Namen steht statt neben der Nummer. */
     .clubliste-bild {
-        width: 44px;
+        width: 120px;
+        height: auto;
     }
 
     .clubliste-bild img {
-        height: 28px;
-        margin-top: 0.7rem;
+        height: 72px;
+        margin-top: 0.75rem;
     }
 
+    /* Ausgeschrieben passen die drei Werte nicht mehr in eine Zeile -
+       deshalb umbrechend statt abgeschnitten. */
     .clubliste-werte {
         justify-self: start;
         align-self: center;
         padding: 0.7rem 0 0;
         font-size: 0.68rem;
+        white-space: normal;
     }
 
     .clubliste-name {

@@ -426,16 +426,19 @@ function createClubListe() {
         // Ein <button>, damit die Details auch mit der Tastatur
         // erreichbar sind - auf einem Zeigegeraet kommen sie sonst nur
         // beim Darueberfahren.
+        // Die Einzelwerte stehen ausgeschrieben da. "ATM 95 · SND 92 ·
+        // LNP 89" war eine Abkuerzung, die nur kannte, wer sie selbst
+        // vergeben hat - und sie machte eine zweite, versteckte Fassung
+        // fuer Screenreader noetig. Jetzt reicht eine.
         zeile.innerHTML = `
             <button type="button" class="clubliste-knopf" aria-expanded="false">
                 <span class="clubliste-nr">${nummer}</span>
                 <span class="clubliste-bild">
-                    <img src="${club.image}" alt="" width="52" height="32" loading="lazy">
+                    <img src="${club.image}" alt="" width="120" height="72" loading="lazy">
                 </span>
                 <span class="clubliste-name">${club.name}</span>
-                <span class="clubliste-werte" aria-hidden="true">ATM ${club.ratings.atmosphere} &middot; SND ${club.ratings.sound} &middot; LNP ${club.ratings.lineup}</span>
-                <span class="visually-hidden">Atmosphäre ${club.ratings.atmosphere}, Sound ${club.ratings.sound}, Lineup ${club.ratings.lineup}</span>
-                <span class="clubliste-gesamt">${gesamt}</span>
+                <span class="clubliste-werte">Atmosphäre ${club.ratings.atmosphere} &middot; Sound ${club.ratings.sound} &middot; Lineup ${club.ratings.lineup}</span>
+                <span class="clubliste-gesamt">${gesamt}<span class="visually-hidden"> von 100</span></span>
             </button>
         `;
 
