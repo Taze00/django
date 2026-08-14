@@ -1711,6 +1711,13 @@ function initReveals() {
 
     const kacheln = Array.from(raster.children);
 
+    // Nachladegrenze: nicht alle Kacheln auf einmal zeigen. 216 Stueck
+    // ergaben auf Mobil eine Seite von ueber 34000px - unbrauchbar zum
+    // Ueberfliegen und teuer im Aufbau.
+    const ERSTE_MENGE = 40;
+    const NACHSCHUB = 40;
+    let gezeigt = ERSTE_MENGE;
+
     // Werte einmal auslesen statt bei jeder Sortierung neu aus dem DOM.
     const daten = kacheln.map(el => ({
         el,
@@ -1760,23 +1767,53 @@ function initReveals() {
 
     function wende_an() {
         const pruefe = FILTER[aktiverFilter] || FILTER.alle;
+        let passend = 0;
         let sichtbar = 0;
 
         daten.forEach(d => {
-            const zeigen = pruefe(d);
+            const trifft = pruefe(d);
+            // Erst der Filter, dann die Nachladegrenze: die Grenze zaehlt
+            // nur die Kacheln, die zur Auswahl gehoeren.
+            const zeigen = trifft && passend < gezeigt;
+            if (trifft) passend++;
             d.el.hidden = !zeigen;
             if (zeigen) sichtbar++;
         });
 
-        zaehler.textContent = sichtbar === daten.length
-            ? `${daten.length} Filme`
-            : `${sichtbar} von ${daten.length}`;
+        zaehler.textContent = passend === daten.length
+            ? `${sichtbar} von ${daten.length} Filmen`
+            : `${sichtbar} von ${passend} (Auswahl aus ${daten.length})`;
 
-        leerHinweis.hidden = sichtbar > 0;
+        leerHinweis.hidden = passend > 0;
+
+        // Der Fuehler steht unter der letzten sichtbaren Kachel und
+        // loest den Nachschub aus, sobald er in Sichtweite kommt.
+        const fehltNoch = passend > sichtbar;
+        fuehler.hidden = !fehltNoch;
+        if (fehltNoch) {
+            nachschubBeobachter.observe(fuehler);
+        } else {
+            nachschubBeobachter.unobserve(fuehler);
+        }
 
         // Neu sichtbare Kacheln brauchen ihr Poster.
         beobachteOffene();
     }
+
+    // Ein leeres Element am Ende der Liste. Kommt es in Sichtweite,
+    // wird nachgelegt - kein Knopf, kein Scroll-Listener.
+    const fuehler = document.createElement('div');
+    fuehler.className = 'filmraster-fuehler';
+    fuehler.hidden = true;
+    raster.after(fuehler);
+
+    const nachschubBeobachter = new IntersectionObserver(eintraege => {
+        eintraege.forEach(eintrag => {
+            if (!eintrag.isIntersecting) return;
+            gezeigt += NACHSCHUB;
+            wende_an();
+        });
+    }, { rootMargin: '400px 0px' });
 
     sortierung.addEventListener('change', () => {
         sortiere(sortierung.value);
@@ -1786,6 +1823,8 @@ function initReveals() {
     chips.forEach(chip => {
         chip.addEventListener('click', () => {
             aktiverFilter = chip.dataset.filter;
+            // Neue Auswahl faengt wieder bei der ersten Menge an.
+            gezeigt = ERSTE_MENGE;
             chips.forEach(c => {
                 const aktiv = c === chip;
                 c.classList.toggle('is-active', aktiv);

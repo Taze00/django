@@ -51,3 +51,7 @@ screenshots/
 # Letterboxd-Export: Sehdaten mit Datum ueber Jahre - persoenlich,
 # gehoert nicht ins oeffentliche Repo. In der Datenbank ist es ok.
 data/letterboxd/
+
+# Unbenutzte CORVIS-Screenshots - liegen nur als Vorlage herum
+static/css/images/projects/corvis-vergleich.png
+static/css/images/projects/corvis-app.png

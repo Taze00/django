@@ -126,6 +126,20 @@ def ansicht_schiessen(browser, name: str, konfig: dict, url: str,
     seite_vorbereiten(page, url, wartezeit)
 
     voll = ziel / f"{name}-full.png"
+    # Zweimal, und nur die zweite Aufnahme zaehlt.
+    #
+    # Bei langen Seiten laesst Chromium in der ersten Full-Page-Aufnahme
+    # regelmaessig Bilder weit unterhalb des Viewports weg - sie sind
+    # geladen (complete, naturalWidth > 0) und sichtbar (opacity 1), aber
+    # zum Aufnahmezeitpunkt nicht rasterisiert. Welche fehlen, wechselt
+    # von Lauf zu Lauf. Im Bild sehen sie aus wie leere Kacheln, was
+    # schon zweimal zu einer Fehlersuche an der Seite gefuehrt hat,
+    # obwohl die Seite in Ordnung war.
+    #
+    # Die erste Aufnahme erzwingt die Rasterung, die zweite ist
+    # vollstaendig. Gemessen: erster Durchgang 9 leere Kacheln, zweiter
+    # und dritter keine.
+    page.screenshot(path=str(voll), full_page=True)
     page.screenshot(path=str(voll), full_page=True)
     print(f"  ok  {voll.name}")
 
