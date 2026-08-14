@@ -1462,3 +1462,197 @@ function initReveals() {
         if (ereignis.key === 'Escape') schliesse(null);
     });
 })();
+
+
+// ===== FILMSUCHE =====
+// "Hab ich den gesehen?" - der Index kommt einmal vom Server, gesucht
+// wird danach vollstaendig hier. Kein Abruf je Tastendruck, damit auch
+// kein Ladezustand und keine Verzoegerung.
+(function initFilmsuche() {
+    const block = document.querySelector('[data-filmsuche]');
+    if (!block) return;
+
+    const feld = block.querySelector('[data-filmsuche-feld]');
+    const liste = block.querySelector('[data-filmsuche-treffer]');
+    const leerHinweis = block.querySelector('[data-filmsuche-leer]');
+    const leerenKnopf = block.querySelector('[data-filmsuche-leeren]');
+
+    const HOECHSTENS = 5;
+    const BOXD = 'https://boxd.it/';
+
+    let index = [];
+    let treffer = [];
+    let auswahl = -1;
+
+    // Dieselbe Normalisierung wie serverseitig in films/models.py:
+    // klein, ohne Akzente. Sonst faende "amelie" den Eintrag "Amélie"
+    // nur auf einer der beiden Seiten.
+    function normalisiere(text) {
+        return String(text || '')
+            .normalize('NFKD')
+            .replace(/[̀-ͯ]/g, '')
+            .toLowerCase()
+            .trim();
+    }
+
+    function sterne(wertung) {
+        const voll = Math.floor(wertung);
+        const halb = wertung % 1 >= 0.5;
+        return '★'.repeat(voll) + (halb ? '½' : '');
+    }
+
+    // --- Suche ----------------------------------------------------------
+    function suche(eingabe) {
+        const frage = normalisiere(eingabe);
+        if (!frage) return [];
+
+        // Treffer am Wortanfang zuerst - wer "pul" tippt, meint eher
+        // "Pulp Fiction" als "Ford v Ferrari: Pulling Ahead".
+        const beginnt = [];
+        const enthaelt = [];
+
+        for (const film of index) {
+            const stelle = film.n.indexOf(frage);
+            if (stelle === 0) beginnt.push(film);
+            else if (stelle > 0) enthaelt.push(film);
+            if (beginnt.length >= HOECHSTENS) break;
+        }
+
+        return beginnt.concat(enthaelt).slice(0, HOECHSTENS);
+    }
+
+    // --- Anzeige --------------------------------------------------------
+    function zeichne() {
+        liste.replaceChildren();
+        auswahl = -1;
+
+        treffer.forEach((film, i) => {
+            const li = document.createElement('li');
+            li.id = `filmsuche-treffer-${i}`;
+            li.setAttribute('role', 'option');
+            li.setAttribute('aria-selected', 'false');
+
+            const a = document.createElement('a');
+            a.href = BOXD + film.u;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+
+            const titel = document.createElement('span');
+            titel.className = 'filmsuche-titel';
+            titel.textContent = film.t;
+            a.appendChild(titel);
+
+            if (film.j) {
+                const jahr = document.createElement('span');
+                jahr.className = 'filmsuche-jahr';
+                jahr.textContent = film.j;
+                a.appendChild(jahr);
+            }
+
+            // Drei Faelle. `w` fehlt heisst unbewertet, `l` heisst Watchlist.
+            if (film.l) {
+                const status = document.createElement('span');
+                status.className = 'filmsuche-status';
+                status.textContent = 'Steht auf meiner Liste';
+                a.appendChild(status);
+            } else if (typeof film.w === 'number') {
+                const wertung = document.createElement('span');
+                wertung.className = 'filmsuche-wertung';
+                wertung.textContent = sterne(film.w);
+                wertung.title = `${film.w} von 5`;
+                a.appendChild(wertung);
+            } else {
+                const status = document.createElement('span');
+                status.className = 'filmsuche-status';
+                status.textContent = 'Gesehen, nicht bewertet';
+                a.appendChild(status);
+            }
+
+            li.appendChild(a);
+            liste.appendChild(li);
+        });
+
+        feld.setAttribute('aria-expanded', String(treffer.length > 0));
+        leerenKnopf.hidden = !feld.value;
+    }
+
+    function markiere(neu) {
+        const eintraege = Array.from(liste.children);
+        if (!eintraege.length) return;
+
+        // Umlaufend: von unten weiter landet man wieder oben.
+        auswahl = (neu + eintraege.length) % eintraege.length;
+
+        eintraege.forEach((li, i) => {
+            const aktiv = i === auswahl;
+            li.classList.toggle('is-aktiv', aktiv);
+            li.setAttribute('aria-selected', String(aktiv));
+        });
+        feld.setAttribute('aria-activedescendant', eintraege[auswahl].id);
+    }
+
+    function leere() {
+        feld.value = '';
+        treffer = [];
+        zeichne();
+        leerHinweis.hidden = true;
+        feld.removeAttribute('aria-activedescendant');
+    }
+
+    // --- Ereignisse -----------------------------------------------------
+    feld.addEventListener('input', () => {
+        treffer = suche(feld.value);
+        zeichne();
+
+        // "Noch nicht gesehen" nur, wenn wirklich etwas getippt wurde und
+        // nichts passt - nicht schon beim leeren Feld.
+        const nichts = feld.value.trim().length > 0 && treffer.length === 0;
+        leerHinweis.hidden = !nichts;
+        if (nichts) leerHinweis.textContent = 'Noch nicht gesehen';
+    });
+
+    feld.addEventListener('keydown', ereignis => {
+        if (ereignis.key === 'Escape') {
+            ereignis.preventDefault();
+            leere();
+            return;
+        }
+
+        if (ereignis.key === 'ArrowDown') {
+            ereignis.preventDefault();
+            markiere(auswahl + 1);
+        } else if (ereignis.key === 'ArrowUp') {
+            ereignis.preventDefault();
+            markiere(auswahl - 1);
+        } else if (ereignis.key === 'Enter' && auswahl >= 0) {
+            const link = liste.children[auswahl].querySelector('a');
+            if (link) link.click();
+        }
+    });
+
+    leerenKnopf.addEventListener('click', () => {
+        leere();
+        feld.focus();
+    });
+
+    // Klick daneben schliesst die Liste, ohne das Feld zu leeren.
+    document.addEventListener('click', ereignis => {
+        if (!block.contains(ereignis.target)) {
+            liste.replaceChildren();
+            feld.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    // --- Index holen ----------------------------------------------------
+    // Erst wenn er da ist, wird das Feld sichtbar. Ein Suchfeld, das noch
+    // nichts finden kann, waere irrefuehrender als gar keines.
+    fetch('/api/filme/index.json')
+        .then(antwort => (antwort.ok ? antwort.json() : Promise.reject(antwort.status)))
+        .then(daten => {
+            index = daten;
+            block.hidden = false;
+        })
+        .catch(() => {
+            // Bleibt versteckt. Die Sektion funktioniert ohne die Suche.
+        });
+})();

@@ -219,6 +219,43 @@
 
             <p class="films-claim fade-in">Ich bewerte streng. Von <strong>204 Filmen</strong> haben drei fünf Sterne. Was hier über vier steht, meine ich ernst.</p>
 
+            {% comment %}
+            Filmsuche. Der Index wird einmal von /api/filme/index.json geholt,
+            danach sucht der Browser allein - kein Ladezustand, keine
+            Verzoegerung, kein Abruf je Tastendruck.
+
+            Ohne JavaScript bleibt der Block weg: main.js blendet ihn erst
+            ein, wenn der Index da ist. Ein Suchfeld, das nichts tut, waere
+            schlimmer als keines.
+            {% endcomment %}
+            <div class="filmsuche" data-filmsuche hidden>
+                <label class="filmsuche-label" for="filmsuche-feld">Hab ich den gesehen?</label>
+
+                <div class="filmsuche-feld-zeile">
+                    <input type="search" id="filmsuche-feld" class="filmsuche-feld"
+                           data-filmsuche-feld
+                           placeholder="Titel eintippen"
+                           autocomplete="off" spellcheck="false"
+                           role="combobox" aria-expanded="false"
+                           aria-controls="filmsuche-treffer"
+                           aria-describedby="filmsuche-hinweis">
+                    <button type="button" class="filmsuche-leeren" data-filmsuche-leeren hidden>
+                        <span class="visually-hidden">Suche leeren</span>
+                    </button>
+                </div>
+
+                <p class="visually-hidden" id="filmsuche-hinweis">
+                    Ergebnisse erscheinen beim Tippen. Mit Pfeil hoch und runter
+                    auswaehlen, mit Escape leeren.
+                </p>
+
+                <ul class="filmsuche-treffer" id="filmsuche-treffer"
+                    data-filmsuche-treffer role="listbox"
+                    aria-label="Suchergebnisse"></ul>
+
+                <p class="filmsuche-leer" data-filmsuche-leer hidden aria-live="polite"></p>
+            </div>
+
             {% if stimmungen %}
             {% comment %}Wirkt nur auf das Filme-Regal - Serien und Anime haben keine Stimmung hinterlegt.{% endcomment %}
             <div class="films-filter films-filter--stimmung fade-in" role="group" aria-label="Filme nach Stimmung filtern">

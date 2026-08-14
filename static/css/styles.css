@@ -3476,3 +3476,188 @@ html.lenis body {
     overflow-y: auto;
     overscroll-behavior: contain;
 }
+
+/* --- Filmsuche --------------------------------------------------------- */
+
+.filmsuche {
+    position: relative;
+    max-width: 30rem;
+    margin: 0 0 clamp(2.5rem, 5vw, 3.5rem);
+}
+
+.filmsuche-label {
+    display: block;
+    margin-bottom: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+    color: var(--text-bright);
+}
+
+.filmsuche-feld-zeile {
+    position: relative;
+}
+
+.filmsuche-feld {
+    width: 100%;
+    padding: 0.85rem 2.6rem 0.85rem 1rem;
+    border: 1px solid var(--gray);
+    border-radius: var(--film-radius);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-bright);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    transition: border-color 0.25s ease, background 0.25s ease;
+}
+
+.filmsuche-feld::placeholder {
+    color: var(--text);
+    opacity: 0.45;
+}
+
+.filmsuche-feld:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Das Kreuz zum Leeren. Eigener Knopf statt des browsereigenen: der
+   sieht in jedem Browser anders aus und fehlt in manchen ganz. */
+.filmsuche-feld::-webkit-search-cancel-button { display: none; }
+
+.filmsuche-leeren {
+    position: absolute;
+    top: 50%;
+    right: 0.5rem;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    transform: translateY(-50%);
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    cursor: pointer;
+}
+
+.filmsuche-leeren::before,
+.filmsuche-leeren::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 11px;
+    height: 1px;
+    background: var(--text);
+    transition: background 0.2s ease;
+}
+
+.filmsuche-leeren::before { transform: translate(-50%, -50%) rotate(45deg); }
+.filmsuche-leeren::after  { transform: translate(-50%, -50%) rotate(-45deg); }
+
+.filmsuche-leeren:hover::before,
+.filmsuche-leeren:hover::after { background: var(--primary); }
+
+/* --- Trefferliste ------------------------------------------------------ */
+
+/* Liegt ueber dem Folgeinhalt statt ihn wegzuschieben - beim Tippen soll
+   die Seite nicht bei jedem Zeichen springen. */
+.filmsuche-treffer {
+    position: absolute;
+    z-index: 20;
+    top: calc(100% + 0.4rem);
+    right: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: var(--darker);
+    border: 1px solid var(--gray);
+    border-radius: var(--film-radius);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+}
+
+.filmsuche-treffer:empty {
+    display: none;
+}
+
+.filmsuche-treffer li + li {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.filmsuche-treffer a {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    padding: 0.7rem 0.9rem;
+    color: var(--text-bright);
+    text-decoration: none;
+}
+
+.filmsuche-treffer a:hover,
+.filmsuche-treffer li.is-aktiv a {
+    background: rgba(0, 217, 255, 0.09);
+    color: var(--text-bright);
+}
+
+.filmsuche-titel {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.92rem;
+}
+
+.filmsuche-jahr {
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text);
+    opacity: 0.6;
+}
+
+/* Die drei Faelle: bewertet, vorgemerkt, unbekannt. */
+.filmsuche-wertung {
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: var(--primary);
+    white-space: nowrap;
+}
+
+.filmsuche-status {
+    flex-shrink: 0;
+    font-family: var(--font-mono);
+    font-size: 0.64rem;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+    color: var(--text);
+    opacity: 0.7;
+    white-space: nowrap;
+}
+
+/* "Noch nicht gesehen" - kein Treffer im Bestand. */
+.filmsuche-leer {
+    margin: 0.6rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+    color: var(--text);
+    opacity: 0.7;
+}
+
+@media (max-width: 480px) {
+    .filmsuche-treffer a {
+        flex-wrap: wrap;
+        gap: 0.35rem 0.6rem;
+    }
+
+    .filmsuche-titel {
+        flex: 1 1 100%;
+        white-space: normal;
+    }
+}

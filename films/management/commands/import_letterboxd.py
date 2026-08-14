@@ -34,6 +34,7 @@ from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
+from films import suchindex
 from films.models import Film, normalisiere
 
 STANDARD_PFAD = Path(settings.BASE_DIR) / "data" / "letterboxd"
@@ -141,6 +142,12 @@ class Command(BaseCommand):
         grenze = optionen["poster_ab"]
         if grenze is not None:
             self._hole_poster(grenze)
+
+        # Der Suchindex haengt an einem Cache - ohne das hier lieferte
+        # der Endpunkt nach dem Import bis zu eine Stunde lang den alten
+        # Bestand.
+        suchindex.leere_cache()
+        self.stdout.write("Suchindex-Cache verworfen.")
 
     # -- Schreiben -------------------------------------------------------
 
