@@ -47,3 +47,7 @@ staticfiles/
 
 # Design-Audit: generierte Screenshots (tools/shots.py)
 screenshots/
+
+# Letterboxd-Export: Sehdaten mit Datum ueber Jahre - persoenlich,
+# gehoert nicht ins oeffentliche Repo. In der Datenbank ist es ok.
+data/letterboxd/
