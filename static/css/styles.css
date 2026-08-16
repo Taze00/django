@@ -2052,19 +2052,29 @@ footer {
 
 .filmblock:last-child { margin-bottom: 0; }
 
-/* --- Block 1: Meine Fuenf --------------------------------------------- */
-
-/* 240px: bei 1440px Fensterbreite stehen damit alle fuenf nebeneinander,
-   ohne dass die Spur scrollen muss - der Container misst dort 1300px,
-   fuenf Kacheln plus vier Abstaende brauchen 1270px. Darunter wird die
-   Reihe scrollbar wie jedes andere Regal. */
-.regal--kern {
-    --regal-kachel-breite: 240px;
+/* Kleiner als die uebrigen Bloecke, aus demselben Grund wie oben bei
+   .fuenf-satz: die Spur der fuenf endet nicht an der letzten
+   Posterkante, sondern rund 56px darunter. Ohne diese Ruecknahme
+   stuende der Abschlusskasten sichtbar tiefer als vorher. */
+.filmblock--fuenf {
+    margin-bottom: clamp(2rem, 4.5vw, 3.7rem);
 }
 
+/* --- Block 1: Meine Fuenf --------------------------------------------- */
+
+/* Die Masse der Regale (Kachelbreite, Abstand, Luft) stehen nicht hier,
+   sondern gesammelt im Block "Regal-Varianten" - der muss hinter
+   .regal stehen, sonst gewinnt die Grundregel. Siehe dort. */
+
+/* Der Abstand nach unten ist absichtlich klein: die Spur darunter
+   bringt mit --regal-luft rund 56px eigene Polsterung mit, damit der
+   Leuchtschein nicht abgeschnitten wird (siehe .regal--neon). Sichtbar
+   klafft zwischen diesem Satz und der ersten Posterkante trotzdem
+   dasselbe Loch wie vorher - die Polsterung ist unsichtbar, sie zaehlt
+   aber mit. Wer hier wieder aufdreht, treibt den Block auseinander. */
 .fuenf-satz {
     max-width: 46ch;
-    margin: 1.4rem 0 clamp(1.75rem, 3.5vw, 2.5rem);
+    margin: 1.4rem 0 clamp(0.4rem, 1.2vw, 0.75rem);
     font-size: 1.05rem;
     line-height: 1.6;
     color: var(--text);
@@ -2072,13 +2082,6 @@ footer {
 }
 
 /* --- Block 2: Empfehlungen -------------------------------------------- */
-
-/* Deutlich kleiner als die fuenf: der Abstand in der Groesse ist die
-   Aussage. Diese Filme sind gut, aber sie haben keinen eigenen Text. */
-.regal--empfehlungen {
-    --regal-kachel-breite: 165px;
-    --regal-abstand: 0.9rem;
-}
 
 /* Kopfzeile mit Platz fuer den Knopf rechts. Das Regal-Bauteil bringt
    seine eigene Titelzeile nicht mit (kopf_aus) - es kennt keinen
@@ -2309,14 +2312,9 @@ footer {
                 0 18px 40px rgba(0, 0, 0, 0.55);
 }
 
-/* Der Schein braucht Platz. Die Spur schneidet senkrecht ab
-   (overflow-y: hidden), und die Standard-Luft ist auf die wachsende
-   Kachel berechnet, nicht auf 30px Streuung obendrauf. */
-.regal--neon {
-    --regal-luft: calc(
-        (var(--regal-hover-skalierung) - 1) * var(--regal-kachel-breite) * 1.5 / 2 + 26px
-    );
-}
+/* Der Schein braucht Platz in der Spur, sonst schneidet sie ihn ab.
+   Die Rechnung dazu steht bei den Regal-Varianten weiter unten - sie
+   muss hinter .regal stehen, um zu gelten. */
 
 
 /* ==========================================================================
@@ -2380,6 +2378,91 @@ footer {
 }
 
 .regal:last-child { margin-bottom: 0; }
+
+/* --- Regal-Varianten ---------------------------------------------------
+   ALLE Masse der einzelnen Regale stehen hier, und zwar bewusst DIREKT
+   HINTER .regal - nicht bei den Kacheln, zu denen sie inhaltlich
+   gehoeren.
+
+   Grund: .regal--kern und .regal sind gleich spezifisch (beides eine
+   Klasse). Bei Gleichstand gewinnt die spaetere Regel. Standen die
+   Varianten weiter oben in der Datei - dort, wo ihre Sektion beschrieben
+   ist -, ueberschrieb die Grundregel sie stillschweigend wieder.
+
+   Genau das war lange der Fall: --kern, --empfehlungen und der
+   Neon-Zuschlag lagen im Block FILMSEKTION oberhalb von .regal und
+   waren damit wirkungslos. Alle drei Regale liefen auf den 225px der
+   Grundregel, statt auf 240 - 165 - 130, und dem Leuchtschein der fuenf
+   fehlte die Luft, fuer die der Zuschlag gedacht war. Wer eine Variante
+   ergaenzt: hierher, nicht woanders hin. */
+
+/* Die fuenf sollen ohne Scrollen nebeneinander stehen - der Block heisst
+   "Meine fuenf", man soll fuenf sehen.
+
+   Hier stand 240px mit der Begruendung, der Container messe 1300px und
+   fuenf Kacheln plus vier Abstaende brauchten 1270px. Beides ging knapp
+   daneben: der Container ist zwar hoechstens 1300 breit, die Spur darin
+   aber nur 1236 (32px Polsterung je Seite), und zu den vier Abstaenden
+   kommt die seitliche Luft der Spur dazu. Gerechnet:
+
+       5 * Breite + 4 * 17.6px + 0.08 * Breite  <=  1236px
+       -> Breite <= 229px
+
+   Aufgefallen ist es nie, weil die Regel wirkungslos war (siehe oben) und
+   die Reihe die 225px der Grundregel nutzte - die passen. Sie stehen
+   jetzt ausdruecklich hier, damit die fuenf nicht mitwandern, falls die
+   Grundregel sich mal aendert. */
+.regal--kern {
+    --regal-kachel-breite: 225px;
+}
+
+/* Deutlich kleiner als die fuenf: der Abstand in der Groesse ist die
+   Aussage. Diese Filme sind gut, aber sie haben keinen eigenen Text. */
+.regal--empfehlungen {
+    --regal-kachel-breite: 165px;
+    --regal-abstand: 0.9rem;
+}
+
+/* Schmaler und flacher - eine Chronik, keine Empfehlung. */
+.regal--chronik {
+    --regal-kachel-breite: 130px;
+    --regal-abstand: 0.8rem;
+    --regal-hover-skalierung: 1.06;
+}
+
+.regal--projekte {
+    --regal-kachel-breite: 300px;
+}
+
+/* Der Leuchtschein der fuenf braucht mehr senkrechte Luft als jedes
+   andere Regal. Die Spur scrollt waagerecht und schneidet deshalb
+   senkrecht ab (overflow-y: hidden) - eine Achse laesst sich nicht
+   beschneiden und die andere sichtbar lassen. Was ueber die Polsterung
+   hinausragt, endet an einer harten Kante.
+
+   Die drei Summanden sind gemessen, nicht geschaetzt (1440px, Kachel
+   240px, beim Hover - da ist der Bedarf am groessten):
+
+     halbe Zuwachshoehe   18px   die Kachel waechst auf 1.08 und
+                                 schiebt oben wie unten heraus
+     Hub nach oben         6px   --regal-hover-hub
+     Reichweite Schein    32px   ab da liegt der Schein im Rauschen
+                                 des Hintergrunds (in Ruhe sind es 18px)
+
+   1.9 statt der 1.5 der Grundregel: die Posterkachel ist mit Titelzeile
+   knapp doppelt so hoch wie breit, nicht 3:2. Mit 1.5 war der Zuwachs
+   zu niedrig angesetzt.
+
+   Was das an Hoehe kostet, nehmen .fuenf-satz und .filmblock--fuenf
+   an ihren Abstaenden wieder zurueck - der Block soll nicht wachsen,
+   nur der Schein soll Platz haben. */
+.regal--neon {
+    --regal-luft: calc(
+        (var(--regal-hover-skalierung) - 1) * var(--regal-kachel-breite) * 1.9 / 2
+        + 6px
+        + 32px
+    );
+}
 
 /* --- Titelzeile ------------------------------------------------------- */
 
@@ -2715,13 +2798,7 @@ footer {
 .kachel-sterne::before { content: '★★★★★'; }
 
 /* --- Kachel: Chronik (Tagebuch) --------------------------------------- */
-/* Schmaler und flacher - eine Chronik, keine Empfehlung. */
-
-.regal--chronik {
-    --regal-kachel-breite: 130px;
-    --regal-abstand: 0.8rem;
-    --regal-hover-skalierung: 1.06;
-}
+/* Die Masse von .regal--chronik stehen bei den Regal-Varianten. */
 
 .kachel--chronik .kachel-body {
     padding: 0.6rem 0.65rem 0.7rem;
@@ -2766,10 +2843,7 @@ footer {
 }
 
 /* --- Kachel: Projekt -------------------------------------------------- */
-
-.regal--projekte {
-    --regal-kachel-breite: 300px;
-}
+/* Die Masse von .regal--projekte stehen bei den Regal-Varianten. */
 
 .kachel--projekt .kachel-bild {
     aspect-ratio: 16 / 10;
