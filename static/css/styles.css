@@ -2842,6 +2842,26 @@ footer {
     color: var(--text-bright);
 }
 
+/* Nur die fuenf: ihre Titel sind die einzigen Filmnamen der Seite, die
+   fuer sich stehen - zu jedem gehoert ein eigener Text hinter der
+   Kachel. In den Empfehlungen und in der Chronik ist der Titel eine
+   Beschriftung unter einem Plakat und bleibt Grotesk. Bekaemen alle
+   Regale Serifen, hoerte man den Unterschied nicht mehr.
+
+   Groesser als die Grotesk daneben (1.2rem gegen 0.92): Instrument
+   Serif hat eine kleinere x-Hoehe, bei gleicher Punktgroesse waere der
+   Titel der fuenf kleiner als der einer Empfehlung.
+
+   Die Zeile darunter - Sterne und Jahr - bleibt unangetastet in
+   Monospace. Sie ist Messwert, nicht Name. */
+.regal--kern .kachel-titel {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.2rem;
+    line-height: 1.15;
+    letter-spacing: 0.01em;
+}
+
 .kachel-meta {
     display: flex;
     align-items: center;
