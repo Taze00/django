@@ -4,190 +4,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-
     <title>Impressum | Alex Volkmann</title>
+    <meta name="description" content="Impressum und Datenschutzhinweise für alex.volkmann.com.">
+    {% comment %}Nicht indexieren: die Seite enthaelt eine Privatanschrift und
+    hat als Suchtreffer keinen Wert - erreichbar bleibt sie ueber den Footer
+    der Startseite.{% endcomment %}
+    <meta name="robots" content="noindex">
 
-    <!-- Favicon -->
     <link rel="icon" href="{% static 'css/images/favicon.ico' %}" type="image/x-icon">
 
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- Eigener CSS -->
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20250514-2">
-
-    <style>
-        .impressum-section {
-            background: var(--darker);
-            min-height: 100vh;
-            padding: 120px 0 60px 0;
-        }
-
-        .impressum-content {
-            background: rgba(24, 24, 24, 0.6);
-            backdrop-filter: blur(10px);
-            border-radius: 12px;
-            padding: 3rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            max-width: 900px;
-            margin: 0 auto;
-        }
-
-        .impressum-content h1 {
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 2rem;
-            font-size: 3rem;
-        }
-
-        .impressum-content h2 {
-            color: var(--primary);
-            margin-top: 2.5rem;
-            margin-bottom: 1.5rem;
-            font-size: 1.8rem;
-        }
-
-        .impressum-content p,
-        .impressum-content li {
-            color: var(--text);
-            line-height: 1.8;
-            margin-bottom: 1rem;
-        }
-
-        .impressum-content a {
-            color: var(--primary);
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .impressum-content a:hover {
-            color: var(--secondary);
-        }
-
-        .contact-info {
-            background: rgba(0, 240, 255, 0.05);
-            padding: 1.5rem;
-            border-radius: 8px;
-            border-left: 3px solid var(--primary);
-            margin: 1.5rem 0;
-        }
-
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-            color: var(--text);
-            transition: var(--transition);
-        }
-
-        .back-link:hover {
-            color: var(--primary);
-            transform: translateX(-5px);
-        }
-
-        @media (max-width: 768px) {
-            .impressum-section {
-                padding: 80px 0 40px 0;
-            }
-
-            .impressum-content {
-                padding: 2rem 1.5rem;
-            }
-
-            .impressum-content h1 {
-                font-size: 2.2rem;
-            }
-
-            .impressum-content h2 {
-                font-size: 1.5rem;
-            }
-        }
-    </style>
+    {% comment %}Dieselben zwei Schriften wie /filme/ und die Startseite.
+    Vorher lud diese Seite zusaetzlich Montserrat, Font Awesome, Bootstrap
+    und jQuery - vier Abhaengigkeiten fuer eine Seite aus Fliesstext.{% endcomment %}
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" as="style">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260816-1">
 </head>
 
-<body>
-    <!-- Header -->
-    <header id="header">
+<body class="seite-impressum">
+    <a class="skip-link" href="#inhalt">Zum Inhalt springen</a>
+
+    {% comment %}Dieselbe Bewegungsschicht wie Startseite und /filme/.{% endcomment %}
+    <div class="koernung" aria-hidden="true"></div>
+
+    {% comment %}basis="/" - die Anker zeigen zurueck auf die Startseite,
+    nicht auf Sektionen, die es hier nicht gibt.{% endcomment %}
+    {% include "includes/seitenkopf.html" with basis="/" %}
+
+    <main class="impressumseite" id="inhalt">
         <div class="container">
-            <nav>
-                <ul class="nav-links">
-                    <li><a href="/#home">Home</a></li>
-                    <li><a href="/#about">Über Mich</a></li>
-                    <li><a href="/#clubs">Club Ranking</a></li>
-                    <li><a href="/#gallery">Galerie</a></li>
-                    <li><a href="/#contact">Kontakt</a></li>
-                    <li><a href="/impressum">Impressum</a></li>
-                </ul>
-                <div class="menu-toggle">
-                    <i class="fas fa-bars"></i>
-                </div>
-            </nav>
-        </div>
-    </header>
 
-    <!-- Impressum Section -->
-    <section class="impressum-section">
-        <div class="container">
-            <div class="impressum-content fade-in active">
-                <a href="/" class="back-link">
-                    <i class="fas fa-arrow-left"></i>
-                    Zurück zur Startseite
-                </a>
-
-                <h1>Impressum</h1>
-
-                <h2>Angaben gemäß § 5 TMG</h2>
-                <div class="contact-info">
-                    <p><strong>Alex Volkmann</strong><br>
-                    Isoldestraße 28a<br>
-                    14542 Werder (Havel)<br>
-                    Deutschland</p>
-                </div>
-
-                <h2>Kontakt</h2>
-                <p>
-                    E-Mail: alex@devpool.net<br>
+            <div class="sektion-kopf">
+                {% include "includes/sektion-meta.html" with titel="Impressum" zusatz="Angaben gemäß § 5 TMG" als_h1=True %}
+                <p class="sektion-einleitung">
+                    Wer diese Seite betreibt, wie man mich erreicht und was
+                    rechtlich dazugehört.
                 </p>
+            </div>
 
-                <h2>Haftungsausschluss</h2>
+            <div class="impressumtext">
 
-                <h3>Haftung für Inhalte</h3>
+                <h2>Anbieter</h2>
+                <div class="impressumkasten">
+                    <p>
+                        <strong>Alex Volkmann</strong><br>
+                        Isoldestraße 28a<br>
+                        14542 Werder (Havel)<br>
+                        Deutschland
+                    </p>
+                    <p>E-Mail: <a href="mailto:alex@devpool.net">alex@devpool.net</a></p>
+                </div>
+
+                <h2>Haftung für Inhalte</h2>
                 <p>
-                    Die Inhalte unserer Seiten wurden mit größter Sorgfalt erstellt. Für die Richtigkeit,
-                    Vollständigkeit und Aktualität der Inhalte können wir jedoch keine Gewähr übernehmen.
-                    Als Diensteanbieter sind wir gemäß § 7 Abs.1 TMG für eigene Inhalte auf diesen Seiten
-                    nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG sind wir als
+                    Die Inhalte dieser Seiten wurden mit größter Sorgfalt erstellt. Für die Richtigkeit,
+                    Vollständigkeit und Aktualität der Inhalte kann ich jedoch keine Gewähr übernehmen.
+                    Als Diensteanbieter bin ich gemäß § 7 Abs. 1 TMG für eigene Inhalte auf diesen Seiten
+                    nach den allgemeinen Gesetzen verantwortlich. Nach §§ 8 bis 10 TMG bin ich als
                     Diensteanbieter jedoch nicht verpflichtet, übermittelte oder gespeicherte fremde
                     Informationen zu überwachen oder nach Umständen zu forschen, die auf eine rechtswidrige
                     Tätigkeit hinweisen.
                 </p>
 
-                <h3>Haftung für Links</h3>
+                <h2>Haftung für Links</h2>
                 <p>
-                    Unser Angebot enthält Links zu externen Webseiten Dritter, auf deren Inhalte wir
-                    keinen Einfluss haben. Deshalb können wir für diese fremden Inhalte auch keine
+                    Dieses Angebot enthält Links zu externen Webseiten Dritter, auf deren Inhalte ich
+                    keinen Einfluss habe. Deshalb kann ich für diese fremden Inhalte auch keine
                     Gewähr übernehmen. Für die Inhalte der verlinkten Seiten ist stets der jeweilige
                     Anbieter oder Betreiber der Seiten verantwortlich. Die verlinkten Seiten wurden
                     zum Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße überprüft. Rechtswidrige
                     Inhalte waren zum Zeitpunkt der Verlinkung nicht erkennbar.
                 </p>
 
-                <h3>Urheberrecht</h3>
+                <h2>Urheberrecht</h2>
                 <p>
-                    Die durch die Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten
+                    Die durch den Seitenbetreiber erstellten Inhalte und Werke auf diesen Seiten
                     unterliegen dem deutschen Urheberrecht. Die Vervielfältigung, Bearbeitung,
                     Verbreitung und jede Art der Verwertung außerhalb der Grenzen des Urheberrechtes
                     bedürfen der schriftlichen Zustimmung des jeweiligen Autors bzw. Erstellers.
@@ -197,22 +88,27 @@
 
                 <h2>Datenschutz</h2>
                 <p>
-                    Die Nutzung unserer Webseite ist in der Regel ohne Angabe personenbezogener Daten
-                    möglich. Soweit auf unseren Seiten personenbezogene Daten (beispielsweise Name,
+                    Die Nutzung dieser Webseite ist in der Regel ohne Angabe personenbezogener Daten
+                    möglich. Soweit auf diesen Seiten personenbezogene Daten (beispielsweise Name,
                     Anschrift oder E-Mail-Adressen) erhoben werden, erfolgt dies, soweit möglich,
-                    stets auf freiwilliger Basis. Diese Daten werden ohne Ihre ausdrückliche
+                    stets auf freiwilliger Basis. Diese Daten werden ohne ausdrückliche
                     Zustimmung nicht an Dritte weitergegeben.
                 </p>
                 <p>
-                    Wir weisen darauf hin, dass die Datenübertragung im Internet (z.B. bei der
+                    Ich weise darauf hin, dass die Datenübertragung im Internet (z.&nbsp;B. bei der
                     Kommunikation per E-Mail) Sicherheitslücken aufweisen kann. Ein lückenloser
                     Schutz der Daten vor dem Zugriff durch Dritte ist nicht möglich.
                 </p>
 
-                <h2>Externe Links</h2>
+                <h2>Externe Dienste und Links</h2>
                 <p>
-                    Diese Website enthält Links zu folgenden externen Plattformen:
+                    Diese Website nutzt die API von
+                    <a href="https://www.themoviedb.org/" target="_blank" rel="noopener noreferrer">TMDB</a>
+                    für Filmdaten und Plakate, wird aber weder von TMDB unterstützt noch zertifiziert.
+                    Die Filmchronik stammt aus einem öffentlichen
+                    <a href="https://letterboxd.com/" target="_blank" rel="noopener noreferrer">Letterboxd</a>-Profil.
                 </p>
+                <p>Verlinkt wird außerdem auf folgende Plattformen:</p>
                 <ul>
                     <li>Instagram</li>
                     <li>TikTok</li>
@@ -224,35 +120,17 @@
                     verantwortlich.
                 </p>
 
-                <p style="margin-top: 3rem; font-size: 0.9rem; opacity: 0.7;">
-                    Stand: {% now "d.m.Y" %}
-                </p>
+                <p class="impressumstand">Stand: {% now "d.m.Y" %}</p>
             </div>
+
+            {% comment %}Gleicher Rueckweg wie am Ende von /filme/.{% endcomment %}
+            <p class="filmseite-zurueck">
+                <a href="/">&larr; Zurück zur Startseite</a>
+            </p>
         </div>
-    </section>
+    </main>
 
-    <!-- Footer -->
-    <footer id="contact">
-        <div class="container">
-            <div class="footer-content">
-                <div class="social-links">
-                    <a href="https://www.instagram.com/a_.volkmann/" target="_blank" rel="noopener noreferrer" class="social-link"><i class="fab fa-instagram"></i></a>
-                    <a href="https://www.tiktok.com/@killua_alex" target="_blank" rel="noopener noreferrer" class="social-link"><i class="fab fa-tiktok"></i></a>
-                    <a href="https://soundcloud.com/alex_sasuke" target="_blank" rel="noopener noreferrer" class="social-link"><i class="fab fa-soundcloud"></i></a>
-                    <a href="https://www.linkedin.com/in/alex-volkmann-54677a239/" target="_blank" rel="noopener noreferrer" class="social-link"><i class="fab fa-linkedin"></i></a>
-                </div>
-                <p><a href="/impressum" style="color: var(--primary);">Impressum</a></p>
-                <p class="copyright">&copy; {% now "Y" %} Alex Volkmann | Alle Rechte vorbehalten.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Bootstrap JS und jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
-
-    <!-- Eigener JavaScript -->
-    <script src="{% static 'js/main.js' %}?v=20250514-2"></script>
+    <script defer src="{% static 'js/vendor/lenis.min.js' %}?v=20260816-1"></script>
+    <script defer src="{% static 'js/main.js' %}?v=20260816-1"></script>
 </body>
 </html>

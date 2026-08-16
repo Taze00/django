@@ -1234,6 +1234,7 @@ function initReveals() {
         '.regal',
         '.films-quelle',
         '.films-attribution',
+        '.impressumtext',
         '.footer-content'
     ];
 

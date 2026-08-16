@@ -4496,6 +4496,97 @@ html.lenis body {
     letter-spacing: var(--mono-track);
 }
 
+
+/* ==========================================================================
+   IMPRESSUM
+   ==========================================================================
+   Dieselbe Anlage wie /filme/: fixierter Seitenkopf, Metazeile als
+   Ueberschrift, Koernung, Reveals. Die Seite sah vorher nach der alten
+   Fassung aus - zentrierte Verlaufsueberschrift, Karte mit
+   backdrop-filter, eigene Navigation aus <ul class="nav-links">, dazu
+   Bootstrap, Font Awesome, jQuery und Montserrat fuer eine Seite aus
+   Fliesstext.
+
+   Der Abstand oben ist derselbe wie bei .filmseite: 72px fuer den
+   fixierten Balken plus der uebliche Sektionsabstand.
+   ========================================================================== */
+
+.impressumseite {
+    padding: calc(72px + clamp(2.5rem, 6vw, 4.5rem)) 0 clamp(4rem, 8vw, 6rem);
+}
+
+/* Kein Kasten um den ganzen Text. Ein Impressum ist Fliesstext, kein
+   Bauteil - die Zeilenbreite ordnet ihn, nicht ein Rahmen. */
+.impressumtext {
+    max-width: 70ch;
+}
+
+.impressumtext p,
+.impressumtext li {
+    margin: 0 0 1rem;
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: var(--text);
+}
+
+.impressumtext ul {
+    margin: 0 0 1rem;
+    padding-left: 1.2rem;
+}
+
+/* Die Abschnittsmarken in der Sprache der uebrigen Seite: Monospace,
+   klein, gesperrt, versal - wie .regal-titel und .skills-marke. Vorher
+   waren es 1.8rem grosse cyane Ueberschriften, die den Text daneben
+   erschlugen. */
+.impressumtext h2 {
+    margin: clamp(2.25rem, 4vw, 3rem) 0 0.9rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: var(--mono-track);
+    line-height: 1.5;
+    text-transform: uppercase;
+    color: var(--primary);
+    opacity: 0.8;
+}
+
+.impressumtext h2:first-child {
+    margin-top: 0;
+}
+
+/* Die Anschrift bekommt als einziger Abschnitt einen Rahmen - sie ist
+   die Pflichtangabe, wegen der es die Seite gibt. */
+.impressumkasten {
+    padding: clamp(1.1rem, 2.5vw, 1.5rem);
+    border: 1px solid var(--gray);
+    border-radius: calc(var(--film-radius, 8px) * 1.5);
+    background: rgba(255, 255, 255, 0.015);
+}
+
+.impressumkasten p:last-child {
+    margin-bottom: 0;
+}
+
+.impressumkasten strong {
+    color: var(--text-bright);
+}
+
+.impressumstand {
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: var(--mono-track);
+    text-transform: uppercase;
+    opacity: 0.5;
+}
+
+@media (max-width: 480px) {
+    .impressumtext p,
+    .impressumtext li {
+        font-size: 0.9rem;
+    }
+}
+
 /* --- Abschluss der Filmsektion auf der Startseite ---------------------- */
 
 .filme-alle {
