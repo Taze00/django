@@ -28,7 +28,6 @@ from films.views import poster_json, suchindex_json, uebersicht as filme_uebersi
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
-    path("schubi/", views.freundin_page, name="schubi_page"),
     path('impressum/', views.impressum, name='impressum'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
@@ -43,14 +42,8 @@ urlpatterns = [
     # CORVIS App (React frontend)
     path('corvis-app/', views.fitness_page, name='fitness_page'),
     re_path(r'^corvis-app/.*$', views.fitness_page, name='fitness_catch_all'),
-    # Festival checklist
-    path('festival/', views.festival_page, name='festival_page'),
-    # Skills page
-    path('skills/', views.skills_page, name='skills_page'),
     # CORVIS landing page
     path('corvis/', views.fitness_landing_page, name='fitness_landing_page'),
-    # AURELIA demo (technique showcase)
-    path('aurelia/', views.aurelia_demo, name='aurelia_demo'),
 ]
 
 # Serve uploaded media files. Works regardless of DEBUG — under gunicorn +
