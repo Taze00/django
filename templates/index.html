@@ -492,21 +492,56 @@
             </div>
 
             {% comment %}
-            Skills unter den Karten: nur Nennung, keine Niveaus. Die Chips
-            tragen bewusst dieselbe Optik wie die Tech-Pills in den
-            Projektkarten darueber - beides sind Techniken, das soll als
-            ein Block lesbar sein.
+            Skills unter den Karten: nur Nennung, keine Niveaus. Drei
+            Laufbaender, eines je Gruppe, benachbarte Zeilen laufen
+            gegeneinander.
+
+            Der Inhalt steht ZWEIMAL in der Spur. Die Schleife
+            verschiebt die Spur um genau die Haelfte ihrer Breite - an
+            dem Punkt steht die zweite Haelfte dort, wo die erste
+            angefangen hat, und der Ruecksprung auf 0 ist unsichtbar.
+            Mit nur einer Fassung risse hinter dem letzten Begriff eine
+            Luecke auf, bis der erste wieder hereinkaeme.
+
+            Die zweite Fassung ist aria-hidden: fuer Screenreader ist
+            sie eine wortgleiche Wiederholung, die nichts hinzufuegt.
+            Die Gruppe traegt deshalb die Liste als role="list" mit
+            Beschriftung durch die Marke darueber.
             {% endcomment %}
             {% if skills %}
             <div class="skills-block">
                 {% for gruppe in skills %}
                 <div class="skills-gruppe">
-                    <h3 class="skills-marke">{{ gruppe.marke }}</h3>
-                    <ul class="skills-liste">
-                        {% for eintrag in gruppe.eintraege %}
-                        <li class="skills-chip">{{ eintrag }}</li>
-                        {% endfor %}
-                    </ul>
+                    <h3 class="skills-marke" id="skills-marke-{{ forloop.counter }}">{{ gruppe.marke }}</h3>
+
+                    {% comment %}--laufrichtung dreht die Richtung: die
+                    mittlere Zeile laeuft andersherum als ihre Nachbarn.
+
+                    --laufdauer aus der Zeichenzahl der Gruppe (1,1s je
+                    Zeichen, siehe films/skills.py), damit alle drei
+                    Baender gleich schnell laufen. Nach der Zahl der
+                    Begriffe gerechnet stimmte das nicht: "Werkzeuge" hat
+                    so viele Eintraege wie "Design & Content", ist aber
+                    deutlich breiter - das Band lief ueber die Haelfte
+                    schneller.{% endcomment %}
+                    <div class="skills-band"
+                         style="--laufrichtung: {% cycle 'normal' 'reverse' %};
+                                --laufdauer: {% widthratio gruppe.zeichen 10 11 %}s;">
+                        {% comment %}Die Spur traegt die Bewegung und ist so
+                        breit wie beide Fassungen zusammen.{% endcomment %}
+                        <div class="skills-spur">
+                            <ul class="skills-liste" aria-labelledby="skills-marke-{{ forloop.counter }}">
+                                {% for eintrag in gruppe.eintraege %}
+                                <li class="skills-wort">{{ eintrag }}</li>
+                                {% endfor %}
+                            </ul>
+                            <ul class="skills-liste" aria-hidden="true">
+                                {% for eintrag in gruppe.eintraege %}
+                                <li class="skills-wort">{{ eintrag }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
                 </div>
                 {% endfor %}
             </div>

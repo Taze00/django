@@ -50,5 +50,26 @@ SKILLS = [
 
 
 def get_skills():
-    """Skill-Gruppen in der vorgesehenen Reihenfolge."""
-    return SKILLS
+    """Skill-Gruppen in der vorgesehenen Reihenfolge.
+
+    Setzt zusaetzlich `zeichen`: die Laenge der Gruppe in Zeichen,
+    Trenner mitgezaehlt. Daraus rechnet das Template die Laufdauer des
+    Bandes (siehe .skills-spur in styles.css).
+
+    Warum nicht einfach die Zahl der Begriffe: die Baender sollen gleich
+    schnell laufen, und dafuer muss die Dauer zur zurueckgelegten
+    Strecke passen. "Werkzeuge" und "Design & Content" haben beide fuenf
+    Eintraege, aber "KI-Modelle (Claude, Copilot, ChatGPT, Gemini)" ist
+    allein so breit wie drei andere - nach Eintraegen gerechnet liefe
+    das Band ueber die Haelfte schneller. Die Zeichenzahl ist ein guter
+    Ersatz fuer die Breite: gemessen liegen alle drei Gruppen bei rund
+    0,065 Zeichen je Pixel.
+    """
+    gruppen = []
+    for gruppe in SKILLS:
+        eintrag = dict(gruppe)
+        eintraege = eintrag["eintraege"]
+        # +3 je Eintrag fuer " · " zwischen den Begriffen.
+        eintrag["zeichen"] = sum(len(e) for e in eintraege) + 3 * len(eintraege)
+        gruppen.append(eintrag)
+    return gruppen

@@ -3028,11 +3028,10 @@ footer {
     list-style: none;
 }
 
-/* Gemeinsam mit .skills-chip: die Skills unter den Karten sollen
-   dieselben Chips sein, nicht bloss aehnliche. Eine Regel fuer beide,
-   damit sie nicht auseinanderlaufen, wenn eine davon angefasst wird. */
-.project-pill,
-.skills-chip {
+/* Stand hier gemeinsam mit .skills-chip, solange die Skills ebenfalls
+   Chips waren. Sie sind jetzt Laufbaender - die Regel gilt wieder nur
+   fuer die Tech-Pills der Projektkarten. */
+.project-pill {
     padding: 0.28rem 0.7rem;
     border: 1px solid var(--gray);
     border-radius: 999px;
@@ -3105,6 +3104,11 @@ footer {
    Aufmerksamkeit auf sich als die Namen daneben. */
 .skills-block {
     display: grid;
+    /* minmax(0, 1fr) statt der Vorgabe: eine Rasterspalte richtet sich
+       sonst nach max-content, und der laengste Inhalt ist hier eine
+       Spur aus 18 Begriffen. Die Spalte wuerde ueber 2500px breit und
+       das Band mit ihr - beschnitten wuerde dann nichts mehr. */
+    grid-template-columns: minmax(0, 1fr);
     gap: clamp(1.6rem, 3vw, 2.2rem);
     margin-top: clamp(2.5rem, 5vw, 3.5rem);
     padding-top: clamp(2rem, 4vw, 2.8rem);
@@ -3126,18 +3130,123 @@ footer {
     opacity: 0.75;
 }
 
+/* --- Laufbaender --------------------------------------------------------
+   Eine Zeile je Gruppe, endlos laufend, benachbarte Zeilen
+   gegeneinander. Grosse Schrift: die Begriffe sind hier der Inhalt,
+   nicht mehr Etiketten an einer Liste.
+
+   Die Schleife: die Spur enthaelt den Inhalt zweimal und wird um genau
+   -50% ihrer eigenen Breite verschoben. An dem Punkt steht die zweite
+   Fassung exakt dort, wo die erste angefangen hat - der Ruecksprung auf
+   0 faellt deshalb nicht auf. Prozent bezieht sich bei translate auf
+   die eigene Breite, die Rechnung stimmt also unabhaengig davon, wie
+   lang die Woerter sind.
+   ---------------------------------------------------------------------- */
+
+/* Rasterkind mit min-width: auto waechst ebenfalls auf seinen Inhalt -
+   die Begrenzung der Spalte allein reicht nicht. */
+.skills-gruppe {
+    min-width: 0;
+}
+
+.skills-band {
+    /* Beschneidet die Spur auf die Containerbreite. */
+    overflow: hidden;
+
+    /* Weich aus an beiden Enden - per Maske, nicht per Farbverlauf
+       darueber. Ein Verlauf muesste die Hintergrundfarbe kennen; die
+       Sektion hat aber keine einheitliche (siehe die Regalraender, wo
+       genau das der Fehler war). Die Maske blendet den Inhalt aus und
+       passt damit auf jeden Untergrund. */
+    --skills-rand: clamp(2rem, 8vw, 6rem);
+    mask-image: linear-gradient(to right,
+        transparent 0,
+        #000 var(--skills-rand),
+        #000 calc(100% - var(--skills-rand)),
+        transparent 100%);
+    -webkit-mask-image: linear-gradient(to right,
+        transparent 0,
+        #000 var(--skills-rand),
+        #000 calc(100% - var(--skills-rand)),
+        transparent 100%);
+}
+
+.skills-spur {
+    display: flex;
+    /* Ohne max-content bricht die Spur auf Containerbreite um und die
+       Rechnung mit -50% zeigt ins Leere. */
+    width: max-content;
+    animation: skills-lauf var(--laufdauer, 60s) linear infinite;
+    /* --laufrichtung kommt als Schluesselwort aus dem Template
+       (normal/reverse, siehe index.html). Dieselben Keyframes
+       rueckwaerts - eine zweite Animation braucht es dafuer nicht. */
+    animation-direction: var(--laufrichtung, normal);
+}
+
+@keyframes skills-lauf {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+}
+
+/* Anhalten, damit man lesen kann. :hover fuer Zeigegeraete,
+   :focus-within fuer die Tastatur - und weil Touch kein Hover kennt,
+   haelt dort der Fingerdruck an (:active). */
+.skills-band:hover .skills-spur,
+.skills-band:focus-within .skills-spur,
+.skills-band:active .skills-spur {
+    animation-play-state: paused;
+}
+
 .skills-liste {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
+    align-items: center;
     margin: 0;
     padding: 0;
     list-style: none;
 }
 
-.skills-chip:hover {
-    border-color: rgba(0, 217, 255, 0.35);
-    color: var(--text-bright);
+.skills-wort {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    font-size: clamp(1.15rem, 2.4vw, 1.375rem);
+    line-height: 1.4;
+    color: var(--text);
+}
+
+/* Der Trenner haengt an jedem Wort, auch am letzten: zwischen der
+   letzten und der ersten Nennung der naechsten Fassung muss er
+   genauso stehen, sonst klebt die Naht der Schleife zusammen. */
+.skills-wort::after {
+    content: '·';
+    margin: 0 clamp(0.7rem, 1.6vw, 1.1rem);
+    color: var(--primary);
+}
+
+/* Bewegung reduziert: die Baender stehen still und brechen normal um.
+   Nicht bloss die Animation anhalten - die Spur waere dann doppelt so
+   breit wie der Container und die zweite Haelfte unerreichbar. */
+@media (prefers-reduced-motion: reduce) {
+    .skills-band {
+        overflow: visible;
+        mask-image: none;
+        -webkit-mask-image: none;
+    }
+
+    .skills-spur {
+        width: auto;
+        animation: none;
+    }
+
+    .skills-liste {
+        flex-wrap: wrap;
+    }
+
+    /* Die zweite Fassung ist nur fuer die Schleife da. Steht nichts
+       mehr in Bewegung, waere sie eine wortgleiche Wiederholung. */
+    .skills-spur .skills-liste[aria-hidden="true"] {
+        display: none;
+    }
 }
 
 @media (max-width: 480px) {
