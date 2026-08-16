@@ -288,8 +288,27 @@
             ------------------------------------------------------------
             {% endcomment %}
             <div class="abschluss">
-                <div class="abschluss-grafik">
-                    {% include "includes/wertungsverteilung.html" with klein=True %}
+                {% comment %}Die Kennzahl der Sektion, und der groesste
+                Groessenunterschied der Seite: die Zahl steht rund
+                sechsmal so gross wie ihre Beschriftung daneben. Bei
+                anderthalbfach saehe es nach einem Versehen aus - erst
+                der grosse Sprung macht daraus zwei verschiedene Dinge,
+                eine Aussage und ihre Fussnote.
+
+                Die Balken darunter gehoeren dazu: sie zeigen, wie sich
+                die 216 verteilen.{% endcomment %}
+                <div class="abschluss-bestand">
+                    <p class="abschluss-kennzahl">
+                        <span class="abschluss-zahl">{{ statistik.gesehen }}</span>
+                        <span class="abschluss-zahl-marke">
+                            Filme gesehen<br>
+                            Schnitt {{ statistik.schnitt_kurz }}
+                        </span>
+                    </p>
+
+                    <div class="abschluss-grafik">
+                        {% include "includes/wertungsverteilung.html" with klein=True %}
+                    </div>
                 </div>
 
                 <div class="abschluss-text">

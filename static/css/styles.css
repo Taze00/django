@@ -2250,6 +2250,52 @@ footer {
     opacity: 0.6;
 }
 
+/* --- Kennzahl: der Groessensprung ---------------------------------------
+   Zahl und Beschriftung stehen im Verhaeltnis 6:1 zueinander (59px zu
+   9.9px bei 1440). Das ist der Punkt: bei 1,5:1 laesen sich beide als
+   dieselbe Zeile in zwei Groessen, bei 6:1 sind es zwei verschiedene
+   Dinge - eine Aussage und ihre Fussnote.
+
+   Die Zahl steht aufrecht, nicht kursiv. Sie ist die eine Stelle, an
+   der die Serifenschrift keinen Namen und kein Wort traegt, sondern
+   einen Wert; grosse kursive Ziffern kippen nach rechts weg und lesen
+   sich als Zierde statt als Zahl. */
+.abschluss-bestand {
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+}
+
+.abschluss-kennzahl {
+    display: flex;
+    /* An der Grundlinie der Ziffern ausgerichtet, nicht mittig: die
+       Beschriftung soll auf der Zahl stehen, nicht neben ihr schweben. */
+    align-items: flex-end;
+    gap: 0.7rem;
+    margin: 0;
+}
+
+.abschluss-zahl {
+    font-family: var(--font-serif);
+    font-size: clamp(2.6rem, 5.5vw, 3.7rem);
+    font-weight: 400;
+    /* Knapp unter 1, damit die Ziffernkiste die Ziffern eng umschliesst
+       und die Beschriftung daneben wirklich unten ansetzt. */
+    line-height: 0.82;
+    letter-spacing: -0.01em;
+    color: var(--text-bright);
+}
+
+.abschluss-zahl-marke {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: var(--mono-track);
+    line-height: 1.7;
+    text-transform: uppercase;
+    color: var(--text);
+    opacity: 0.6;
+}
+
 .abschluss-satz {
     margin: 0 0 0.6rem;
     font-family: var(--font-display);
@@ -2283,22 +2329,8 @@ footer {
     text-align: center;
 }
 
-/* Die kleine Verteilung: nur die Balken, rund 52px hoch. Zahlen und
-   Skalenbeschriftung entfallen (siehe wertungsverteilung.html) - auf
-   52px waeren sie unlesbar, und der Text steht daneben im Kasten. */
-.verteilung--klein {
-    display: block;
-    margin: 0;
-}
-
-.verteilung--klein .verteilung-grafik {
-    height: 52px;
-    gap: 3px;
-}
-
-.verteilung--klein .verteilung-balken {
-    border-radius: 2px 2px 0 0;
-}
+/* Die kleine Fassung der Verteilung steht bei .verteilung - eine
+   Variante muss hinter ihrer Grundregel stehen, um zu gelten. */
 
 @media (max-width: 900px) {
     /* Untereinander, sobald die drei Spalten zu schmal werden. Die
@@ -4500,6 +4532,30 @@ html.lenis body {
     letter-spacing: 0;
     color: var(--text-bright);
     opacity: 1;
+}
+
+/* --- Kleine Fassung fuer den Abschlusskasten ---------------------------
+   Nur die Balken, rund 52px hoch. Zahlen und Skalenbeschriftung
+   entfallen (siehe wertungsverteilung.html) - auf 52px waeren sie
+   unlesbar, und der Text steht daneben im Kasten.
+
+   Muss hinter .verteilung stehen: gleiche Spezifitaet, die spaetere
+   Regel gewinnt. Der Block lag lange oben bei der Filmsektion, damit
+   griff `margin: 0` nicht und unter den Balken standen unsichtbare
+   64px Aussenabstand aus der grossen Fassung - der Abschlusskasten war
+   entsprechend zu hoch. Dieselbe Falle wie bei den Regal-Varianten. */
+.verteilung--klein {
+    display: block;
+    margin: 0;
+}
+
+.verteilung--klein .verteilung-grafik {
+    height: 52px;
+    gap: 3px;
+}
+
+.verteilung--klein .verteilung-balken {
+    border-radius: 2px 2px 0 0;
 }
 
 /* Ohne JS und bei reduzierter Bewegung stehen die Balken sofort auf
