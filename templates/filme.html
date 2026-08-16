@@ -175,6 +175,10 @@
         </div>
     </main>
 
+    {% comment %}Ohne nummer: eine Sektionsreihenfolge hat nur die
+    Startseite. anker="/" - die Sprungziele zeigen dorthin zurueck.{% endcomment %}
+    {% include "includes/seitenfuss.html" with anker="/" %}
+
     <script defer src="{% static 'js/vendor/lenis.min.js' %}?v=20260814-3"></script>
     <script defer src="{% static 'js/main.js' %}?v=20260814-3"></script>
 </body>

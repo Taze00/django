@@ -1212,8 +1212,17 @@ footer {
     background: rgba(0, 217, 255, 0.08);
     border-radius: 50%;
     color: var(--primary);
-    font-size: 1.3rem;
     transition: var(--transition);
+}
+
+/* Die Icons sind Inline-SVG (siehe includes/seitenfuss.html), nicht
+   mehr Font Awesome - eine Schriftgroesse steuert sie also nicht mehr,
+   das Mass steht hier. currentColor in den Pfaden nimmt die Farbe von
+   .social-link auf, samt Umschlag beim Hover. */
+.social-icon {
+    width: 21px;
+    height: 21px;
+    display: block;
 }
 
 .social-link:hover {

@@ -506,40 +506,7 @@
     </section>
     {% endif %}
 
-    <!-- Footer -->
-    <footer id="contact">
-        <div class="container">
-            <div class="footer-content fade-in">
-                {% include "includes/sektion-meta.html" with nummer="05" titel="Kontakt" %}
-                <p>Lass uns in Verbindung bleiben oder tausche dich mit mir über die Berliner Clubszene aus.</p>
-                <div class="social-links">
-                    <a href="https://www.instagram.com/a_.volkmann/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="Instagram">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                    <a href="https://www.tiktok.com/@killua_alex" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="TikTok">
-                        <i class="fab fa-tiktok"></i>
-                    </a>
-                    <a href="https://soundcloud.com/alex_sasuke" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="SoundCloud">
-                        <i class="fab fa-soundcloud"></i>
-                    </a>
-                    <a href="https://www.linkedin.com/in/alex-volkmann-54677a239/" target="_blank" rel="noopener noreferrer" class="social-link" aria-label="LinkedIn">
-                        <i class="fab fa-linkedin"></i>
-                    </a>
-                </div>
-                <p>
-                    <a href="/impressum/" style="color: var(--primary);">Impressum</a>
-                    &nbsp;·&nbsp;
-                    {% comment %}"Skills & Portfolio" zeigte auf /skills - die
-                    Seite ist geloescht. Die Skills stehen jetzt in der Sektion
-                    "Was ich baue", der Link daneben fuehrt also schon hin.{% endcomment %}
-                    <a href="#projekte" style="color: var(--primary);">Projekte</a>
-                    &nbsp;·&nbsp;
-                    <a href="#filme" style="color: var(--primary);">Filme</a>
-                </p>
-                <p class="copyright">&copy; {% now "Y" %} Alex Volkmann | Alle Rechte vorbehalten.</p>
-            </div>
-        </div>
-    </footer>
+    {% include "includes/seitenfuss.html" with nummer="05" %}
 
     <script defer src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
     {% comment %}Lenis liegt lokal, nicht am CDN - eine Abhaengigkeit weniger
