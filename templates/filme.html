@@ -80,14 +80,43 @@
             {% comment %}Sortierung und Filter wirken im Browser auf das
             fertige Raster - alle Filme stehen bereits im Markup.{% endcomment %}
             <div class="filmsteuerung" data-filmsteuerung>
+                {% comment %}
+                Eigenes Auswahlelement statt <select>. Ein natives Auswahlfeld
+                laesst nur den zugeklappten Knopf gestalten - die
+                aufgeklappte Liste zeichnet das Betriebssystem, weiss mit
+                blauer Markierung, mitten in einer sonst durchgehend dunklen
+                Seite. Dagegen hilft kein CSS.
+
+                Bauform wie die Sterne-Chips daneben: derselbe Rahmen,
+                dieselbe Monospace. Bedienung siehe initAuswahl in main.js -
+                Pfeiltasten, Pos1/Ende, Enter, Escape.
+                {% endcomment %}
                 <div class="filmsteuerung-gruppe">
-                    <label class="filmsteuerung-label" for="filme-sortierung">Sortieren</label>
-                    <select class="filmsteuerung-auswahl" id="filme-sortierung" data-sortierung>
-                        <option value="wertung">Wertung</option>
-                        <option value="jahr">Jahr</option>
-                        <option value="gesehen">Sehdatum</option>
-                        <option value="titel">Titel</option>
-                    </select>
+                    <span class="filmsteuerung-label" id="filme-sortierung-marke">Sortieren</span>
+
+                    <div class="auswahl" data-auswahl data-sortierung>
+                        <button type="button" class="auswahl-knopf" data-auswahl-knopf
+                                aria-haspopup="listbox" aria-expanded="false"
+                                aria-labelledby="filme-sortierung-marke filme-sortierung-wert">
+                            <span class="auswahl-wert" id="filme-sortierung-wert">Wertung</span>
+                            <span class="auswahl-pfeil" aria-hidden="true"></span>
+                        </button>
+
+                        {% comment %}tabindex="-1": den Fokus bekommt die Liste
+                        beim Aufklappen per Skript, nicht ueber Tab.{% endcomment %}
+                        <ul class="auswahl-liste" data-auswahl-liste role="listbox"
+                            tabindex="-1" hidden
+                            aria-labelledby="filme-sortierung-marke">
+                            <li class="auswahl-option" role="option" id="sortieren-wertung"
+                                data-wert="wertung" aria-selected="true">Wertung</li>
+                            <li class="auswahl-option" role="option" id="sortieren-jahr"
+                                data-wert="jahr" aria-selected="false">Jahr</li>
+                            <li class="auswahl-option" role="option" id="sortieren-gesehen"
+                                data-wert="gesehen" aria-selected="false">Sehdatum</li>
+                            <li class="auswahl-option" role="option" id="sortieren-titel"
+                                data-wert="titel" aria-selected="false">Titel</li>
+                        </ul>
+                    </div>
                 </div>
 
                 <div class="filmsteuerung-gruppe">

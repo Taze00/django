@@ -4274,27 +4274,111 @@ html.lenis body {
     opacity: 0.6;
 }
 
-.filmsteuerung-auswahl {
-    padding: 0.5rem 2rem 0.5rem 0.75rem;
-    border: 1px solid var(--gray);
-    border-radius: var(--film-radius);
-    background: rgba(255, 255, 255, 0.03);
-    color: var(--text-bright);
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    cursor: pointer;
-    /* Eigener Pfeil - der browsereigene sieht ueberall anders aus. */
-    appearance: none;
-    background-image: linear-gradient(45deg, transparent 50%, var(--text) 50%),
-                      linear-gradient(135deg, var(--text) 50%, transparent 50%);
-    background-position: calc(100% - 15px) 52%, calc(100% - 10px) 52%;
-    background-size: 5px 5px, 5px 5px;
-    background-repeat: no-repeat;
+/* --- Eigenes Auswahlelement -------------------------------------------
+   Ersetzt ein <select>. Dort liess sich nur der zugeklappte Knopf
+   gestalten - die aufgeklappte Liste zeichnet das Betriebssystem,
+   weiss mit blauer Markierung, mitten in einer dunklen Seite.
+
+   Bauform bewusst wie die Sterne-Chips daneben: derselbe Rahmen,
+   dieselbe Monospace, dieselbe Hoehe. Es sind zwei Filter
+   nebeneinander, sie sollen nicht wie zwei Bauteile aussehen. */
+.auswahl {
+    position: relative;
 }
 
-.filmsteuerung-auswahl:focus-visible {
+.auswahl-knopf {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.45rem 0.85rem;
+    border: 1px solid var(--gray);
+    border-radius: 999px;
+    background: transparent;
+    color: var(--text-bright);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.auswahl-knopf:hover,
+.auswahl-knopf[aria-expanded="true"] {
+    border-color: var(--primary);
+}
+
+.auswahl-knopf:focus-visible {
     outline: 2px solid var(--primary);
     outline-offset: 2px;
+}
+
+/* Dreieck aus einem Rahmen statt als Zeichen: ein Glyph haengt je nach
+   Schriftschnitt anders in der Zeile. */
+.auswahl-pfeil {
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid currentColor;
+    opacity: 0.6;
+    transition: transform 0.2s ease;
+}
+
+.auswahl-knopf[aria-expanded="true"] .auswahl-pfeil {
+    transform: rotate(180deg);
+}
+
+/* Die Liste liegt ueber dem Raster, nicht darin - sie soll die
+   Kacheln darunter nicht verschieben. */
+.auswahl-liste {
+    position: absolute;
+    top: calc(100% + 0.4rem);
+    left: 0;
+    z-index: 20;
+    min-width: 100%;
+    margin: 0;
+    padding: 0.3rem;
+    list-style: none;
+    border: 1px solid var(--gray);
+    border-radius: var(--film-radius);
+    /* Deckend, nicht transluzent: durchscheinende Filmplakate machen
+       die Beschriftung unlesbar. */
+    background: #0c0c0f;
+    box-shadow: 0 16px 32px rgba(0, 0, 0, 0.6);
+}
+
+/* Kein outline: das legte einen zweiten Strich um einen Kasten, der
+   schon einen Rahmen hat. Stattdessen springt der vorhandene Rahmen
+   an - der Fokus ist damit genauso deutlich, ohne Doppellinie. Wo der
+   Fokus innerhalb der Liste steht, zeigt ohnehin die Vorauswahl. */
+.auswahl-liste:focus-visible {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.auswahl-option {
+    padding: 0.45rem 0.9rem;
+    border-radius: calc(var(--film-radius) - 2px);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+    white-space: nowrap;
+    color: var(--text);
+    cursor: pointer;
+}
+
+/* Vorauswahl (Tastatur und Maus) und getroffene Wahl sind zwei
+   verschiedene Zustaende: die eine wandert beim Blaettern mit, die
+   andere steht bis zur naechsten Auswahl. */
+.auswahl-option.is-vorgewaehlt {
+    background: rgba(0, 217, 255, 0.12);
+    color: var(--text-bright);
+}
+
+.auswahl-option[aria-selected="true"] {
+    color: var(--primary);
 }
 
 .filmsteuerung-chips {

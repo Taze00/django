@@ -1464,12 +1464,138 @@ function initMetazeilen() {
 // Alle Filme stehen bereits im Markup. Sortiert und gefiltert wird
 // deshalb hier, ohne Serverrunde - bei gut zweihundert Kacheln ist das
 // schneller als jede Anfrage und funktioniert ohne Nachladen.
+// Eigenes Auswahlelement (Knopf plus Liste) als Ersatz fuer <select>.
+// Ein natives Auswahlfeld laesst nur den zugeklappten Knopf gestalten;
+// die aufgeklappte Liste zeichnet das Betriebssystem, weiss mit blauer
+// Markierung mitten in einer dunklen Seite. Dagegen hilft kein CSS.
+//
+// Gibt { wert, aufWechsel } zurueck. Die Auswahl meldet sich ueber
+// einen Rueckruf statt ueber ein 'change'-Ereignis - es ist kein
+// Formularfeld, und ein nachgebautes change waere eine Behauptung.
+//
+// Tastatur: Pfeil hoch/runter bewegt die Vorauswahl, Pos1/Ende
+// springen an die Enden, Enter und Leertaste uebernehmen, Escape
+// bricht ab. Der Fokus liegt waehrenddessen auf der Liste, die
+// Vorauswahl wandert ueber aria-activedescendant - so muss nicht jede
+// Option einzeln fokussierbar sein.
+function initAuswahl(wurzel) {
+    if (!wurzel) return null;
+
+    const knopf = wurzel.querySelector('[data-auswahl-knopf]');
+    const liste = wurzel.querySelector('[data-auswahl-liste]');
+    const optionen = Array.from(liste.querySelectorAll('[role="option"]'));
+    const anzeige = knopf.querySelector('.auswahl-wert');
+    if (!knopf || !liste || !optionen.length) return null;
+
+    let wert = (optionen.find(o => o.getAttribute('aria-selected') === 'true')
+                || optionen[0]).dataset.wert;
+    let vorwahl = 0;
+    let rueckruf = null;
+
+    function istOffen() {
+        return !liste.hidden;
+    }
+
+    function zeigeVorwahl(i) {
+        vorwahl = Math.max(0, Math.min(optionen.length - 1, i));
+        optionen.forEach((o, n) => o.classList.toggle('is-vorgewaehlt', n === vorwahl));
+        liste.setAttribute('aria-activedescendant', optionen[vorwahl].id);
+        // Bei vielen Eintraegen laege die Vorauswahl sonst ausserhalb.
+        optionen[vorwahl].scrollIntoView({ block: 'nearest' });
+    }
+
+    function oeffne() {
+        if (istOffen()) return;
+        liste.hidden = false;
+        knopf.setAttribute('aria-expanded', 'true');
+        zeigeVorwahl(optionen.findIndex(o => o.dataset.wert === wert));
+        liste.focus();
+    }
+
+    // zurueckZumKnopf steuert, ob der Fokus zurueckspringt: beim
+    // Schliessen per Tastatur oder Klick auf eine Option ja, beim Klick
+    // irgendwohin ausserhalb nicht - dort will man dahin, wohin man
+    // geklickt hat.
+    function schliesse(zurueckZumKnopf) {
+        if (!istOffen()) return;
+        liste.hidden = true;
+        knopf.setAttribute('aria-expanded', 'false');
+        liste.removeAttribute('aria-activedescendant');
+        optionen.forEach(o => o.classList.remove('is-vorgewaehlt'));
+        if (zurueckZumKnopf) knopf.focus();
+    }
+
+    function waehle(i) {
+        const option = optionen[i];
+        if (!option) return;
+        const neu = option.dataset.wert;
+        optionen.forEach(o => o.setAttribute('aria-selected', String(o === option)));
+        anzeige.textContent = option.textContent.trim();
+        const geaendert = neu !== wert;
+        wert = neu;
+        if (geaendert && rueckruf) rueckruf(wert);
+    }
+
+    knopf.addEventListener('click', () => {
+        istOffen() ? schliesse(true) : oeffne();
+    });
+
+    // Aufklappen direkt aus dem Knopf heraus, ohne Umweg ueber den Klick.
+    knopf.addEventListener('keydown', e => {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp' || e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            oeffne();
+        }
+    });
+
+    liste.addEventListener('keydown', e => {
+        switch (e.key) {
+            case 'ArrowDown': e.preventDefault(); zeigeVorwahl(vorwahl + 1); break;
+            case 'ArrowUp':   e.preventDefault(); zeigeVorwahl(vorwahl - 1); break;
+            case 'Home':      e.preventDefault(); zeigeVorwahl(0); break;
+            case 'End':       e.preventDefault(); zeigeVorwahl(optionen.length - 1); break;
+            case 'Enter':
+            case ' ':
+                e.preventDefault();
+                waehle(vorwahl);
+                schliesse(true);
+                break;
+            case 'Escape':
+                e.preventDefault();
+                schliesse(true);
+                break;
+            case 'Tab':
+                // Nicht abfangen: Tab soll weiterfuehren, nur zu darf es.
+                schliesse(false);
+                break;
+        }
+    });
+
+    optionen.forEach((option, i) => {
+        option.addEventListener('click', () => {
+            waehle(i);
+            schliesse(true);
+        });
+        option.addEventListener('mousemove', () => zeigeVorwahl(i));
+    });
+
+    document.addEventListener('pointerdown', e => {
+        if (!wurzel.contains(e.target)) schliesse(false);
+    });
+
+    return {
+        get wert() { return wert; },
+        aufWechsel(fn) { rueckruf = fn; }
+    };
+}
+
+
 (function initFilmraster() {
     const raster = document.querySelector('[data-filmraster]');
     if (!raster) return;
 
     const steuerung = document.querySelector('[data-filmsteuerung]');
-    const sortierung = steuerung.querySelector('[data-sortierung]');
+    const sortierung = initAuswahl(steuerung.querySelector('[data-auswahl]'));
     const chips = Array.from(steuerung.querySelectorAll('[data-filter]'));
     const zaehler = steuerung.querySelector('[data-zaehler]');
     const leerHinweis = document.querySelector('[data-raster-leer]');
@@ -1580,8 +1706,8 @@ function initMetazeilen() {
         });
     }, { rootMargin: '400px 0px' });
 
-    sortierung.addEventListener('change', () => {
-        sortiere(sortierung.value);
+    sortierung.aufWechsel(neuerWert => {
+        sortiere(neuerWert);
         beobachteOffene();
     });
 
@@ -1663,7 +1789,7 @@ function initMetazeilen() {
     // Beim Start einmal sortieren, nicht nur filtern: sonst bliebe die
     // Reihenfolge aus der Datenbank stehen und die Auswahl im Feld waere
     // eine Behauptung.
-    sortiere(sortierung.value);
+    sortiere(sortierung.wert);
     wende_an();
 })();
 
