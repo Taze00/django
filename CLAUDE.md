@@ -64,6 +64,24 @@ docker compose restart django-dev
   ```
   `index()` liefert immer das *erste* Vorkommen. Liegt die Endmarke davor, wird der Bereich **dupliziert statt entfernt** — die Datei bleibt syntaktisch gültig, und in CSS/JS gewinnt die spätere Kopie, die Änderung wirkt also folgenlos. Ist zweimal passiert (`.verteilung`/`.filmsuche` in `styles.css`, `initReveals` in `main.js`).
 
+- **Modifikator-Regeln (`--klein`, `--neon`, `--kern`, `--empfehlungen`) müssen IMMER hinter ihrer Basisregel stehen.** `.regal--kern` und `.regal` sind gleich spezifisch — beides eine Klasse. Bei Gleichstand gewinnt die **spätere** Regel. Steht der Modifikator weiter oben in der Datei, weil er inhaltlich zu seiner Sektion gehört, überschreibt die Basis ihn stillschweigend wieder.
+
+  Vier Mal passiert, immer unbemerkt: `.regal--kern`, `.regal--neon` und `.regal--empfehlungen` standen im Block FILMSEKTION oberhalb von `.regal` — die Staffelung 240–165–130 lief nie, alle drei Regale hatten 225px, und dem Leuchtschein der fünf fehlte die Luft, für die der Zuschlag gedacht war. `.verteilung--klein` stand vor `.verteilung`, sein `margin: 0` griff nicht, unter den kleinen Balken standen 64px unsichtbarer Abstand.
+
+  **Es fällt nicht auf, weil nichts kaputtgeht** — die Seite sieht nur anders aus, als der Code behauptet, und der Kommentar daneben beschreibt einen Zustand, den es nie gab.
+
+  Nach jedem neuen Modifikator prüfen, ob er wirklich **greift**, nicht nur ob er im CSS steht:
+  ```
+  # Zeilennummern vergleichen - Modifikator muss die groessere haben
+  grep -n "^\.regal {\|^\.regal--" static/css/styles.css
+  ```
+  Im Zweifel im Browser messen, nicht in der Datei nachlesen:
+  ```python
+  getComputedStyle(document.querySelector('.regal--kern'))
+      .getPropertyValue('--regal-kachel-breite')   # muss 225px sein, nicht 225px der Basis
+  ```
+  Die Maße aller Regal-Varianten stehen deshalb gesammelt direkt hinter `.regal` (Block „Regal-Varianten"), nicht bei den Kacheln, zu denen sie inhaltlich gehören. Neue Variante: dorthin, nicht woanders hin.
+
 - **Nach jedem größeren CSS-/JS-Eingriff nachzählen**, ob Regeln oder Funktionen doppelt stehen:
   ```
   grep -c "^\.verteilung {" static/css/styles.css     # muss 1 sein
