@@ -46,7 +46,10 @@ Startseite gefuellt, auf den drei anderen Seiten bliebe das href leer.
     <div class="container">
         <div class="footer-content fade-in">
             {% include "includes/sektion-meta.html" with nummer=nummer titel="Weiter" %}
-            <p class="seitenfuss-schlagzeile">Der Rest steht woanders.</p>
+            {% comment %}Akzentwort "woanders": der Fuss sagt nicht, dass
+            etwas fehlt, sondern wohin es zeigt - genau darunter stehen
+            die Kanaele.{% endcomment %}
+            <p class="seitenfuss-schlagzeile">Der Rest steht <span class="akzent">woanders</span>.</p>
 
             <ul class="kanalliste">
                 <li class="kanal">

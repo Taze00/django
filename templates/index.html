@@ -141,7 +141,10 @@
         <div class="container">
             <div class="about-kopf fade-in">
                 {% include "includes/sektion-meta.html" with nummer="01" titel="Über mich" zusatz="Werder, Brandenburg" %}
-                <p class="about-lead">Hi, ich bin Alex und das ist meine Website, die eigentlich nie fertig wird.</p>
+                {% comment %}Akzentwort "nie": daran haengt die Pointe des
+                Satzes. Ohne es bliebe die Feststellung, dass hier eine
+                Website steht - das sieht man schon.{% endcomment %}
+                <p class="about-lead">Hi, ich bin Alex und das ist meine Website, die eigentlich <span class="akzent">nie</span> fertig wird.</p>
             </div>
             <div class="about-grid">
                 <dl class="about-eckdaten fade-in">
@@ -209,7 +212,10 @@
                 einem leuchtenden Rahmen. Der Rahmen trug das Gewicht, aber
                 die Zeile sagte nicht, was gemeint ist: fuenf was? Jetzt eine
                 normale Ueberschrift, die den Satz zu Ende spricht.{% endcomment %}
-                <h3 class="fuenf-titel">Meine fünf Lieblingsfilme</h3>
+                {% comment %}Akzentwort "fünf": die Zahl ist die Aussage.
+                "Meine Lieblingsfilme" waere eine Liste, "meine fünf"
+                ist eine Entscheidung.{% endcomment %}
+                <h3 class="fuenf-titel">Meine <span class="akzent">fünf</span> Lieblingsfilme</h3>
 
                 <p class="fuenf-satz">
                     Von {{ statistik.gesehen }} Filmen haben genau
@@ -287,7 +293,7 @@
                 </div>
 
                 <div class="abschluss-text">
-                    <p class="abschluss-satz">Ich bewerte streng.</p>
+                    <p class="abschluss-satz">Ich bewerte <span class="akzent">streng</span>.</p>
                     <p class="abschluss-zahlen">
                         Gipfel bei {{ statistik.gipfel_stufe }} <span aria-hidden="true">—</span>
                         {{ statistik.gipfel_anzahl }} Filme /
@@ -384,7 +390,7 @@
                 {% comment %}Die Schlagzeile hiess "Wochenenden, die ich
                 bewerte wie Filme." - das Bewerten ist mit der Rangliste
                 weggefallen, der Satz haette auf nichts mehr gezeigt.{% endcomment %}
-                <p class="sektion-schlagzeile">Wochenenden, von denen Fotos übrig sind.</p>
+                <p class="sektion-schlagzeile">Wochenenden, von denen <span class="akzent">Fotos</span> übrig sind.</p>
                 <p class="sektion-einleitung">Nachts in Berlin, meistens zu laut für ein Gespräch.</p>
 
                 {% comment %}Dieselbe Bauform wie die Eckdaten in "Ueber
