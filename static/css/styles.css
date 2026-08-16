@@ -580,9 +580,14 @@ html.intro-laeuft .hero-skyline {
 /* Sektion BERLIN - Clubs und Momente in einem Block.
    Frueher zwei Sektionen (.club-ranking, .gallery) mit eigenem
    Hintergrund; die Naht dazwischen trennte zwei Haelften desselben
-   Themas. Jetzt ein Grund, eine Kopfzeile, zwei Bloecke darin. */
+   Themas. Jetzt ein Grund, eine Kopfzeile, zwei Bloecke darin.
+
+   Der Grund war #060606 - ein Punkt heller als der Rest der Seite.
+   Das war keine Trennung, die jemand sehen konnte, nur ein zweiter
+   Wert, der gepflegt werden musste. Die Sektionen trennen sich ueber
+   Metazeile und Abstand. */
 .berlin {
-    background: #060606;
+    background: var(--darker);
     position: relative;
     overflow: hidden;
     padding-top: clamp(5rem, 10vw, 7rem);
@@ -978,12 +983,17 @@ footer {
     z-index: 1;
 }
 
-/* Die Schlagzeile des Abschlusses. Wie .sektion-schlagzeile eine Stufe
+/* Die Schlagzeile des Seitenfusses. Wie .sektion-schlagzeile eine Stufe
    unter der Metazeile, aber eine Nummer kleiner und mittig - der Fuss
    ist der einzige zentrierte Abschnitt der Seite, und ein Schlusssatz
    darf leiser auftreten als eine Sektionsueberschrift. Kein <h>: die
-   Metazeile darueber ist bereits das <h2> des Abschnitts. */
-.abschluss-schlagzeile {
+   Metazeile darueber ist bereits das <h2> des Abschnitts.
+
+   Hiess kurz .abschluss-schlagzeile - das las sich wie ein Teil des
+   Abschlusskastens der Filmsektion (.abschluss, .abschluss-satz,
+   .abschluss-zahlen), mit dem sie nichts zu tun hat. Praefix jetzt wie
+   beim .seitenkopf, dessen Gegenstueck sie ist. */
+.seitenfuss-schlagzeile {
     margin: 0;
     font-family: var(--font-display);
     font-size: clamp(1.5rem, 3.4vw, 2.2rem);
@@ -2983,9 +2993,18 @@ footer {
    Club-Karten, damit beide Sektionen wie eine Familie wirken.
    ========================================================================== */
 
+/* Stand auf var(--dark) (#0f0f0f) und war damit die letzte sichtbare
+   Farbkante der Seite - der Sprung von "Berlin" hierher war deutlich
+   zu sehen. Jetzt derselbe Grund wie ueberall.
+
+   Fuer die Karten ist das ein Gewinn: .project-card liegt auf
+   rgba(15,15,15,0.7) und ergab auf #0f0f0f exakt #0f0f0f - die
+   Kartenflaeche war unsichtbar, die Karte hing allein an Rahmen und
+   Schatten. Auf #050505 ergibt dieselbe Farbe #0c0c0c und hebt sich
+   wieder ab. */
 .projects-section {
     padding: 4rem 0;
-    background: var(--dark);
+    background: var(--darker);
     position: relative;
     overflow: hidden;
 }
