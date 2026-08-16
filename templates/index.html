@@ -481,7 +481,19 @@
                 die halbe Sektion.
                 {% endcomment %}
                 {% include "includes/sektion-meta.html" with nummer="04" titel="Was ich baue" zusatz="Projekte und Skills" %}
-                <p class="sektion-einleitung">Zwei Sachen, die ich wirklich gebaut habe und die laufen – der Rest war Übung und ist es nicht wert, hier zu stehen.</p>
+                {% comment %}Schlagzeile wie in "Berlin": Metazeile,
+                Schlagzeile, Einleitung. Bis eben war dies die einzige
+                Sektion ohne - und damit die einzige ohne Akzentwort.
+
+                "Zwei" und nicht "ein": darunter stehen zwei Karten.
+
+                Die Einleitung stand vorher voll da ("Zwei Sachen, die
+                ich wirklich gebaut habe und die laufen - der Rest war
+                Uebung..."). Die erste Haelfte sagt jetzt die
+                Schlagzeile, samt "wirklich"; geblieben ist der Teil,
+                den sie nicht sagt.{% endcomment %}
+                <p class="sektion-schlagzeile">Zwei Projekte, die ich <span class="akzent">wirklich</span> baue.</p>
+                <p class="sektion-einleitung">Der Rest war Übung und ist es nicht wert, hier zu stehen.</p>
             </div>
 
             <div class="projects-grid">
