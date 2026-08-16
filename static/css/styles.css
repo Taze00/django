@@ -4243,19 +4243,36 @@ html.lenis body {
 
 /* Die Seite hat keinen Hero, unter dem der fixierte Kopf liegen koennte -
    ohne diesen Abstand staende die Ueberschrift dahinter. */
+/* Weniger Luft ueber dem Kopf als bisher (war 6vw/4.5rem): zwischen
+   Metazeile, Satz, Suche und Filtern standen zusammen ueber 600px,
+   bevor der erste Film kam. */
 .filmseite {
-    padding: calc(72px + clamp(2.5rem, 6vw, 4.5rem)) 0 clamp(4rem, 8vw, 6rem);
+    padding: calc(72px + clamp(1.75rem, 4vw, 3rem)) 0 clamp(4rem, 8vw, 6rem);
+}
+
+/* Der Sektionskopf traegt hier nur zwei Zeilen - der allgemeine
+   Abstand (bis 3rem) ist dafuer zu gross. */
+.filmseite .sektion-kopf {
+    margin-bottom: clamp(1.25rem, 2.5vw, 1.75rem);
+}
+
+/* Einzeilig halten: die allgemeine Breite von 46ch trieb den Satz in
+   eine zweite Zeile, die nach dem Gedankenstrich umbrach. */
+.filmseite-einleitung {
+    max-width: 60ch;
 }
 
 /* --- Steuerung --------------------------------------------------------- */
 
+/* align-items: flex-end richtet die Bedienelemente auf einer Linie
+   aus, auch wenn die Marken darueber unterschiedlich hoch umbrechen. */
 .filmsteuerung {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-end;
-    gap: clamp(1rem, 3vw, 2.5rem);
-    margin-bottom: clamp(1.75rem, 4vw, 2.5rem);
-    padding-bottom: 1.25rem;
+    gap: 0.9rem clamp(1rem, 2.5vw, 2rem);
+    margin-bottom: clamp(1.25rem, 2.5vw, 1.75rem);
+    padding-bottom: 1.1rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.07);
 }
 
@@ -4263,6 +4280,35 @@ html.lenis body {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+}
+
+/* Die Suche nimmt den Rest der Zeile ein. flex-basis so gewaehlt, dass
+   sie umbricht statt sich auf Briefmarkenbreite zusammenzuziehen,
+   sobald Sortierung und Sterne die Zeile fuellen. */
+.filmsteuerung-gruppe--suche {
+    flex: 1 1 15rem;
+    min-width: 0;
+}
+
+/* Die Marke der Suche ist ihr <label> - es soll aussehen wie die
+   Marken der beiden Gruppen daneben, nicht wie eine Ueberschrift. */
+.filmsteuerung-gruppe--suche .filmsuche-label {
+    margin-bottom: 0;
+    font-size: 0.66rem;
+    font-weight: 400;
+    color: var(--text);
+    opacity: 0.6;
+}
+
+/* Auf Chiphoehe bringen. --klein ist auf den Abschlusskasten der
+   Startseite eingestellt, wo das Feld allein in seiner Spalte steht -
+   hier steht es neben Chips von 32px, und 48px daneben liessen die
+   Zeile uneben aussehen. Nur in dieser Gruppe, die Startseite behaelt
+   ihr groesseres Feld. */
+.filmsteuerung-gruppe--suche .filmsuche-feld {
+    padding-top: 0.42rem;
+    padding-bottom: 0.42rem;
+    font-size: 0.8rem;
 }
 
 .filmsteuerung-label {
