@@ -20,6 +20,13 @@ import unicodedata
 from django.db import models
 
 
+# Merker fuer "bei TMDB gesucht, nichts gefunden". Steht hier und nicht
+# in films/poster.py, weil beide ihn brauchen: poster.py schreibt ihn,
+# Film.poster_url muss ihn erkennen. poster.py importiert models - die
+# umgekehrte Richtung waere ein Zirkelschluss.
+KEIN_TREFFER = "-"
+
+
 def normalisiere(titel):
     """Kleinschreibung ohne Akzente - fuer die Suche im Browser.
 
@@ -93,8 +100,20 @@ class Film(models.Model):
 
     @property
     def poster_url(self):
-        """Volle TMDB-Bild-URL oder None."""
-        if not self.poster_pfad:
+        """Volle TMDB-Bild-URL oder None.
+
+        KEIN_TREFFER muss hier mit abgefangen werden. Der Bindestrich
+        ist ein Merker, kein Pfad - ohne die Pruefung entstand daraus
+        ".../w342-", eine gueltig aussehende URL, die 404 liefert. Das
+        Template haelt sie fuer ein Poster, zeigt ein <img> und damit
+        ein kaputtes Bild samt Alt-Text, statt auf den
+        Anfangsbuchstaben zurueckzufallen.
+
+        films/poster.py kannte den Merker, diese Property nicht - er
+        wurde an einer Stelle beachtet und an der anderen nicht.
+        Deshalb steht er jetzt hier, wo beide ihn sehen.
+        """
+        if not self.poster_pfad or self.poster_pfad == KEIN_TREFFER:
             return None
         return f"https://image.tmdb.org/t/p/w342{self.poster_pfad}"
 
