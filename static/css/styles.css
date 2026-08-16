@@ -2156,45 +2156,37 @@ footer {
     color: var(--text-bright);
 }
 
-/* --- Schaukasten um die fuenf ------------------------------------------
-   Ein Rahmen wie der Aushang vor einem Kino: ein breiter dunkler Rand,
-   und knapp innen darin ein schmaler Leuchtstreifen in der
-   Akzentfarbe, als laege die Roehre im Kasten. Dazu ein leichter
-   Schein nach aussen.
+/* --- Leuchtrahmen um die fuenf -----------------------------------------
+   Erster Versuch war ein breiter dunkler Rand mit einem Leuchtstreifen
+   knapp innen darin. Das ergab zwei konkurrierende Rahmen und las sich
+   als Kachel mit Rand, nicht als Schaukasten.
 
-   Der Rahmen sitzt an der ganzen Kachel, nicht nur am Poster: im
-   Schaukasten haengt der Aushang samt Titelschild, und der Titel steht
-   unter dem Poster. Nur das Poster einzufassen liesse das Schild
-   ausserhalb des Kastens stehen.
+   Jetzt eine Roehre statt eines Kastens: ein duenner heller Rahmen,
+   und der Schein liegt aussen. Genau ein Rahmen, und was ihn
+   heraushebt, ist das Licht drumherum - nicht ein zweiter Strich.
 
-   Der dunkle Rand ist ein border, der Leuchtstreifen ein inset-Schatten
-   - der zeichnet innerhalb des Rands, liegt also genau dort, wo im
-   echten Kasten die Roehre sitzt. Zwei borders gibt es nicht.
+   Bewusst zurueckhaltend. Der Effekt soll die fuenf von den Regalen
+   darunter abheben, nicht die Poster ueberstrahlen: die Plakate sind
+   der Inhalt, der Rahmen ist die Fassung.
 
-   Nur im Regal der fuenf. Empfehlungen und Zuletzt gesehen bleiben
-   schlicht, sonst hebt der Effekt nichts mehr heraus. */
+   Zwei Schatten statt einem: ein enger, der die Kante ausleuchtet, und
+   ein weiter, sehr schwacher, der als Hof in den Hintergrund laeuft.
+   Ein einzelner Schatten ist entweder hart oder diffus, eine Roehre
+   ist beides. */
 .regal--neon .kachel {
-    border: 5px solid #08080a;
-    box-shadow: inset 0 0 0 1px rgba(0, 217, 255, 0.45),
-                0 0 22px rgba(0, 217, 255, 0.13);
+    border-color: rgba(0, 217, 255, 0.5);
+    box-shadow: 0 0 14px rgba(0, 217, 255, 0.16),
+                0 0 38px rgba(0, 217, 255, 0.07);
 }
 
-/* Innen kleiner als aussen: ein gleich grosser Radius wirkt im Rand
-   ausgebeult, weil der Rand die Rundung nach aussen mitnimmt. */
-.regal--neon .kachel-poster {
-    border-radius: 3px 3px 0 0;
-}
-
-/* Die allgemeine Regel faerbt den Rand beim Hover cyan (border-color:
-   var(--primary)) und ersetzt den Schatten - beides wuerde den Kasten
-   aufloesen. Hier bleibt der Rand dunkel, stattdessen zieht der
-   Leuchtstreifen an und der Schein wird groesser. Der Tiefenschatten
-   der allgemeinen Regel kommt hinten wieder mit dazu. */
+/* Die allgemeine Regel ersetzt beim Hover den Schatten durch den
+   Tiefenschatten der Regale - der Schein waere dann weg. Hier zieht er
+   stattdessen an, der Tiefenschatten kommt hinten mit dazu. */
 .regal--neon .kachel:hover,
 .regal--neon .kachel:focus-within {
-    border-color: #0d0d12;
-    box-shadow: inset 0 0 0 1px rgba(0, 217, 255, 0.9),
-                0 0 30px rgba(0, 217, 255, 0.26),
+    border-color: var(--primary);
+    box-shadow: 0 0 20px rgba(0, 217, 255, 0.3),
+                0 0 52px rgba(0, 217, 255, 0.12),
                 0 18px 40px rgba(0, 0, 0, 0.55);
 }
 
