@@ -366,39 +366,48 @@
     {% endif %}
 
     {% comment %}
-    Sektion BERLIN - Clubs und Momente gehoeren zusammen: dieselben
-    Abende, einmal als Wertung, einmal als Bild. Die Anker #clubs und
-    #gallery bleiben als Sprungziele im Inneren erhalten, damit alte
-    Links und Lesezeichen weiter treffen.
+    Sektion BERLIN. Bis eben stand hier eine Rangliste aus sechs Clubs
+    mit Punktzahlen - die ist weg. Geblieben ist, was die Abende
+    tatsaechlich festhaelt: die Fotos. Davor drei Angaben, die die
+    Sektion einordnen, ohne etwas zu bewerten.
+
+    Die Anker #clubs und #gallery bleiben als Sprungziele erhalten,
+    damit alte Links und Lesezeichen weiter treffen - #clubs sitzt
+    jetzt am Sektionskopf.
     {% endcomment %}
     <section id="berlin" class="berlin">
         <div class="club-pattern"></div>
         <div class="container berlin-container">
-            <div class="sektion-kopf">
-                {% include "includes/sektion-meta.html" with nummer="03" titel="Berlin" zusatz="Clubs &amp; Momente" %}
-                <p class="sektion-schlagzeile">Wochenenden, die ich bewerte wie Filme.</p>
-                <p class="sektion-einleitung">Sechs Clubs, 17 Abende, ein Handy voller Beweise.</p>
+            <div class="sektion-kopf" id="clubs">
+                {% include "includes/sektion-meta.html" with nummer="03" titel="Berlin" zusatz="17 Momente" %}
+                {% comment %}Die Schlagzeile hiess "Wochenenden, die ich
+                bewerte wie Filme." - das Bewerten ist mit der Rangliste
+                weggefallen, der Satz haette auf nichts mehr gezeigt.{% endcomment %}
+                <p class="sektion-schlagzeile">Wochenenden, von denen Fotos übrig sind.</p>
+                <p class="sektion-einleitung">Nachts in Berlin, meistens zu laut für ein Gespräch.</p>
+
+                {% comment %}Dieselbe Bauform wie die Eckdaten in "Ueber
+                mich": <dl> mit Monospace-Marke und Wert darunter.{% endcomment %}
+                <dl class="about-eckdaten berlin-eckdaten">
+                    <div class="about-eckdaten-posten">
+                        <dt>Lieblingsclub</dt>
+                        <dd>Lokschuppen</dd>
+                    </div>
+                    <div class="about-eckdaten-posten">
+                        <dt>Lieblings-DJ</dt>
+                        <dd>Heggemann</dd>
+                    </div>
+                    <div class="about-eckdaten-posten">
+                        <dt>Musikrichtung</dt>
+                        <dd>Trance / Bounce</dd>
+                    </div>
+                </dl>
             </div>
 
-            <div id="clubs" class="berlin-clubs">
-                {% comment %}Spaltenkopf. Die Zahl rechts stand vorher ohne
-                jede Beschriftung da - niemand konnte wissen, dass 92 ein
-                Schnitt aus hundert ist und nicht Besuche, Euro oder
-                Minuten.{% endcomment %}
-                <p class="clubliste-kopf">
-                    <span>Platz &amp; Club</span>
-                    <span>Schnitt / 100</span>
-                </p>
-
-                {% comment %}Die Zeilen kommen aus main.js (createClubListe) -
-                dort stehen auch die Daten. <ol>, weil die Reihenfolge die
-                Aussage ist: sortiert nach Gesamtzahl.{% endcomment %}
-                <ol class="clubliste" id="clubliste"></ol>
-            </div>
-
+            {% comment %}Die Marke "Die Abende dazu" entfaellt: sie hat die
+            Fotos von der Clubliste abgesetzt, und die gibt es nicht mehr.
+            Jetzt folgen sie direkt auf den Kopf.{% endcomment %}
             <div id="gallery" class="berlin-momente">
-                <p class="berlin-marke">Die Abende dazu</p>
-
                 <div class="gallery-grid" id="gallery-grid">
                     <!-- Gallery items will be inserted here by JavaScript -->
                 </div>

@@ -12,7 +12,6 @@ const CONFIG = {
 // ===== DOM ELEMENTS =====
 const elements = {
     galleryGrid: document.getElementById('gallery-grid'),
-    clubListe: document.getElementById('clubliste'),
     fadeElements: document.querySelectorAll('.fade-in'),
     threeBgContainer: document.getElementById('three-bg')
 };
@@ -161,80 +160,6 @@ const galleryItems = [
 
 ];
 
-const clubData = [
-    {
-        id: 1,
-        name: 'Lokschuppen',
-        image: '/static/css/images/clubs/lokschuppen.png',
-        description: 'Der Lokschuppen Berlin ist ein bekannter Techno-Club im Herzen Berlins.',
-        ratings: {
-            atmosphere: 95,
-            sound: 92,
-            lineup: 89
-        },
-        badge: '★★★★★'
-    },
-    {
-        id: 2,
-        name: 'Club Ost',
-        image: '/static/css/images/clubs/ost.png',
-        description: 'Erlebe das Beste aus Techno, EDM und Berliner Nachtleben im Club OST.',
-        ratings: {
-            atmosphere: 89,
-            sound: 98,
-            lineup: 86
-        },
-        badge: '★★★★★'
-    },
-    {
-        id: 3,
-        name: 'Tresor',
-        image: '/static/css/images/clubs/tresor.png',
-        description: 'Legendärer Untergrund-Techno-Club in einem ehemaligen Kraftwerk.',
-        ratings: {
-            atmosphere: 85,
-            sound: 89,
-            lineup: 76
-        },
-        badge: '★★★★☆'
-    },
-    {
-        id: 4,
-        name: 'Ritter Butzke',
-        image: '/static/css/images/clubs/butzke.png',
-        description: 'Geiler Club mit einer einzigartigen Atmosphäre.',
-        ratings: {
-            atmosphere: 98,
-            sound: 83,
-            lineup: 83
-        },
-        badge: '★★★☆☆'
-    },
-    {
-        id: 5,
-        name: 'Wilde Renate',
-        image: '/static/css/images/clubs/renate.png',
-        description: 'Mehrere Floors in einer alten Wohnung mit Labyrinth im Keller.',
-        ratings: {
-            atmosphere: 91,
-            sound: 80,
-            lineup: 73
-        },
-        badge: '★★★☆☆'
-    },
-    {
-        id: 6,
-        name: 'MBIA',
-        image: '/static/css/images/clubs/mbia.png',
-        description: 'Bekannter Fetisch-Club mit Techno-Musik und Pool.',
-        ratings: {
-            atmosphere: 87,
-            sound: 83,
-            lineup: 70
-        },
-        badge: '★★★☆☆'
-    }
-];
 
 
 // ===== THREE.JS BACKGROUND =====
@@ -392,78 +317,6 @@ function setupCarouselNavigation() {
 // Die Clubs standen als Karten mit Foto, Sternebadge und drei farbigen
 // Fortschrittsbalken. Drei Balken je Karte, sechs Karten - achtzehn
 // Balken, die alle ungefaehr gleich weit ausschlugen und deshalb nichts
-// unterschieden. Die Rangfolge, um die es geht, war daraus nicht
-// ablesbar: die Karten standen in Eingabereihenfolge im Raster.
-//
-// Jetzt eine nummerierte Liste, sortiert nach der Gesamtzahl. Das Foto
-// und die drei Einzelwerte kommen beim Darueberfahren dazu - auf
-// Zeigegeraeten per Hover, sonst per Antippen.
-function createClubListe() {
-    const liste = elements.clubListe;
-    if (!liste) return;
-
-    // Die Gesamtzahl ist der gerundete Schnitt der drei Einzelwerte -
-    // sie steht nirgends in den Daten, sonst koennten beide auseinander
-    // laufen.
-    const rang = clubData
-        .map(club => ({
-            club,
-            gesamt: Math.round(
-                (club.ratings.atmosphere + club.ratings.sound + club.ratings.lineup) / 3
-            )
-        }))
-        .sort((a, b) => b.gesamt - a.gesamt);
-
-    liste.innerHTML = '';
-
-    rang.forEach((eintrag, i) => {
-        const { club, gesamt } = eintrag;
-        const nummer = String(i + 1).padStart(2, '0');
-
-        const zeile = document.createElement('li');
-        zeile.className = 'clubliste-zeile';
-
-        // Ein <button>, damit die Details auch mit der Tastatur
-        // erreichbar sind - auf einem Zeigegeraet kommen sie sonst nur
-        // beim Darueberfahren.
-        // Die Einzelwerte stehen ausgeschrieben da. "ATM 95 · SND 92 ·
-        // LNP 89" war eine Abkuerzung, die nur kannte, wer sie selbst
-        // vergeben hat - und sie machte eine zweite, versteckte Fassung
-        // fuer Screenreader noetig. Jetzt reicht eine.
-        zeile.innerHTML = `
-            <button type="button" class="clubliste-knopf" aria-expanded="false">
-                <span class="clubliste-nr">${nummer}</span>
-                <span class="clubliste-bild">
-                    <img src="${club.image}" alt="" width="120" height="72" loading="lazy">
-                </span>
-                <span class="clubliste-name">${club.name}</span>
-                <span class="clubliste-werte">Atmosphäre ${club.ratings.atmosphere} &middot; Sound ${club.ratings.sound} &middot; Lineup ${club.ratings.lineup}</span>
-                <span class="clubliste-gesamt">${gesamt}<span class="visually-hidden"> von 100</span></span>
-            </button>
-        `;
-
-        const knopf = zeile.querySelector('.clubliste-knopf');
-        knopf.addEventListener('click', () => oeffneClubZeile(zeile));
-
-        liste.appendChild(zeile);
-    });
-}
-
-// Immer nur eine Zeile offen: sechs aufgeklappte Zeilen sind wieder die
-// Kartenwand, die die Liste ersetzt hat.
-function oeffneClubZeile(zeile) {
-    const offen = zeile.classList.contains('is-offen');
-
-    document.querySelectorAll('.clubliste-zeile.is-offen').forEach(andere => {
-        if (andere === zeile) return;
-        andere.classList.remove('is-offen');
-        andere.querySelector('.clubliste-knopf').setAttribute('aria-expanded', 'false');
-    });
-
-    zeile.classList.toggle('is-offen', !offen);
-    zeile.querySelector('.clubliste-knopf').setAttribute('aria-expanded', String(!offen));
-}
-
 // ===== TOP LISTS TOGGLE FUNCTION =====
 function toggleDetails(element) {
     const details = element.querySelector('.item-details');
@@ -804,10 +657,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     createGallery();
     setupCarouselNavigation();
-    createClubListe();
 
-    // Nach createGallery/createClubListe: Galeriekacheln und Clubzeilen
-    // entstehen erst dort, vorher gaebe es nichts zu beobachten.
+    // Nach createGallery: die Galeriekacheln entstehen erst dort,
+    // vorher gaebe es nichts zu beobachten.
     initReveals();
     initMetazeilen();
 
@@ -834,7 +686,6 @@ window.addEventListener('load', () => {
 
 // Make functions globally available
 window.createGallery = createGallery;
-window.createClubListe = createClubListe;
 window.toggleDetails = toggleDetails;
 window.galleryItems = galleryItems;
 
@@ -1211,7 +1062,6 @@ function initReveals() {
     // Reihen, deren Kinder nacheinander erscheinen.
     const GRUPPEN = [
         ['.projects-grid', '.project-card'],
-        ['.clubliste', ':scope > *'],
         ['.gallery-grid', '.gallery-item'],
         ['.films-filter', ':scope > *'],
         ['.social-links', ':scope > *']
@@ -1229,7 +1079,6 @@ function initReveals() {
         '.sektion-kopf',
         '.about-text',
         '.about-image',
-        '.berlin-marke',
         '.films-claim',
         '.regal',
         '.films-quelle',

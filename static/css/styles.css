@@ -605,276 +605,58 @@ html.intro-laeuft .hero-skyline {
     z-index: 1;
 }
 
-/* Die Momente stehen weit genug unter der Clubliste, dass klar ist:
-   neuer Block, gleiche Sektion. */
+/* Die Fotos folgen direkt auf den Kopf. Der Abstand war groesser, als
+   noch die Clubliste dazwischen stand und "Die Abende dazu" sie
+   absetzte - beides ist weg, es ist nur noch ein Block. */
 .berlin-momente {
-    margin-top: clamp(3.5rem, 7vw, 5.5rem);
+    margin-top: clamp(2rem, 4vw, 3rem);
 }
 
-/* Kleine Marke statt zweiter Ueberschrift - die Sektion hat schon eine,
-   und die Momente sind ihr zweiter Teil, nicht ihr Nachfolger. */
-.berlin-marke {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    font-weight: 500;
-    letter-spacing: var(--mono-track);
-    text-transform: uppercase;
-    color: var(--text);
-    opacity: 0.6;
+/* Die drei Angaben unter der Schlagzeile. Sie teilen sich die Bauform
+   mit den Eckdaten aus "Ueber mich" (.about-eckdaten traegt Monospace,
+   Marke und Wert) - hier stehen sie aber nebeneinander statt
+   untereinander: dort sind sie eine schmale Spalte neben dem Text,
+   hier eine Zeile unter der Schlagzeile ueber die volle Breite. */
+/* Gleich breite Spalten, nicht max-content: die Linien unter den drei
+   Posten sind sonst so lang wie ihr laengstes Wort, und drei
+   unterschiedlich weit auslaufende Striche nebeneinander sehen nach
+   Versehen aus. Die max-width haelt sie zusammen - ueber die volle
+   Containerbreite gezogen stuenden die Werte vereinzelt. */
+.berlin-eckdaten {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0 clamp(1.5rem, 4vw, 3rem);
+    max-width: 44rem;
+    margin-top: clamp(1.75rem, 3.5vw, 2.5rem);
+}
+
+/* Nebeneinander braucht jeder Posten seine eigene untere Linie - die
+   Regel aus "Ueber mich" setzt sie nur unter den letzten, weil die
+   Posten dort gestapelt sind. */
+.berlin-eckdaten .about-eckdaten-posten {
+    border-bottom: 1px solid var(--gray);
+}
+
+@media (max-width: 700px) {
+    /* Drei Spalten nebeneinander werden auf 390px zu schmal -
+       "Musikrichtung" bricht dann mitten im Wort. */
+    .berlin-eckdaten {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0;
+    }
+
+    /* Gestapelt liegen obere und untere Linie aufeinander. */
+    .berlin-eckdaten .about-eckdaten-posten + .about-eckdaten-posten {
+        border-top: 0;
+    }
 }
 
 /* Sprungziele innerhalb der Sektion. Es sind <div>, nicht <section> -
-   die Regel weiter unten fuer section[id] greift hier nicht. */
-.berlin-clubs,
+   die Regel weiter unten fuer section[id] greift hier nicht.
+   #clubs sitzt seit dem Wegfall der Rangliste am Sektionskopf. */
+.sektion-kopf[id],
 .berlin-momente {
     scroll-margin-top: 88px;
-}
-
-/* --- Clubliste --------------------------------------------------------
-   Frueher sechs Karten im Raster: Foto, Sternebadge, drei farbige
-   Balken. Die Balken schlugen alle zwischen 70 und 98 aus - achtzehn
-   Striche, die sich kaum unterschieden und die Rangfolge trotzdem
-   nicht zeigten, weil die Karten in Eingabereihenfolge standen.
-
-   Jetzt sechs Zeilen, sortiert. Sichtbar ist nur, was die Rangfolge
-   traegt: Platz, Name, Gesamtzahl. Foto und Einzelwerte kommen beim
-   Darueberfahren dazu.
-
-   Haarlinien nur zwischen den Zeilen - kein Rahmen aussen, sonst waere
-   es wieder eine Karte, nur eine grosse. */
-/* Spaltenkopf. Steht in derselben Mono-Sprache wie die uebrigen
-   Metazeilen, aber leiser - er benennt die Liste, er fuehrt sie nicht.
-   Der Innenabstand spiegelt den der Zeilenknoepfe, damit "Platz & Club"
-   ueber der Nummer und "Schnitt / 100" ueber der Zahl steht. */
-.clubliste-kopf {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    margin: 0 0 0.6rem;
-    padding: 0 0.25rem 0.75rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.09);
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    letter-spacing: var(--mono-track);
-    text-transform: uppercase;
-    color: var(--text);
-    opacity: 0.45;
-}
-
-.clubliste {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.clubliste-zeile + .clubliste-zeile {
-    border-top: 1px solid rgba(255, 255, 255, 0.09);
-}
-
-/* Ein <button>: die Details muessen auch mit der Tastatur erreichbar
-   sein, nicht nur unter dem Zeiger. */
-.clubliste-knopf {
-    display: grid;
-    grid-template-columns: auto var(--clubbild) minmax(0, max-content) 1fr auto;
-    grid-template-areas: "nr bild name werte gesamt";
-    align-items: center;
-    gap: 0 1.1rem;
-    width: 100%;
-    padding: 0.85rem 0.25rem;
-    background: none;
-    border: 0;
-    text-align: left;
-    color: inherit;
-    font: inherit;
-    cursor: pointer;
-    transition: background-color 0.25s ease;
-
-    /* 52x32 war zu klein, um einen Raum wiederzuerkennen - bei einem
-       dunklen Clubfoto blieb ein grauer Fleck. Die Hoehe kommt jetzt
-       vom Bild, deshalb weniger Innenabstand als vorher (1.15rem). */
-    --clubbild: 120px;
-}
-
-.clubliste-nr {
-    grid-area: nr;
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    letter-spacing: var(--mono-track);
-    color: var(--text);
-    opacity: 0.45;
-    transition: opacity 0.25s ease, color 0.25s ease;
-}
-
-/* Der Platz fuer das Foto steht immer - nur das Bild darin faehrt ein.
-   Waechst stattdessen die Spalte, ruecken Name und Werte bei jedem
-   Ueberfahren um 63px zur Seite, und die Liste zappelt. */
-.clubliste-bild {
-    grid-area: bild;
-    display: block;
-    width: var(--clubbild);
-    height: 72px;
-    overflow: hidden;
-    border-radius: 3px;
-}
-
-.clubliste-bild img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0;
-    transform: translateX(-12px);
-    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.clubliste-name {
-    grid-area: name;
-    font-family: var(--font-display);
-    font-size: clamp(1.05rem, 1.6vw, 1.3rem);
-    font-weight: 500;
-    color: var(--text-bright);
-}
-
-.clubliste-werte {
-    grid-area: werte;
-    justify-self: end;
-    padding-right: 1.5rem;
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.1em;
-    white-space: nowrap;
-    color: var(--text);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.clubliste-gesamt {
-    grid-area: gesamt;
-    font-family: var(--font-mono);
-    font-size: 1rem;
-    font-variant-numeric: tabular-nums;
-    color: var(--text);
-    opacity: 0.75;
-    transition: color 0.25s ease, opacity 0.25s ease;
-}
-
-/* Aufgedeckt: unter dem Zeiger, mit der Tastatur, oder angetippt. */
-.clubliste-knopf:hover,
-.clubliste-knopf:focus-visible,
-.clubliste-zeile.is-offen .clubliste-knopf {
-    background-color: rgba(255, 255, 255, 0.02);
-}
-
-.clubliste-knopf:hover .clubliste-bild img,
-.clubliste-knopf:focus-visible .clubliste-bild img,
-.clubliste-zeile.is-offen .clubliste-bild img,
-.clubliste-knopf:hover .clubliste-werte,
-.clubliste-knopf:focus-visible .clubliste-werte,
-.clubliste-zeile.is-offen .clubliste-werte {
-    opacity: 1;
-    transform: none;
-}
-
-.clubliste-knopf:hover .clubliste-werte,
-.clubliste-knopf:focus-visible .clubliste-werte,
-.clubliste-zeile.is-offen .clubliste-werte {
-    opacity: 0.6;
-}
-
-.clubliste-knopf:hover .clubliste-nr,
-.clubliste-knopf:focus-visible .clubliste-nr,
-.clubliste-zeile.is-offen .clubliste-nr {
-    opacity: 0.8;
-}
-
-.clubliste-knopf:hover .clubliste-gesamt,
-.clubliste-knopf:focus-visible .clubliste-gesamt,
-.clubliste-zeile.is-offen .clubliste-gesamt {
-    color: var(--primary);
-    opacity: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .clubliste-bild img,
-    .clubliste-werte,
-    .clubliste-nr,
-    .clubliste-gesamt,
-    .clubliste-knopf {
-        transition: none;
-    }
-
-    .clubliste-bild img {
-        transform: none;
-    }
-}
-
-/* Auf schmalen Schirmen bleibt es eine Liste, nur enger: Nummer, Name
-   und Zahl in einer Reihe, Foto und Einzelwerte klappen darunter auf.
-   Nebeneinander waere die Zeile sonst 40 Zeichen breit auf 390px.
-
-   Die zweite Rasterreihe steht auf 0fr und waechst beim Aufklappen auf
-   1fr - deshalb muessen ihre Kinder overflow und min-height 0 haben,
-   sonst halten sie die Reihe von innen auf. */
-@media (max-width: 640px) {
-    /* Foto und Werte stehen unter dem Namen, nicht unter der Nummer:
-       stuenden sie in Spalte eins, wuerde das 120px breite Foto die
-       Spalte der Nummer auf seine Breite aufziehen - und zwischen "01"
-       und dem Clubnamen klaffte in jeder Zeile eine Handbreit Leere,
-       auch in den zugeklappten. Die leeren Zellen (".") halten die
-       Spalte schmal. */
-    .clubliste-knopf {
-        grid-template-columns: auto 1fr auto;
-        grid-template-rows: auto 0fr 0fr;
-        grid-template-areas:
-            "nr name  gesamt"
-            ".  bild  bild"
-            ".  werte werte";
-        gap: 0 0.9rem;
-        padding: 0.95rem 0.25rem;
-        transition: grid-template-rows 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-    }
-
-    .clubliste-zeile.is-offen .clubliste-knopf {
-        grid-template-rows: auto 1fr 1fr;
-    }
-
-    .clubliste-bild,
-    .clubliste-werte {
-        min-height: 0;
-        height: auto;
-        overflow: hidden;
-    }
-
-    /* Dieselbe Groesse wie auf dem Desktop - der Platz ist da, seit das
-       Foto unter dem Namen steht statt neben der Nummer. */
-    .clubliste-bild {
-        width: 120px;
-        height: auto;
-    }
-
-    .clubliste-bild img {
-        height: 72px;
-        margin-top: 0.75rem;
-    }
-
-    /* Ausgeschrieben passen die drei Werte nicht mehr in eine Zeile -
-       deshalb umbrechend statt abgeschnitten. */
-    .clubliste-werte {
-        justify-self: start;
-        align-self: center;
-        padding: 0.7rem 0 0;
-        font-size: 0.68rem;
-        white-space: normal;
-    }
-
-    .clubliste-name {
-        font-size: 1rem;
-    }
-
-    .clubliste-gesamt {
-        font-size: 0.95rem;
-    }
 }
 
 /* GALLERY - MASONRY
