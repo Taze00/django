@@ -1312,13 +1312,13 @@ function initMetazeilen() {
     if (BEWEGUNG_REDUZIERT) return;
     if (typeof IntersectionObserver !== 'function') return;
 
-    // Das Neonschild der Filmsektion haengt am selben Beobachter: es
-    // springt nach derselben Regel an (einmal, beim Sichtbarwerden),
-    // nur mit einer groesseren Geste - welche, entscheidet das CSS
-    // ueber die Klasse, nicht dieses JS.
+    // Nur noch die Metazeilen. Das Neonschild der Filmsektion hing hier
+    // mit drin und ist einer normalen Ueberschrift gewichen - eine
+    // Ueberschrift, die anspringt wie eine Roehre, waere ein Effekt
+    // ohne Anlass.
     const wahl = document.documentElement.classList.contains('intro-laeuft')
-        ? '.sektion-meta, .neonschild'
-        : '.sektion-meta, .neonschild, .hero-meta-zeile';
+        ? '.sektion-meta'
+        : '.sektion-meta, .hero-meta-zeile';
 
     const zeilen = document.querySelectorAll(wahl);
     if (!zeilen.length) return;

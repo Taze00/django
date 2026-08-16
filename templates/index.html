@@ -202,9 +202,13 @@
             {% if filme %}
             <div class="filmblock filmblock--fuenf">
                 {% comment %}Kein <h2>: die Metazeile der Sektion ist bereits
-                die Ueberschrift. Das Schild traegt das optische Gewicht,
-                die Gliederung soll nicht doppelt zaehlen.{% endcomment %}
-                <h3 class="neonschild">Meine <span class="neonschild-zahl">Fünf</span></h3>
+                die Ueberschrift, die Gliederung soll nicht doppelt zaehlen.
+
+                Frueher stand hier ein Neonschild - "MEINE FÜNF" gesperrt in
+                einem leuchtenden Rahmen. Der Rahmen trug das Gewicht, aber
+                die Zeile sagte nicht, was gemeint ist: fuenf was? Jetzt eine
+                normale Ueberschrift, die den Satz zu Ende spricht.{% endcomment %}
+                <h3 class="fuenf-titel">Meine fünf Lieblingsfilme</h3>
 
                 <p class="fuenf-satz">
                     Von {{ statistik.gesehen }} Filmen haben genau
@@ -341,6 +345,16 @@
                         Alle {{ statistik.gesehen }} Filme <span aria-hidden="true">&rarr;</span>
                     </a>
                 </div>
+
+                {% comment %}Zwei Vorlieben, die keine Zahl abbildet - der
+                Kasten daneben rechnet, diese Zeile nicht. Monospace und
+                gesperrt wie die uebrigen Marken der Seite, damit sie als
+                Fussnote des Kastens liest und nicht als neue Aussage.{% endcomment %}
+                <p class="abschluss-vorlieben">
+                    Regie, die ich verfolge: Nolan
+                    <span aria-hidden="true">·</span>
+                    Schauspieler: Will Smith
+                </p>
             </div>
 
             <p class="films-attribution">

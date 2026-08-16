@@ -2249,6 +2249,24 @@ footer {
     background: rgba(255, 255, 255, 0.015);
 }
 
+/* Vierter Posten im Kasten, aber ueber die ganze Breite: die drei
+   Spalten daneben gehoeren zusammen (Verteilung, Satz, Suche), die
+   Zeile gehoert zu allen dreien. Ohne grid-column stuende sie als
+   vierte Zelle unter der ersten Spalte. */
+.abschluss-vorlieben {
+    grid-column: 1 / -1;
+    margin: 0.4rem 0 0;
+    padding-top: clamp(1rem, 2vw, 1.4rem);
+    border-top: 1px solid var(--gray);
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: var(--mono-track);
+    line-height: 1.7;
+    text-transform: uppercase;
+    color: var(--text);
+    opacity: 0.6;
+}
+
 .abschluss-satz {
     margin: 0 0 0.6rem;
     font-family: var(--font-display);
@@ -2316,10 +2334,10 @@ footer {
    dunkel und lebt von Leuchtschrift; das traegt Berliner Nacht und Kino
    zugleich.
 
-   Bewusst an wenigen Stellen: das Schild ueber "Meine Fuenf" und die
-   Rahmen um die fuenf Poster darunter. Neon an jedem Regal waere kein
-   Programmkino mehr, sondern eine Spielhalle - und der Effekt, der die
-   fuenf heraushebt, hoebe dann nichts mehr heraus.
+   Bewusst an wenigen Stellen: nur noch die Rahmen um die fuenf Poster.
+   Neon an jedem Regal waere kein Programmkino mehr, sondern eine
+   Spielhalle - und der Effekt, der die fuenf heraushebt, hoebe dann
+   nichts mehr heraus.
 
    Der Schein liegt aussen UND innen. Das macht den Roehreneindruck:
    eine Leuchtroehre wirft Licht auf die Wand hinter sich und zeichnet
@@ -2327,61 +2345,24 @@ footer {
    Schlagschatten, nur innen wie ein Verlauf.
    ========================================================================== */
 
-.neonschild {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 0.75rem;
-    padding: 0.7rem 1.5rem 0.75rem;
-    border: 1px solid var(--primary);
-    border-radius: 3px;
+/* Ueber den fuenf Postern stand ein Neonschild: "MEINE FÜNF", gesperrt
+   in einem leuchtenden Rahmen, mit eigenem Zuend-Flackern. Der Rahmen
+   trug viel Gewicht fuer eine Zeile, die die eigentliche Frage offen
+   liess - fuenf was? Und gesperrte Versalien in einer duennen Roehre
+   lesen sich schlechter, je mehr Buchstaben drinstehen.
+
+   Jetzt eine normale Ueberschrift, die den Satz zu Ende spricht. Sie
+   fuehrt den schwersten Block der Sektion, bleibt aber unter der
+   Sektions-Schlagzeile: die Metazeile darueber ordnet weiter ein. */
+.fuenf-titel {
+    max-width: 24ch;
+    margin: 0 0 0.9rem;
     font-family: var(--font-display);
-    font-size: clamp(1.05rem, 2.2vw, 1.5rem);
+    font-size: clamp(1.5rem, 3.2vw, 2.2rem);
     font-weight: 600;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
+    line-height: 1.1;
+    letter-spacing: -0.01em;
     color: var(--text-bright);
-    box-shadow: 0 0 20px rgba(0, 217, 255, 0.3),
-                inset 0 0 20px rgba(0, 217, 255, 0.15);
-    text-shadow: 0 0 14px rgba(0, 217, 255, 0.5);
-}
-
-/* Die Zahl im Schild leuchtet staerker als das Wort - sie ist die
-   Aussage ("genau fuenf"), nicht die Beschriftung. */
-.neonschild-zahl {
-    color: var(--primary);
-    text-shadow: 0 0 16px rgba(0, 217, 255, 0.8);
-}
-
-/* --- Anspringen, staerker als bei den Metazeilen ----------------------- */
-
-/* Mehr Zuckungen und tiefere Einbrueche als metazeile-anspringen: das
-   Schild ist die Ueberschrift des wichtigsten Blocks, es darf die
-   groessere Geste haben. Es bleibt bei einem einzigen Durchlauf -
-   dauerhaftes Flackern waere hier so wenig zumutbar wie dort.
-
-   Animiert wird `filter`. Das wirkt auf die fertig gezeichnete Kachel,
-   also auch auf box-shadow und text-shadow - der Schein geht mit aus
-   und wieder an, und genau das laesst die Roehre zuenden. Mit
-   opacity waere der Rahmen zwar blass, der Schein aber unveraendert da. */
-@keyframes neon-zuenden {
-    0%   { filter: brightness(0.12); }
-    4%   { filter: brightness(1.9); }
-    7%   { filter: brightness(0.14); }
-    13%  { filter: brightness(1.75); }
-    17%  { filter: brightness(0.18); }
-    24%  { filter: brightness(1.85); }
-    29%  { filter: brightness(0.2); }
-    43%  { filter: brightness(1.6); }
-    51%  { filter: brightness(0.5); }
-    63%  { filter: brightness(1.3); }
-    73%  { filter: brightness(0.9); }
-    100% { filter: none; }
-}
-
-/* Die Klasse setzt derselbe Beobachter wie bei den Metazeilen
-   (initMetazeilen in main.js) - jedes Element genau einmal. */
-.neonschild.is-angesprungen {
-    animation: neon-zuenden 1.5s ease-out 0.3s both;
 }
 
 /* --- Neonrahmen um die Poster ----------------------------------------- */
@@ -2404,10 +2385,6 @@ footer {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .neonschild.is-angesprungen {
-        animation: none;
-    }
-
     .regal--neon .kachel-poster {
         transition: none;
     }
@@ -2523,23 +2500,27 @@ footer {
     position: relative;
 }
 
-/* Weicher Verlauf am rechten Rand - deutet an, dass es weitergeht.
-   Verschwindet, sobald das Ende erreicht ist (Klasse vom JS). */
-.regal-viewport::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    width: var(--regal-verlauf-breite);
-    background: linear-gradient(to left, var(--darker, #050505) 10%, transparent);
-    pointer-events: none;
-    opacity: 1;
-    transition: opacity 0.25s ease;
-    z-index: 2;
+/* Weicher Rand rechts - deutet an, dass es weitergeht. Verschwindet,
+   sobald das Ende erreicht ist (Klasse vom JS).
+
+   Frueher lag hier ein ::after mit linear-gradient auf --darker
+   (#050505). Das setzt voraus, dass der Hintergrund dahinter genau
+   diese Farbe hat - #filme ist aber ein diagonaler Verlauf von #0f0f1a
+   nach #050505. Ueber dem blaeulichen Teil sass das Overlay als
+   schwarzer Balken auf der Sektion, am deutlichsten an den
+   Empfehlungen und an "Zuletzt gesehen".
+
+   Jetzt eine Maske auf der Spur statt eines Overlays darueber: sie
+   blendet den Inhalt aus, nicht in eine Farbe hinein. Damit passt der
+   Rand auf jedem Hintergrund, ohne dass eine Farbe gepflegt werden
+   muss - auch wenn sich der Sektionsverlauf spaeter aendert. */
+@property --regal-verlauf-stop {
+    syntax: '<length-percentage>';
+    inherits: true;
+    initial-value: 100%;
 }
 
-.regal-viewport.is-am-ende::after { opacity: 0; }
+.regal-viewport.is-am-ende .regal-spur { --regal-verlauf-stop: 100%; }
 
 /* --- Spur ------------------------------------------------------------- */
 
@@ -2566,6 +2547,17 @@ footer {
     overscroll-behavior-x: contain;
     /* Scrollbar ausblenden - gescrollt wird per Wisch, Pfeil oder Taste. */
     scrollbar-width: none;
+
+    /* Weicher rechter Rand (siehe Kommentar an .regal-viewport oben).
+       Die Maske sitzt an der Spur, nicht am Viewport: die Pfeile liegen
+       als Geschwister darueber und sollen deckend bleiben.
+       Der Stop braucht das @property oben, sonst springt er statt zu
+       ueberblenden - ohne Unterstuetzung schaltet er hart um, der Rand
+       stimmt trotzdem. */
+    --regal-verlauf-stop: calc(100% - var(--regal-verlauf-breite));
+    mask-image: linear-gradient(to right, #000 var(--regal-verlauf-stop), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, #000 var(--regal-verlauf-stop), transparent 100%);
+    transition: --regal-verlauf-stop 0.25s ease;
 }
 
 .regal-spur::-webkit-scrollbar { display: none; }
@@ -3032,19 +3024,33 @@ footer {
 
 .films-quelle a:hover { color: var(--text-bright); }
 
+/* Pflichtangabe: die TMDB-Nutzungsbedingungen verlangen den Hinweis auf
+   die Quelle und die Klarstellung, dass TMDB die Seite nicht
+   unterstuetzt. Sie muss also stehen bleiben - aber sie ist Kleingedrucktes
+   und hat keinen Anspruch auf Aufmerksamkeit.
+
+   Die Trennlinie darueber ist deshalb weg: sie hat die Zeile wie einen
+   eigenen Abschnitt aussehen lassen, statt wie den Fussnotenrest der
+   Sektion. Dazu kleiner und deutlich gedeckter. */
 .films-attribution {
-    margin: clamp(2rem, 4vw, 3rem) 0 0;
-    padding-top: 1rem;
-    border-top: 1px solid var(--gray);
+    margin: clamp(2.5rem, 5vw, 3.5rem) 0 0;
     font-family: var(--font-mono);
-    font-size: 0.62rem;
-    line-height: 1.5;
+    font-size: 0.55rem;
+    line-height: 1.6;
     text-align: center;
     color: var(--text);
-    opacity: 0.65;
+    opacity: 0.38;
 }
 
-.films-attribution a { color: var(--primary); }
+/* Auch der Link nimmt sich zurueck - cyan waere hier der hellste Punkt
+   einer Zeile, die niemand zuerst lesen soll. Beim Hover kommt er. */
+.films-attribution a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+}
+
+.films-attribution:hover { opacity: 0.6; }
 
 /* ==========================================================================
    WAS ICH BAUE (Projekte)
@@ -3102,15 +3108,15 @@ footer {
     overflow: hidden;
 }
 
+/* Kein Zoom bei Hover. Die Bilder sind Screenshots - beim Vergroessern
+   wird der Text darin unscharf und der Rand beschnitten, das Bild zeigt
+   also weniger statt mehr. Die Karte hebt sich beim Hover ohnehin schon
+   (translateY plus Rahmenfarbe), eine zweite Bewegung darin braucht es
+   nicht. */
 .project-media img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: var(--transition);
-}
-
-.project-card:hover .project-media img {
-    transform: scale(1.1);
 }
 
 /* --- Platzhalter, solange kein Bild hinterlegt ist --------------------- */
