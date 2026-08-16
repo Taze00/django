@@ -1102,25 +1102,30 @@ function initReveals() {
         document.querySelectorAll(wahl).forEach(el => ziele.push(el));
     });
 
-    // Skills: Gruppe fuer Gruppe, innerhalb der Gruppe Chip fuer Chip.
-    // Ueber GRUPPEN liefe der Zaehler in jeder Gruppe wieder bei 0 los -
-    // dann faengt die zweite Marke gleichzeitig mit dem ersten Chip der
-    // ersten an und der Eindruck von drei Bereichen geht verloren.
-    // Deshalb ein eigener Grundverzug pro Gruppe.
+    // Skills: eine Gruppe nach der anderen, Marke kurz vor ihrem Band.
+    // Ueber GRUPPEN liefe der Zaehler in jeder Gruppe wieder bei 0 los,
+    // dann kaemen alle drei Marken gleichzeitig und der Eindruck von
+    // drei Bereichen ginge verloren. Deshalb ein eigener Grundverzug.
+    //
+    // Frueher standen hier Chips und wurden einzeln gestaffelt. Es sind
+    // jetzt Laufbaender - ein Band als Ganzes, sonst faehrt die Zeile in
+    // Stuecken ein, waehrend sie schon laeuft.
     const SKILL_GRUPPE_MS = 220;
-    const SKILL_CHIP_MS = 55;   // enger als 80ms: es sind bis zu 9 Chips
+    const SKILL_BAND_MS = 90;
     document.querySelectorAll('.skills-gruppe').forEach((gruppe, gi) => {
         const grundverzug = gi * SKILL_GRUPPE_MS;
+
         const marke = gruppe.querySelector('.skills-marke');
         if (marke) {
             marke.style.setProperty('--reveal-verzug', `${grundverzug}ms`);
             ziele.push(marke);
         }
-        gruppe.querySelectorAll('.skills-chip').forEach((chip, i) => {
-            const verzug = grundverzug + Math.min(i, VERSATZ_MAX) * SKILL_CHIP_MS;
-            chip.style.setProperty('--reveal-verzug', `${verzug}ms`);
-            ziele.push(chip);
-        });
+
+        const band = gruppe.querySelector('.skills-band');
+        if (band) {
+            band.style.setProperty('--reveal-verzug', `${grundverzug + SKILL_BAND_MS}ms`);
+            ziele.push(band);
+        }
     });
 
     if (!ziele.length) return;
