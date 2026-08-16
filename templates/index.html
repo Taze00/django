@@ -367,8 +367,12 @@
                         <p class="filmsuche-leer" data-filmsuche-leer hidden aria-live="polite"></p>
                     </div>
 
+                    {% comment %}Ohne Zahl: die steht seit der Kennzahl
+                    links im selben Kasten riesig da. Zweimal 216 in
+                    einem Kasten liest sich als Versehen, und der Knopf
+                    braucht sie nicht - er sagt, wohin er fuehrt.{% endcomment %}
                     <a class="btn abschluss-knopf" href="/filme/">
-                        Alle {{ statistik.gesehen }} Filme <span aria-hidden="true">&rarr;</span>
+                        Alle Filme ansehen <span aria-hidden="true">&rarr;</span>
                     </a>
                 </div>
 
