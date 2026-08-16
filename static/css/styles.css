@@ -341,18 +341,29 @@ html.intro-laeuft .hero-skyline {
 }
 
 /* --- Namenszug ---------------------------------------------------------
-   ALEX gross, versal und weit gesperrt; "Volkmann" klein, gemischt und
-   in Serifen-Kursiv darunter. Der Unterschied liegt jetzt in drei
-   Dingen zugleich - Schrift, Lage, Groesse - und nicht mehr allein im
-   Groessensprung.
+   ALEX versal und weit gesperrt, "Volkmann" in Serifen-Kursiv rechts
+   daneben auf derselben Grundlinie. Zusammen ein Namenszug, nicht
+   Ueberschrift plus Unterzeile.
 
    Vorher war beides dieselbe Grotesk in Versalien, nur einmal riesig
-   und einmal winzig. Das las sich wie eine Bildunterschrift zum eigenen
-   Namen. Die Kursive nimmt den Nachnamen aus der Beschriftungsrolle
-   heraus, ohne ihn lauter zu machen. */
+   und einmal winzig - das las sich wie eine Bildunterschrift zum
+   eigenen Namen. Dann stand die Kursive eine Zeile tiefer und wirkte
+   dort verloren: zu klein und zu weit weg, um noch zum Vornamen zu
+   gehoeren.
+
+   Auf der Grundlinie gibt es diese Distanz nicht mehr. Den Unterschied
+   tragen jetzt Schrift und Haltung - Versal-Grotesk gegen Serifen-
+   Kursiv -, nicht mehr der Groessensprung. */
 .hero-name {
     margin: 0;
     line-height: 1;
+    display: flex;
+    align-items: baseline;
+    /* Umbruch als Rueckfallebene: wird das Fenster so schmal, dass
+       beide nicht mehr nebeneinander passen, steht der Nachname wieder
+       unter dem Vornamen statt ueber den Rand zu laufen. */
+    flex-wrap: wrap;
+    column-gap: 1.25rem;
 }
 
 .hero-vorname,
@@ -369,13 +380,21 @@ html.intro-laeuft .hero-skyline {
     letter-spacing: 0.22em;
     line-height: 0.95;
     color: var(--text-bright);
+    /* Die Sperrung haengt auch hinter dem letzten X ein Leerfeld an -
+       bei 128px sind das 28px. Solange der Nachname darunter stand,
+       fiel das nicht auf; daneben klaffte die Luecke sichtbar zu weit.
+       Der negative Rand nimmt genau dieses eine Leerfeld zurueck,
+       danach steht der Abstand allein im column-gap oben. */
+    margin-right: -0.22em;
 }
 
 .hero-nachname {
-    margin-top: 0.75em;
     font-family: var(--font-serif);
     font-style: italic;
-    font-size: clamp(0.95rem, 2vw, 1.25rem);
+    /* Rund das Doppelte der frueheren Groesse. Neben einem 128px hohen
+       ALEX braucht die Kursive diese Groesse, um mitzuhalten - bei
+       20px las sie sich als Beschriftung. */
+    font-size: clamp(1.9rem, 4vw, 2.5rem);
     font-weight: 400;
     /* Keine Sperrung mehr: eine Kursive lebt von ihrem Zusammenhang,
        gesperrt zerfaellt sie in Einzelbuchstaben. */
