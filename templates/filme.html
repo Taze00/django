@@ -10,7 +10,7 @@
     <link rel="icon" href="{% static 'css/images/favicon.ico' %}" type="image/x-icon">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" as="style">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260814-3">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260816-1">
 </head>
 
 <body class="seite-filme">
@@ -37,6 +37,61 @@
                     {{ statistik.volle_wertung }} mit voller Wertung.
                 </p>
             </div>
+
+
+            {% comment %}Die geschriebenen Rezensionen. Bewusst ueber der
+            Steuerung und nicht zwischen ihr und dem Raster: Sortierung,
+            Sternefilter und Suche wirken auf das Raster: stuenden die
+            Rezensionen dazwischen, saehen sie aus, als waeren sie
+            mitgefiltert.
+
+            Die Texte stehen ungekuerzt im Markup. Gekuerzt wird erst per
+            JavaScript (initRezensionen in main.js) - so bleibt ohne JS
+            alles lesbar, statt hinter einem "Weiterlesen" zu
+            verschwinden, das dann niemand aufklappen kann.{% endcomment %}
+            {% if rezensionen %}
+            <section class="rezensionen-block" aria-labelledby="rezensionen">
+                <div class="sektion-kopf" id="rezensionen">
+                    {% include "includes/sektion-meta.html" with titel="Geschrieben" zusatz=rezensionen_zusatz %}
+                </div>
+
+                <ul class="rezensionen">
+                    {% for film in rezensionen %}
+                    <li class="rezension">
+                        <a class="rezension-poster" href="{{ film.letterboxd_uri }}"
+                           target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true">
+                            {% if film.poster_url %}
+                            <img src="{{ film.poster_url }}" alt="" loading="lazy" decoding="async">
+                            {% else %}
+                            <span class="rezension-fallback">{{ film.titel|first }}</span>
+                            {% endif %}
+                        </a>
+
+                        <div class="rezension-body">
+                            <h3 class="rezension-titel">
+                                <a href="{{ film.letterboxd_uri }}" target="_blank" rel="noopener noreferrer">{{ film.titel }}</a>
+                                {% if film.jahr %}<span class="rezension-jahr">{{ film.jahr }}</span>{% endif %}
+                            </h3>
+
+                            <p class="rezension-meta">
+                                {% if film.wertung %}
+                                <span class="kachel-sterne" aria-hidden="true" style="--rating: {{ film.wertung }};"></span>
+                                <span class="visually-hidden">{{ film.wertung }} von 5 Sternen</span>
+                                {% endif %}
+                                {% if film.rezension_am %}
+                                <time class="rezension-datum" datetime="{{ film.rezension_am|date:'Y-m-d' }}">{{ film.rezension_am|date:'d.m.Y' }}</time>
+                                {% endif %}
+                            </p>
+
+                            <div class="rezension-text" data-rezension-text>
+                                {{ film.rezension|linebreaks }}
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </section>
+            {% endif %}
 
 
             {% comment %}Sortierung und Filter wirken im Browser auf das
@@ -219,7 +274,7 @@
     Startseite. anker="/" - die Sprungziele zeigen dorthin zurueck.{% endcomment %}
     {% include "includes/seitenfuss.html" with anker="/" %}
 
-    <script defer src="{% static 'js/vendor/lenis.min.js' %}?v=20260814-3"></script>
-    <script defer src="{% static 'js/main.js' %}?v=20260814-3"></script>
+    <script defer src="{% static 'js/vendor/lenis.min.js' %}?v=20260816-1"></script>
+    <script defer src="{% static 'js/main.js' %}?v=20260816-1"></script>
 </body>
 </html>

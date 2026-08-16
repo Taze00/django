@@ -1064,6 +1064,7 @@ function initReveals() {
         ['.projects-grid', '.project-card'],
         ['.gallery-grid', '.gallery-item'],
         ['.films-filter', ':scope > *'],
+        ['.rezensionen', ':scope > *'],
         ['.social-links', ':scope > *']
     ];
 
@@ -1791,6 +1792,62 @@ function initAuswahl(wurzel) {
     // eine Behauptung.
     sortiere(sortierung.wert);
     wende_an();
+})();
+
+
+// ===== SEITE /filme/: REZENSIONEN KUERZEN =====
+// Die Texte stehen ungekuerzt im Markup. Gekuerzt wird erst hier - ohne
+// JavaScript soll alles lesbar bleiben, statt hinter einem
+// "Weiterlesen" zu verschwinden, das dann niemand aufklappen kann.
+//
+// Gekuerzt wird nur, was tatsaechlich ueber vier Zeilen geht: gemessen
+// wird mit gesetzter Klasse, ein Einzeiler bekommt so keinen Knopf fuer
+// nichts.
+(function initRezensionen() {
+    const texte = Array.from(document.querySelectorAll('[data-rezension-text]'));
+    if (!texte.length) return;
+
+    // Toleranz gegen Rundung: ein Text, der die vier Zeilen um ein paar
+    // Bruchteile ueberragt, ist keiner zum Aufklappen.
+    const TOLERANZ = 8;
+
+    function baue() {
+        texte.forEach((text, i) => {
+            text.classList.add('is-gekuerzt');
+
+            if (text.scrollHeight <= text.clientHeight + TOLERANZ) {
+                text.classList.remove('is-gekuerzt');
+                return;
+            }
+
+            if (!text.id) text.id = `rezension-text-${i + 1}`;
+
+            const knopf = document.createElement('button');
+            knopf.type = 'button';
+            knopf.className = 'rezension-mehr';
+            knopf.textContent = 'Weiterlesen';
+            knopf.setAttribute('aria-expanded', 'false');
+            knopf.setAttribute('aria-controls', text.id);
+
+            knopf.addEventListener('click', () => {
+                const offen = !text.classList.toggle('is-gekuerzt');
+                knopf.setAttribute('aria-expanded', String(offen));
+                knopf.textContent = offen ? 'Weniger' : 'Weiterlesen';
+            });
+
+            text.insertAdjacentElement('afterend', knopf);
+        });
+    }
+
+    // Erst messen, wenn die Schrift steht. Vorher rechnet der Browser mit
+    // der Ersatzschrift - die Zeilen brechen anders, und ein Text kann
+    // damit vier Zeilen ueberschreiten, den er mit IBM Plex gar nicht
+    // fuellt (oder umgekehrt).
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(baue);
+    } else {
+        baue();
+    }
 })();
 
 

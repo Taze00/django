@@ -82,8 +82,37 @@ def uebersicht(request):
         kuratiert.get_serien(), id_feld="tmdb_tv_id", medium="tv"
     )
 
+    # Die geschriebenen Rezensionen. Kommt aus demselben Bestand wie das
+    # Raster, steht aber oben als eigener Bereich: es sind eigene Saetze
+    # und keine Kachel mit Sternen. Neueste zuerst; `rezension_am` fehlt
+    # bei Rezensionen aus der Zeit vor dem Feld, deshalb das Sehdatum als
+    # zweiter Schluessel statt einer leeren Sortierung.
+    geschrieben = Film.objects.exclude(rezension="").order_by(
+        F("rezension_am").desc(nulls_last=True),
+        F("gesehen_am").desc(nulls_last=True),
+        "titel",
+    )
+    rezensionen = list(geschrieben)
+
+    # Poster hier serverseitig holen, nicht ueber den Nachlade-Endpunkt:
+    # der bedient nur die Kacheln im Raster. Es sind wenige Filme - man
+    # schreibt nicht ueber jeden - und geholt wird ohnehin nur, was noch
+    # keinen Pfad hat. Danach steht es in der Datenbank.
+    offen = [f.id for f in rezensionen if not f.poster_pfad]
+    if offen:
+        poster.hole_poster(offen)
+        # hole_poster schreibt auf eigenen Objekten; die Liste hier weiss
+        # von den frisch geholten Pfaden nichts. Deshalb neu laden - sonst
+        # bliebe das Poster bis zum naechsten Aufruf der Seite aus.
+        rezensionen = list(geschrieben)
+
     return render(request, "filme.html", {
         "filme": filme,
+        "rezensionen": rezensionen,
+        # Fuer die Metazeile - "1 Rezension" statt "1 Rezensionen".
+        "rezensionen_zusatz": "{} {}".format(
+            len(rezensionen), "Rezension" if len(rezensionen) == 1 else "Rezensionen"
+        ),
         "serien": [e for e in serien if e.get("gattung") == "serie"],
         "anime": [e for e in serien if e.get("gattung") == "anime"],
         "statistik": statistik.hole_statistik(),

@@ -11,7 +11,7 @@ gelesen, weil sie sich ergaenzen:
     watched.csv    Grundbestand, setzt `gesehen`
     ratings.csv    ergaenzt die Wertung
     diary.csv      ergaenzt das Sehdatum
-    reviews.csv    ergaenzt den Rezensionstext
+    reviews.csv    ergaenzt Rezensionstext und Rezensionsdatum
     watchlist.csv  eigene Eintraege, setzt `auf_watchlist`
 
 Watchlist-Filme sind ausdruecklich keine gesehenen Filme - sie bekommen
@@ -174,6 +174,7 @@ class Command(BaseCommand):
                     "eingetragen_am": _datum(zeile.get(SPALTE_DATUM)),
                     "gesehen_am": None,
                     "rezension": "",
+                    "rezension_am": None,
                 },
             )
 
@@ -220,10 +221,21 @@ class Command(BaseCommand):
                     d["wertung"] = _wertung(zeile.get("Rating"))
 
         for zeile in reviews:
+            # Zeilen ohne Text vor der Zuordnung aussortieren: sie
+            # ueberschrieben sonst eine vorhandene Rezension mit Leere und
+            # landeten, wenn der Film fehlt, in `ohne_zuordnung` - eine
+            # Warnung ueber eine Rezension, die es gar nicht gibt.
+            text = (zeile.get("Review") or "").strip()
+            if not text:
+                continue
+
             d = finde(zeile)
             if d is not None:
                 d["gesehen"] = True
-                d["rezension"] = (zeile.get("Review") or "").strip()
+                d["rezension"] = text
+                # `Date` ist hier das Datum der Rezension, nicht das des
+                # Films - siehe Film.rezension_am.
+                d["rezension_am"] = _datum(zeile.get(SPALTE_DATUM))
                 if not d["gesehen_am"]:
                     d["gesehen_am"] = _datum(zeile.get("Watched Date"))
 

@@ -70,6 +70,11 @@ class Film(models.Model):
     gesehen_am = models.DateField(null=True, blank=True)
 
     rezension = models.TextField(blank=True)
+    # `Date` aus reviews.csv - wann die Rezension geschrieben wurde.
+    # Eigenes Feld, weil es weder `gesehen_am` noch `eingetragen_am` ist:
+    # geschrieben wird oft erst einen Tag nach dem Film, und der Eintrag
+    # zum Film kann Jahre aelter sein als der Text darueber.
+    rezension_am = models.DateField(null=True, blank=True)
 
     # --- TMDB (nur fuer angezeigte Filme gefuellt) ----------------------
     tmdb_id = models.PositiveIntegerField(null=True, blank=True)

@@ -4443,6 +4443,180 @@ html.lenis body {
     opacity: 0.6;
 }
 
+/* --- Geschriebene Rezensionen ------------------------------------------
+   Steht ueber der Steuerung. Die Trennlinie unten schliesst den Bereich
+   ab, damit Sortierung und Sternefilter darunter sichtbar zum Raster
+   gehoeren und nicht zu den Rezensionen. */
+
+/* padding-top zuruecknehmen: die allgemeine section-Regel gibt jedem
+   <section> bis 6rem oben und unten. Das ist fuer die Sektionen der
+   Startseite gedacht - hier standen dadurch 96px Leere zwischen der
+   Einleitung und der Metazeile. */
+.rezensionen-block {
+    margin-bottom: clamp(2rem, 4vw, 3rem);
+    padding-top: 0;
+    padding-bottom: clamp(1.75rem, 3.5vw, 2.5rem);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.rezensionen {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.75rem, 3.5vw, 2.75rem);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+/* Poster links, Text rechts. `auto 1fr` statt fester Spalten: die
+   Posterbreite steht am Poster selbst, der Text nimmt den Rest. */
+.rezension {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: clamp(0.9rem, 2.5vw, 1.5rem);
+    align-items: start;
+}
+
+/* Dieselbe Behandlung wie eine Rasterkachel, nur kleiner - es soll wie
+   derselbe Bestand aussehen, nicht wie ein anderes Bauteil. */
+.rezension-poster {
+    position: relative;
+    display: block;
+    width: clamp(64px, 14vw, 96px);
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    border: 1px solid var(--gray);
+    border-radius: var(--film-radius);
+    background: rgba(255, 255, 255, 0.03);
+    transition: border-color 0.25s ease;
+}
+
+.rezension-poster img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.rezension-fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: var(--gray);
+}
+
+.rezension-body {
+    min-width: 0;
+}
+
+/* Der Titel ist eine Ueberschrift, soll aber nicht wie eine wirken -
+   die allgemeine h3-Regel bringt 1,5rem Abstand nach unten und eine
+   Groesse, die neben einem 96px-Poster zu laut waere. */
+.rezension-titel {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0 0 0.4rem;
+    font-size: 1.05rem;
+    line-height: 1.25;
+}
+
+.rezension-titel a {
+    color: var(--text-bright);
+    text-decoration: none;
+}
+
+.rezension-titel a:hover {
+    color: var(--primary);
+}
+
+.rezension-jahr,
+.rezension-datum {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: var(--mono-track);
+    color: var(--text);
+    opacity: 0.6;
+}
+
+.rezension-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0 0 0.7rem;
+    font-size: 0.66rem;
+}
+
+.rezension-text {
+    position: relative;
+    max-width: 68ch;
+    font-size: 0.92rem;
+    line-height: 1.7;
+    color: var(--text);
+}
+
+/* linebreaks setzt <p> - die globale Regel gibt ihnen 1,5rem Abstand
+   und eine Groesse bis 1,1rem. Beides passt hier nicht. */
+.rezension-text p {
+    margin: 0;
+    font-size: inherit;
+}
+
+.rezension-text p + p {
+    margin-top: 0.8em;
+}
+
+/* Gekuerzt auf vier Zeilen. Die Hoehe steht in Zeilen (`lh` waere
+   schoener, ist aber nicht ueberall da), der Verlauf unten sagt, dass
+   der Text weitergeht - eine harte Kante mitten im Wort saehe nach
+   Fehler aus statt nach Absicht.
+
+   Gesetzt wird die Klasse per JavaScript und nur, wenn der Text
+   tatsaechlich laenger ist: der Einzeiler behaelt kein "Weiterlesen"
+   fuer nichts. */
+.rezension-text.is-gekuerzt {
+    max-height: calc(4 * 1.7 * 0.92rem);
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to bottom, #000 75%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 75%, transparent 100%);
+}
+
+.rezension-mehr {
+    margin-top: 0.6rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--primary);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: var(--mono-track);
+    cursor: pointer;
+}
+
+.rezension-mehr:hover {
+    text-decoration: underline;
+}
+
+.rezension-mehr:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 3px;
+}
+
+/* Unter 480px steht das Poster ueber dem Text: bei 64px Poster und
+   Rand bleiben sonst keine 30 Zeichen je Zeile. */
+@media (max-width: 480px) {
+    .rezension {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+    }
+}
+
+
 /* --- Raster ------------------------------------------------------------ */
 
 .filmraster {
