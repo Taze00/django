@@ -978,39 +978,148 @@ footer {
     z-index: 1;
 }
 
-.social-links {
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
-    margin: 3rem 0;
+/* Die Schlagzeile des Abschlusses. Wie .sektion-schlagzeile eine Stufe
+   unter der Metazeile, aber eine Nummer kleiner und mittig - der Fuss
+   ist der einzige zentrierte Abschnitt der Seite, und ein Schlusssatz
+   darf leiser auftreten als eine Sektionsueberschrift. Kein <h>: die
+   Metazeile darueber ist bereits das <h2> des Abschnitts. */
+.abschluss-schlagzeile {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3.4vw, 2.2rem);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--text-bright);
 }
 
-.social-link {
-    width: 50px;
-    height: 50px;
-    display: flex;
+/* --- Kanalzeilen -------------------------------------------------------
+   Vorher vier gleiche Kreise mit blossem Icon nebeneinander: wo man
+   landet, war Ratespiel. Jetzt eine Liste benannter Zeilen - Marke,
+   Dienst, Konto. Linksbuendig gesetzt, aber als Block mittig im sonst
+   zentrierten Fuss.
+
+   Die Zeilen sind ein Register, keine Knoepfe: Trennlinien statt
+   Kaesten, das Gewicht traegt der Dienstname. */
+.kanalliste {
+    list-style: none;
+    max-width: 34rem;
+    margin: clamp(2.5rem, 5vw, 3.5rem) auto 0;
+    padding: 0;
+    text-align: left;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.kanal {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Vier Spalten: Marke, Dienst, Konto (rechtsbuendig), Pfeil. Das Konto
+   in der 1fr-Spalte schiebt sich damit an die rechte Kante, egal wie
+   lang der Dienstname ist - die Zeilen bekommen zwei saubere Kanten. */
+.kanal-link {
+    display: grid;
+    grid-template-columns: 20px auto 1fr auto;
     align-items: center;
-    justify-content: center;
-    background: rgba(0, 217, 255, 0.08);
-    border-radius: 50%;
-    color: var(--primary);
+    gap: 0.85rem;
+    padding: 0.95rem 0.6rem;
+    color: var(--text);
     transition: var(--transition);
 }
 
 /* Die Icons sind Inline-SVG (siehe includes/seitenfuss.html), nicht
    mehr Font Awesome - eine Schriftgroesse steuert sie also nicht mehr,
    das Mass steht hier. currentColor in den Pfaden nimmt die Farbe von
-   .social-link auf, samt Umschlag beim Hover. */
-.social-icon {
-    width: 21px;
-    height: 21px;
+   .kanal-icon auf, samt Umschlag beim Hover. */
+.kanal-icon {
+    width: 20px;
+    height: 20px;
     display: block;
+    color: var(--primary);
+    opacity: 0.85;
+    transition: var(--transition);
 }
 
-.social-link:hover {
-    background: var(--primary);
-    color: var(--darker);
-    transform: translateY(-5px);
+/* Derselbe Satz wie in den Metazeilen: Monospace, gesperrt, gross
+   geschrieben. Der Dienstname ist die Beschriftung der Zeile. */
+.kanal-dienst {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 500;
+    letter-spacing: var(--mono-track);
+    text-transform: uppercase;
+    color: var(--text-bright);
+}
+
+.kanal-konto {
+    justify-self: end;
+    text-align: right;
+    font-size: 0.9rem;
+    color: var(--text);
+    opacity: 0.7;
+    transition: var(--transition);
+}
+
+/* Steht immer in der Spalte, sichtbar wird er erst beim Hover - so
+   springt die Zeile beim Ueberfahren nicht in der Breite. */
+.kanal-pfeil {
+    color: var(--primary);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: var(--transition);
+}
+
+.kanal-link:hover,
+.kanal-link:focus-visible {
+    background: rgba(0, 217, 255, 0.06);
+    padding-left: 1rem;
+}
+
+.kanal-link:focus-visible {
+    outline: 1px solid var(--primary);
+    outline-offset: -1px;
+}
+
+.kanal-link:hover .kanal-icon,
+.kanal-link:focus-visible .kanal-icon {
+    opacity: 1;
+}
+
+.kanal-link:hover .kanal-konto,
+.kanal-link:focus-visible .kanal-konto {
+    color: var(--text-bright);
+    opacity: 1;
+}
+
+.kanal-link:hover .kanal-pfeil,
+.kanal-link:focus-visible .kanal-pfeil {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Die Fusszeile mit Impressum und Sprungzielen. Der Abstand hing vorher
+   an der Kreisreihe (margin: 3rem 0); die Liste bringt nur ihren
+   oberen Abstand mit, der untere steht hier. */
+.kanalliste + p {
+    margin-top: clamp(2.5rem, 5vw, 3.5rem);
+}
+
+@media (max-width: 480px) {
+    .kanal-link {
+        gap: 0.7rem;
+        padding: 0.85rem 0.2rem;
+    }
+
+    .kanal-dienst { font-size: 0.7rem; }
+    .kanal-konto { font-size: 0.82rem; }
+
+    /* Der Einzug beim Hover kostet auf schmalen Schirmen Platz, den die
+       Zeile nicht hat - und ohne Zeigegeraet passiert er ohnehin nur
+       kurz nach dem Antippen. */
+    .kanal-link:hover,
+    .kanal-link:focus-visible {
+        padding-left: 0.2rem;
+    }
 }
 
 .copyright {

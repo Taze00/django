@@ -34,7 +34,9 @@ Leere.
                 <li><a class="hauptnav-link" data-nav-link href="{{ basis }}#filme">Filme</a></li>
                 <li><a class="hauptnav-link" data-nav-link href="{{ basis }}#berlin">Berlin</a></li>
                 <li><a class="hauptnav-link" data-nav-link href="{{ basis }}#projekte">Was ich baue</a></li>
-                <li><a class="hauptnav-link" data-nav-link href="{{ basis }}#contact">Kontakt</a></li>
+                {% comment %}Das Sprungziel heisst weiter "#contact" - die
+                Sektion selbst nicht mehr, siehe includes/seitenfuss.html.{% endcomment %}
+                <li><a class="hauptnav-link" data-nav-link href="{{ basis }}#contact">Weiter</a></li>
             </ul>
         </nav>
     </div>

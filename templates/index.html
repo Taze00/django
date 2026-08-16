@@ -9,7 +9,7 @@
     <link rel="icon" href="{% static 'css/images/favicon.ico' %}" type="image/x-icon">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" as="style">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260816-1">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260816-3">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -167,7 +167,8 @@
                     <p>Am Wochenende bin ich meistens in Berlin unterwegs. Clubs, Bars mit Freunden und den Fernsehturm bestaunen. Manche Momente davon landen dann hier auf der Seite, als Foto, als Gedanke oder als Club-Review, den ich nachts in mein Handy getippt habe.</p>
                     <p>Diese Seite ist mein digitales Sammelsurium. Kein durchdachtes Portfolio mit Mission Statement, eher ein Ort für alles, was mir durch den Kopf geht und was ich nicht vergessen will.</p>
                     <div class="button-group">
-                        <a href="#contact" class="btn">Kontakt</a>
+                        {# Fuehrt in den Abschluss der Seite, nicht mehr zu einer Kontaktaufnahme. #}
+                        <a href="#contact" class="btn">Wo ich sonst bin</a>
                         <a href="https://soundcloud.com/alex_sasuke/sets/goat" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
                             <i class="fab fa-soundcloud"></i> Meine Playlist
                         </a>
@@ -555,7 +556,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
     {% comment %}Lenis liegt lokal, nicht am CDN - eine Abhaengigkeit weniger
     zur Laufzeit. defer haelt die Reihenfolge: Lenis vor main.js.{% endcomment %}
-    <script defer src="{% static 'js/vendor/lenis.min.js' %}?v=20260816-1"></script>
-    <script defer src="{% static 'js/main.js' %}?v=20260816-1"></script>
+    <script defer src="{% static 'js/vendor/lenis.min.js' %}?v=20260816-3"></script>
+    <script defer src="{% static 'js/main.js' %}?v=20260816-3"></script>
 </body>
 </html>

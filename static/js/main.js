@@ -1065,7 +1065,7 @@ function initReveals() {
         ['.gallery-grid', '.gallery-item'],
         ['.films-filter', ':scope > *'],
         ['.rezensionen', ':scope > *'],
-        ['.social-links', ':scope > *']
+        ['.kanalliste', ':scope > *']
     ];
 
     // Einzelstuecke - erscheinen als Block, ohne Versatz.
