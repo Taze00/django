@@ -2423,9 +2423,9 @@ footer {
 
    Frueher lag hier ein ::after mit linear-gradient auf --darker
    (#050505). Das setzt voraus, dass der Hintergrund dahinter genau
-   diese Farbe hat - #filme ist aber ein diagonaler Verlauf von #0f0f1a
-   nach #050505. Ueber dem blaeulichen Teil sass das Overlay als
-   schwarzer Balken auf der Sektion, am deutlichsten an den
+   diese Farbe hat - #filme war damals ein diagonaler Verlauf von
+   #0f0f1a nach #050505. Ueber dem blaeulichen Teil sass das Overlay
+   als schwarzer Balken auf der Sektion, am deutlichsten an den
    Empfehlungen und an "Zuletzt gesehen".
 
    Jetzt eine Maske auf der Spur statt eines Overlays darueber: sie
@@ -2879,9 +2879,16 @@ footer {
     white-space: nowrap;
 }
 
+/* Derselbe Grund wie ueberall. Hier lag als einziger Sektion ein
+   diagonaler Verlauf von #0f0f1a nach #050505 - ein blaeulicher Ton,
+   den sonst nichts auf der Seite aufnimmt. Er hat die Sektion nicht
+   hervorgehoben, sondern eine Kante zu "Berlin" darueber gezogen, und
+   die Filmseite unter /filme/ zeigt dieselben Regale ohnehin auf
+   #050505. Wenn sich die Sektion absetzen soll, dann ueber eine Linie,
+   nicht ueber einen zweiten Farbton. */
 #filme {
     padding: 4rem 0;
-    background: linear-gradient(135deg, #0f0f1a 0%, #0a0a14 50%, #050505 100%);
+    background: var(--darker);
     position: relative;
     overflow: hidden;
 }
