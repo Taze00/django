@@ -75,8 +75,12 @@ a {
     transition: var(--transition);
 }
 
+/* Aufhellen statt Farbwechsel. Vorher --secondary (rot): das ist die
+   Warnfarbe der Palette und stand bei jedem beliebigen Link. Auf der
+   Seite soll bei Hover nirgends Rot erscheinen - Rot bleibt dem
+   Status-Badge vorbehalten (.project-status), und das ist kein Hover. */
 a:hover {
-    color: var(--secondary);
+    color: var(--text-bright);
 }
 
 /* Layout */
@@ -120,16 +124,23 @@ section {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: var(--secondary);
+    /* Faehrt bei Hover von links ein. Das war --secondary (rot) - der
+       rote Hero-Knopf. Der fruehere Fix hat nur .btn-outline:hover
+       angefasst, die Fuellung des gefuellten Knopfes blieb rot. Jetzt
+       das dunklere Cyan: der Knopf wird beim Hover satter, nicht
+       fremdfarbig. */
+    background: var(--primary-dark);
     transition: left 0.3s var(--transition);
     z-index: -1;
 }
 
 .btn:hover {
-    color: white;
+    /* Dunkel auf --primary-dark statt Weiss: die Schrift stand vorher
+       weiss auf Rot, auf dem Cyan waere sie zu blass. */
+    color: var(--darker);
     box-shadow: 0 12px 32px rgba(0, 217, 255, 0.25);
     transform: translateY(-2px);
-    border-color: var(--secondary);
+    border-color: var(--primary-dark);
 }
 
 .btn:hover::before {
@@ -147,10 +158,10 @@ section {
     background: var(--primary);
 }
 
-/* Der Rahmen bleibt cyan. .btn:hover setzt ihn auf --secondary (rot),
-   weil sich dort die rote Fuellung darunterschiebt - beim Outline-Knopf
-   faehrt aber --primary ein, und der rote Rahmen um die cyane Flaeche
-   war ein Durchschlag, kein Entwurf. */
+/* Der Rahmen bleibt cyan - seit .btn:hover kein Rot mehr setzt, ist das
+   dieselbe Familie wie beim gefuellten Knopf. Die Regel bleibt trotzdem
+   stehen: hier faehrt --primary ein, nicht --primary-dark, der Rahmen
+   muss also heller sein als dort. */
 .btn-outline:hover {
     color: var(--darker);
     border-color: var(--primary);
@@ -2742,7 +2753,7 @@ footer {
     text-decoration: none;
 }
 
-.kachel-link:hover { color: var(--secondary); }
+.kachel-link:hover { color: var(--text-bright); }
 
 /* --- Kachel: Textteil unter dem Bild ---------------------------------- */
 
@@ -2934,7 +2945,7 @@ footer {
    Kuratierte Filme aus films/data/filme.json plus Letterboxd-Tagebuch.
    Nutzt die vorhandenen Tokens des alten Systems; ergaenzt wurden nur
    --font-mono und --mono-track (siehe unten), alles andere ist gemappt:
-   Neon -> --primary, Hover-Akzent -> --secondary, Timing -> --transition.
+   Neon -> --primary, Hover-Akzent -> --text-bright, Timing -> --transition.
    ========================================================================== */
 
 :root {
@@ -3019,7 +3030,7 @@ footer {
     transition: var(--transition);
 }
 
-.films-quelle a:hover { color: var(--secondary); }
+.films-quelle a:hover { color: var(--text-bright); }
 
 .films-attribution {
     margin: clamp(2rem, 4vw, 3rem) 0 0;
@@ -3356,43 +3367,16 @@ footer {
     border-bottom-color: transparent;
 }
 
+/* Links steht nichts mehr (siehe includes/seitenkopf.html), also endet
+   der Inhalt rechts statt sich auf zwei Enden zu verteilen.
+   space-between haette die Liste bei nur einem Kind nach links gezogen -
+   genau an die Stelle, an der vorher die Marke sass. */
 .seitenkopf-innen {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     gap: 1.5rem;
     height: 72px;
-}
-
-/* Die Marke ist der Hero-Strich als Miniatur. Der Link selbst bekommt
-   Innenabstand, damit die Trefferflaeche 44px hoch bleibt - der Strich
-   allein waere ein 3px hohes Ziel. */
-.seitenkopf-marke {
-    display: flex;
-    align-items: center;
-    padding: 1.25rem 0.25rem;
-    margin-left: -0.25rem;
-}
-
-.seitenkopf-marke-strich {
-    display: block;
-    width: 26px;
-    height: 3px;
-    background: var(--primary);
-    transition: width 0.3s cubic-bezier(0.22, 0.61, 0.36, 1),
-                box-shadow 0.3s ease;
-}
-
-.seitenkopf-marke:hover .seitenkopf-marke-strich,
-.seitenkopf-marke:focus-visible .seitenkopf-marke-strich {
-    width: 38px;
-    box-shadow: 0 0 12px rgba(0, 217, 255, 0.6);
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .seitenkopf-marke-strich {
-        transition: none;
-    }
 }
 
 /* --- Linkliste -------------------------------------------------------- */
