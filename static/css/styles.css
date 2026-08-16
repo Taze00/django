@@ -1,5 +1,42 @@
 /* Base Styles - BERLIN NIGHTLIFE MINIMAL */
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+/* Zwei Familien in einer Anfrage - Instrument Serif kommt nicht ueber
+   einen zweiten @import dazu. Verkettete Importe laden nacheinander,
+   nicht nebeneinander: der zweite startet erst, wenn der erste da ist.
+
+   Von Instrument Serif gibt es ueberhaupt nur diese beiden Schnitte,
+   Regular und Kursiv (ital@0;1) - ein Gewichtsschluessel wuerde nichts
+   hinzuladen. Genau deshalb steht sie hier und nicht Playfair Display,
+   das sieben Gewichte in zwei Lagen mitbringt, von denen wir eines
+   braechten. */
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+/* ==========================================================================
+   DIE DREI SCHRIFTEN UND IHRE ROLLEN
+   ==========================================================================
+   Jede Familie hat genau eine Aufgabe. Wer eine davon ausserhalb ihrer
+   Rolle einsetzt, nimmt allen dreien die Bedeutung - der Kontrast
+   traegt nur, solange er selten ist.
+
+   --font-serif  Instrument Serif, fast immer KURSIV.
+                 Das Persoenliche: das Akzentwort in einer Ueberschrift
+                 (.akzent), der Rufname im Hero, die Titel der fuenf
+                 Lieblingsfilme, die grosse Kennzahl im Abschlusskasten.
+                 Nie fuer Fliesstext, nie fuer ganze Ueberschriften, nie
+                 fuer eine Beschriftung.
+
+   --font-mono   IBM Plex Mono, versal und gesperrt (--mono-track).
+                 Das Technische: Metazeilen, Marken, Beschriftungen,
+                 Zahlen, Sterne, Jahreszahlen.
+
+   --font-display / --font-body   Space Grotesk.
+                 Alles uebrige: Fliesstext und die Ueberschrift selbst,
+                 in die das Akzentwort eingesetzt ist.
+
+   Faustregel fuer ein neues Akzentwort: genau eines je Ueberschrift,
+   und es muss das Wort sein, das die Aussage traegt - streicht man es,
+   bleibt ein Satz ohne Pointe uebrig.
+   ========================================================================== */
 
 :root {
     /* Subtile Neon Palette - echtes Berlin Feel */
@@ -17,6 +54,10 @@
     --text-bright: #ffffff;
     --font-display: 'Space Grotesk', sans-serif;
     --font-body: 'Space Grotesk', sans-serif;
+    /* Georgia als Ersatz und nicht das blosse `serif`: die Voreinstellung
+       ist je nach System eine andere Schrift, Georgia steht ueberall und
+       hat eine aehnlich kraeftige Kursive. */
+    --font-serif: 'Instrument Serif', Georgia, serif;
     --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     --shadow: 0 8px 32px rgba(0, 217, 255, 0.15);
 }
@@ -43,6 +84,25 @@ body {
     touch-action: manipulation;
 }
 
+
+/* Das Akzentwort in einer Ueberschrift - siehe Rollen ganz oben. Steht
+   in jeder Sektion genau einmal.
+
+   Etwas groesser als die Grotesk drumherum (1.08em): Instrument Serif
+   hat eine kleinere x-Hoehe, bei gleicher Punktgroesse saehe das Wort
+   geschrumpft aus statt hervorgehoben. Der Ausgleich betrifft nur die
+   Anmutung, nicht die Zeilenhoehe - deshalb em und nicht rem.
+
+   font-style kursiv steht hier und nicht im Markup: <em> waere eine
+   Betonung fuer Screenreader. Das Wort ist gestalterisch ausgezeichnet,
+   nicht inhaltlich betont. */
+.akzent {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.08em;
+    letter-spacing: 0;
+}
 
 /* Typography - BERLIN MINIMAL */
 h1, h2, h3, h4, h5, h6 {
@@ -281,9 +341,15 @@ html.intro-laeuft .hero-skyline {
 }
 
 /* --- Namenszug ---------------------------------------------------------
-   ALEX gross und eng, VOLKMANN klein und gesperrt darunter: der
-   Groessensprung traegt den Hero, nicht ein Satz. Der Rufname fuehrt -
-   ein turmhoher Nachname war mehr Plakat als Vorstellung. */
+   ALEX gross, versal und weit gesperrt; "Volkmann" klein, gemischt und
+   in Serifen-Kursiv darunter. Der Unterschied liegt jetzt in drei
+   Dingen zugleich - Schrift, Lage, Groesse - und nicht mehr allein im
+   Groessensprung.
+
+   Vorher war beides dieselbe Grotesk in Versalien, nur einmal riesig
+   und einmal winzig. Das las sich wie eine Bildunterschrift zum eigenen
+   Namen. Die Kursive nimmt den Nachnamen aus der Beschriftungsrolle
+   heraus, ohne ihn lauter zu machen. */
 .hero-name {
     margin: 0;
     line-height: 1;
@@ -292,26 +358,30 @@ html.intro-laeuft .hero-skyline {
 .hero-vorname,
 .hero-nachname {
     display: block;
-    text-transform: uppercase;
 }
 
 .hero-vorname {
     font-size: clamp(3rem, 11vw, 8rem);
     font-weight: 700;
-    letter-spacing: -0.035em;
+    text-transform: uppercase;
+    /* Weit gesperrt statt eng gesetzt. Vier Buchstaben halten das aus,
+       ein ganzes Wort waere so nicht mehr lesbar. */
+    letter-spacing: 0.22em;
     line-height: 0.95;
     color: var(--text-bright);
 }
 
 .hero-nachname {
-    /* Die Sperrung haengt rechts hinter dem letzten Buchstaben ein
-       Leerfeld an - links steht die Zeile trotzdem auf der Kante. */
-    margin-top: 0.6em;
-    font-size: clamp(0.95rem, 2vw, 1.35rem);
-    font-weight: 500;
-    letter-spacing: 0.42em;
+    margin-top: 0.75em;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(0.95rem, 2vw, 1.25rem);
+    font-weight: 400;
+    /* Keine Sperrung mehr: eine Kursive lebt von ihrem Zusammenhang,
+       gesperrt zerfaellt sie in Einzelbuchstaben. */
+    letter-spacing: 0.01em;
     color: var(--text);
-    opacity: 0.7;
+    opacity: 0.85;
 }
 
 /* Die Buchstaben muessen einzeln animierbar sein, duerfen aber wie
