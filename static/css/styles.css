@@ -286,7 +286,9 @@ section {
     filter: brightness(1.5) contrast(1.12) saturate(0.9);
     transform-origin: center 65%;
     animation: skyline-zoom 20s ease-in-out infinite alternate;
-    will-change: transform;
+    /* translate mit dazu: die Parallaxe in main.js schiebt die Ebene
+       darueber, ohne die Zoom-Animation auf transform anzufassen. */
+    will-change: transform, translate;
     z-index: 0;
 }
 
@@ -5407,12 +5409,24 @@ html.intro-laeuft .hero-content.is-eingefahren .hero-marke {
     --hero-verzug: 60ms;
 }
 
-/* 40ms Abstand von Buchstabe zu Buchstabe, aus dem Unscharfen von
+/* 24ms Abstand von Buchstabe zu Buchstabe, aus dem Unscharfen von
    unten herein. --i steht im Markup an jedem Span und zaehlt ueber
    alle drei Zeilen durch - die Bewegung laeuft die Treppe hinunter,
-   statt dreimal von vorn anzufangen. */
+   statt dreimal von vorn anzufangen.
+
+   Warum 24ms und nicht die 40ms von vorher: main.js raeumt den Vorhang
+   647ms nach dem Startschuss weg (VORHANG_DAUER 800 minus 150ms
+   Vorlauf), und mit ihm faellt html.intro-laeuft. Ab da gelten diese
+   Regeln nicht mehr - was bis dahin nicht angefangen hat, steht
+   einfach da, statt einzufahren. Bei 40ms und dreizehn Buchstaben
+   startete der letzte bei 640ms, also 7ms vor dem Ende des Fensters.
+   Mit 24ms ist er bei 408ms unterwegs und die Metazeile hat danach
+   noch Platz.
+
+   Wer den Namen aendert und Buchstaben dazunimmt: nachrechnen.
+   160ms Vorlauf + Anzahl * Schritt muss unter 650ms bleiben. */
 html.intro-laeuft .hero-content.is-eingefahren .hero-buchstabe {
-    --hero-verzug: calc(160ms + var(--i) * 40ms);
+    --hero-verzug: calc(120ms + var(--i) * 24ms);
     opacity: 1;
     transform: none;
     filter: none;
@@ -5421,10 +5435,12 @@ html.intro-laeuft .hero-content.is-eingefahren .hero-buchstabe {
                 filter 0.55s ease var(--hero-verzug);
 }
 
-/* Nach dem letzten Buchstaben: der startet bei 160 + 12 * 40 = 640ms
-   und braucht 650ms. */
+/* Kurz nach dem letzten Buchstaben, der bei 120 + 12 * 24 = 408ms
+   startet - und noch deutlich vor dem Wegraeumen des Vorhangs bei
+   647ms, sonst faehrt die Zeile nicht ein, sondern steht ploetzlich
+   da. */
 html.intro-laeuft .hero-content.is-eingefahren .hero-meta-zeile {
-    --hero-verzug: 1180ms;
+    --hero-verzug: 500ms;
 
     /* Die Roehre springt an, sobald die Zeile ihre Endposition erreicht
        hat - deshalb der eigene Verzug plus die Dauer des Einfahrens.

@@ -1042,6 +1042,69 @@ function starteTraegheitsScroll() {
 }
 
 
+// ===== HERO-PARALLAXE =====
+// Skyline und Namenszug scrollen unterschiedlich schnell weg. Sehr
+// dezent: der Himmel bleibt 12% hinter der Seite zurueck, der Name 4%.
+// Man soll es nicht sehen, sondern nur merken, dass die Ebenen nicht
+// aneinander kleben.
+//
+// Geplant waren drei Ebenen - Himmel, Name, Stadt davor. Die dritte
+// fehlt, weil sich die Haeuserzeile nicht aus dem Foto freistellen
+// laesst (siehe Commit zum Hero-Umbau): die Stadt ist ein
+// durchgehendes Feld gleich heller Gebaeude ohne Kante, an der man
+// schneiden koennte. Ohne freigestellte Ebene gibt es nichts, was
+// schneller als die Seite laufen koennte.
+//
+// Verschoben wird ueber die eigenstaendige translate-Eigenschaft, nicht
+// ueber transform: .hero-skyline traegt eine Zoom-Animation auf
+// transform und .hero-content das translateY der fade-in-Klasse. Beides
+// wuerde eine Zuweisung an transform ueberschreiben - translate legt
+// sich davor, ohne sie anzufassen.
+//
+// Die Luecke, die am oberen Rand der Skyline entsteht, ist nie zu
+// sehen: sie liegt bei Faktor 0.12 immer oberhalb des Viewports.
+// Sichtbar wuerde sie erst ab Faktor 1.
+function starteHeroParallaxe() {
+    if (BEWEGUNG_REDUZIERT) return;
+
+    // Auf schmalen Fenstern nicht: dort liefert das native Scrollen
+    // beim Nachlaufen zu wenige Ereignisse, die Ebenen ruckeln mehr,
+    // als der Effekt bei der Fenstergroesse hergibt.
+    if (window.matchMedia('(max-width: 600px)').matches) return;
+
+    const hero = document.querySelector('.hero');
+    const himmel = document.querySelector('.hero-skyline');
+    const name = document.querySelector('.hero-content');
+    if (!hero || (!himmel && !name)) return;
+
+    let angefordert = false;
+
+    function zeichnen() {
+        angefordert = false;
+        // Auf die Hoehe des Hero geklemmt statt abgebrochen: darueber
+        // hinaus ist er ohnehin aus dem Bild, und der Wert bleibt am
+        // Rand richtig. Ein blosses `return` wuerde die Ebenen auf dem
+        // letzten gezeichneten Stand einfrieren - bei einem grossen
+        // Sprung also mitten in der Bewegung.
+        const y = Math.min(window.scrollY || window.pageYOffset || 0,
+                           hero.offsetHeight);
+
+        if (himmel) himmel.style.translate = `0 ${(y * 0.12).toFixed(2)}px`;
+        if (name) name.style.translate = `0 ${(y * 0.04).toFixed(2)}px`;
+    }
+
+    window.addEventListener('scroll', () => {
+        if (angefordert) return;
+        angefordert = true;
+        requestAnimationFrame(zeichnen);
+    }, { passive: true });
+
+    zeichnen();
+}
+
+starteHeroParallaxe();
+
+
 // ===== SCROLL-REVEALS =====
 // Ein Beobachter fuer die ganze Seite. Elemente starten 24px tiefer und
 // unsichtbar und fahren beim Sichtbarwerden auf ihre Endposition.
@@ -1938,9 +2001,9 @@ function initAuswahl(wurzel) {
 
     // --- Vorhang und Hero -------------------------------------------------
     setTimeout(() => {
-        // Die Staffelung des Heros steht vollstaendig im CSS (Namenszug,
-        // Buchstaben, Strich, Metazeilen, Buttons). Hier faellt nur noch
-        // der Startschuss ueber .is-eingefahren.
+        // Die Staffelung des Heros steht vollstaendig im CSS (Marke,
+        // Buchstaben der Treppe, Metazeile). Hier faellt nur noch der
+        // Startschuss ueber .is-eingefahren.
         vorhang.classList.add('is-faehrt-weg');
 
         // Kurz nach dem Anfahren des Vorhangs, damit der Hero hinter der
