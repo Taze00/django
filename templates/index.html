@@ -117,16 +117,27 @@
                 ausgeblendet, daneben steht das Wort einmal am Stueck: ein
                 aria-label an einem schlichten <span> wird nicht von jedem
                 Vorleseprogramm beachtet.{% endcomment %}
+                <p class="hero-marke">Portfolio <span class="hero-marke-trenner" aria-hidden="true">—</span> 2026</p>
+
+                {% comment %}Drei Zeilen als Treppe: ALEX / VOLK- / MANN,
+                jede eine Stufe weiter rechts, die mittlere fast
+                verschluckt. Der Name traegt die Flaeche selbst, es
+                braucht keinen Strich und keine Unterzeile mehr.
+
+                Die Buchstaben zaehlen ueber alle drei Zeilen durch
+                (--i von 0 bis 12), damit das Einfahren als eine
+                Bewegung die Treppe hinunterlaeuft und nicht dreimal
+                von vorn anfaengt.{% endcomment %}
                 <h1 class="hero-name">
                     <span class="visually-hidden">Alex Volkmann</span>
-                    <span class="hero-vorname" aria-hidden="true"><span class="hero-buchstabe" style="--i:0">A</span><span class="hero-buchstabe" style="--i:1">l</span><span class="hero-buchstabe" style="--i:2">e</span><span class="hero-buchstabe" style="--i:3">x</span></span>
-                    <span class="hero-nachname" aria-hidden="true">Volkmann</span>
+                    <span class="hero-zeile" style="--stufe:0" aria-hidden="true"><span class="hero-buchstabe" style="--i:0">A</span><span class="hero-buchstabe" style="--i:1">L</span><span class="hero-buchstabe" style="--i:2">E</span><span class="hero-buchstabe" style="--i:3">X</span></span>
+                    <span class="hero-zeile hero-zeile--mitte" style="--stufe:1" aria-hidden="true"><span class="hero-buchstabe" style="--i:4">V</span><span class="hero-buchstabe" style="--i:5">O</span><span class="hero-buchstabe" style="--i:6">L</span><span class="hero-buchstabe" style="--i:7">K</span><span class="hero-buchstabe" style="--i:8">-</span></span>
+                    <span class="hero-zeile" style="--stufe:2" aria-hidden="true"><span class="hero-buchstabe" style="--i:9">M</span><span class="hero-buchstabe" style="--i:10">A</span><span class="hero-buchstabe" style="--i:11">N</span><span class="hero-buchstabe" style="--i:12">N</span></span>
                 </h1>
-                <div class="hero-strich" aria-hidden="true"></div>
-                <div class="hero-meta">
-                    <p class="hero-meta-zeile" style="--i:0">Werder, Brandenburg</p>
-                    <p class="hero-meta-zeile" style="--i:1">B.Sc. Wirtschaftsinformatik</p>
-                </div>
+
+                {% comment %}Eine Metazeile statt dreier gestapelter -
+                Ort und Fach in einer Reihe.{% endcomment %}
+                <p class="hero-meta-zeile" style="--i:0">Werder, Brandenburg <span aria-hidden="true">—</span> Wirtschaftsinformatik</p>
             </div>
         </div>
 

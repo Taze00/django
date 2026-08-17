@@ -338,69 +338,84 @@ html.intro-laeuft .hero-skyline {
 .hero-content {
     position: relative;
     z-index: 2;
+    /* Der Versatz je Treppenstufe. Steht hier und nicht auf
+       .hero-name, weil die Metazeile darunter ihn auch braucht und
+       Geschwister und nicht Kind ist - von .hero-name aus wuerde sie
+       ihn nicht erben.
+
+       44px bei grossen Fenstern wie vorgegeben, nach unten
+       mitskaliert: auf 390px waeren zwei feste Stufen von 44px ein
+       Viertel der Bildschirmbreite. */
+    --hero-stufe: clamp(1.25rem, 3vw, 44px);
 }
 
-/* --- Namenszug ---------------------------------------------------------
-   ALEX versal und weit gesperrt, "Volkmann" in Serifen-Kursiv rechts
-   daneben auf derselben Grundlinie. Zusammen ein Namenszug, nicht
-   Ueberschrift plus Unterzeile.
+/* --- Namenszug: die Treppe ----------------------------------------------
+   ALEX / VOLK- / MANN, drei Zeilen, jede eine Stufe weiter rechts. Der
+   Name nimmt damit die Flaeche des Hero ein, statt als kleiner Block im
+   linken Drittel zu sitzen.
 
-   Vorher war beides dieselbe Grotesk in Versalien, nur einmal riesig
-   und einmal winzig - das las sich wie eine Bildunterschrift zum
-   eigenen Namen. Dann stand die Kursive eine Zeile tiefer und wirkte
-   dort verloren: zu klein und zu weit weg, um noch zum Vornamen zu
-   gehoeren.
+   Was hier vorher stand und weggefallen ist: der cyane Strich, die
+   Serifen-Kursive im Nachnamen und die drei gestapelten Metazeilen.
+   Bei dieser Groesse zerfaellt eine Schriftmischung im Namen - zwei
+   Familien in einem Wort lesen sich als zwei Woerter. Jetzt eine
+   Familie, Space Grotesk fett, und der Kontrast liegt in Versatz und
+   Helligkeit.
 
-   Auf der Grundlinie gibt es diese Distanz nicht mehr. Den Unterschied
-   tragen jetzt Schrift und Haltung - Versal-Grotesk gegen Serifen-
-   Kursiv -, nicht mehr der Groessensprung. */
+   Warum drei Zeilen und nicht eine ueber die ganze Breite (das war
+   Variante B): dafuer muesste die Freistellung des Fernsehturms
+   klappen, und sie klappt nicht - die Kugel hat eine Seite, die heller
+   ist als der Himmel. Siehe Commit-Text.
+
+   Geometrisch geht "eine Zeile randlos" mit drei Zeilen ohnehin nicht
+   zusammen: damit "VOLK-" plus Stufe die 1250px der Spalte fuellt,
+   braeuchte es rund 390px Schriftgrad, drei Zeilen davon sind knapp
+   1000px hoch und passen in kein 900px-Fenster. Die Treppe fuellt die
+   Flaeche ueber Hoehe und Versatz statt ueber Randberuehrung. */
 .hero-name {
     margin: 0;
-    line-height: 1;
-    display: flex;
-    align-items: baseline;
-    /* Umbruch als Rueckfallebene: wird das Fenster so schmal, dass
-       beide nicht mehr nebeneinander passen, steht der Nachname wieder
-       unter dem Vornamen statt ueber den Rand zu laufen. */
-    flex-wrap: wrap;
-    column-gap: 1.25rem;
+    line-height: 0.84;
 }
 
-.hero-vorname,
-.hero-nachname {
+.hero-zeile {
     display: block;
-}
+    margin-left: calc(var(--stufe, 0) * var(--hero-stufe));
+    /* Der Grad muss aus der Fensterhoehe mitgerechnet werden, nicht nur
+       aus der Breite: der Hero ist 100vh hoch und beschneidet, und drei
+       Zeilen zu 0.84 Zeilenhoehe plus Marke und Metazeile brauchen rund
+       2.52 Grad plus 110px. Allein nach der Breite bemessen wuerde der
+       Name auf einem 1440x700-Laptop unten abgeschnitten.
 
-.hero-vorname {
-    font-size: clamp(3rem, 11vw, 8rem);
+       24vw / 28vh / 20rem, es gilt der kleinste Wert:
+         1440x900   -> 252px (28vh bindet)
+         1440x700   -> 196px (28vh bindet)
+          390x844   ->  94px (24vw bindet)
+         2560x1440  -> 320px (20rem bindet)
+
+       Warum 24vw und nicht mehr: "MANN" ist die breiteste Zeile (2.778
+       Grad) und sitzt auf der zweiten Stufe. Bei 320px Fensterbreite -
+       dem schmalsten, mit dem zu rechnen ist - braucht sie
+       2 * 20 + 2.778 * 0.24 * 320 = 253px, die Spalte ist dort 269px
+       breit. Bei 26vw waeren es 271px und die Zeile braeche um.
+
+       Auf schmalen Fenstern bindet immer die Breite - der vh-Anteil ist
+       dort ohne Wirkung und die Schrift springt nicht, wenn auf dem
+       Handy die Browserleisten ein- und ausfahren. */
+    font-size: min(24vw, 28vh, 20rem);
     font-weight: 700;
     text-transform: uppercase;
-    /* Weit gesperrt statt eng gesetzt. Vier Buchstaben halten das aus,
-       ein ganzes Wort waere so nicht mehr lesbar. */
-    letter-spacing: 0.22em;
-    line-height: 0.95;
+    /* Eng gesetzt: die Zeilen sollen als Bloecke stehen, nicht als
+       Buchstabenreihen. Die frueheren 0.22em waren fuer ein einzelnes
+       Wort im linken Drittel gedacht. */
+    letter-spacing: -0.02em;
     color: var(--text-bright);
-    /* Die Sperrung haengt auch hinter dem letzten X ein Leerfeld an -
-       bei 128px sind das 28px. Solange der Nachname darunter stand,
-       fiel das nicht auf; daneben klaffte die Luecke sichtbar zu weit.
-       Der negative Rand nimmt genau dieses eine Leerfeld zurueck,
-       danach steht der Abstand allein im column-gap oben. */
-    margin-right: -0.22em;
 }
 
-.hero-nachname {
-    font-family: var(--font-serif);
-    font-style: italic;
-    /* Rund das Doppelte der frueheren Groesse. Neben einem 128px hohen
-       ALEX braucht die Kursive diese Groesse, um mitzuhalten - bei
-       20px las sie sich als Beschriftung. */
-    font-size: clamp(1.9rem, 4vw, 2.5rem);
-    font-weight: 400;
-    /* Keine Sperrung mehr: eine Kursive lebt von ihrem Zusammenhang,
-       gesperrt zerfaellt sie in Einzelbuchstaben. */
-    letter-spacing: 0.01em;
-    color: var(--text);
-    opacity: 0.85;
+/* Die mittlere Zeile faellt fast in den Hintergrund zurueck. Das ist
+   der Tiefeneffekt, der bei Variante B vom Turm gekommen waere: nicht
+   drei gleich laute Zeilen, sondern zwei helle mit einer verschluckten
+   dazwischen. */
+.hero-zeile--mitte {
+    color: #3a3a3a;
 }
 
 /* Die Buchstaben muessen einzeln animierbar sein, duerfen aber wie
@@ -409,21 +424,28 @@ html.intro-laeuft .hero-skyline {
     display: inline-block;
 }
 
-.hero-strich {
-    width: 54px;
-    height: 2px;
-    margin: clamp(1.75rem, 3.5vw, 2.5rem) 0 clamp(1.75rem, 3vw, 2.25rem);
-    background: var(--primary);
+/* Die Marke ueber dem Namen. Monospace und gesperrt wie jede andere
+   Beschriftung der Seite, aber in der Akzentfarbe - sie ordnet die
+   Seite ein, bevor der Name kommt. */
+.hero-marke {
+    margin: 0 0 clamp(1.25rem, 2.5vw, 2rem);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: var(--mono-track);
+    text-transform: uppercase;
+    color: var(--primary);
 }
 
-.hero-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+.hero-marke-trenner {
+    opacity: 0.5;
 }
 
+/* Eine Zeile, nicht mehr drei gestapelte. Sie sitzt auf der Stufe der
+   letzten Namenszeile, damit die Treppe unten nicht wieder auf die
+   linke Kante zurueckfaellt. */
 .hero-meta-zeile {
-    margin: 0;
+    margin: clamp(1.5rem, 3vw, 2.5rem) 0 0 calc(2 * var(--hero-stufe, 44px));
     font-family: var(--font-mono);
     font-size: 0.8rem;
     font-weight: 500;
@@ -5351,10 +5373,15 @@ html.intro-laeuft .intro.is-faehrt-weg {
    Normalzustand - auch dann, wenn das Sicherheitsnetz geraeumt hat und
    sonst niemand mehr aufraeumt.
 
-   Die Reihenfolge steht hier im CSS, nicht in main.js: die Buchstaben
-   von ALEX einzeln, dann VOLKMANN, dann der Strich und zuletzt die
-   Metazeilen. */
-html.intro-laeuft .hero-nachname,
+   Die Reihenfolge steht hier im CSS, nicht in main.js: erst die Marke,
+   dann die dreizehn Buchstaben der Treppe einzeln von oben nach unten,
+   zuletzt die Metazeile.
+
+   Der Strich und der eigene Verzug fuer VOLKMANN sind mit dem Umbau
+   auf die Treppe weggefallen - es gibt keinen Strich mehr, und der
+   Nachname ist keine eigene Zeile mehr, sondern zwei Stufen, die in
+   derselben Buchstabenkette mitlaufen. */
+html.intro-laeuft .hero-marke,
 html.intro-laeuft .hero-meta-zeile {
     opacity: 0;
     transform: translateY(24px);
@@ -5366,12 +5393,7 @@ html.intro-laeuft .hero-buchstabe {
     filter: blur(10px);
 }
 
-html.intro-laeuft .hero-strich {
-    width: 0;
-    opacity: 0;
-}
-
-html.intro-laeuft .hero-content.is-eingefahren .hero-nachname,
+html.intro-laeuft .hero-content.is-eingefahren .hero-marke,
 html.intro-laeuft .hero-content.is-eingefahren .hero-meta-zeile {
     opacity: 1;
     transform: none;
@@ -5379,8 +5401,16 @@ html.intro-laeuft .hero-content.is-eingefahren .hero-meta-zeile {
                 transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1) var(--hero-verzug, 0ms);
 }
 
+/* Die Marke steht als erste da - sie ordnet ein, bevor der Name
+   kommt. */
+html.intro-laeuft .hero-content.is-eingefahren .hero-marke {
+    --hero-verzug: 60ms;
+}
+
 /* 40ms Abstand von Buchstabe zu Buchstabe, aus dem Unscharfen von
-   unten herein. --i steht im Markup an jedem Span. */
+   unten herein. --i steht im Markup an jedem Span und zaehlt ueber
+   alle drei Zeilen durch - die Bewegung laeuft die Treppe hinunter,
+   statt dreimal von vorn anzufangen. */
 html.intro-laeuft .hero-content.is-eingefahren .hero-buchstabe {
     --hero-verzug: calc(160ms + var(--i) * 40ms);
     opacity: 1;
@@ -5391,23 +5421,10 @@ html.intro-laeuft .hero-content.is-eingefahren .hero-buchstabe {
                 filter 0.55s ease var(--hero-verzug);
 }
 
-/* VOLKMANN erst, wenn ALEX ausbuchstabiert ist - der letzte Buchstabe
-   startet bei 280ms. */
-html.intro-laeuft .hero-content.is-eingefahren .hero-nachname {
-    --hero-verzug: 430ms;
-}
-
-/* Der Strich waechst von links auf seine 54px - Breite statt
-   Verschiebung, damit die linke Kante steht. */
-html.intro-laeuft .hero-content.is-eingefahren .hero-strich {
-    width: 54px;
-    opacity: 1;
-    transition: width 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) 620ms,
-                opacity 0.3s ease 620ms;
-}
-
+/* Nach dem letzten Buchstaben: der startet bei 160 + 12 * 40 = 640ms
+   und braucht 650ms. */
 html.intro-laeuft .hero-content.is-eingefahren .hero-meta-zeile {
-    --hero-verzug: calc(780ms + var(--i) * 90ms);
+    --hero-verzug: 1180ms;
 
     /* Die Roehre springt an, sobald die Zeile ihre Endposition erreicht
        hat - deshalb der eigene Verzug plus die Dauer des Einfahrens.
@@ -5429,7 +5446,7 @@ html.intro-laeuft .hero-content.is-eingefahren .hero-meta-zeile {
     }
 
     /* Alles steht sofort da, und die Skyline steht still. */
-    html.intro-laeuft .hero-nachname,
+    html.intro-laeuft .hero-marke,
     html.intro-laeuft .hero-buchstabe,
     html.intro-laeuft .hero-meta-zeile {
         opacity: 1;
@@ -5443,11 +5460,6 @@ html.intro-laeuft .hero-content.is-eingefahren .hero-meta-zeile {
     .hero-meta-zeile.is-angesprungen,
     html.intro-laeuft .hero-content.is-eingefahren .hero-meta-zeile {
         animation: none;
-    }
-
-    html.intro-laeuft .hero-strich {
-        width: 54px;
-        opacity: 1;
     }
 
     .hero-skyline {
