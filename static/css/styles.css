@@ -270,85 +270,187 @@ section {
     position: relative;
     overflow: hidden;
     background: var(--darker);
-}
 
-/* Die Skyline. Eigene Ebene unter dem Sternenfeld, weil nur sie zoomt -
-   laege das Bild weiter auf .hero-bg, wuerde das Canvas von three.js
-   mitskaliert.
+    /* Die Stellschrauben des Hero, alle an einer Stelle. Warum hier und
+       nicht jeweils bei der Regel, zu der sie inhaltlich gehoeren: sie
+       werden von mehreren Regeln gebraucht, und .hero soll es in dieser
+       Datei nur einmal geben. */
 
-   Frueher stand hier brightness(0.8): vom Foto blieb praktisch nur die
-   Silhouette des Fernsehturms. Jetzt aufgehellt, die Lesbarkeit macht
-   der Verlauf darueber. */
-.hero-skyline {
-    position: absolute;
-    inset: 0;
-    background: url('./images/header/berlin-crop.jpg') center 60% / cover no-repeat;
-    filter: brightness(1.5) contrast(1.12) saturate(0.9);
-    transform-origin: center 65%;
-    animation: skyline-zoom 20s ease-in-out infinite alternate;
-    /* translate mit dazu: die Parallaxe in main.js schiebt die Ebene
-       darueber, ohne die Zoom-Animation auf transform anzufassen. */
-    will-change: transform, translate;
-    z-index: 0;
-}
+    /* Der Ton der Silhouetten - sehr dunkel, aber nicht schwarz, mit
+       einem Stich ins Blaue. Naeheres unten bei "Die Silhouetten".
+       Dunklere Fassung, falls die Stadt zurueckhaltender stehen soll:
+       #1b2230. */
+    --silhouette: #26303f;
 
-/* Sehr langsam heran und wieder zurueck - man soll es nicht sehen,
-   sondern nur merken, dass das Bild nicht ganz still steht. */
-@keyframes skyline-zoom {
-    from { transform: scale(1); }
-    to   { transform: scale(1.06); }
-}
+    /* Hoehe des Turms. Aus ihr wird seine Breite gerechnet -
+       aspect-ratio hilft nicht, weil die Zentrierung die Breite in
+       calc() braucht. */
+    --turm-hoehe: min(68vh, 620px);
 
-/* Waehrend der Vorhang liegt, steht auch die Skyline still - der Zoom
-   soll nicht schon hinter dem Vorhang halb durchgelaufen sein. */
-html.intro-laeuft .hero-skyline {
-    animation-play-state: paused;
-}
-
-.hero-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-}
-
-/* Zwei Verlaeufe statt einer gleichmaessigen Abdunklung: senkrecht
-   nimmt die Deckung nach unten ab, damit die Haeuser als Silhouetten
-   stehen bleiben, und waagerecht liegt links ein Schleier unter dem
-   Text - dort steht die Schrift, dort braucht es die Deckung. */
-.hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background:
-        linear-gradient(to right,
-            rgba(5, 5, 5, 0.82) 0%,
-            rgba(5, 5, 5, 0.55) 40%,
-            rgba(5, 5, 5, 0.1) 72%,
-            rgba(5, 5, 5, 0) 100%),
-        linear-gradient(to top,
-            rgba(5, 5, 5, 0.15) 0%,
-            rgba(5, 5, 5, 0.4) 45%,
-            rgba(5, 5, 5, 0.78) 100%);
-    z-index: 0;
-}
-
-.hero-content {
-    position: relative;
-    z-index: 2;
-    /* Der Versatz je Treppenstufe. Steht hier und nicht auf
-       .hero-name, weil die Metazeile darunter ihn auch braucht und
-       Geschwister und nicht Kind ist - von .hero-name aus wuerde sie
-       ihn nicht erben.
+    /* Der Versatz je Treppenstufe des Namenszugs. Die Metazeile
+       richtet sich auch danach, und sie ist seit dem Umbau der Ebenen
+       weder Kind noch Geschwister von .hero-content.
 
        44px bei grossen Fenstern wie vorgegeben, nach unten
        mitskaliert: auf 390px waeren zwei feste Stufen von 44px ein
        Viertel der Bildschirmbreite. */
     --hero-stufe: clamp(1.25rem, 3vw, 44px);
+}
+
+/* --- Die Ebenen des Hero ------------------------------------------------
+   Von hinten nach vorn:
+
+     0  .hero-bg          Sternenfeld von three.js
+     0  .hero-overlay     Verlauf, der die Schrift links traegt
+     1  .hero-haeuser     Haeuserzeile auf der Unterkante
+     2  .hero-content     Marke und Namenszug
+     3  .hero-turm        Fernsehturm
+     4  .hero-meta-zeile  Ort und Fach
+     4  .scroll-indicator
+
+   Das Foto berlin-crop.jpg lag hier bis August 2026 als unterste Ebene
+   und ist weggefallen: es zeigt denselben Fernsehturm, den die
+   Silhouette mittig noch einmal zeichnet, und die beiden Tuerme deckten
+   sich fast, aber nicht ganz - die Kugel stand doppelt. Die
+   Haeuserzeile setzte sich vor den Haeusern im Foto ausserdem kaum ab.
+   Jetzt steht die Stadt als reine Zeichnung auf dem Grund der Seite,
+   und das Sternenfeld gibt dem Himmel die Tiefe, die vorher das Foto
+   gab.
+
+   Warum Turm und Haeuser NICHT in einem gemeinsamen Wrapper liegen,
+   obwohl sie zusammengehoeren und sich gleich schnell bewegen: sie
+   brauchen verschiedene Ebenen. Der Turm steht vor dem Namen - das ist
+   die Tiefenwirkung, um die es geht -, die Haeuserzeile dahinter, sonst
+   frisst ihre Dachlinie die Unterkante von "MANN" und die Metazeile
+   gleich mit. Ein gemeinsamer Wrapper haette einen z-index fuer beide,
+   und weil die Parallaxe ihn per translate verschiebt, waere er
+   zusaetzlich ein eigener Stapelkontext - die Kinder kaemen aus ihm
+   nicht mehr heraus.
+
+   Verschoben werden Turm und Haeuser deshalb einzeln, mit demselben
+   Faktor (siehe starteHeroParallaxe in main.js). Das geht, weil beide
+   ohne transform auskommen: der Turm ist ueber left und margin-left
+   zentriert, nicht ueber translateX. */
+
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    /* Die hinterste Ebene laeuft am langsamsten mit - die Parallaxe
+       schiebt sie ueber translate. */
+    will-change: translate;
+    z-index: 0;
+}
+
+/* Ein Schleier von links: dort steht die Schrift, dort braucht es die
+   Deckung. Nach rechts laeuft er aus, damit die Silhouetten unten nicht
+   zugedeckt werden - sie stehen auf dem blanken Grund der Seite, es
+   gibt dort nichts abzudunkeln. */
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right,
+        rgba(5, 5, 5, 0.7) 0%,
+        rgba(5, 5, 5, 0.35) 45%,
+        rgba(5, 5, 5, 0) 80%);
+    z-index: 0;
+}
+
+/* --- Die Silhouetten ----------------------------------------------------
+   Fernsehturm mittig, Haeuserzeile auf der Unterkante. Beide kommen aus
+   tools/silhouetten.py als freigestellte PNGs; aus der Haeuserzeile ist
+   der Turm herausgerechnet, weil er hier einzeln daneben steht.
+
+   Eingefaerbt wird ueber mask-image plus background-color, nicht ueber
+   das Bild selbst: die PNGs tragen ihren Farbton zwar eingebacken, als
+   Maske zaehlt aber nur der Alphakanal - der Ton steht damit hier an
+   genau einer Stelle, und ein filter haette an fast schwarzen Pixeln
+   ohnehin nichts zu greifen.
+
+   Der Ton ist eine Aufhellung gegen den Grund, keine Abdunklung: vor
+   einem Foto waere eine Silhouette dunkler als ihr Hintergrund, auf dem
+   #050505 der Seite gibt es nichts, was noch dunkler waere. Das
+   Ergebnis liest sich als graphische Zeichnung, nicht als Gegenlicht.
+
+   Der Ton selbst steht als --silhouette oben an .hero, zusammen mit den
+   uebrigen Stellschrauben des Hero - nicht hier, damit es .hero nur ein
+   einziges Mal in dieser Datei gibt. */
+
+/* Turm: waagerecht mittig, Fuss auf der Unterkante. Die 154/1326 sind
+   die Pixelmasse von fernsehturm-silhouette.png; der Rand-Versatz ist
+   die halbe Breite. Aendert sich das Bild, hier nachrechnen.
+
+   Er liegt VOR dem Namen (z-index 3 gegen 2) - der Turm schneidet durch
+   "VOLK-MANN" hindurch, und daran haengt die ganze Tiefenwirkung. */
+.hero-turm {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    height: var(--turm-hoehe);
+    width: calc(var(--turm-hoehe) * 154 / 1326);
+    margin-left: calc(var(--turm-hoehe) * -77 / 1326);
+    background: var(--silhouette);
+    -webkit-mask: url('./images/header/fernsehturm-silhouette.png') bottom center / 100% 100% no-repeat;
+    mask: url('./images/header/fernsehturm-silhouette.png') bottom center / 100% 100% no-repeat;
+    /* Sonst waere der Namenszug hinter dem Turm nicht mehr markierbar. */
+    pointer-events: none;
+    will-change: translate;
+    z-index: 3;
+}
+
+/* Haeuserzeile: ueber die ganze Breite, auf der Unterkante, HINTER dem
+   Text (z-index 1).
+
+   Das Element traegt selbst keine Maske, nur die Verschiebung der
+   Parallaxe - die Maske sitzt eine Ebene tiefer auf .hero-haeuser-bild.
+   Das ist der Grund fuer die Verschachtelung: eine Maske gilt fuer das
+   ganze Element samt seiner Kinder und Pseudo-Elemente. Als der
+   Fuellblock unten noch ein ::after an einem maskierten Element war,
+   wurde er von genau dieser Maske weggeschnitten - dort, wo das
+   Skyline-PNG endet, hat sie kein Alpha mehr. Aufgefallen ist es erst
+   beim Scrollen: eine Luecke in Hoehe des Parallaxe-Versatzes. */
+.hero-haeuser {
+    position: absolute;
+    inset-inline: 0;
+    bottom: 0;
+    /* 12.8vw ist genau das Seitenverhaeltnis von
+       skyline-silhouette.png (1680x215) - so wird nichts verzerrt. Das
+       Maximum von 132px greift erst unter etwa 1030px Fensterbreite und
+       streckt die Zeile dann leicht in die Hoehe; bei einer Silhouette
+       faellt das nicht auf, eine zu flache Stadt schon. */
+    height: max(12.8vw, 132px);
+    pointer-events: none;
+    will-change: translate;
+    z-index: 1;
+}
+
+.hero-haeuser-bild {
+    position: absolute;
+    inset: 0;
+    background: var(--silhouette);
+    -webkit-mask: url('./images/header/skyline-silhouette.png') bottom center / 100% 100% no-repeat;
+    mask: url('./images/header/skyline-silhouette.png') bottom center / 100% 100% no-repeat;
+}
+
+/* Die Ebene laeuft schneller als die Seite, wandert beim Scrollen also
+   nach oben - darunter wuerde der Grund zwischen Haeuserzeile und
+   Unterkante des Hero hervorschauen. Die unterste Bildzeile von
+   skyline-silhouette.png ist ueber die ganze Breite deckend, deshalb
+   setzt dieser Block sie nahtlos nach unten fort. Im Ruhezustand liegt
+   er unter der Unterkante und .hero hat overflow: hidden - man sieht
+   ihn nie, er verhindert nur die Luecke. */
+.hero-boden {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    height: 25vh;
+    background: var(--silhouette);
+}
+
+.hero-content {
+    position: relative;
+    /* Vor der Haeuserzeile (1), hinter dem Turm (3). */
+    z-index: 2;
 }
 
 /* --- Namenszug: die Treppe ----------------------------------------------
@@ -447,6 +549,15 @@ html.intro-laeuft .hero-skyline {
    letzten Namenszeile, damit die Treppe unten nicht wieder auf die
    linke Kante zurueckfaellt. */
 .hero-meta-zeile {
+    position: relative;
+    /* Vor allen Silhouetten, auch vor dem Turm. Sie sitzt unten links,
+       genau auf der Hoehe der Dachlinie - ohne das frisst die
+       Haeuserzeile die halbe Zeile weg, und auf schmalen Fenstern
+       schneidet zusaetzlich der Turmschaft hindurch. Der Namenszug
+       darueber bleibt bei 2 und damit hinter dem Turm; dass das
+       gleichzeitig geht, ist der Grund fuer ihren Platz im Markup
+       (siehe index.html). */
+    z-index: 4;
     margin: clamp(1.5rem, 3vw, 2.5rem) 0 0 calc(2 * var(--hero-stufe, 44px));
     font-family: var(--font-mono);
     font-size: 0.8rem;
@@ -463,7 +574,10 @@ html.intro-laeuft .hero-skyline {
     bottom: 2rem;
     left: 50%;
     transform: translateX(-50%);
-    z-index: 2;
+    /* Ueber den Silhouetten (z-index 3): der Pfeil sitzt unten mittig,
+       genau dort, wo Haeuserzeile und Turmfuss liegen - bei 2 waere er
+       verdeckt. */
+    z-index: 4;
 }
 
 .scroll-arrow {
@@ -5396,7 +5510,7 @@ html.intro-laeuft .hero-buchstabe {
 }
 
 html.intro-laeuft .hero-content.is-eingefahren .hero-marke,
-html.intro-laeuft .hero-content.is-eingefahren .hero-meta-zeile {
+html.intro-laeuft .hero-content.is-eingefahren ~ .hero-meta-zeile {
     opacity: 1;
     transform: none;
     transition: opacity 0.6s ease var(--hero-verzug, 0ms),
@@ -5439,7 +5553,7 @@ html.intro-laeuft .hero-content.is-eingefahren .hero-buchstabe {
    startet - und noch deutlich vor dem Wegraeumen des Vorhangs bei
    647ms, sonst faehrt die Zeile nicht ein, sondern steht ploetzlich
    da. */
-html.intro-laeuft .hero-content.is-eingefahren .hero-meta-zeile {
+html.intro-laeuft .hero-content.is-eingefahren ~ .hero-meta-zeile {
     --hero-verzug: 500ms;
 
     /* Die Roehre springt an, sobald die Zeile ihre Endposition erreicht
@@ -5461,7 +5575,7 @@ html.intro-laeuft .hero-content.is-eingefahren .hero-meta-zeile {
         overflow: visible;
     }
 
-    /* Alles steht sofort da, und die Skyline steht still. */
+    /* Alles steht sofort da. */
     html.intro-laeuft .hero-marke,
     html.intro-laeuft .hero-buchstabe,
     html.intro-laeuft .hero-meta-zeile {
@@ -5474,11 +5588,7 @@ html.intro-laeuft .hero-content.is-eingefahren .hero-meta-zeile {
        mehr, der Hero haengt aber allein am CSS. */
     .sektion-meta.is-angesprungen,
     .hero-meta-zeile.is-angesprungen,
-    html.intro-laeuft .hero-content.is-eingefahren .hero-meta-zeile {
-        animation: none;
-    }
-
-    .hero-skyline {
+    html.intro-laeuft .hero-content.is-eingefahren ~ .hero-meta-zeile {
         animation: none;
     }
 }

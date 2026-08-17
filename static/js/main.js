@@ -1043,27 +1043,42 @@ function starteTraegheitsScroll() {
 
 
 // ===== HERO-PARALLAXE =====
-// Skyline und Namenszug scrollen unterschiedlich schnell weg. Sehr
-// dezent: der Himmel bleibt 12% hinter der Seite zurueck, der Name 4%.
-// Man soll es nicht sehen, sondern nur merken, dass die Ebenen nicht
-// aneinander kleben.
+// Drei Ebenen, drei Geschwindigkeiten - von hinten nach vorn immer
+// schneller:
 //
-// Geplant waren drei Ebenen - Himmel, Name, Stadt davor. Die dritte
-// fehlt, weil sich die Haeuserzeile nicht aus dem Foto freistellen
-// laesst (siehe Commit zum Hero-Umbau): die Stadt ist ein
-// durchgehendes Feld gleich heller Gebaeude ohne Kante, an der man
-// schneiden koennte. Ohne freigestellte Ebene gibt es nichts, was
-// schneller als die Seite laufen koennte.
+//   Sternenfeld  Faktor  0.14   langsamst
+//   Text         Faktor  0.06   mittel
+//   Silhouetten  Faktor -0.10   schnellst
+//
+// Der Faktor ist die Verschiebung nach UNTEN je gescrollten Pixel, er
+// arbeitet also gegen das Scrollen: die Ebene bewegt sich mit
+// (1 - Faktor) der Seitengeschwindigkeit. Ein groesserer Faktor heisst
+// darum langsamer, nicht schneller - 0.14 laeuft mit 86%, 0.06 mit 94%.
+//
+// Die Silhouetten brauchen deshalb ein negatives Vorzeichen: nur so
+// laufen sie mit 110% schneller als die Seite selbst. Das ist der
+// Grund, aus dem unter der Haeuserzeile .hero-boden steht - die Ebene
+// wandert nach oben und wuerde sonst eine Luecke zur Unterkante des
+// Hero aufreissen.
+//
+// Die hinterste Ebene war bis August 2026 das Foto berlin-crop.jpg.
+// Mit dem Foto ist das Sternenfeld von three.js nachgerueckt; es fuellt
+// den Hero randlos, die Luecke, die sein Nachlaufen am oberen Rand
+// aufmacht, liegt bei Faktor 0.14 immer oberhalb des Viewports.
+// Sichtbar wuerde sie erst ab Faktor 1.
 //
 // Verschoben wird ueber die eigenstaendige translate-Eigenschaft, nicht
-// ueber transform: .hero-skyline traegt eine Zoom-Animation auf
-// transform und .hero-content das translateY der fade-in-Klasse. Beides
-// wuerde eine Zuweisung an transform ueberschreiben - translate legt
-// sich davor, ohne sie anzufassen.
+// ueber transform: .hero-content traegt das translateY der
+// fade-in-Klasse und der Scroll-Pfeil sein translateX. Eine Zuweisung
+// an transform wuerde das ueberschreiben - translate legt sich davor,
+// ohne es anzufassen.
 //
-// Die Luecke, die am oberen Rand der Skyline entsteht, ist nie zu
-// sehen: sie liegt bei Faktor 0.12 immer oberhalb des Viewports.
-// Sichtbar wuerde sie erst ab Faktor 1.
+// Turm und Haeuserzeile werden einzeln verschoben statt gemeinsam ueber
+// einen Wrapper: sie liegen auf verschiedenen z-index-Ebenen, weil der
+// Text zwischen ihnen steht (siehe CSS, "Die Ebenen des Hero"). Der
+// gemeinsame Faktor haelt sie trotzdem als eine Ebene zusammen.
+// Dasselbe gilt fuer Namenszug und Metazeile, die aus demselben Grund
+// nicht mehr im selben Element sitzen.
 function starteHeroParallaxe() {
     if (BEWEGUNG_REDUZIERT) return;
 
@@ -1073,9 +1088,15 @@ function starteHeroParallaxe() {
     if (window.matchMedia('(max-width: 600px)').matches) return;
 
     const hero = document.querySelector('.hero');
-    const himmel = document.querySelector('.hero-skyline');
-    const name = document.querySelector('.hero-content');
-    if (!hero || (!himmel && !name)) return;
+    if (!hero) return;
+
+    // Je Faktor die Elemente, die sich damit bewegen.
+    const ebenen = [
+        [0.14, hero.querySelectorAll('.hero-bg')],
+        [0.06, hero.querySelectorAll('.hero-content, .hero-meta-zeile')],
+        [-0.10, hero.querySelectorAll('.hero-turm, .hero-haeuser')]
+    ].filter(([, knoten]) => knoten.length);
+    if (!ebenen.length) return;
 
     let angefordert = false;
 
@@ -1089,8 +1110,10 @@ function starteHeroParallaxe() {
         const y = Math.min(window.scrollY || window.pageYOffset || 0,
                            hero.offsetHeight);
 
-        if (himmel) himmel.style.translate = `0 ${(y * 0.12).toFixed(2)}px`;
-        if (name) name.style.translate = `0 ${(y * 0.04).toFixed(2)}px`;
+        for (const [faktor, knoten] of ebenen) {
+            const versatz = `0 ${(y * faktor).toFixed(2)}px`;
+            for (const el of knoten) el.style.translate = versatz;
+        }
     }
 
     window.addEventListener('scroll', () => {

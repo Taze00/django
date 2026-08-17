@@ -9,7 +9,7 @@
     <link rel="icon" href="{% static 'css/images/favicon.ico' %}" type="image/x-icon">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" as="style">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260816-7">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260817-2">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -102,10 +102,6 @@
 
     <!-- Hero Section -->
     <section id="home" class="hero">
-        {% comment %}Die Skyline liegt in einer eigenen Ebene unter dem
-        Sternenfeld: nur sie zoomt, das Canvas von three.js bleibt
-        unangetastet.{% endcomment %}
-        <div class="hero-skyline" aria-hidden="true"></div>
         <div class="hero-bg" id="three-bg"></div>
         <div class="hero-overlay"></div>
 
@@ -137,11 +133,45 @@
                     <span class="hero-zeile" style="--stufe:2" aria-hidden="true"><span class="hero-buchstabe" style="--i:9">M</span><span class="hero-buchstabe" style="--i:10">A</span><span class="hero-buchstabe" style="--i:11">N</span><span class="hero-buchstabe" style="--i:12">N</span></span>
                 </h1>
 
-                {% comment %}Eine Metazeile statt dreier gestapelter -
-                Ort und Fach in einer Reihe.{% endcomment %}
-                <p class="hero-meta-zeile" style="--i:0">Werder, Brandenburg <span aria-hidden="true">—</span> Wirtschaftsinformatik</p>
             </div>
+
+            {% comment %}Eine Metazeile statt dreier gestapelter - Ort und
+            Fach in einer Reihe.
+
+            Sie steht NEBEN .hero-content und nicht darin, obwohl sie
+            inhaltlich dazugehoert und optisch die letzte Stufe der
+            Treppe bildet. Der Grund ist die Stapelung: sie muss vor den
+            Silhouetten liegen, der Namenszug soll hinter dem Turm
+            bleiben. Beides gleichzeitig geht nur, wenn die zwei nicht im
+            selben Stapelkontext sitzen - und .hero-content ist einer,
+            weil die fade-in-Klasse und die Parallaxe ihm ein transform
+            beziehungsweise translate geben. Ein z-index an einem Kind
+            kaeme daraus nicht mehr heraus.
+
+            Ihre Einrueckung haengt an --hero-stufe, das deshalb auf
+            .hero steht und nicht auf .hero-content.{% endcomment %}
+            <p class="hero-meta-zeile" style="--i:0">Werder, Brandenburg <span aria-hidden="true">—</span> Wirtschaftsinformatik</p>
         </div>
+
+        {% comment %}Die Silhouetten: Fernsehturm mittig, Haeuserzeile auf
+        der Unterkante. Beide sind freigestellte PNGs aus zwei
+        Midjourney-Bildern (siehe tools/silhouetten.py) - aus der
+        Haeuserzeile ist der Turm herausgerechnet, weil er hier einzeln
+        daneben steht.
+
+        Sie liegen bewusst nicht beieinander im Markup-Baum, sondern auf
+        verschiedenen Ebenen um den Text herum: der Turm davor, die
+        Haeuser dahinter. Warum, steht im CSS bei "Die Ebenen des
+        Hero".
+
+        .hero-boden ist kein Bild, sondern eine deckende Flaeche, die die
+        Haeuserzeile nach unten fortsetzt - sie fuellt die Luecke, die
+        die Parallaxe sonst am unteren Rand aufreisst.{% endcomment %}
+        <div class="hero-haeuser" aria-hidden="true">
+            <div class="hero-haeuser-bild"></div>
+            <div class="hero-boden"></div>
+        </div>
+        <div class="hero-turm" aria-hidden="true"></div>
 
         <div class="scroll-indicator">
             <div class="scroll-arrow"></div>
@@ -610,7 +640,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
     {% comment %}Lenis liegt lokal, nicht am CDN - eine Abhaengigkeit weniger
     zur Laufzeit. defer haelt die Reihenfolge: Lenis vor main.js.{% endcomment %}
-    <script defer src="{% static 'js/vendor/lenis.min.js' %}?v=20260816-7"></script>
-    <script defer src="{% static 'js/main.js' %}?v=20260816-7"></script>
+    <script defer src="{% static 'js/vendor/lenis.min.js' %}?v=20260817-2"></script>
+    <script defer src="{% static 'js/main.js' %}?v=20260817-2"></script>
 </body>
 </html>
