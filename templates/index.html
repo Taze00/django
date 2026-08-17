@@ -111,12 +111,6 @@
 
         <div class="container">
             <div class="hero-content fade-in">
-                {% comment %}ALEX traegt den Hero und steht deshalb Buchstabe
-                fuer Buchstabe im Markup, damit jeder einzeln einfahren kann -
-                wie im Intro. Die Buchstabenkette ist fuer Screenreader
-                ausgeblendet, daneben steht das Wort einmal am Stueck: ein
-                aria-label an einem schlichten <span> wird nicht von jedem
-                Vorleseprogramm beachtet.{% endcomment %}
                 <p class="hero-marke">Portfolio <span class="hero-marke-trenner" aria-hidden="true">—</span> 2026</p>
 
                 {% comment %}Drei Zeilen als Treppe: ALEX / VOLK- / MANN,
@@ -124,10 +118,18 @@
                 verschluckt. Der Name traegt die Flaeche selbst, es
                 braucht keinen Strich und keine Unterzeile mehr.
 
-                Die Buchstaben zaehlen ueber alle drei Zeilen durch
-                (--i von 0 bis 12), damit das Einfahren als eine
-                Bewegung die Treppe hinunterlaeuft und nicht dreimal
-                von vorn anfaengt.{% endcomment %}
+                Jeder Buchstabe steht einzeln im Markup, damit er
+                einzeln einfahren kann - wie im Intro. Die
+                Buchstabenkette ist fuer Screenreader ausgeblendet,
+                darueber steht der Name einmal am Stueck: ein
+                aria-label an einem schlichten <span> wird nicht von
+                jedem Vorleseprogramm beachtet.
+
+                --i zaehlt ueber alle drei Zeilen durch (0 bis 12),
+                damit das Einfahren als eine Bewegung die Treppe
+                hinunterlaeuft und nicht dreimal von vorn anfaengt.
+                Kommen Buchstaben dazu, den Schritt im CSS nachrechnen -
+                die Staffelung hat nur 650ms Zeit.{% endcomment %}
                 <h1 class="hero-name">
                     <span class="visually-hidden">Alex Volkmann</span>
                     <span class="hero-zeile" style="--stufe:0" aria-hidden="true"><span class="hero-buchstabe" style="--i:0">A</span><span class="hero-buchstabe" style="--i:1">L</span><span class="hero-buchstabe" style="--i:2">E</span><span class="hero-buchstabe" style="--i:3">X</span></span>
