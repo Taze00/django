@@ -9,7 +9,7 @@
     <link rel="icon" href="{% static 'css/images/favicon.ico' %}" type="image/x-icon">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" as="style">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260818-5">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260818-6">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -131,10 +131,16 @@
             <div class="hero-content fade-in">
                 <p class="hero-marke">Portfolio <span class="hero-marke-trenner" aria-hidden="true">—</span> 2026</p>
 
-                {% comment %}Drei Zeilen als Treppe: ALEX / VOLK- / MANN,
-                jede eine Stufe weiter rechts, die mittlere fast
-                verschluckt. Der Name traegt die Flaeche selbst, es
-                braucht keinen Strich und keine Unterzeile mehr.
+                {% comment %}Zwei Zeilen als Treppe: ALEX / VOLKMANN, die
+                zweite eine Stufe weiter rechts. Der Name traegt die
+                Flaeche selbst, es braucht keinen Strich und keine
+                Unterzeile mehr.
+
+                Der Nachname stand bis August 2026 auf zwei Zeilen
+                getrennt, VOLK- / MANN. Das las sich nicht als ein
+                Name: die Trennung sass mitten im Wort, und die untere
+                Zeile verschwand zur Haelfte hinter der Stadt. Jetzt
+                steht er am Stueck.
 
                 Jeder Buchstabe steht einzeln im Markup, damit er
                 einzeln einfahren kann - wie im Intro. Die
@@ -143,7 +149,7 @@
                 aria-label an einem schlichten <span> wird nicht von
                 jedem Vorleseprogramm beachtet.
 
-                --i zaehlt ueber alle drei Zeilen durch (0 bis 12),
+                --i zaehlt ueber beide Zeilen durch (0 bis 11),
                 damit das Einfahren als eine Bewegung die Treppe
                 hinunterlaeuft und nicht dreimal von vorn anfaengt.
                 Kommen Buchstaben dazu, den Schritt im CSS nachrechnen -
@@ -151,8 +157,7 @@
                 <h1 class="hero-name">
                     <span class="visually-hidden">Alex Volkmann</span>
                     <span class="hero-zeile" style="--stufe:0" aria-hidden="true"><span class="hero-buchstabe" style="--i:0">A</span><span class="hero-buchstabe" style="--i:1">L</span><span class="hero-buchstabe" style="--i:2">E</span><span class="hero-buchstabe" style="--i:3">X</span></span>
-                    <span class="hero-zeile hero-zeile--mitte" style="--stufe:1" aria-hidden="true"><span class="hero-buchstabe" style="--i:4">V</span><span class="hero-buchstabe" style="--i:5">O</span><span class="hero-buchstabe" style="--i:6">L</span><span class="hero-buchstabe" style="--i:7">K</span><span class="hero-buchstabe" style="--i:8">-</span></span>
-                    <span class="hero-zeile" style="--stufe:2" aria-hidden="true"><span class="hero-buchstabe" style="--i:9">M</span><span class="hero-buchstabe" style="--i:10">A</span><span class="hero-buchstabe" style="--i:11">N</span><span class="hero-buchstabe" style="--i:12">N</span></span>
+                    <span class="hero-zeile hero-zeile--nachname" style="--stufe:1" aria-hidden="true"><span class="hero-buchstabe" style="--i:4">V</span><span class="hero-buchstabe" style="--i:5">O</span><span class="hero-buchstabe" style="--i:6">L</span><span class="hero-buchstabe" style="--i:7">K</span><span class="hero-buchstabe" style="--i:8">M</span><span class="hero-buchstabe" style="--i:9">A</span><span class="hero-buchstabe" style="--i:10">N</span><span class="hero-buchstabe" style="--i:11">N</span></span>
                 </h1>
 
             </div>
@@ -651,7 +656,7 @@
 
     {% comment %}Lenis liegt lokal, nicht am CDN - eine Abhaengigkeit weniger
     zur Laufzeit. defer haelt die Reihenfolge: Lenis vor main.js.{% endcomment %}
-    <script defer src="{% static 'js/vendor/lenis.min.js' %}?v=20260818-5"></script>
-    <script defer src="{% static 'js/main.js' %}?v=20260818-5"></script>
+    <script defer src="{% static 'js/vendor/lenis.min.js' %}?v=20260818-6"></script>
+    <script defer src="{% static 'js/main.js' %}?v=20260818-6"></script>
 </body>
 </html>

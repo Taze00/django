@@ -309,6 +309,17 @@ section {
      4  .hero-meta-zeile  Ort und Fach
      4  .scroll-indicator
 
+   Was an .hero .container NICHT stehen darf: transform, filter,
+   will-change, isolation - jedes davon macht daraus einen
+   Stapelkontext, und dann kommt .hero-content mit seinem z-index 2
+   nicht mehr hinter .hero-stadt mit 3. Die Stadt stuende hinter dem
+   Namen und die Tiefenwirkung waere weg. Bis August 2026 stand hier
+   ein `position: relative; top: -6.1vh`, um den dreizeiligen Namen
+   ueber die Dachlinie zu heben; position/top war genau deshalb
+   gewaehlt. Seit der Nachname am Stueck steht, ist der Block kuerzer
+   und braucht die Anhebung nicht mehr - wer sie wieder einfuehrt,
+   nimmt wieder position/top.
+
    Die drei Flaechen mit z-index 0 stapeln sich in Markup-Reihenfolge.
    Dass .hero-overlay zuletzt kommt, ist Absicht: sein Schleier von
    links soll auch ueber dem Lichtschein liegen, sonst hellt der die
@@ -445,33 +456,6 @@ section {
     z-index: 0;
 }
 
-/* Der Namenszug sitzt hoeher als die Mitte des Hero, damit von "MANN"
-   rund vier Fuenftel ueber der Dachlinie stehen bleiben. Ohne den
-   Versatz sind es 48 Prozent der Buchstabenflaeche - gemessen, indem
-   die Tintenpunkte der Zeile gegen den Alphakanal der Maske gehalten
-   werden (tools/ hat kein Skript dafuer, es war eine einmalige
-   Messung). 6.1vh sind auf 1440x900 rund 55px und bringen die 48 auf
-   81 Prozent.
-
-   Warum nicht stattdessen das Foto tiefer setzen, also --foto-lage auf
-   `center top`: das schiebt die Dachlinie um 60px nach unten und
-   stellt MANN zu 93 Prozent frei - dann schneidet die Stadt praktisch
-   nicht mehr durch den Namen, und die Tiefenwirkung, um die es hier
-   geht, ist weg. Gemessen, nicht geschaetzt.
-
-   position/top und NICHT transform: ein transform an .container waere
-   ein Stapelkontext, und dann kaeme .hero-content mit seinem z-index 2
-   nicht mehr hinter .hero-stadt mit 3 - die Stadt stuende hinter dem
-   Namen und die ganze Tiefenwirkung waere weg. Aus dem gleichen Grund
-   hier auch kein filter und kein will-change.
-
-   Der Kindselektor ist Absicht: .container gibt es auf jeder Sektion,
-   angehoben werden soll nur die des Hero. */
-.hero > .container {
-    position: relative;
-    top: -6.1vh;
-}
-
 /* Ebene ganz vorn: dasselbe Foto, auf die Stadt freigestellt und
    aufgehellt, damit sie sich vor dem Namenszug abhebt. Sie liegt VOR
    dem Namen (z-index 3 gegen 2) - Turm und Dachlinie schneiden durch
@@ -548,22 +532,32 @@ section {
        2.52 Grad plus 110px. Allein nach der Breite bemessen wuerde der
        Name auf einem 1440x700-Laptop unten abgeschnitten.
 
-       24vw / 28vh / 20rem, es gilt der kleinste Wert:
-         1440x900   -> 252px (28vh bindet)
-         1440x700   -> 196px (28vh bindet)
-          390x844   ->  94px (24vw bindet)
-         2560x1440  -> 320px (20rem bindet)
+       Seit der Nachname am Stueck steht, bindet die SPALTE und nicht
+       mehr das Fenster: "VOLKMANN" misst nachgemessen 5.146 Grad
+       gegen die 2.777 des frueheren "MANN", also fast das Doppelte.
+       Die Spalte waechst aber nicht mit dem Fenster mit - .container
+       ist bei 1300px gedeckelt. Ueber etwa 1444px Fensterbreite kann
+       der Name deshalb nicht mehr groesser werden, egal wie breit der
+       Schirm ist; dafuer steht die Obergrenze in rem.
 
-       Warum 24vw und nicht mehr: "MANN" ist die breiteste Zeile (2.778
-       Grad) und sitzt auf der zweiten Stufe. Bei 320px Fensterbreite -
-       dem schmalsten, mit dem zu rechnen ist - braucht sie
-       2 * 20 + 2.778 * 0.24 * 320 = 253px, die Spalte ist dort 269px
-       breit. Bei 26vw waeren es 271px und die Zeile braeche um.
+       15vw / 28vh / 14rem, es gilt der kleinste Wert:
+         1440x900   -> 216px (15vw bindet)
+         1440x700   -> 196px (28vh bindet)
+          390x844   ->  59px (15vw bindet)
+         2560x1440  -> 224px (14rem bindet)
+
+       Die Werte sind so gewaehlt, dass 5.146 Grad PLUS die Einrueckung
+       der Stufe in jeder Fensterbreite in die Spalte passen. Die Stufe
+       mitzurechnen ist der Punkt, an dem es zuerst schiefging: bei
+       320px Fensterbreite braucht der Nachname 256px und die Spalte
+       hat 272px - mit den 20px Einzug sind es aber 276px, und die
+       Zeile brach um. Wer am Namen dreht, muss neu messen, nicht
+       rechnen: tools/hero-breite.py.
 
        Auf schmalen Fenstern bindet immer die Breite - der vh-Anteil ist
        dort ohne Wirkung und die Schrift springt nicht, wenn auf dem
        Handy die Browserleisten ein- und ausfahren. */
-    font-size: min(24vw, 28vh, 20rem);
+    font-size: min(15vw, 28vh, 14rem);
     font-weight: 700;
     text-transform: uppercase;
     /* Eng gesetzt: die Zeilen sollen als Bloecke stehen, nicht als
@@ -577,7 +571,7 @@ section {
    der Tiefeneffekt, der bei Variante B vom Turm gekommen waere: nicht
    drei gleich laute Zeilen, sondern zwei helle mit einer verschluckten
    dazwischen. */
-.hero-zeile--mitte {
+.hero-zeile--nachname {
     /* Nur wenig unter dem Weiss der beiden anderen Zeilen. Vorher
        stand hier #3a3a3a - ein Dunkelgrau, das auf dem alten, fast
        schwarzen Himmel als Andeutung funktionierte. Seit das Foto
@@ -585,7 +579,10 @@ section {
        aehnlich dunklen Grund: "VOLK-" verschwand, und weil "MANN"
        unten zur Haelfte in der Stadt sitzt, war der Nachname als
        Ganzes weg. Der Kontrast der Treppe kommt aus Versatz und
-       Groesse, nicht daraus, dass eine Zeile unsichtbar ist. */
+       Groesse, nicht daraus, dass eine Zeile unsichtbar ist.
+
+       Die Klasse hiess --mitte, solange der Name auf drei Zeilen
+       stand und dies die mittlere war. */
     color: #e6e6e6;
 }
 
@@ -623,7 +620,12 @@ section {
        der Stadt; dass beides gleichzeitig geht, ist der Grund fuer
        ihren Platz im Markup (siehe index.html). */
     z-index: 4;
-    margin: clamp(1.5rem, 3vw, 2.5rem) 0 0 calc(2 * var(--hero-stufe, 44px));
+    /* Eine Stufe Einzug, nicht zwei: sie sitzt unter der letzten
+       Namenszeile, und das ist seit dem Zusammenruecken des Nachnamens
+       die zweite (Stufe 1) und nicht mehr die dritte. Mit zwei Stufen
+       stuende sie einen Absatz zu weit rechts und die Treppe knickte
+       unten weg. */
+    margin: clamp(1.5rem, 3vw, 2.5rem) 0 0 calc(1 * var(--hero-stufe, 44px));
     /* Steht direkt auf der Stadt - ohne Schatten frisst die Dachlinie
        die Zeile. */
     text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
