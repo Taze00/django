@@ -297,7 +297,7 @@ section {
 /* --- Die Ebenen des Hero ------------------------------------------------
    Von hinten nach vorn:
 
-     0  .hero-foto        berlin.png, abgedunkelt
+     0  .hero-foto        berlin.jpg, abgedunkelt
      0  .hero-bg          Sternenfeld von three.js
      0  .hero-overlay     Verlauf, der die Schrift links traegt
      2  .hero-content     Marke und Namenszug
@@ -313,7 +313,7 @@ section {
    Freistellung vor der Schrift.
 
    --- Die zwei Ebenen aus einer Datei ---
-   Beide Ebenen laden dieselbe Datei, berlin.png. Das ist keine
+   Beide Ebenen laden dieselbe Datei, berlin.jpg. Das ist keine
    Sparmassnahme, sondern die ganze Idee: weil die Pixel identisch sind
    und beide Ebenen dieselbe Lage und Groesse einsetzen
    (--foto-lage / --foto-groesse), liegen sie im Ruhezustand
@@ -321,11 +321,21 @@ section {
    steht einmal, nicht doppelt nebeneinander wie beim alten Versuch
    mit Foto plus Silhouette.
 
+   berlin.jpg ist die Neukodierung von berlin.png, progressiv bei
+   Qualitaet 82: 5.62 MB -> 0.96 MB. Das PNG war ein Fehlgriff der
+   Kodierung, kein besseres Bild - es hielt nur 205 Farben, also ein
+   bereits quantisiertes, verrauschtes Grau. Die groesste Abweichung
+   sitzt denn auch im Himmel (mittel 3.4 von 255) und ist dort das
+   weggeglaettete Dither-Rauschen, nicht ein Verlust. An der
+   Dachlinie, wo die Maske schneidet, sind es 2.5. Das Original liegt
+   in der Git-Historie:
+   git show 1a2e0ed:static/css/images/header/berlin.png
+
    Freigestellt wird ueber mask-image, nicht ueber ein zweites Bild.
    berlin-removebg-preview.png ist die remove.bg-Vorschau desselben
    Fotos und misst nur 612x408 - ihre Pixel als Bild genommen waeren
    auf 1440px zweifach hochskaliert und sichtbar weich. Als Maske
-   zaehlt nur ihr Alphakanal, die Pixel kommen weiter aus berlin.png
+   zaehlt nur ihr Alphakanal, die Pixel kommen weiter aus berlin.jpg
    in voller Aufloesung.
 
    Die Maske ist trotzdem nicht die Vorschau selbst, sondern
@@ -359,7 +369,7 @@ section {
     inset: 0;
     background:
         linear-gradient(rgba(5, 5, 5, 0.70), rgba(5, 5, 5, 0.70)),
-        url('./images/header/berlin.png')
+        url('./images/header/berlin.jpg')
             var(--foto-lage) / var(--foto-groesse) no-repeat;
     /* Die hinterste Ebene laeuft am langsamsten mit - die Parallaxe
        schiebt sie ueber translate. */
@@ -397,7 +407,7 @@ section {
 .hero-stadt {
     position: absolute;
     inset: 0;
-    background: url('./images/header/berlin.png')
+    background: url('./images/header/berlin.jpg')
         var(--foto-lage) / var(--foto-groesse) no-repeat;
     -webkit-mask: url('./images/header/berlin-maske.png')
         var(--foto-lage) / var(--foto-groesse) no-repeat;

@@ -9,7 +9,7 @@
     <link rel="icon" href="{% static 'css/images/favicon.ico' %}" type="image/x-icon">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" as="style">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260818-1">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260818-2">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -102,7 +102,7 @@
 
     <!-- Hero Section -->
     <section id="home" class="hero">
-        {% comment %}Die hinterste Ebene: das komplette Foto berlin.png,
+        {% comment %}Die hinterste Ebene: das komplette Foto berlin.jpg,
         abgedunkelt, damit der Namenszug darauf lesbar bleibt. Die
         vorderste Ebene weiter unten laedt dieselbe Datei noch einmal,
         freigestellt und heller - das ist die ganze Konstruktion. Warum
@@ -637,7 +637,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js"></script>
     {% comment %}Lenis liegt lokal, nicht am CDN - eine Abhaengigkeit weniger
     zur Laufzeit. defer haelt die Reihenfolge: Lenis vor main.js.{% endcomment %}
-    <script defer src="{% static 'js/vendor/lenis.min.js' %}?v=20260818-1"></script>
-    <script defer src="{% static 'js/main.js' %}?v=20260818-1"></script>
+    <script defer src="{% static 'js/vendor/lenis.min.js' %}?v=20260818-2"></script>
+    <script defer src="{% static 'js/main.js' %}?v=20260818-2"></script>
 </body>
 </html>

@@ -7,7 +7,7 @@ von remove.bg und misst nur 612x408. Im Hero wird sie auf mindestens
 linear, und aus der ohnehin kantengeglaetteten Alphakante wird ein
 weicher Verlauf von rund einem Dutzend Pixeln. Sichtbar wird das dort,
 wo die Dachlinie ueber den weissen Namenszug laeuft: die Haeuser sind
-gestochen scharf (ihre Pixel kommen aus berlin.png in voller
+gestochen scharf (ihre Pixel kommen aus berlin.jpg in voller
 Aufloesung), ihre Schnittkante dagegen ist ein grauer Schmier. Genau
 diese Mischung liest sich als schlechte Freistellung.
 
