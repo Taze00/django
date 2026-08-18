@@ -46,12 +46,23 @@ docker compose restart django-dev
 ## Werkzeuge und Fallen
 > Dieser Abschnitt gilt **repo-weit**, nicht nur für CORVIS — er betrifft vor allem die Portfolio-Seiten (`templates/index.html`, `static/css/styles.css`, `static/js/main.js`).
 
-- **Screenshots: `tools/shots.py`** — Playwright für Python, kein Node auf dieser Maschine. Macht Full-Page und Einzelsektionen in 1440px und 390px nach `screenshots/` (gitignored).
+- **Screenshots: `tools/shots.py`** — Playwright für Python, kein Node auf dieser Maschine. Macht einen Hero-Viewport-Shot, Full-Page und Einzelsektionen in 1440px und 390px nach `screenshots/` (gitignored).
   ```
   python3 tools/shots.py                                   # Startseite, beide Breiten
   python3 tools/shots.py --url http://localhost:8000/filme/ --out screenshots/filme
   ```
   **Immer laufen lassen und die Bilder tatsächlich ansehen, bevor etwas als fertig gemeldet wird.**
+
+- **Den Hero immer auf `<breite>-hero.png` beurteilen, nie auf dem Full-Page-Bild.** Er ist die einzige Sektion, deren Höhe aus dem Fenster kommt (`height: 100vh`), und die einzige mit Parallaxe — er hängt damit am Aufnahmezustand, nicht nur am Layout. Im Full-Page-Bild steht er außerdem zwischen 9000px Seite und ist dort nie so zu sehen, wie ein Besucher ihn sieht. `shots.py` nimmt ihn deshalb seit August 2026 zuerst als reine Viewport-Aufnahme auf.
+
+  Nachgemessen mit der Playwright-Version von August 2026 sind die beiden Aufnahmen **identisch**: Abweichung 0.00, Namenszug in beiden auf derselben Zeile, `offsetHeight` bleibt 900. Chromium nimmt Full-Page über `captureBeyondViewport` auf und fasst den Layout-Viewport dabei nicht an, `100vh` bleibt also die Fensterhöhe — eine Stauchung des Hero war *nicht* reproduzierbar. Die alte Umschalt-Strategie, die den Viewport wirklich vergrößert und `100vh` damit auf Seitenhöhe aufbläht, greift erst ab etwa 16384px; die Startseite liegt bei 8958px (1440) und 9837px (390). Wächst sie darüber, ist der Hero-Shot die Aufnahme, die weiterhin stimmt.
+
+- **Fehlt der Namenszug im Hero-Screenshot, war es der Intro-Vorhang, nicht die Seite.** `html.intro-laeuft .hero-buchstabe` hält die Buchstaben verborgen, bis das Intro sie einfahren lässt; das Sicherheitsnetz im `<head>` räumt erst nach 3,5s auf. Eine Aufnahme bei ~3,5s erwischt genau die Kante und zeigt Hero samt Foto, Nav und Metazeile — nur ohne Namen. `shots.py` umgeht das, indem es `sessionStorage['intro-gesehen']` setzt. **Wer eigene Playwright-Skripte schreibt, muss das mitsetzen**, sonst sucht man den Fehler im CSS:
+  ```python
+  kontext.add_init_script(
+      "try { sessionStorage.setItem('intro-gesehen', '1'); } catch (e) {}")
+  ```
+  Genau daran bin ich beim Hero-Umbau hängengeblieben.
 
 - **Leere Kacheln im Screenshot sind meist ein Aufnahmefehler, kein Seitenfehler.** Chromium rasterisiert bei langen Seiten die *erste* Full-Page-Aufnahme unvollständig — Bilder weit unterhalb des Viewports fehlen, obwohl sie geladen und sichtbar sind, und welche fehlen wechselt von Lauf zu Lauf. `shots.py` nimmt deshalb zweimal auf und behält die zweite. Vor der Fehlersuche an der Seite: mit einem **Viewport**-Screenshot gegenprüfen.
 

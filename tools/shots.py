@@ -2,9 +2,14 @@
 """Screenshot-Werkzeug fuer die Design-Arbeit an der Startseite.
 
 Schiesst pro Durchlauf:
+  - einen Viewport-Screenshot des Hero            -> <breite>-hero.png
   - einen Full-Page-Screenshot in 1440px Breite  -> 1440-full.png
   - einen Full-Page-Screenshot in  390px Breite  ->  390-full.png
   - je einen Einzel-Screenshot pro Sektion       -> <breite>-<section-id>.png
+
+Der Hero-Shot ist die Aufnahme, der beim Hero zu trauen ist: nur
+Fensterhoehe, ohne Scrollen, ohne dass die Parallaxe gelaufen ist.
+Naeheres bei ansicht_schiessen.
 
 Alles landet in screenshots/ (gitignored).
 
@@ -132,6 +137,30 @@ def ansicht_schiessen(browser, name: str, konfig: dict, url: str,
 
     print(f"\n[{name}px] {url}")
     seite_vorbereiten(page, url, wartezeit)
+
+    # Der Hero zuerst, als reine Viewport-Aufnahme ohne Scrollen.
+    #
+    # Er ist die einzige Sektion, die ihre Hoehe aus dem Fenster nimmt
+    # (height: 100vh), und die einzige mit Parallaxe. Beides macht ihn
+    # abhaengig vom Aufnahmezustand statt nur vom Layout, und im
+    # Full-Page-Bild steht er zwischen 9000 Pixeln Seite - man sieht ihn
+    # dort nie so, wie ein Besucher ihn sieht.
+    #
+    # Nachgemessen mit der Playwright-Version von August 2026 stimmen
+    # die beiden Aufnahmen exakt ueberein: Abweichung 0.00, der
+    # Namenszug sitzt in beiden auf derselben Zeile, offsetHeight
+    # bleibt bei 900. Chromium nimmt Full-Page ueber
+    # captureBeyondViewport auf und fasst den Layout-Viewport dabei
+    # nicht an, 100vh bleibt also die Fensterhoehe. Die Aufnahme hier
+    # ist trotzdem die, der zu trauen ist - sie haengt an keiner
+    # dieser Zusicherungen. Sollte Chromium je auf die alte
+    # Umschalt-Strategie zurueckfallen (sie greift ab etwa 16384px
+    # Seitenhoehe; die Startseite liegt bei 9000 auf 1440px und 9800
+    # auf 390px), waere der Hero im Full-Page-Bild verzerrt und hier
+    # weiterhin richtig.
+    hero = ziel / f"{name}-hero.png"
+    page.screenshot(path=str(hero))
+    print(f"  ok  {hero.name}")
 
     voll = ziel / f"{name}-full.png"
     # Zweimal, und nur die zweite Aufnahme zaehlt.
