@@ -626,17 +626,22 @@ section {
        stuende sie einen Absatz zu weit rechts und die Treppe knickte
        unten weg. */
     margin: clamp(1.5rem, 3vw, 2.5rem) 0 0 calc(1 * var(--hero-stufe, 44px));
-    /* Steht direkt auf der Stadt - ohne Schatten frisst die Dachlinie
-       die Zeile. */
-    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
+    /* Sie steht als einzige Schrift mitten in der Stadt, nicht im
+       leeren Himmel - unter der Dachlinie, zwischen Daechern und
+       Fenstern. Dagegen reicht die zurueckhaltende Fassung nicht, mit
+       der sie frueher im Dunkeln stand: sie war 0.8rem in --text bei
+       Deckkraft 0.9 und ging in der Textur unter. Jetzt groesser,
+       fetter, in vollem Weiss und mit einem zweistufigen Schatten, der
+       ihr einen dunklen Hof gibt. */
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9),
+                 0 2px 16px rgba(0, 0, 0, 0.8);
     font-family: var(--font-mono);
-    font-size: 0.8rem;
-    font-weight: 500;
+    font-size: 0.95rem;
+    font-weight: 600;
     letter-spacing: var(--mono-track);
     line-height: 1.4;
     text-transform: uppercase;
-    color: var(--text);
-    opacity: 0.9;
+    color: var(--text-bright);
 }
 
 .scroll-indicator {
