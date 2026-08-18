@@ -1,19 +1,13 @@
 
 // ===== MAIN CONFIGURATION =====
 const CONFIG = {
-    SITE_VERSION: '20250515-2',
-    PARTICLES_COUNT: 800,
-    ANIMATION_SPEED: {
-        ROTATION_X: 0.0003,
-        ROTATION_Y: 0.0005
-    }
+    SITE_VERSION: '20250515-2'
 };
 
 // ===== DOM ELEMENTS =====
 const elements = {
     galleryGrid: document.getElementById('gallery-grid'),
-    fadeElements: document.querySelectorAll('.fade-in'),
-    threeBgContainer: document.getElementById('three-bg')
+    fadeElements: document.querySelectorAll('.fade-in')
 };
 
 // ===== DATA STRUCTURES =====
@@ -161,80 +155,6 @@ const galleryItems = [
 ];
 
 
-
-// ===== THREE.JS BACKGROUND =====
-function initThreeBackground() {
-    if (!elements.threeBgContainer) return;
-    
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ 
-        alpha: true, 
-        antialias: true 
-    });
-    
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    elements.threeBgContainer.appendChild(renderer.domElement);
-    
-    camera.position.z = 30;
-    
-    // Create particles
-    const particlesGeometry = new THREE.BufferGeometry();
-    const posArray = new Float32Array(CONFIG.PARTICLES_COUNT * 3);
-    
-    for (let i = 0; i < CONFIG.PARTICLES_COUNT * 3; i += 3) {
-        posArray[i] = (Math.random() - 0.5) * 100;
-        posArray[i + 1] = (Math.random() - 0.5) * 100;
-        posArray[i + 2] = (Math.random() - 0.5) * 100;
-    }
-    
-    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-    
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    const size = 64;
-    canvas.width = size;
-    canvas.height = size;
-    
-    ctx.beginPath();
-    ctx.arc(size/2, size/2, size/2, 0, Math.PI * 2);
-    ctx.fillStyle = 'white';
-    ctx.fill();
-    
-    const texture = new THREE.Texture(canvas);
-    texture.needsUpdate = true;
-    
-    const particlesMaterial = new THREE.PointsMaterial({
-        color: 0xcccccc,
-        size: 0.2,
-        map: texture,
-        transparent: true,
-        opacity: 0.5,
-        alphaTest: 0.1,
-        sizeAttenuation: true,
-        depthWrite: false
-    });
-    
-    const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-    scene.add(particlesMesh);
-    
-    const animate = () => {
-        requestAnimationFrame(animate);
-        
-        particlesMesh.rotation.x += CONFIG.ANIMATION_SPEED.ROTATION_X;
-        particlesMesh.rotation.y += CONFIG.ANIMATION_SPEED.ROTATION_Y;
-        
-        renderer.render(scene, camera);
-    };
-    
-    window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-    
-    animate();
-}
 
 // ===== LOGO ENHANCEMENT =====
 function enhanceLogo() {
@@ -670,9 +590,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize when page loads
 window.addEventListener('load', () => {
-    // Initialize Three.js background
-    initThreeBackground();
-    
     // Activate initial fade elements
     elements.fadeElements.forEach(el => {
         const elementTop = el.getBoundingClientRect().top;
@@ -1046,7 +963,7 @@ function starteTraegheitsScroll() {
 // Drei Ebenen, drei Geschwindigkeiten - von hinten nach vorn immer
 // schneller:
 //
-//   Foto + Sterne  Faktor  0.025  langsamst
+//   Foto           Faktor  0.025  langsamst
 //   Text           Faktor  0.012  mittel
 //   Stadt          Faktor  0      schnellst, laeuft mit der Seite
 //
@@ -1111,7 +1028,7 @@ function starteHeroParallaxe() {
     // also mit der Seite und braucht kein translate. Sie ist trotzdem
     // die schnellste der drei.
     const ebenen = [
-        [0.025, hero.querySelectorAll('.hero-foto, .hero-bg')],
+        [0.025, hero.querySelectorAll('.hero-foto')],
         [0.012, hero.querySelectorAll('.hero-content, .hero-meta-zeile')]
     ].filter(([, knoten]) => knoten.length);
     if (!ebenen.length) return;

@@ -298,7 +298,6 @@ section {
    Von hinten nach vorn:
 
      0  .hero-foto        berlin.jpg, abgedunkelt
-     0  .hero-bg          Sternenfeld von three.js
      0  .hero-overlay     Verlauf, der die Schrift links traegt
      2  .hero-content     Marke und Namenszug
      3  .hero-stadt       dasselbe Foto, freigestellt und aufgehellt
@@ -381,13 +380,6 @@ section {
             var(--foto-lage) / var(--foto-groesse) no-repeat;
     /* Die hinterste Ebene laeuft am langsamsten mit - die Parallaxe
        schiebt sie ueber translate. */
-    will-change: translate;
-    z-index: 0;
-}
-
-.hero-bg {
-    position: absolute;
-    inset: 0;
     will-change: translate;
     z-index: 0;
 }
