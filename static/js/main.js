@@ -1046,15 +1046,15 @@ function starteTraegheitsScroll() {
 // Drei Ebenen, drei Geschwindigkeiten - von hinten nach vorn immer
 // schneller:
 //
-//   Foto + Sterne  Faktor  0.05   langsamst
-//   Text           Faktor  0.025  mittel
+//   Foto + Sterne  Faktor  0.025  langsamst
+//   Text           Faktor  0.012  mittel
 //   Stadt          Faktor  0      schnellst, laeuft mit der Seite
 //
 // Der Faktor ist die Verschiebung nach UNTEN je gescrollten Pixel, er
 // arbeitet also gegen das Scrollen: die Ebene bewegt sich mit
 // (1 - Faktor) der Seitengeschwindigkeit. Ein groesserer Faktor heisst
-// darum langsamer, nicht schneller - 0.05 laeuft mit 95%, 0.025 mit
-// 97.5%, die vorderste Ebene bei 0 mit 100%.
+// darum langsamer, nicht schneller - 0.025 laeuft mit 97.5%, 0.012 mit
+// 98.8%, die vorderste Ebene bei 0 mit 100%.
 //
 // Warum die Werte so klein sind - kleiner als die 0.14/0.06/-0.10, die
 // hier bis August 2026 standen:
@@ -1065,9 +1065,18 @@ function starteTraegheitsScroll() {
 // das ist gewollt, genau daher kommt die Tiefe. Aber der Abstand
 // waechst mit der Differenz der Faktoren mal der Scrollstrecke, und
 // sobald er gross genug wird, liest man ihn nicht mehr als Tiefe,
-// sondern als zwei Skylines nebeneinander. Bei 0.05 gegen 0 sind es
-// nach 400px Scrollen 20px Versatz; ein Vielfaches davon sieht falsch
-// aus. Wer hier dreht, dreht am Doppelbild - sehr dezent bleiben.
+// sondern als zwei Skylines nebeneinander. Bei 0.025 gegen 0 sind es
+// nach 400px Scrollen 10px Versatz. Wer hier dreht, dreht am
+// Doppelbild - sehr dezent bleiben.
+//
+// Die Werte waren einmal doppelt so hoch. Sie mussten runter, als der
+// Schleier auf .hero-foto von 0.70 auf 0.15 fiel: solange die hintere
+// Ebene fast schwarz war, verdeckte die Dunkelheit das Auseinander-
+// laufen: bei 20px Versatz stand ueber der hellen Dachlinie eine
+// zweite, dunklere - besonders am rechten Bildrand. Sichtbar wurde der
+// Fehler also nicht durch die Parallaxe, sondern durch das hellere
+// Foto. Wer den Schleier wieder anzieht, darf die Faktoren mit
+// anziehen.
 //
 // Keine Ebene reisst dabei eine Luecke auf, deshalb braucht es die
 // frueheren Fuellflaechen (.hero-boden) nicht mehr: die vorderste Ebene
@@ -1102,8 +1111,8 @@ function starteHeroParallaxe() {
     // also mit der Seite und braucht kein translate. Sie ist trotzdem
     // die schnellste der drei.
     const ebenen = [
-        [0.05, hero.querySelectorAll('.hero-foto, .hero-bg')],
-        [0.025, hero.querySelectorAll('.hero-content, .hero-meta-zeile')]
+        [0.025, hero.querySelectorAll('.hero-foto, .hero-bg')],
+        [0.012, hero.querySelectorAll('.hero-content, .hero-meta-zeile')]
     ].filter(([, knoten]) => knoten.length);
     if (!ebenen.length) return;
 

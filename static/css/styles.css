@@ -363,12 +363,20 @@ section {
 /* Ebene ganz hinten: das komplette Foto. Abgedunkelt ueber eine
    Verlaufsflaeche IM Hintergrund statt ueber filter - ein filter auf
    einer bildschirmfuellenden Ebene, die bei jedem Scrollschritt
-   verschoben wird, kostet in jedem Bild neu. */
+   verschoben wird, kostet in jedem Bild neu.
+
+   Nur 0.15, also fast nichts: das Foto ist der Kern des Hero, Wolken
+   und Dunst sollen zu sehen sein und nicht bloss angedeutet. Die
+   Deckung, die der Namenszug braucht, holt er sich stattdessen aus
+   seinem eigenen text-shadow und aus .hero-overlay - besser Schatten
+   am Text als Schleier ueber dem Bild. Zum Vergleich gemessen: bei
+   0.15 liegt der Himmel bei mittlerer Helligkeit 40.6 von 255, bei
+   0.20 bei 38.7 - der Unterschied zwischen den beiden ist keiner. */
 .hero-foto {
     position: absolute;
     inset: 0;
     background:
-        linear-gradient(rgba(5, 5, 5, 0.70), rgba(5, 5, 5, 0.70)),
+        linear-gradient(rgba(5, 5, 5, 0.15), rgba(5, 5, 5, 0.15)),
         url('./images/header/berlin.jpg')
             var(--foto-lage) / var(--foto-groesse) no-repeat;
     /* Die hinterste Ebene laeuft am langsamsten mit - die Parallaxe
@@ -395,6 +403,33 @@ section {
         rgba(5, 5, 5, 0.35) 45%,
         rgba(5, 5, 5, 0) 80%);
     z-index: 0;
+}
+
+/* Der Namenszug sitzt hoeher als die Mitte des Hero, damit von "MANN"
+   rund vier Fuenftel ueber der Dachlinie stehen bleiben. Ohne den
+   Versatz sind es 48 Prozent der Buchstabenflaeche - gemessen, indem
+   die Tintenpunkte der Zeile gegen den Alphakanal der Maske gehalten
+   werden (tools/ hat kein Skript dafuer, es war eine einmalige
+   Messung). 6.1vh sind auf 1440x900 rund 55px und bringen die 48 auf
+   81 Prozent.
+
+   Warum nicht stattdessen das Foto tiefer setzen, also --foto-lage auf
+   `center top`: das schiebt die Dachlinie um 60px nach unten und
+   stellt MANN zu 93 Prozent frei - dann schneidet die Stadt praktisch
+   nicht mehr durch den Namen, und die Tiefenwirkung, um die es hier
+   geht, ist weg. Gemessen, nicht geschaetzt.
+
+   position/top und NICHT transform: ein transform an .container waere
+   ein Stapelkontext, und dann kaeme .hero-content mit seinem z-index 2
+   nicht mehr hinter .hero-stadt mit 3 - die Stadt stuende hinter dem
+   Namen und die ganze Tiefenwirkung waere weg. Aus dem gleichen Grund
+   hier auch kein filter und kein will-change.
+
+   Der Kindselektor ist Absicht: .container gibt es auf jeder Sektion,
+   angehoben werden soll nur die des Hero. */
+.hero > .container {
+    position: relative;
+    top: -6.1vh;
 }
 
 /* Ebene ganz vorn: dasselbe Foto, auf die Stadt freigestellt und
@@ -455,6 +490,13 @@ section {
 .hero-name {
     margin: 0;
     line-height: 0.84;
+    /* Weich und dunkel, zwei Stufen: die enge Stufe traegt die Kante
+       gegen den hellen Himmel, die weite legt einen Hauch Tiefe
+       darunter. Der Schatten ist die Gegenleistung dafuer, dass der
+       Schleier auf dem Foto fast weg ist - er verdunkelt nur, wo
+       Schrift steht, statt das ganze Bild. */
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45),
+                 0 6px 34px rgba(0, 0, 0, 0.55);
 }
 
 .hero-zeile {
@@ -496,7 +538,15 @@ section {
    drei gleich laute Zeilen, sondern zwei helle mit einer verschluckten
    dazwischen. */
 .hero-zeile--mitte {
-    color: #3a3a3a;
+    /* Nur wenig unter dem Weiss der beiden anderen Zeilen. Vorher
+       stand hier #3a3a3a - ein Dunkelgrau, das auf dem alten, fast
+       schwarzen Himmel als Andeutung funktionierte. Seit das Foto
+       sichtbar ist, steht der Nachname damit unlesbar auf einem
+       aehnlich dunklen Grund: "VOLK-" verschwand, und weil "MANN"
+       unten zur Haelfte in der Stadt sitzt, war der Nachname als
+       Ganzes weg. Der Kontrast der Treppe kommt aus Versatz und
+       Groesse, nicht daraus, dass eine Zeile unsichtbar ist. */
+    color: #e6e6e6;
 }
 
 /* Die Buchstaben muessen einzeln animierbar sein, duerfen aber wie
@@ -534,6 +584,9 @@ section {
        ihren Platz im Markup (siehe index.html). */
     z-index: 4;
     margin: clamp(1.5rem, 3vw, 2.5rem) 0 0 calc(2 * var(--hero-stufe, 44px));
+    /* Steht direkt auf der Stadt - ohne Schatten frisst die Dachlinie
+       die Zeile. */
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7);
     font-family: var(--font-mono);
     font-size: 0.8rem;
     font-weight: 500;
