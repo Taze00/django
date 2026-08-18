@@ -9,7 +9,7 @@
     <link rel="icon" href="{% static 'css/images/favicon.ico' %}" type="image/x-icon">
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" as="style">
     <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260818-4">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=20260818-5">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -109,6 +109,22 @@
         das ein Bild ergibt und nicht zwei, steht im CSS bei "Die zwei
         Ebenen aus einer Datei".{% endcomment %}
         <div class="hero-foto" aria-hidden="true"></div>
+
+        {% comment %}Der Lichtschein, den die Stadt nachts in den Himmel
+        wirft. Er ersetzt keine Struktur im Foto, sondern schafft
+        welche: der Himmel dieser Aufnahme ist ein gleichmaessiger
+        Verlauf ohne Wolken - nachgemessen sind es 3.5 Helligkeits-
+        stufen von 255 ueber das obere Drittel, der Rest der Streuung
+        ist Korn.
+
+        Bis hierher stand an dieser Stelle ein Sternenfeld aus
+        Three.js. Es ist raus: auf dem frueheren, fast schwarzen
+        Himmel waren es Sterne, auf dem sichtbaren Foto sind die
+        kameranahen Partikel graue Schlieren. Mit ihm faellt das
+        Three.js vom CDN weg - es war auf dieser Seite sein einziger
+        Verbraucher.{% endcomment %}
+        <div class="hero-schein" aria-hidden="true"></div>
+
         <div class="hero-overlay"></div>
 
         <div class="container">
@@ -635,7 +651,7 @@
 
     {% comment %}Lenis liegt lokal, nicht am CDN - eine Abhaengigkeit weniger
     zur Laufzeit. defer haelt die Reihenfolge: Lenis vor main.js.{% endcomment %}
-    <script defer src="{% static 'js/vendor/lenis.min.js' %}?v=20260818-4"></script>
-    <script defer src="{% static 'js/main.js' %}?v=20260818-4"></script>
+    <script defer src="{% static 'js/vendor/lenis.min.js' %}?v=20260818-5"></script>
+    <script defer src="{% static 'js/main.js' %}?v=20260818-5"></script>
 </body>
 </html>

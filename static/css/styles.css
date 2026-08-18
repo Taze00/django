@@ -284,6 +284,10 @@ section {
     --foto-lage: center bottom;
     --foto-groesse: cover;
 
+    /* Deckkraft des Lichtscheins an seinem hellsten Punkt, unten an
+       der Dachlinie. Naeheres bei .hero-schein. */
+    --schein: 0.18;
+
     /* Der Versatz je Treppenstufe des Namenszugs. Die Metazeile
        richtet sich auch danach, und sie ist seit dem Umbau der Ebenen
        weder Kind noch Geschwister von .hero-content.
@@ -298,11 +302,17 @@ section {
    Von hinten nach vorn:
 
      0  .hero-foto        berlin.jpg, abgedunkelt
+     0  .hero-schein      Lichtschein der Stadt im Himmel
      0  .hero-overlay     Verlauf, der die Schrift links traegt
      2  .hero-content     Marke und Namenszug
      3  .hero-stadt       dasselbe Foto, freigestellt und aufgehellt
      4  .hero-meta-zeile  Ort und Fach
      4  .scroll-indicator
+
+   Die drei Flaechen mit z-index 0 stapeln sich in Markup-Reihenfolge.
+   Dass .hero-overlay zuletzt kommt, ist Absicht: sein Schleier von
+   links soll auch ueber dem Lichtschein liegen, sonst hellt der die
+   Ecke wieder auf, in der der Namenszug steht.
 
    Bis August 2026 standen hier statt des Fotos zwei Silhouetten aus
    Midjourney - ein Turm und eine Haeuserzeile, beide als Maske
@@ -381,6 +391,44 @@ section {
     /* Die hinterste Ebene laeuft am langsamsten mit - die Parallaxe
        schiebt sie ueber translate. */
     will-change: translate;
+    z-index: 0;
+}
+
+/* Der Lichtschein, den eine Grossstadt nachts in den Himmel wirft.
+
+   Er steht hier, weil im Foto nichts steht: der Himmel dieser Aufnahme
+   ist ein glatter Verlauf ueber 3.5 Helligkeitsstufen von 255, ohne
+   Wolken - was an Streuung da ist, ist Korn. berlin-crop.jpg hilft
+   nicht, es ist derselbe Himmel ab Zeile 783. Der Schein ersetzt die
+   fehlende Struktur also nicht durch eine erfundene Wolke, sondern
+   durch das einzige, was ueber einer Stadt nachts wirklich am Himmel
+   steht.
+
+   Warm, nicht cyan: Natriumdampf und LED, kein Effektlicht. Und sehr
+   flach angesetzt - ein Schein, den man als Schein bemerkt, ist zu
+   stark.
+
+   Die Staerke hat ein Vorzeichen, nicht nur einen Betrag. Ohne ihn
+   wird der Himmel des Fotos zum Horizont hin DUNKLER (gemessen 40.9
+   oben gegen 27.0 unten), und das ist ueber einer Grossstadt nachts
+   falsch herum. Bei 0.10 hebt der Schein das gerade auf, der Himmel
+   wird flach. Erst bei 0.18 dreht er um - 56.7 unten gegen 40.9 oben.
+
+   Unten laeuft er voll durch, obwohl man das nie sieht: dort liegt die
+   Stadt (z-index 3) davor. Sichtbar ist nur das Stueck zwischen
+   Dachlinie und Ausklang, auf 1440x900 also von y 660 bis 360 - 300px
+   von 900, rund ein Drittel des Hero. Die Stufen bilden einen Abfall
+   nach, der nach oben schnell duenner wird, keinen linearen Verlauf. */
+.hero-schein {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top,
+        rgba(255, 232, 200, var(--schein))                 0%,
+        rgba(255, 232, 200, var(--schein))                24%,
+        rgba(255, 232, 200, calc(var(--schein) * 0.55))   36%,
+        rgba(255, 232, 200, calc(var(--schein) * 0.22))   47%,
+        rgba(255, 232, 200, 0)                            60%);
+    pointer-events: none;
     z-index: 0;
 }
 
