@@ -1046,26 +1046,34 @@ function starteTraegheitsScroll() {
 // Drei Ebenen, drei Geschwindigkeiten - von hinten nach vorn immer
 // schneller:
 //
-//   Sternenfeld  Faktor  0.14   langsamst
-//   Text         Faktor  0.06   mittel
-//   Silhouetten  Faktor -0.10   schnellst
+//   Foto + Sterne  Faktor  0.05   langsamst
+//   Text           Faktor  0.025  mittel
+//   Stadt          Faktor  0      schnellst, laeuft mit der Seite
 //
 // Der Faktor ist die Verschiebung nach UNTEN je gescrollten Pixel, er
 // arbeitet also gegen das Scrollen: die Ebene bewegt sich mit
 // (1 - Faktor) der Seitengeschwindigkeit. Ein groesserer Faktor heisst
-// darum langsamer, nicht schneller - 0.14 laeuft mit 86%, 0.06 mit 94%.
+// darum langsamer, nicht schneller - 0.05 laeuft mit 95%, 0.025 mit
+// 97.5%, die vorderste Ebene bei 0 mit 100%.
 //
-// Die Silhouetten brauchen deshalb ein negatives Vorzeichen: nur so
-// laufen sie mit 110% schneller als die Seite selbst. Das ist der
-// Grund, aus dem unter der Haeuserzeile .hero-boden steht - die Ebene
-// wandert nach oben und wuerde sonst eine Luecke zur Unterkante des
-// Hero aufreissen.
+// Warum die Werte so klein sind - kleiner als die 0.14/0.06/-0.10, die
+// hier bis August 2026 standen:
 //
-// Die hinterste Ebene war bis August 2026 das Foto berlin-crop.jpg.
-// Mit dem Foto ist das Sternenfeld von three.js nachgerueckt; es fuellt
-// den Hero randlos, die Luecke, die sein Nachlaufen am oberen Rand
-// aufmacht, liegt bei Faktor 0.14 immer oberhalb des Viewports.
-// Sichtbar wuerde sie erst ab Faktor 1.
+// .hero-foto und .hero-stadt zeigen DASSELBE Foto und liegen im
+// Ruhezustand pixelgenau uebereinander (siehe CSS, "Die zwei Ebenen aus
+// einer Datei"). Beim Scrollen loest die Parallaxe diese Deckung auf -
+// das ist gewollt, genau daher kommt die Tiefe. Aber der Abstand
+// waechst mit der Differenz der Faktoren mal der Scrollstrecke, und
+// sobald er gross genug wird, liest man ihn nicht mehr als Tiefe,
+// sondern als zwei Skylines nebeneinander. Bei 0.05 gegen 0 sind es
+// nach 400px Scrollen 20px Versatz; ein Vielfaches davon sieht falsch
+// aus. Wer hier dreht, dreht am Doppelbild - sehr dezent bleiben.
+//
+// Keine Ebene reisst dabei eine Luecke auf, deshalb braucht es die
+// frueheren Fuellflaechen (.hero-boden) nicht mehr: die vorderste Ebene
+// steht mit Faktor 0 still zum Hero, und die hinterste wandert nach
+// unten, ihr oberer Rand bleibt bei 0.05 immer oberhalb des Viewports.
+// Sichtbar wuerde er erst ab Faktor 1.
 //
 // Verschoben wird ueber die eigenstaendige translate-Eigenschaft, nicht
 // ueber transform: .hero-content traegt das translateY der
@@ -1073,12 +1081,11 @@ function starteTraegheitsScroll() {
 // an transform wuerde das ueberschreiben - translate legt sich davor,
 // ohne es anzufassen.
 //
-// Turm und Haeuserzeile werden einzeln verschoben statt gemeinsam ueber
-// einen Wrapper: sie liegen auf verschiedenen z-index-Ebenen, weil der
-// Text zwischen ihnen steht (siehe CSS, "Die Ebenen des Hero"). Der
-// gemeinsame Faktor haelt sie trotzdem als eine Ebene zusammen.
-// Dasselbe gilt fuer Namenszug und Metazeile, die aus demselben Grund
-// nicht mehr im selben Element sitzen.
+// Namenszug und Metazeile werden einzeln verschoben statt gemeinsam
+// ueber einen Wrapper: sie liegen auf verschiedenen z-index-Ebenen,
+// weil die freigestellte Stadt zwischen ihnen steht (siehe CSS, "Die
+// Ebenen des Hero"). Der gemeinsame Faktor haelt sie trotzdem als eine
+// Ebene zusammen.
 function starteHeroParallaxe() {
     if (BEWEGUNG_REDUZIERT) return;
 
@@ -1090,11 +1097,13 @@ function starteHeroParallaxe() {
     const hero = document.querySelector('.hero');
     if (!hero) return;
 
-    // Je Faktor die Elemente, die sich damit bewegen.
+    // Je Faktor die Elemente, die sich damit bewegen. Die vorderste
+    // Ebene .hero-stadt steht hier nicht: ihr Faktor ist 0, sie laeuft
+    // also mit der Seite und braucht kein translate. Sie ist trotzdem
+    // die schnellste der drei.
     const ebenen = [
-        [0.14, hero.querySelectorAll('.hero-bg')],
-        [0.06, hero.querySelectorAll('.hero-content, .hero-meta-zeile')],
-        [-0.10, hero.querySelectorAll('.hero-turm, .hero-haeuser')]
+        [0.05, hero.querySelectorAll('.hero-foto, .hero-bg')],
+        [0.025, hero.querySelectorAll('.hero-content, .hero-meta-zeile')]
     ].filter(([, knoten]) => knoten.length);
     if (!ebenen.length) return;
 

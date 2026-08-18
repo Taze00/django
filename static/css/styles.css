@@ -276,16 +276,13 @@ section {
        werden von mehreren Regeln gebraucht, und .hero soll es in dieser
        Datei nur einmal geben. */
 
-    /* Der Ton der Silhouetten - sehr dunkel, aber nicht schwarz, mit
-       einem Stich ins Blaue. Naeheres unten bei "Die Silhouetten".
-       Dunklere Fassung, falls die Stadt zurueckhaltender stehen soll:
-       #1b2230. */
-    --silhouette: #26303f;
-
-    /* Hoehe des Turms. Aus ihr wird seine Breite gerechnet -
-       aspect-ratio hilft nicht, weil die Zentrierung die Breite in
-       calc() braucht. */
-    --turm-hoehe: min(68vh, 620px);
+    /* Lage und Groesse des Fotos. Diese zwei Werte sind der Grund, aus
+       dem es sie ueberhaupt als Variablen gibt: .hero-foto und
+       .hero-stadt MUESSEN sie beide unveraendert einsetzen, sonst
+       decken sich die Ebenen nicht mehr und der Turm steht doppelt.
+       Naeheres unten bei "Die zwei Ebenen aus einer Datei". */
+    --foto-lage: center bottom;
+    --foto-groesse: cover;
 
     /* Der Versatz je Treppenstufe des Namenszugs. Die Metazeile
        richtet sich auch danach, und sie ist seit dem Umbau der Ebenen
@@ -300,51 +297,86 @@ section {
 /* --- Die Ebenen des Hero ------------------------------------------------
    Von hinten nach vorn:
 
+     0  .hero-foto        berlin.png, abgedunkelt
      0  .hero-bg          Sternenfeld von three.js
      0  .hero-overlay     Verlauf, der die Schrift links traegt
-     1  .hero-haeuser     Haeuserzeile auf der Unterkante
      2  .hero-content     Marke und Namenszug
-     3  .hero-turm        Fernsehturm
+     3  .hero-stadt       dasselbe Foto, freigestellt und aufgehellt
      4  .hero-meta-zeile  Ort und Fach
      4  .scroll-indicator
 
-   Das Foto berlin-crop.jpg lag hier bis August 2026 als unterste Ebene
-   und ist weggefallen: es zeigt denselben Fernsehturm, den die
-   Silhouette mittig noch einmal zeichnet, und die beiden Tuerme deckten
-   sich fast, aber nicht ganz - die Kugel stand doppelt. Die
-   Haeuserzeile setzte sich vor den Haeusern im Foto ausserdem kaum ab.
-   Jetzt steht die Stadt als reine Zeichnung auf dem Grund der Seite,
-   und das Sternenfeld gibt dem Himmel die Tiefe, die vorher das Foto
-   gab.
+   Bis August 2026 standen hier statt des Fotos zwei Silhouetten aus
+   Midjourney - ein Turm und eine Haeuserzeile, beide als Maske
+   eingefaerbt. Sie sind weg. Die Stadt ist wieder das Foto, und die
+   Tiefe kommt jetzt daher, dass dasselbe Foto zweimal liegt: einmal
+   ganz hinten als abgedunkelter Grund, einmal ganz vorn als
+   Freistellung vor der Schrift.
 
-   Warum Turm und Haeuser NICHT in einem gemeinsamen Wrapper liegen,
-   obwohl sie zusammengehoeren und sich gleich schnell bewegen: sie
-   brauchen verschiedene Ebenen. Der Turm steht vor dem Namen - das ist
-   die Tiefenwirkung, um die es geht -, die Haeuserzeile dahinter, sonst
-   frisst ihre Dachlinie die Unterkante von "MANN" und die Metazeile
-   gleich mit. Ein gemeinsamer Wrapper haette einen z-index fuer beide,
-   und weil die Parallaxe ihn per translate verschiebt, waere er
-   zusaetzlich ein eigener Stapelkontext - die Kinder kaemen aus ihm
-   nicht mehr heraus.
+   --- Die zwei Ebenen aus einer Datei ---
+   Beide Ebenen laden dieselbe Datei, berlin.png. Das ist keine
+   Sparmassnahme, sondern die ganze Idee: weil die Pixel identisch sind
+   und beide Ebenen dieselbe Lage und Groesse einsetzen
+   (--foto-lage / --foto-groesse), liegen sie im Ruhezustand
+   pixelgenau uebereinander. Man sieht ein Bild, nicht zwei - der Turm
+   steht einmal, nicht doppelt nebeneinander wie beim alten Versuch
+   mit Foto plus Silhouette.
 
-   Verschoben werden Turm und Haeuser deshalb einzeln, mit demselben
-   Faktor (siehe starteHeroParallaxe in main.js). Das geht, weil beide
-   ohne transform auskommen: der Turm ist ueber left und margin-left
-   zentriert, nicht ueber translateX. */
+   Freigestellt wird ueber mask-image, nicht ueber ein zweites Bild.
+   berlin-removebg-preview.png ist die remove.bg-Vorschau desselben
+   Fotos und misst nur 612x408 - ihre Pixel als Bild genommen waeren
+   auf 1440px zweifach hochskaliert und sichtbar weich. Als Maske
+   zaehlt nur ihr Alphakanal, die Pixel kommen weiter aus berlin.png
+   in voller Aufloesung.
 
-.hero-bg {
+   Die Maske ist trotzdem nicht die Vorschau selbst, sondern
+   berlin-maske.png: ihr nachgeschaerfter Alphakanal aus
+   tools/berlin-maske.py. Ungeschaerft zieht der Browser die weiche
+   612px-Kante auf rund ein Dutzend Pixel auseinander, und dort, wo
+   die Dachlinie ueber den weissen Namenszug laeuft, steht dann ein
+   grauer Schmier zwischen gestochen scharfen Haeusern - das liest
+   sich als schlechte Freistellung. Aendert sich die Vorlage, das
+   Werkzeug neu laufen lassen.
+
+   Das Seitenverhaeltnis der Maske (1.5000) weicht minimal von dem des
+   Fotos (1.50042) ab - auf 1440px Breite sind das 0.27px, und sie
+   liegen dank `bottom` am oberen Rand, also im Himmel, wo die Maske
+   leer ist.
+
+   berlin-crop.jpg ist NICHT verwendbar: anderer Ausschnitt, deckt sich
+   also nicht mit der Freistellung.
+
+   Beim Scrollen loest die Parallaxe die Deckung absichtlich auf -
+   siehe starteHeroParallaxe in main.js. Sehr wenig: laufen die zwei
+   Skylines weit auseinander, kippt der Eindruck von Tiefe in einen
+   Doppelbild-Fehler. */
+
+/* Ebene ganz hinten: das komplette Foto. Abgedunkelt ueber eine
+   Verlaufsflaeche IM Hintergrund statt ueber filter - ein filter auf
+   einer bildschirmfuellenden Ebene, die bei jedem Scrollschritt
+   verschoben wird, kostet in jedem Bild neu. */
+.hero-foto {
     position: absolute;
     inset: 0;
+    background:
+        linear-gradient(rgba(5, 5, 5, 0.70), rgba(5, 5, 5, 0.70)),
+        url('./images/header/berlin.png')
+            var(--foto-lage) / var(--foto-groesse) no-repeat;
     /* Die hinterste Ebene laeuft am langsamsten mit - die Parallaxe
        schiebt sie ueber translate. */
     will-change: translate;
     z-index: 0;
 }
 
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    will-change: translate;
+    z-index: 0;
+}
+
 /* Ein Schleier von links: dort steht die Schrift, dort braucht es die
-   Deckung. Nach rechts laeuft er aus, damit die Silhouetten unten nicht
-   zugedeckt werden - sie stehen auf dem blanken Grund der Seite, es
-   gibt dort nichts abzudunkeln. */
+   Deckung. Nach rechts laeuft er aus, damit die Stadt auf der rechten
+   Seite nicht zugedeckt wird. */
 .hero-overlay {
     position: absolute;
     inset: 0;
@@ -355,101 +387,36 @@ section {
     z-index: 0;
 }
 
-/* --- Die Silhouetten ----------------------------------------------------
-   Fernsehturm mittig, Haeuserzeile auf der Unterkante. Beide kommen aus
-   tools/silhouetten.py als freigestellte PNGs; aus der Haeuserzeile ist
-   der Turm herausgerechnet, weil er hier einzeln daneben steht.
+/* Ebene ganz vorn: dasselbe Foto, auf die Stadt freigestellt und
+   aufgehellt, damit sie sich vor dem Namenszug abhebt. Sie liegt VOR
+   dem Namen (z-index 3 gegen 2) - Turm und Dachlinie schneiden durch
+   "VOLK-MANN" hindurch, und daran haengt die ganze Tiefenwirkung.
 
-   Eingefaerbt wird ueber mask-image plus background-color, nicht ueber
-   das Bild selbst: die PNGs tragen ihren Farbton zwar eingebacken, als
-   Maske zaehlt aber nur der Alphakanal - der Ton steht damit hier an
-   genau einer Stelle, und ein filter haette an fast schwarzen Pixeln
-   ohnehin nichts zu greifen.
-
-   Der Ton ist eine Aufhellung gegen den Grund, keine Abdunklung: vor
-   einem Foto waere eine Silhouette dunkler als ihr Hintergrund, auf dem
-   #050505 der Seite gibt es nichts, was noch dunkler waere. Das
-   Ergebnis liest sich als graphische Zeichnung, nicht als Gegenlicht.
-
-   Der Ton selbst steht als --silhouette oben an .hero, zusammen mit den
-   uebrigen Stellschrauben des Hero - nicht hier, damit es .hero nur ein
-   einziges Mal in dieser Datei gibt. */
-
-/* Turm: waagerecht mittig, Fuss auf der Unterkante. Die 154/1326 sind
-   die Pixelmasse von fernsehturm-silhouette.png; der Rand-Versatz ist
-   die halbe Breite. Aendert sich das Bild, hier nachrechnen.
-
-   Er liegt VOR dem Namen (z-index 3 gegen 2) - der Turm schneidet durch
-   "VOLK-MANN" hindurch, und daran haengt die ganze Tiefenwirkung. */
-.hero-turm {
+   Lage und Groesse sind dieselben Variablen wie bei .hero-foto. Nicht
+   die Werte hier direkt hinschreiben - die Deckung haengt daran. */
+.hero-stadt {
     position: absolute;
-    bottom: 0;
-    left: 50%;
-    height: var(--turm-hoehe);
-    width: calc(var(--turm-hoehe) * 154 / 1326);
-    margin-left: calc(var(--turm-hoehe) * -77 / 1326);
-    background: var(--silhouette);
-    -webkit-mask: url('./images/header/fernsehturm-silhouette.png') bottom center / 100% 100% no-repeat;
-    mask: url('./images/header/fernsehturm-silhouette.png') bottom center / 100% 100% no-repeat;
-    /* Sonst waere der Namenszug hinter dem Turm nicht mehr markierbar. */
+    inset: 0;
+    background: url('./images/header/berlin.png')
+        var(--foto-lage) / var(--foto-groesse) no-repeat;
+    -webkit-mask: url('./images/header/berlin-maske.png')
+        var(--foto-lage) / var(--foto-groesse) no-repeat;
+    mask: url('./images/header/berlin-maske.png')
+        var(--foto-lage) / var(--foto-groesse) no-repeat;
+    /* Aufhellen geht hier nur ueber filter: eine Verlaufsflaeche im
+       Hintergrund koennte nur abdunkeln. Der Kontrastzuschlag haelt
+       den Himmelsrest an der Dachlinie dunkel, damit die Kante nicht
+       aufweicht. */
+    filter: brightness(1.40) contrast(1.10);
+    /* Sonst waere der Namenszug hinter der Stadt nicht mehr markierbar. */
     pointer-events: none;
     will-change: translate;
     z-index: 3;
 }
 
-/* Haeuserzeile: ueber die ganze Breite, auf der Unterkante, HINTER dem
-   Text (z-index 1).
-
-   Das Element traegt selbst keine Maske, nur die Verschiebung der
-   Parallaxe - die Maske sitzt eine Ebene tiefer auf .hero-haeuser-bild.
-   Das ist der Grund fuer die Verschachtelung: eine Maske gilt fuer das
-   ganze Element samt seiner Kinder und Pseudo-Elemente. Als der
-   Fuellblock unten noch ein ::after an einem maskierten Element war,
-   wurde er von genau dieser Maske weggeschnitten - dort, wo das
-   Skyline-PNG endet, hat sie kein Alpha mehr. Aufgefallen ist es erst
-   beim Scrollen: eine Luecke in Hoehe des Parallaxe-Versatzes. */
-.hero-haeuser {
-    position: absolute;
-    inset-inline: 0;
-    bottom: 0;
-    /* 12.8vw ist genau das Seitenverhaeltnis von
-       skyline-silhouette.png (1680x215) - so wird nichts verzerrt. Das
-       Maximum von 132px greift erst unter etwa 1030px Fensterbreite und
-       streckt die Zeile dann leicht in die Hoehe; bei einer Silhouette
-       faellt das nicht auf, eine zu flache Stadt schon. */
-    height: max(12.8vw, 132px);
-    pointer-events: none;
-    will-change: translate;
-    z-index: 1;
-}
-
-.hero-haeuser-bild {
-    position: absolute;
-    inset: 0;
-    background: var(--silhouette);
-    -webkit-mask: url('./images/header/skyline-silhouette.png') bottom center / 100% 100% no-repeat;
-    mask: url('./images/header/skyline-silhouette.png') bottom center / 100% 100% no-repeat;
-}
-
-/* Die Ebene laeuft schneller als die Seite, wandert beim Scrollen also
-   nach oben - darunter wuerde der Grund zwischen Haeuserzeile und
-   Unterkante des Hero hervorschauen. Die unterste Bildzeile von
-   skyline-silhouette.png ist ueber die ganze Breite deckend, deshalb
-   setzt dieser Block sie nahtlos nach unten fort. Im Ruhezustand liegt
-   er unter der Unterkante und .hero hat overflow: hidden - man sieht
-   ihn nie, er verhindert nur die Luecke. */
-.hero-boden {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    height: 25vh;
-    background: var(--silhouette);
-}
-
 .hero-content {
     position: relative;
-    /* Vor der Haeuserzeile (1), hinter dem Turm (3). */
+    /* Hinter der freigestellten Stadt (3), vor dem Foto (0). */
     z-index: 2;
 }
 
@@ -550,13 +517,11 @@ section {
    linke Kante zurueckfaellt. */
 .hero-meta-zeile {
     position: relative;
-    /* Vor allen Silhouetten, auch vor dem Turm. Sie sitzt unten links,
-       genau auf der Hoehe der Dachlinie - ohne das frisst die
-       Haeuserzeile die halbe Zeile weg, und auf schmalen Fenstern
-       schneidet zusaetzlich der Turmschaft hindurch. Der Namenszug
-       darueber bleibt bei 2 und damit hinter dem Turm; dass das
-       gleichzeitig geht, ist der Grund fuer ihren Platz im Markup
-       (siehe index.html). */
+    /* Vor der freigestellten Stadt. Sie sitzt unten links, genau auf
+       der Hoehe der Dachlinie - ohne das frisst die Stadt die halbe
+       Zeile weg. Der Namenszug darueber bleibt bei 2 und damit hinter
+       der Stadt; dass beides gleichzeitig geht, ist der Grund fuer
+       ihren Platz im Markup (siehe index.html). */
     z-index: 4;
     margin: clamp(1.5rem, 3vw, 2.5rem) 0 0 calc(2 * var(--hero-stufe, 44px));
     font-family: var(--font-mono);
@@ -574,8 +539,8 @@ section {
     bottom: 2rem;
     left: 50%;
     transform: translateX(-50%);
-    /* Ueber den Silhouetten (z-index 3): der Pfeil sitzt unten mittig,
-       genau dort, wo Haeuserzeile und Turmfuss liegen - bei 2 waere er
+    /* Ueber der freigestellten Stadt (z-index 3): der Pfeil sitzt
+       unten mittig, genau dort, wo die Haeuser stehen - bei 2 waere er
        verdeckt. */
     z-index: 4;
 }
