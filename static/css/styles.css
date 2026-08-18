@@ -313,12 +313,8 @@ section {
    will-change, isolation - jedes davon macht daraus einen
    Stapelkontext, und dann kommt .hero-content mit seinem z-index 2
    nicht mehr hinter .hero-stadt mit 3. Die Stadt stuende hinter dem
-   Namen und die Tiefenwirkung waere weg. Bis August 2026 stand hier
-   ein `position: relative; top: -6.1vh`, um den dreizeiligen Namen
-   ueber die Dachlinie zu heben; position/top war genau deshalb
-   gewaehlt. Seit der Nachname am Stueck steht, ist der Block kuerzer
-   und braucht die Anhebung nicht mehr - wer sie wieder einfuehrt,
-   nimmt wieder position/top.
+   Namen und die Tiefenwirkung waere weg. Der Ausgleich weiter unten
+   nimmt deshalb position/top.
 
    Die drei Flaechen mit z-index 0 stapeln sich in Markup-Reihenfolge.
    Dass .hero-overlay zuletzt kommt, ist Absicht: sein Schleier von
@@ -454,6 +450,36 @@ section {
         rgba(5, 5, 5, 0.35) 45%,
         rgba(5, 5, 5, 0) 80%);
     z-index: 0;
+}
+
+/* Ausgleich fuer flache Fenster.
+
+   Der Namenszug sitzt mittig im Hero, also bei 50vh. Die Dachlinie der
+   Stadt sitzt woanders: das Foto wird mit `cover` eingepasst und ist
+   breiter als hoch, also bindet fast immer die Breite - die Dachlinie
+   liegt damit rund 17vw ueber der Unterkante, unabhaengig von der
+   Fensterhoehe. Zwei Groessen, zwei Einheiten. Je flacher das Fenster,
+   desto weiter rutscht die Dachlinie in den Namen hinein.
+
+   Nachgemessen, wieviel von "VOLKMANN" frei bleibt:
+     1440x900   97%      1280x800   97%      1920x1080  94%
+     1395x711   80%      1440x700   73%      2560x1440  96%
+
+   Die flachen Fenster fielen also deutlich heraus. Der Ausdruck hebt
+   genau dort an und wird bei allen anderen zu 0 - `min` mit einem
+   negativen Zweig ist billiger als eine Media Query, weil es stufenlos
+   ist und nicht an einer Schwelle springt. Nach dem Ausgleich liegen
+   alle gemessenen Fenster bei 92 bis 97 Prozent.
+
+   Warum nicht ganz freistellen: der Name SOLL die Dachlinie beruehren.
+   Dass die Stadt vor ihm steht, ist die Aussage des Hero - bei 100
+   Prozent frei schwebt er darueber und die Ebene verliert ihren Sinn.
+
+   Neu gemessen wird mit dem Skript in tools/ - siehe hero-breite.py
+   fuer die Breite; die Hoehe wurde einmalig von Hand gemessen. */
+.hero > .container {
+    position: relative;
+    top: min(0px, calc(25vh - 14vw));
 }
 
 /* Ebene ganz vorn: dasselbe Foto, auf die Stadt freigestellt und
