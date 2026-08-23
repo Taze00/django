@@ -71,7 +71,12 @@ class OeffentlicheEndpunkteTest(ApiBasis):
         self.assertEqual(
             set(antwort.data), {"count", "next", "previous", "results"}
         )
-        self.assertEqual(antwort.data["count"], 1)
+        # Keine absolute Zahl pruefen: seit
+        # 0009_seed_exercises_and_progressions bringt die Migrationskette
+        # die drei echten Uebungen schon mit. Geprueft wird ueber die ID,
+        # nicht ueber den Namen - die geseedete Uebung heisst genauso.
+        ids = [e["id"] for e in antwort.data["results"]]
+        self.assertIn(self.uebung.pk, ids)
         self.assertIn("progressions", antwort.data["results"][0])
 
     def test_exercises_detail_ist_oeffentlich(self):

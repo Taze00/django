@@ -55,3 +55,6 @@ data/letterboxd/
 # Unbenutzte CORVIS-Screenshots - liegen nur als Vorlage herum
 static/css/images/projects/corvis-vergleich.png
 static/css/images/projects/corvis-app.png
+
+# Datenbank-Sicherungen
+backups/
