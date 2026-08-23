@@ -368,8 +368,9 @@ section {
    liegen dank `bottom` am oberen Rand, also im Himmel, wo die Maske
    leer ist.
 
-   berlin-crop.jpg ist NICHT verwendbar: anderer Ausschnitt, deckt sich
-   also nicht mit der Freistellung.
+   Nur genau dieser Ausschnitt ist verwendbar: die Maske ist auf ihn
+   geschnitten, ein anders beschnittener Auszug desselben Fotos deckt
+   sich nicht mit der Freistellung.
 
    Beim Scrollen loest die Parallaxe die Deckung absichtlich auf -
    siehe starteHeroParallaxe in main.js. Sehr wenig: laufen die zwei
@@ -405,11 +406,11 @@ section {
 
    Er steht hier, weil im Foto nichts steht: der Himmel dieser Aufnahme
    ist ein glatter Verlauf ueber 3.5 Helligkeitsstufen von 255, ohne
-   Wolken - was an Streuung da ist, ist Korn. berlin-crop.jpg hilft
-   nicht, es ist derselbe Himmel ab Zeile 783. Der Schein ersetzt die
-   fehlende Struktur also nicht durch eine erfundene Wolke, sondern
-   durch das einzige, was ueber einer Stadt nachts wirklich am Himmel
-   steht.
+   Wolken - was an Streuung da ist, ist Korn. Ein anderer Ausschnitt
+   hilft nicht, es bleibt dasselbe Foto und damit derselbe Himmel ab
+   Bildzeile 783. Der Schein ersetzt die fehlende Struktur also nicht
+   durch eine erfundene Wolke, sondern durch das einzige, was ueber
+   einer Stadt nachts wirklich am Himmel steht.
 
    Warm, nicht cyan: Natriumdampf und LED, kein Effektlicht. Und sehr
    flach angesetzt - ein Schein, den man als Schein bemerkt, ist zu
