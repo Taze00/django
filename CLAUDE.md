@@ -6,7 +6,7 @@
 Minimalistische Calisthenics-App: 3 Übungen (Push-ups, Pull-ups, Planks), adaptives 7-Stufen-Progressionssystem. Domain: `alex.volkmann.com`.
 
 ## ⚠️ WICHTIG: Was zu CORVIS gehört — und was NICHT
-Dieses Django-Projekt bedient **7 unabhängige Seiten**. **Nur diese Pfade gehören zu CORVIS:**
+Dieses Django-Projekt bedient **vier unabhängige Seiten** (Portfolio `/`, Filme `/filme/`, Impressum `/impressum/`, CORVIS). **Nur diese Pfade gehören zu CORVIS:**
 - `fitness/` — Backend (Django-App: models, views, calibration, streak, serializers, urls)
 - `fitness-frontend/` — Frontend (React-Quelle; der eigentliche Code in `fitness-frontend/src/`)
 - `static/fitness/` — gebautes Frontend (generiert, gitignored)
@@ -14,7 +14,9 @@ Dieses Django-Projekt bedient **7 unabhängige Seiten**. **Nur diese Pfade gehö
 - `templates/fitness-landing.html` — Landing Page (`/corvis/`)
 - API-Routen: `/api/fitness/`, `/api/token/`, `/api/register/`
 
-**NICHT zu CORVIS gehört** (nicht lesen/ändern bei CORVIS-Arbeit): `static/css/styles.css`, `static/js/main.js`, `static/css/schubi.*`, `templates/index.html`, `schubi.html`, `impressum.html`, `skills.html`, `festival.html`, `aurelia-demo.html`, alles unter `static/geo/`. Siehe `PROJEKT_LANDKARTE.md` für die volle Übersicht.
+**NICHT zu CORVIS gehört** (nicht lesen/ändern bei CORVIS-Arbeit): die Portfolio-Welt — `static/css/styles.css`, `static/js/main.js`, `templates/index.html`, `filme.html`, `impressum.html`, `404.html`, alles unter `templates/includes/`, sowie die `films/`-App. Siehe `PROJEKT_LANDKARTE.md` für die volle Übersicht.
+
+> Die Seiten `/schubi/`, `/skills/`, `/festival/`, `/aurelia/` und die geo-App **gibt es nicht mehr** (August 2026). Wenn dir noch ein Verweis darauf begegnet, ist der Verweis der Fehler — nicht die fehlende Datei.
 
 CORVIS ist sauber isoliert — eine CORVIS-Änderung kann keine andere Seite brechen.
 
@@ -116,6 +118,8 @@ Backend: Django + DRF + PostgreSQL + JWT, in Docker (`django-dev`), gunicorn + W
 Frontend: React 19 + Vite, Zustand (`authStore`, `workoutStore`), React Router v7 (`basename="/corvis-app"`), Axios. Styling: handgeschriebene `fitness-frontend/src/index.css` (App) + inline in `fitness-landing.html` (Landing).
 
 ## Offene nächste Schritte
-1. **Registration-Key in die `.env` ziehen** — letzte Stelle mit echtem Wert im Code. Greift noch wegen Variablennamen-Tippfehler in `.env` (`REGISTRATION_SECRET_KEY` statt `DJANGO_REGISTRATION_KEY`). ~5 Min.
+1. **Django-Upgrade 4.2 → 5.2 LTS** — 4.2 hat am 7. April 2026 EOL erreicht, es kommen keine Sicherheitspatches mehr. Analyse liegt vor, noch nicht durchgeführt.
 2. **PWA + Push-Notifications** — installierbar machen, Trainings-Reminder.
-3. Optional: geo-Reste + tote Dokus aufräumen (siehe `PROJEKT_LANDKARTE.md`).
+3. Optional: `FITNESS_APP_COMPLETE_SPEC.md` und `BUILD_WORKFLOW.md` löschen (beide überholt, siehe `PROJEKT_LANDKARTE.md`).
+
+*Erledigt:* Registration-Key liegt in der `.env` (`DJANGO_REGISTRATION_KEY`), im Code steht nur noch ein Platzhalter. geo-Reste sind entfernt.
