@@ -1,41 +1,39 @@
 # 🗺️ Projekt-Landkarte — alex-django
 
-> **Zweck:** Dieses eine Django-Projekt (`meinprojekt`) bedient **7 völlig unabhängige Webseiten**. Diese Datei sagt dir auf einen Blick, **welche Datei zu welcher Seite gehört**. Stand: Juni 2026.
+> **Zweck:** Dieses eine Django-Projekt (`meinprojekt`) bedient **vier unabhängige Webseiten**. Diese Datei sagt dir auf einen Blick, **welche Datei zu welcher Seite gehört**. Stand: August 2026.
 >
-> **Wichtigste Erkenntnis:** Die Seiten sind sauber voneinander getrennt. **CORVIS und die Portfolio-Welt berühren sich nirgends** — du kannst an einer Seite arbeiten, ohne die anderen zu gefährden. Es gibt keine gefährliche Verklebung zwischen verschiedenen Projekten.
+> **Wichtigste Erkenntnis:** **CORVIS und die Portfolio-Welt berühren sich nirgends** — du kannst an einer Seite arbeiten, ohne die andere zu gefährden. Innerhalb der Portfolio-Welt ist es umgekehrt: dort teilen sich *alle* Seiten dieselbe `styles.css` und `main.js`.
 
 ---
 
-## Die 7 Seiten im Überblick
+## Die vier Seiten im Überblick
 
 | Seite | URL | Template | Eigene Dateien (CSS/JS/Assets) | Status |
 |-------|-----|----------|-------------------------------|--------|
-| **CORVIS** (Fitness-App) | `/corvis/` + `/corvis-app/` | `fitness-landing.html` + `fitness.html` | siehe eigene CLAUDE.md | 🟢 komplett isoliert |
-| **Portfolio / Hauptseite** | `/` | `index.html` | `static/css/styles.css`, `static/js/main.js`, `static/css/images/about-me/` | 🟡 teilt CSS/JS mit Impressum |
-| **Impressum** | `/impressum/` | `impressum.html` | *keine eigenen* — nutzt `styles.css` + `main.js` der Hauptseite | 🟡 hängt an Hauptseite |
-| **Schubi** (Freundin-Seite) | `/schubi/` | `schubi.html` | `static/css/schubi.css`, `static/js/schubi.js`, `static/css/images/schubi/` (Bilder + Video) | 🟡 toter CSS-Verweis (s.u.) |
-| **Skills** | `/skills/` | `skills.html` | *alles inline* (CSS+JS in der Datei, ~1434 Zeilen) | 🟢 eigenständig |
-| **Festival** | `/festival/` | `festival.html` | *alles inline*, lädt keine lokale Datei | 🟢 eigenständig |
-| **Aurelia** (Technik-Demo) | `/aurelia/` | `aurelia-demo.html` | *alles inline* (Three.js/GSAP nur von CDN) | 🟢 eigenständig |
+| **Portfolio / Startseite** | `/` | `index.html` | `static/css/styles.css`, `static/js/main.js`, `static/css/images/` | 🟡 teilt CSS/JS (s.u.) |
+| **Filme** | `/filme/` | `filme.html` | *keine eigenen* — nutzt `styles.css` + `main.js` | 🟡 teilt CSS/JS (s.u.) |
+| **Impressum** | `/impressum/` | `impressum.html` | *keine eigenen* — nutzt `styles.css` + `main.js` | 🟡 teilt CSS/JS (s.u.) |
+| **CORVIS** (Fitness-App) | `/corvis/` + `/corvis-app/` | `fitness-landing.html` + `fitness.html` | siehe `CLAUDE.md` | 🟢 komplett isoliert |
 
-> Im Backend ist jede dieser Seiten nur **ein Einzeiler** (`render(request, 'xy.html')`) in `meinprojekt/views.py`. Keine geteilte Logik, keine Datenbank. Die Trennung passiert rein über die HTML/CSS/JS-Dateien.
+Dazu `404.html` als Catch-All für alles Übrige — ebenfalls in der Portfolio-Gestaltung, also auch an `styles.css`/`main.js` hängend.
+
+Die Portfolio-Seiten setzen sich aus gemeinsamen Bausteinen in `templates/includes/` zusammen:
+`seitenkopf.html`, `seitenfuss.html`, `sektion-meta.html`, `regal.html`, `wertungsverteilung.html`
+sowie den Kacheln `kachel-chronik.html`, `kachel-foto.html`, `kachel-poster.html`, `kachel-projekt.html`.
+
+> Im Backend ist jede dieser Seiten fast nur **ein Einzeiler** (`render(request, 'xy.html')`) in `meinprojekt/views.py`. Ausnahme ist `/filme/`, das die `films`-App mit eigenen Views, Models und Migrations hat.
 
 ---
 
-## ⚠️ Was man wissen muss (kein Notfall, nur Bewusstsein)
+## ⚠️ Was man wissen muss
 
-### 1. Hauptseite ↔ Impressum teilen sich CSS + JS
-`static/css/styles.css` und `static/js/main.js` werden von **beiden** benutzt.
-→ **Eine Änderung daran trifft Hauptseite UND Impressum gleichzeitig.**
-Das ist gewollt/sinnvoll (das Impressum ist die Rechtsseite des Portfolios und soll gleich aussehen), aber gut zu wissen, bevor man dort etwas ändert.
+### 1. Alle Portfolio-Seiten teilen sich CSS + JS
+`static/css/styles.css` und `static/js/main.js` werden von **Startseite, Filme, Impressum und 404** benutzt.
+→ **Eine Änderung daran trifft alle vier gleichzeitig.**
+Das ist gewollt — es ist eine Seitenfamilie mit gemeinsamer Gestaltung —, aber gut zu wissen, bevor man dort etwas ändert. Die Fallen beim Arbeiten in `styles.css` (Reihenfolge von Modifikator-Regeln, doppelte Blöcke) stehen in `CLAUDE.md` unter „Werkzeuge und Fallen".
 
-### 2. Schubi lädt eine fehlende Datei
-`schubi.html` verweist auf `static/css/general_settings.css` — **diese Datei existiert nicht** (404). Die Seite funktioniert trotzdem (Browser ignoriert die fehlende Datei), aber es ist ein verwaister Verweis.
-→ **Optionaler Mini-Fix:** den `<link>`-Verweis auf `general_settings.css` aus `schubi.html` entfernen. Ein-Zeilen-Sache, wann immer Lust besteht.
-
-### 3. Favicon kommt aus totem geo-Ordner
-`meinprojekt/urls.py` zeigt für `apple-touch-icon.png` und `favicon.svg` noch auf `static/geo/` — Reste der gelöschten geo-App.
-→ **Optionaler Aufräum-Schritt:** Favicon-Dateien an einen sinnvollen Ort verschieben und die Pfade in `urls.py` anpassen. Erst danach lassen sich die toten geo-Ordner (`static/geo/`, `staticfiles/geo/`, `media/geo/`, `build-geo.sh`) gefahrlos entfernen.
+### 2. Screenshots vor „fertig"
+`tools/shots.py` nimmt Hero, Full-Page und Einzelsektionen in 1440px und 390px auf. Details und die bekannten Aufnahme-Fallen (Intro-Vorhang, leere Kacheln, Hero nur auf `*-hero.png` beurteilen) stehen in `CLAUDE.md`.
 
 ---
 
@@ -43,10 +41,21 @@ Das ist gewollt/sinnvoll (das Impressum ist die Rechtsseite des Portfolios und s
 
 | Was | Wo | Hinweis |
 |-----|-----|---------|
-| geo-Reste | `static/geo/`, `staticfiles/geo/`, `media/geo/`, `build-geo.sh` | Erst Favicon-Abhängigkeit lösen (s.o.), dann löschen |
-| `staticfiles/workout/` | Static-Output | Rest einer noch älteren App |
-| `create_test_user.py` | Projekt-Root | loses Einzel-Skript |
-| Veraltete Dokus | `FITNESS_APP_COMPLETE_SPEC.md` (April), `BUILD_WORKFLOW.md` (März) | Beide überholt/widersprüchlich. Einzige gültige Doku: `CORVIS_DOCUMENTATION.md` |
+| Veraltete Dokus | `FITNESS_APP_COMPLETE_SPEC.md` (April), `BUILD_WORKFLOW.md` (März) | Beide überholt/widersprüchlich. Gültig sind nur `CLAUDE.md` und `CORVIS_DOCUMENTATION.md` |
+| `staticfiles/`-Altlasten in der Git-Historie | — | 226 Blobs, ~57 MB. Nur per History-Rewrite zu entfernen — **bewusst nicht gemacht**, das Risiko lohnt den Gewinn nicht |
+
+---
+
+## 🧹 Im August 2026 entfernt
+
+Diese Seiten und Dateien gibt es **nicht mehr** — falls dir irgendwo noch ein Verweis begegnet, ist der Verweis der Fehler, nicht die fehlende Datei:
+
+- **Schubi** (`/schubi/`): `schubi.html`, `static/css/schubi.css`, `static/js/schubi.js`, `static/css/images/schubi/` inkl. des 299-MB-Videos
+- **Skills** (`/skills/`) und **Festival** (`/festival/`): Inhalte sind in die Startseite gewandert
+- **Aurelia** (`/aurelia/`): `aurelia-demo.html` — zwei ihrer Techniken leben in der CORVIS-Landing-Page weiter (`CORVIS_DOCUMENTATION.md` §10)
+- **Club-Ranking** in der Berlin-Sektion samt `static/css/images/clubs/` (sechs Fotos)
+- **geo-App**: `static/geo/`, `staticfiles/geo/`, `media/geo/`, `build-geo.sh` — inkl. der Favicon-Abhängigkeit in `urls.py`
+- `create_test_user.py`, `staticfiles/workout/`, `tools/silhouetten.py`, `films/templatetags/film_text.py`, `static/css/images/header/berlin-crop.jpg`
 
 ---
 
@@ -56,11 +65,13 @@ Das ist gewollt/sinnvoll (das Impressum ist die Rechtsseite des Portfolios und s
 alex-django/
 ├── data/              → Postgres-Datenbank — NICHT anfassen
 ├── docker/            → Dockerfile + requirements.txt
+├── films/             → FILME-App (Models, Views, Daten für /filme/)
 ├── fitness/           → CORVIS BACKEND (Django-App)
 ├── fitness-frontend/  → CORVIS FRONTEND (React-Quelle)
-├── media/             → Hochgeladene Dateien (Profilbilder) + toter geo-Rest
+├── media/             → Hochgeladene Dateien (Profilbilder)
 ├── meinprojekt/       → Django-KERN (settings, urls, wsgi) — bedient ALLE Seiten
 ├── static/            → Quell-Static aller Seiten (siehe Tabelle oben)
 ├── staticfiles/       → GENERIERT von collectstatic (WhiteNoise liefert von hier)
-└── templates/         → ALLE HTML-Seiten (gemischt — siehe Tabelle oben)
+├── templates/         → ALLE HTML-Seiten + includes/ (siehe Tabelle oben)
+└── tools/             → Hilfsskripte (shots.py u.a.), nicht Teil der Seite
 ```

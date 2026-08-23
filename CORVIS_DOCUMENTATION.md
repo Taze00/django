@@ -37,8 +37,7 @@ Die Domain ist **alex.volkmann.com**. Relevante Routen:
 | `/api/fitness/...` | Die REST-API der Fitness-App |
 | `/api/token/`, `/api/token/refresh/`, `/api/register/` | Auth (JWT) |
 | `/admin/` | Django-Admin |
-| `/aurelia/` | **Demo-Seite** (Technik-Showcase, NICHT Teil von CORVIS — siehe §10) |
-| `/`, `/schubi/`, `/impressum/`, `/skills/`, `/festival/` | Andere, projektfremde Seiten des Besitzers |
+| `/`, `/filme/`, `/impressum/` | Andere, projektfremde Seiten des Besitzers (Portfolio) |
 
 **Wichtig:** Die URLs hießen früher `/fitness/` und `/fitness-landing/` und wurden zu `/corvis-app/` bzw. `/corvis/` umbenannt.
 
@@ -94,8 +93,7 @@ Die Domain ist **alex.volkmann.com**. Relevante Routen:
 ├── templates/
 │   ├── fitness-landing.html    # Landing Page /corvis/
 │   ├── fitness.html            # Wrapper der gebauten React-App /corvis-app/
-│   ├── aurelia-demo.html       # Demo-Seite /aurelia/
-│   └── 404.html                # Eigene 404-Seite
+│   └── 404.html                # Eigene 404-Seite (Portfolio-Gestaltung)
 ├── meinprojekt/                # Django-Projekt-Settings
 │   ├── settings.py
 │   ├── urls.py                 # Haupt-URL-Konfiguration
@@ -328,8 +326,8 @@ Ein einzelnes Django-Template (`templates/fitness-landing.html`) mit Inline-CSS/
 4. **Das Problem** — Schmerzpunkte + Stats (67% kündigen, etc.).
 5. **CORVIS vs. Gym** — direkter Vergleich (zwei Spalten).
 6. **Was CORVIS kann** — horizontaler Scroll-Bereich mit 4 Features, jeweils mit einem **CSS-Mockup** der echten App (Level-Up-Karte, Wochenplan-Grid, Statistik-Mockup mit Balkengraph, Übungs-Karten).
-7. **Deine Verwandlung** — eine **Scroll-Flythrough-Sektion** (aus der AURELIA-Demo adaptiert): beim Scrollen "fährt" man durch emotionale Stationen Tag 1 → Tag 7 → Tag 30 → Tag 90 → Für immer (Zoom-Effekt, große Hintergrund-Zahl, Fortschritts-Ticks).
-8. **Gemeinsam stärker** — eine **CMS-artige Live-Stats-Sektion** (aus AURELIA adaptiert): fetcht den öffentlichen Endpoint `GET /api/fitness/community-stats/` und zählt echte Aggregat-Zahlen über alle Nutzer hoch (Athleten, Workouts, Push-ups, Pull-ups, Plank-Minuten, Level-Ups) mit animierten Balken.
+7. **Deine Verwandlung** — eine **Scroll-Flythrough-Sektion** (aus der inzwischen gelöschten AURELIA-Demo adaptiert, siehe §10): beim Scrollen "fährt" man durch emotionale Stationen Tag 1 → Tag 7 → Tag 30 → Tag 90 → Für immer (Zoom-Effekt, große Hintergrund-Zahl, Fortschritts-Ticks).
+8. **Gemeinsam stärker** — eine **CMS-artige Live-Stats-Sektion** (ebenfalls aus AURELIA adaptiert): fetcht den öffentlichen Endpoint `GET /api/fitness/community-stats/` und zählt echte Aggregat-Zahlen über alle Nutzer hoch (Athleten, Workouts, Push-ups, Pull-ups, Plank-Minuten, Level-Ups) mit animierten Balken.
 9. **CTA** — "Hör auf zu warten." + Button (magnetisch, folgt dem Cursor).
 10. **Footer**.
 
@@ -337,9 +335,11 @@ Ein einzelnes Django-Template (`templates/fitness-landing.html`) mit Inline-CSS/
 
 ---
 
-## 10. Die AURELIA-Demo (`/aurelia/`) — NICHT Teil von CORVIS
+## 10. Die AURELIA-Demo — gelöscht (August 2026)
 
-`templates/aurelia-demo.html` ist eine **eigenständige Demo-Seite** für eine fiktive Luxus-Immobilie ("AURELIA"). Sie wurde gebaut, um Web-Techniken vorzuführen (WebGL-Overlay, Scroll-Flythrough, mix-blend-mode-Typo, CMS-artige Daten, magnetische Buttons, golden Grading, Fake-Drohnen-Loop). Aus ihr wurden Techniken in die CORVIS-Landing-Page übernommen (siehe §9). **Sie gehört konzeptionell nicht zu CORVIS** und kann ignoriert/gelöscht werden.
+`templates/aurelia-demo.html` unter `/aurelia/` war eine eigenständige Demo-Seite für eine fiktive Luxus-Immobilie ("AURELIA"), gebaut als Technik-Showcase (WebGL-Overlay, Scroll-Flythrough, mix-blend-mode-Typo, CMS-artige Daten, magnetische Buttons, golden Grading, Fake-Drohnen-Loop). **Die Seite existiert nicht mehr.**
+
+Der Abschnitt bleibt stehen, weil §9 auf ihn verweist: zwei Sektionen der CORVIS-Landing-Page ("Deine Verwandlung", "Gemeinsam stärker") stammen von dort. Diese Technik lebt in der Landing Page weiter — nur die Demo-Seite selbst ist weg.
 
 ---
 
