@@ -41,12 +41,18 @@ Das ist gewollt — es ist eine Seitenfamilie mit gemeinsamer Gestaltung —, ab
 
 | Was | Wo | Hinweis |
 |-----|-----|---------|
-| Veraltete Dokus | `FITNESS_APP_COMPLETE_SPEC.md` (April), `BUILD_WORKFLOW.md` (März) | Beide überholt/widersprüchlich. Gültig sind nur `CLAUDE.md` und `CORVIS_DOCUMENTATION.md` |
 | `staticfiles/`-Altlasten in der Git-Historie | — | 226 Blobs, ~57 MB. Nur per History-Rewrite zu entfernen — **bewusst nicht gemacht**, das Risiko lohnt den Gewinn nicht |
 
 ---
 
 ## 🧹 Im August 2026 entfernt
+
+- **`FITNESS_APP_COMPLETE_SPEC.md`** und **`BUILD_WORKFLOW.md`** — beide waren als
+  veraltet markiert. Die SPEC nannte falsche Startlevel (Push-ups L3 / Planks L1 statt
+  **L4 / L3**) und war damit aktiv schädlich; `BUILD_WORKFLOW.md` kannte
+  `collectstatic` nicht und widersprach sich beim Thema `static/fitness/`. Der
+  brauchbare Inhalt beider Dateien steht jetzt in `CORVIS_DOCUMENTATION.md`
+  (Trainingsablauf + Pausenzeiten in §6, manuelle Build-Schritte in §4).
 
 Diese Seiten und Dateien gibt es **nicht mehr** — falls dir irgendwo noch ein Verweis begegnet, ist der Verweis der Fehler, nicht die fehlende Datei:
 

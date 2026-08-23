@@ -1,6 +1,6 @@
 # CORVIS — Vollständige Projektdokumentation
 
-> **Zweck dieses Dokuments:** Eine KI oder Entwickler*in mit **null Vorwissen** vollständig auf den aktuellen Stand des CORVIS-Projekts bringen — Konzept, Technik, Architektur, jedes Feature, Designentscheidungen, Workflow und offene Punkte. Stand: Juni 2026.
+> **Zweck dieses Dokuments:** Eine KI oder Entwickler*in mit **null Vorwissen** vollständig auf den aktuellen Stand des CORVIS-Projekts bringen — Konzept, Technik, Architektur, jedes Feature, Designentscheidungen, Workflow und offene Punkte. Stand: **August 2026**.
 
 ---
 
@@ -46,7 +46,9 @@ Die Domain ist **alex.volkmann.com**. Relevante Routen:
 ## 3. Tech-Stack
 
 ### Backend
-- **Django 4.2.30** (LTS-Linie) + **Django REST Framework 3.15.2** für die API.
+- **Django 5.2.17** (LTS-Linie) + **Django REST Framework 3.17.0** für die API.
+  Das Upgrade von 4.2 auf 5.2 lief im August 2026 (4.2 hatte am 7. April 2026 EOL erreicht).
+  Abgesichert war es durch die 134 Tests aus §16 — sie liefen vor und nach dem Sprung grün.
 - **PostgreSQL** als Datenbank.
 - **JWT-Authentifizierung** via `rest_framework_simplejwt` (TokenObtainPair / TokenRefresh).
 - **WhiteNoise** liefert die statischen Dateien aus (`STATIC_ROOT`/`staticfiles/`) — nötig, damit Static auch bei `DEBUG=False` funktioniert.
@@ -54,7 +56,11 @@ Die Domain ist **alex.volkmann.com**. Relevante Routen:
 
 ### Infrastruktur / Deployment
 - **Reverse Proxy: Traefik** (NICHT nginx) — terminiert HTTPS (Let's Encrypt via certresolver), leitet alles auf den Django-Container Port 80. Traefik macht **kein** Static-Serving, reicht alles an Django durch. Konfiguriert über `labels:` in `docker-compose.yml` (Host-Regel `alex.volkmann.com`, HTTP→HTTPS-Redirect, Netzwerk `proxy` extern).
-- **App-Server:** Django läuft aktuell noch mit dem **`runserver`** (Dev-Server!) — kein gunicorn/uwsgi. Für echte Produktion wäre gunicorn der nächste Schritt (siehe §16). Mit WhiteNoise liefert `runserver` Static aber auch bei `DEBUG=False` korrekt aus.
+- **App-Server: gunicorn** (kein `runserver` mehr). Der Start steht in `docker-compose.yml`:
+  `gunicorn meinprojekt.wsgi:application --bind 0.0.0.0:80 --workers 3 --timeout 60`.
+  **Folge für den Alltag:** gunicorn hat **kein Auto-Reload**. Das früher übliche
+  `touch wsgi.py` bewirkt nichts mehr — nach jeder Backend- oder Template-Änderung
+  muss der Container neu gestartet werden (siehe §4).
 
 ### Frontend (die App unter `/corvis-app/`)
 - **React 19** + **Vite** (Build-Tool).
@@ -79,7 +85,8 @@ Die Domain ist **alex.volkmann.com**. Relevante Routen:
 │   ├── calibration.py          # Onboarding-Kalibrierungslogik (Feature 1)
 │   ├── streak.py               # Streak-Berechnung (Feature 2)
 │   ├── admin.py
-│   ├── migrations/             # 0001 bis 0008
+│   ├── migrations/             # 0001 bis 0009
+│   ├── tests/                  # 134 Tests (siehe §16)
 │   └── management/commands/    # seed_exercises u.a.
 ├── fitness-frontend/           # React-App (Source)
 │   ├── src/
@@ -88,7 +95,10 @@ Die Domain ist **alex.volkmann.com**. Relevante Routen:
 │   │   ├── stores/             # authStore.js, workoutStore.js
 │   │   ├── index.css           # Das CORVIS-Designsystem (groß!)
 │   │   ├── App.jsx             # Router + Routen
+│   │   ├── data/               # exerciseInfo.js (Form-Tipps)
+│   │   ├── utils/notify.js     # Benachrichtigungen über den Service Worker
 │   │   └── api.js              # Axios-Instanz
+│   ├── public/                 # PWA: manifest.json, sw.js, Icons (siehe §17)
 │   └── index.html              # Vite-Entry (Titel: CORVIS)
 ├── templates/
 │   ├── fitness-landing.html    # Landing Page /corvis/
@@ -98,7 +108,9 @@ Die Domain ist **alex.volkmann.com**. Relevante Routen:
 │   ├── settings.py
 │   ├── urls.py                 # Haupt-URL-Konfiguration
 │   └── views.py                # Seiten-Views (Templates rendern)
-├── static/fitness/             # Gebaute React-Assets (Build-Output)
+├── meinprojekt/settings_test.py  # Settings nur für den Testlauf (SQLite)
+├── tools/shots_corvis.py       # Screenshot-Werkzeug für CORVIS (Playwright)
+├── static/fitness/             # Gebaute React-Assets (Build-Output, gitignored)
 └── build-fitness.sh            # Build- und Deploy-Skript
 ```
 
@@ -125,13 +137,53 @@ Dieses Skript:
 > ```
 > (`collectstatic` kopiert die neuen Assets nach `staticfiles/` + komprimiert sie; der Restart lässt WhiteNoise sie neu einlesen.)
 
-Für **Django-Template-Änderungen** (Landing Page, 404) reicht weiterhin ein Reload (Templates liegen nicht in `staticfiles/`):
+Für **Backend- und Template-Änderungen** (Python, Landing Page, 404) reicht ein Neustart:
 ```bash
-docker compose exec django-dev touch /code/meinprojekt/wsgi.py
+docker compose restart django-dev
 ```
-Nach dem Touch braucht der Server ein paar Sekunden (ggf. kurz HTTP 502, dann 200).
+
+> **⚠️ Seit dem Umstieg auf gunicorn (§3): `touch wsgi.py` reicht NICHT mehr.**
+> Der frühere `runserver` hatte Auto-Reload und hat auf das Antippen der `wsgi.py`
+> reagiert — gunicorn tut das nicht. Ein `touch` bleibt heute **wirkungslos**: die
+> Seite antwortet weiter mit dem alten Code, ohne Fehlermeldung. Genau daran verliert
+> man Zeit, weil nichts kaputtgeht — es ändert sich nur nichts. Immer `restart`.
+
+Nach dem Neustart braucht der Server ein paar Sekunden (ggf. kurz HTTP 502, dann 200).
 
 > **Image-Rebuild:** Wenn sich `docker/requirements.txt` ändert (neue Python-Pakete), muss das Image neu gebaut werden: `docker compose build django-dev`, danach `docker compose up -d django-dev`. Ein reiner Reload reicht dann nicht.
+
+### Von Hand bauen (wenn `build-fitness.sh` streikt)
+
+Das Skript nimmt einem nur die Handgriffe ab — hier sind sie einzeln:
+
+```bash
+# 1. React bauen (im Container, dort liegt node)
+docker compose exec -T django-dev bash -c "cd /code/fitness-frontend && npm run build"
+
+# 2. Build-Ergebnis nach static/ kopieren
+docker compose exec -T django-dev bash -c "cp -r /code/fitness-frontend/dist/. /code/static/fitness/"
+
+# 3. Die neuen Hashes in templates/fitness.html eintragen.
+#    Die richtigen Namen stehen in fitness-frontend/dist/index.html:
+grep -o 'index-[A-Za-z0-9_-]*\.\(js\|css\)' fitness-frontend/dist/index.html
+
+# 4. Danach IMMER (siehe oben) - sonst 404 auf das neue Bundle:
+docker compose exec django-dev python manage.py collectstatic --noinput
+docker compose restart django-dev
+```
+
+**Zu committen ist nur `templates/fitness.html`** (mit den neuen Hashes).
+`static/fitness/` ist gitignored und gehört **nicht** in den Commit — ein früheres
+`BUILD_WORKFLOW.md` behauptete beides gleichzeitig und lag mit dem `git add
+static/fitness/` falsch.
+
+**Gegenprobe, dass Template und Build zusammenpassen:**
+```bash
+ls static/fitness/assets/
+grep -o 'index-[A-Za-z0-9_-]*\.js' templates/fitness.html   # muss dieselbe Datei nennen
+```
+
+---
 
 ### Wichtige Workflow-Eigenheiten / Stolperfallen
 - **Dateiberechtigungen:** Viele Frontend-Dateien gehören `root`. Vor dem Schreiben vom Host aus muss man sie im Container freigeben:
@@ -203,6 +255,33 @@ Ein Meilenstein auf der Fortschritts-Timeline. Felder:
 **Planks** (alle `time`/Sekunden):
 1. Knee Plank (30s) · 2. Incline Plank (45s) · 3. Standard Plank (60s) · 4. Feet-Elevated Plank (60s) · 5. Extended Plank (45s) · 6. RKC Plank (30s) · 7. One-Arm Plank (20s)
 
+### Wo ein neuer Nutzer startet (Startlevel)
+
+Ohne Kalibrierung startet ein neuer Nutzer auf diesen Stufen — markiert über das
+Feld `Progression.user_starts_here`, gesetzt in Migration `0009`:
+
+| Übung | Startlevel | Variante | Ziel |
+|-------|-----------|----------|------|
+| Push-ups | **Level 4** | Standard Push-ups | 8 Wdh |
+| Pull-ups | **Level 1** | Dead Hang | 30 s |
+| Planks | **Level 3** | Standard Plank | 60 s |
+
+> **⚠️ Achtung, hartnäckiger Irrtum:** Ältere Notizen (u.a. die inzwischen
+> gelöschte `FITNESS_APP_COMPLETE_SPEC.md`) behaupteten **Push-ups Level 3**
+> (Knee Push-ups) und **Planks Level 1** (Knee Plank). Das ist **falsch** und war
+> der schädlichste Fehler in der alten Doku: Wer danach eine Migration oder einen
+> Seed schreibt, setzt jeden neuen Nutzer zwei Stufen zu tief an. Maßgeblich ist
+> die Tabelle oben — nachprüfbar in `fitness/migrations/0009_seed_exercises_and_progressions.py`
+> (Konstante `STARTLEVEL`) und in der laufenden Datenbank:
+> ```bash
+> docker compose exec django-dev python manage.py shell -c \
+>   "from fitness.models import Progression; print(list(Progression.objects.filter(user_starts_here=True).values_list('exercise__name','level')))"
+> ```
+
+Die meisten Nutzer sehen dieses Startlevel allerdings nie: Das Onboarding (Feature 1,
+§7) kalibriert direkt beim ersten Start und überschreibt es. Der Wert greift als
+Fallback, wenn eine Progression ohne Kalibrierung angelegt wird.
+
 > **Wichtig:** Die Zielwerte sind **NICHT monoton steigend**. Höhere Level haben teils niedrigere Zahlen (z.B. Diamond Push-ups L5 = 6 Reps ist schwerer als Standard L4 = 8 Reps). Das ist Absicht — die Schwierigkeit steigt durch die Variante, nicht durch die Zahl. Diese Targets wurden gegen Calisthenics-Fachliteratur geprüft und als sinnvoll bestätigt.
 
 ### Trainings-Schwelle (Upgrade/Downgrade beim Workout)
@@ -212,11 +291,53 @@ Logik im `complete`-Endpoint (`WorkoutViewSet.complete`):
 - **Downgrade:** Nur in der ersten Einheit auf einem Level (`is_first_session`), und nur wenn Level > 1. Wenn die Leistung deutlich unter Ziel liegt (definierte Schwellen, z.B. `val1 < 3` bei Reps), steigt man eine Stufe ab und bekommt einen leicht angepassten `custom_target`.
 - Diese Regel ("8 Reps × 2 Sätze, 3 Mal hintereinander → Aufstieg") stammt aus den Original-Trainingsvideos des Besitzers und ist **bewusst unangetastet** geblieben.
 
+**Die Downgrade-Schwellen im Detail** (`WorkoutViewSet.complete`, Satz 1 = `val1`, Satz 2 = `val2`):
+- Bei `reps`: `val1 < 3` **oder** `val1 + val2 < 5`.
+- Bei `time`: `val1 < effective_target // 3` **oder** `val1 + val2 < effective_target // 2`.
+- Nach dem Abstieg bekommt die niedrigere Stufe einen **Zuschlag** auf `custom_target`
+  (Reps: +6/+4/+2 bei 0/1/2 geschafften Wiederholungen; Zeit: +15/+10/+5 s je nach Haltezeit).
+  So ist die leichtere Stufe nicht sofort wieder trivial.
+- `is_first_session` wird auf `False` gesetzt — das verhindert eine Abstiegs-Schleife.
+
+### Der Trainingsablauf (9 Schritte)
+
+Die Schritte werden **dynamisch** aus den Übungen gebaut (`buildWorkoutSteps` in
+`WorkoutView.jsx`), nicht hart kodiert. Bei den drei Standard-Übungen ergibt das:
+
+```
+AUFWÄRMEN (Checkliste, 5 Punkte)
+
+ 1. Push-ups  Satz 1   → Pause 180 s
+ 2. Pull-ups  Satz 1   → Pause 180 s
+ 3. Push-ups  Satz 2   → Pause 180 s
+ 4. Pull-ups  Satz 2   → Pause 180 s
+ 5. Push-ups  Satz 3   DROP-SET → Pause 300 s
+ 6. Pull-ups  Satz 3   DROP-SET → Pause 300 s
+ 7. Planks    Satz 1   → Pause 180 s
+ 8. Planks    Satz 2   → Pause 180 s
+ 9. Planks    Satz 3   DROP-SET → fertig
+
+ABWÄRMEN (Dehn-Checkliste, 5 Punkte)
+```
+
+Das Muster: die Hauptübungen (PUSH/PULL) werden über die Sätze **verschränkt**, die
+CORE-Übung kommt geschlossen am Ende. Pausen: **180 s** nach den normalen Sätzen,
+**300 s** nach einem Drop-Set (`REST_TIMES` in `WorkoutView.jsx`).
+
+> **Die Ziele werden angezeigt.** Im Trainingsbildschirm steht über dem Eingabefeld
+> `Ziel: 8 Wdh` bzw. `Ziel: 60 s` (CSS-Klasse `.wv-target`). Die alte SPEC forderte
+> das Gegenteil ("TARGETS ARE HIDDEN — only 'Last time: X'"). Diese Regel wurde
+> **verworfen**; wer sie wiederherstellt, baut ein Feature zurück, das bewusst so ist.
+
 ---
 
-## 7. Die 5 Features (Roadmap, alle umgesetzt)
+## 7. Die 5 Features (Roadmap — 4 davon sichtbar, siehe Feature 4)
 
-Diese 5 Features wurden in dieser Reihenfolge (nach "Wow-Effekt") gebaut, jedes voll ausgebaut (Backend-Modell + Migration → API → Frontend + CORVIS-Design → Test → Build → Commit). Sie sind das, was CORVIS einzigartig macht. Roter Faden: **"CORVIS denkt mit."**
+Diese 5 Features wurden in dieser Reihenfolge (nach "Wow-Effekt") gebaut. Sie sind das, was CORVIS einzigartig macht. Roter Faden: **"CORVIS denkt mit."**
+
+> **Stand August 2026:** Die Features 1, 2, 3 und 5 sind vollständig — Backend **und**
+> sichtbare Oberfläche. **Feature 4 ist nur im Backend fertig** und wird nirgends
+> angezeigt. Frühere Doku führte alle fünf als erledigt; das stimmt nicht.
 
 ### Feature 1 — 🎯 Onboarding-Test (Kalibrierung)
 **Datei:** `fitness/calibration.py`, `OnboardingView.jsx`, Endpoint `POST /onboarding/calibrate/`.
@@ -264,16 +385,28 @@ Eine vertikale Zeitleiste der Meilensteine, **ab jetzt vorwärts protokolliert**
 
 Die Events werden in der `complete`-Logik geloggt. Beim Onboarding-Reset werden Timeline + RestDays gelöscht (sauberer Neustart). **Bonus-Fix:** Bei dieser Gelegenheit wurde ein `from_level`-Off-by-One-Bug in der Upgrade-Logik behoben (Level wurde nach dem Überschreiben gelesen).
 
-### Feature 4 — 📊 Wochen-Rückblick
-**Datei:** Endpoint `GET /weekly-review/`, Banner in `HomeView.jsx`.
+### Feature 4 — 📊 Wochen-Rückblick ⚠️ **nur Backend — wird nirgends angezeigt**
+**Datei:** Endpoint `GET /weekly-review/` (`fitness/views.py:609`).
 
-Ein **Wochenend-Banner** (nur Sa/So sichtbar, `is_weekend`-Flag vom Backend) auf der Startseite, das die aktuelle Woche (Mo–So) zusammenfasst:
-- Trainings absolviert vs. geplant (z.B. "4/5"),
-- Anzahl Level-Ups,
-- aktuelle Serie,
-- Volumen (Push-Reps, Pull-Reps, Plank-Minuten).
+> **⚠️ Dieses Feature ist unfertig, auch wenn frühere Doku es als erledigt führte.**
+> Es existiert **kein** Bauteil, das den Wochen-Rückblick rendert. Nachprüfbar:
+> ```bash
+> grep -rn "weeklyReview" fitness-frontend/src --include=*.jsx   # findet nichts
+> ```
 
-Aggregiert nur vorhandene Daten. Per `localStorage` pro ISO-Woche wegtippbar, erscheint nächste Woche wieder.
+Was tatsächlich da ist:
+- **Backend:** Der Endpoint `GET /weekly-review/` funktioniert und liefert die
+  Wochenzahlen (Trainings absolviert vs. geplant, Level-Ups, Serie, Volumen aus
+  Push-Reps/Pull-Reps/Plank-Minuten, dazu ein `is_weekend`-Flag).
+- **Store:** `workoutStore.initialize()` ruft ihn bei **jedem** App-Start mit ab und
+  legt das Ergebnis unter `weeklyReview` ab (`stores/workoutStore.js`).
+- **CSS:** Die Klassen `.week-review*` stehen fertig in `index.css` (Zeile ~162).
+- **Frontend:** **Nichts.** Keine `.jsx` liest `weeklyReview`, keine nutzt die
+  CSS-Klassen. Der Wert wird geladen, gespeichert — und nie gelesen.
+
+Der geplante Zustand war ein **Wochenend-Banner** auf der Startseite (nur Sa/So
+sichtbar, per `localStorage` pro ISO-Woche wegtippbar). Zum Fertigbauen fehlt nur
+das Bauteil in `HomeView.jsx` — Daten, Styling und Endpoint liegen bereit.
 
 ### Feature 5 — 💧 Drop-Set-Intelligenz
 **Datei:** `DropSetInstructions.jsx`, `WorkoutView.jsx`, `last_performance`-Endpoint.
@@ -289,7 +422,11 @@ Je weniger tief man fallen muss, desto stärker ist man geworden — ein **sicht
 ### Verworfene Feature-Ideen (nicht erneut vorschlagen!)
 - **Adaptiver Rest-Timer** — bei nur 2 Sätzen + Drop-Set kein spürbarer Nutzen.
 - **Persönliche Rekorde (PRs)** — durch das ständige Auto-Up/Downgrade entsteht nie eine stabile Bestmarke.
-- **Push-Benachrichtigungen aufs Handy** — CORVIS ist eine reine Web-App (kein installiertes PWA), kann keine nativen Push-Notifications senden.
+- **Push-Benachrichtigungen aufs Handy** — ⚠️ **Diese Begründung ist überholt.**
+  CORVIS ist seit August 2026 eine installierbare PWA und zeigt **lokale**
+  Benachrichtigungen (siehe §17). Was weiterhin fehlt, ist echtes **Server-Push**
+  (Web-Push mit VAPID) — also eine Erinnerung, die ankommt, ohne dass die App offen
+  war. Das ist offen, nicht verworfen.
 
 ---
 
@@ -311,7 +448,10 @@ Dunkel, brutal-sportlich, mit Orange-Akzent. Definiert über CSS-Variablen (`:ro
 
 **Wichtige Komponenten/Effekte:**
 - Level-Up-Modal mit **Konfetti-Animation** (`ProgressionModal.jsx`).
-- Übungskarten auf der Startseite: orange Akzent-Linie links, große orange Level-Zahl, Fortschrittsbalken (Level X von 7).
+- **Startseite:** eine große **Gesamtstärke-Zahl** (Summe der drei Level) und darunter
+  das **Stärke-Dreieck** — ein Radar-SVG über PUSH / PULL / CORE, dessen Fläche mit
+  den Leveln wächst. **Keine Übungskarten** (frühere Doku behauptete das; die
+  Karten-Ansicht liegt heute unter `/exercises`).
 - Konsistente deutsche UI-Sprache.
 
 ---
@@ -365,7 +505,7 @@ Der Abschnitt bleibt stehen, weil §9 auf ihn verweist: zwei Sektionen der CORVI
 - `POST /onboarding/complete/`, `POST /onboarding/reset/`.
 - `GET /streak/`, `POST /rest-day/`, `DELETE /rest-day/remove/` — **Feature 2**.
 - `GET /timeline/` — **Feature 3**.
-- `GET /weekly-review/` — **Feature 4**.
+- `GET /weekly-review/` — **Feature 4**. ⚠️ Funktioniert, wird aber vom Frontend zwar geladen, aber nie angezeigt (siehe §7).
 - `GET /community-stats/` — **Landing-Page Live-Stats** (öffentlich, kein Auth).
 
 ---
@@ -376,17 +516,26 @@ Der Abschnitt bleibt stehen, weil §9 auf ihn verweist: zwei Sektionen der CORVI
 
 **State (Zustand):**
 - `authStore` — eingeloggter User, Token.
-- `workoutStore` — die zentrale Quelle der Wahrheit. Lädt in `initialize()` parallel: exercises, user-progressions, workouts, profile-settings, **streak, timeline, weekly-review**. Pattern: `isInitialized: false` + `initialize()` erzwingt nach Level-Änderungen ein frisches Neuladen, damit z.B. ein manuell geändertes Level sofort im Dashboard erscheint (nichts ist hardcoded). Actions u.a.: `getCurrentWorkout`, `addSet`, `completeWorkout` (lädt danach Workouts/Streak/Timeline neu), `markRestDay`, `unmarkRestDay`, `refreshStreak`, `updateTrainingDays`.
+- `workoutStore` — die zentrale Quelle der Wahrheit. Lädt in `initialize()` parallel: exercises, user-progressions, workouts, profile-settings, **streak, timeline, weekly-review**. (`weeklyReview` wird dabei bei jedem Start
+mitgeladen und **nirgends gelesen** — siehe Feature 4 in §7.) Pattern: `isInitialized: false` + `initialize()` erzwingt nach Level-Änderungen ein frisches Neuladen, damit z.B. ein manuell geändertes Level sofort im Dashboard erscheint (nichts ist hardcoded). Actions u.a.: `getCurrentWorkout`, `addSet`, `completeWorkout` (lädt danach Workouts/Streak/Timeline neu), `markRestDay`, `unmarkRestDay`, `refreshStreak`, `updateTrainingDays`.
 
 **Wichtige Views:**
-- `HomeView` — Wochenstrip, Streak-Flamme, Übungskarten, "Training starten", "Heute pausieren", Wochenend-Banner.
+- `HomeView` — Logo, **Wochentage-Leiste** (erledigte/heutige Tage), **Gesamtstärke**
+  (Summe der drei Level) + **Stärke-Dreieck** (Radar über PUSH/PULL/CORE), drei
+  Kennzahlen (🔥 Serie · Workouts · Ø Level), "Training starten", "Ruhetag einlegen".
+  **Keine Übungskarten** und **kein** Wochenend-Banner — der Wochen-Rückblick wird
+  zwar geladen, aber nicht gerendert (siehe Feature 4 in §7).
 - `WorkoutView` — der Trainingsablauf. **`WORKOUT_STEPS` werden dynamisch** via `buildWorkoutSteps(exercises)` aus dem Store gebaut (NICHT hardcoded): 2 normale Sätze interleaved über die Hauptübungen, dann Drop-Sets, dann Core (CORE-Kategorie separat). Aufwärmen → Sätze (Reps-Input oder Timer) → Drop-Set → Abschluss-Modal.
 - `StatisticsView` — Volumen-Stats, Streak (vom Backend), Timeline ("Deine Reise"), Workout-History.
 - `OnboardingView` — der Kalibrierungs-Flow (Feature 1).
 - `SetProgressionView` — manuelles Level-Ändern (setzt danach `isInitialized: false` + `initialize()`).
 - `TrainingDaysView` — Trainingstage wählen.
 
-**Komponenten:** `BottomNav`, `SetInput`, `TimerInput`, `RestTimer`, `WarmupChecklist`, `DropSetInstructions`, `ProgressionModal` (mit Konfetti).
+**Komponenten:** `BottomNav`, `SetInput`, `TimerInput`, `RestTimer`, `WarmupChecklist`,
+`CooldownChecklist` (Dehn-Checkliste nach dem Training), `DropSetInstructions`,
+`FormTip` (aufklappbarer Form-Hinweis je Variante, Texte in `data/exerciseInfo.js`),
+`IosInstallHint` (Installations-Tipp nur für iOS-Safari, siehe §17),
+`ProgressionModal` (mit Konfetti).
 
 ---
 
@@ -401,21 +550,60 @@ Der Abschnitt bleibt stehen, weil §9 auf ihn verweist: zwei Sektionen der CORVI
 
 ---
 
-## 14. Sicherheit (Stand nach dem Security-Durchgang Juni 2026)
+## 14. Sicherheit (Stand August 2026)
 
 Ein dedizierter Security-/Technik-Durchgang hat die folgenden Punkte **erledigt** (jeweils ein eigener Commit):
 
 - **✅ `DEBUG` ist jetzt `False` live.** Gesteuert über die Env-Var `DJANGO_DEBUG` (Default `True` für lokale Entwicklung; `docker-compose.yml` setzt `DJANGO_DEBUG=False` für den Live-Container). Stacktraces werden nicht mehr geleakt.
 - **✅ WhiteNoise** liefert die statischen Dateien aus (Middleware direkt nach `SecurityMiddleware`, `STORAGES` mit `whitenoise.storage.CompressedStaticFilesStorage` — bewusst **ohne** Manifest/Hashing, damit die hart kodierten `/static/`-Pfade in den Templates inkl. des gehashten React-Bundles weiter funktionieren). Static läuft jetzt gzip-komprimiert mit Cache-Headern, auch bei `DEBUG=False`.
 - **✅ Secrets aus settings.py in Env-Vars ausgelagert:** `SECRET_KEY` liest `DJANGO_SECRET_KEY`, `REGISTRATION_SECRET_KEY` liest `DJANGO_REGISTRATION_KEY` (jeweils mit dem alten Wert als Fallback für lokal). Der Registration-Key war **nie** im Frontend-Bundle (der User tippt ihn in ein Eingabefeld). In Produktion sollten echte Werte via Env gesetzt werden.
-- **✅ Verwundbare Dependencies aktualisiert** (siehe §3): axios 1.18.1, react-router-dom 7.18.0, vite 7.3.5, Django 4.2.30, DRF 3.15.2.
+- **✅ `ALLOWED_HOSTS` eingeschränkt — kein Wildcard mehr.** Früher stand dort `["*"]`.
+  Heute:
+  ```python
+  ALLOWED_HOSTS = os.environ.get(
+      'DJANGO_ALLOWED_HOSTS', 'alex.volkmann.com,localhost,127.0.0.1').split(',')
+  ```
+  Überschreibbar per Env-Var (kommagetrennt). Dazu `CSRF_TRUSTED_ORIGINS` für
+  `https://alex.volkmann.com` und `http://localhost:8000`.
+- **✅ gunicorn statt `runserver`.** Der Django-Dev-Server ist nicht mehr im Einsatz
+  (siehe §3) — er war nie für Produktion gedacht (Single-Thread, kein Härtung).
+- **✅ Django auf 5.2.17 LTS** (August 2026). 4.2 hatte am 7. April 2026 EOL erreicht
+  und bekam keine Sicherheitspatches mehr. Dazu **DRF 3.17.0**.
+- **✅ Verwundbare Dependencies aktualisiert** (siehe §3): axios 1.18.1,
+  react-router-dom 7.18.0, vite 7.3.5.
 - **Eigene 404-Seite** (`templates/404.html`): `handler404 = 'meinprojekt.views.not_found'` (greift bei DEBUG=False) + Catch-All `re_path(r'^.*$', views.not_found)` am Ende der URLconf (Fallback). Echte Routen haben Vorrang, da die Catch-All zuletzt steht. Verhindert das Leaken der URL-Liste.
 
 ### Noch offen (bewusst aufgeschoben)
 - **Git-Historie:** Die alten Secrets (SECRET_KEY, Registration-Key) stehen weiterhin in alten Commits. Echte Bereinigung (BFG / git filter-repo) + Rotation der Keys ist ein separater, invasiver Schritt (alle Commit-Hashes ändern sich, force-push nötig). **Empfehlung:** vor einer etwaigen Veröffentlichung des Repos nachholen + neue Keys generieren.
-- **`ALLOWED_HOSTS = ["*"]`** — sollte für Produktion auf die echte Domain eingeschränkt werden.
-- **`runserver` statt gunicorn** (siehe §3, §16).
-- **1 verbleibende npm-low-Vuln** (esbuild, nur Dev-Server + nur Windows) — vernachlässigbar, nicht im Bundle.
+- **npm-Findings: 7, nicht 1.** Frühere Doku sprach von "1 verbleibender low-Vuln
+  (esbuild)". Der tatsächliche Stand (`npm audit` im Container, August 2026) ist
+  **7 Findings: 1 low + 6 high**:
+
+  | Paket | Schwere | Kommt aus | Landet im Browser-Bundle? |
+  |-------|---------|-----------|---------------------------|
+  | `brace-expansion` | high | eslint | ❌ nein |
+  | `esbuild` | low | vite | ❌ nein |
+  | `js-yaml` | high | eslint | ❌ nein |
+  | `nanoid` | high | postcss | ❌ nein |
+  | `postcss` | high | Build-Kette | ❌ nein |
+  | `react-router` | high | — | ✅ **ja** |
+  | `react-router-dom` | high | zieht `react-router` | ✅ **ja** |
+
+  **Einordnung:** **5 der 7** sind reines Build-Werkzeug (`devDependencies`) — sie
+  laufen nur beim Bauen und Linten, nie im Browser des Nutzers. Die zwei
+  verbleibenden (`react-router` / `react-router-dom` 7.18.0) sind echte
+  Produktions-Abhängigkeiten und **werden mit ausgeliefert**. Ihr Advisory betrifft
+  allerdings einen **CSRF-Bypass im RSC-Modus** (React Server Components) — den
+  CORVIS nicht benutzt: die App ist eine reine SPA gegen ein Django-Backend. Damit
+  ist das Finding hier **nicht ausnutzbar**, aber es sollte bei Gelegenheit
+  mit `npm audit fix` weggeräumt werden (die Fixes gelten als nicht-breaking).
+
+  ```bash
+  docker compose exec django-dev bash -c "cd /code/fitness-frontend && npm audit"
+  ```
+
+- **Echtes Server-Push fehlt** — die PWA kann nur lokale Benachrichtigungen zeigen
+  (siehe §17).
 
 ---
 
@@ -423,24 +611,136 @@ Ein dedizierter Security-/Technik-Durchgang hat die folgenden Punkte **erledigt*
 
 - Remote: `git@github.com:Taze00/django.git` (SSH-Remote heißt `alex`, HTTPS-Remote `origin`). Push via `git pull alex main` / `git push alex main`.
 - Commit-Konvention: pro Feature/Fix ein Commit, mit `Co-Authored-By`-Trailer.
-- Wichtige Commit-Reihen: das CORVIS-Redesign + Entfernung der geo-App → die 5 CORVIS-Features (je ein Commit) → Landing-Page-Überarbeitung → **der Security-Durchgang** (4 Commits: WhiteNoise/DEBUG, Secrets-Env, Dependency-Updates, Cleanup).
+- Wichtige Commit-Reihen: das CORVIS-Redesign + Entfernung der geo-App → die 5 CORVIS-Features (je ein Commit) → Landing-Page-Überarbeitung → **der Security-Durchgang** (4 Commits: WhiteNoise/DEBUG, Secrets-Env, Dependency-Updates, Cleanup) → **der Branch `django-upgrade`** (August 2026): 134 Tests, reproduzierbare Migrationskette, DRF 3.17, Django 5.2.17, dazu `tools/shots_corvis.py`. Der Branch ist in `main` gemerged.
 
 ---
 
-## 16. Mögliche nächste Schritte (Ideenraum für die andere KI)
+## 16. Tests
+
+Seit August 2026 gibt es eine echte Testabdeckung — sie ist das Sicherheitsnetz,
+das das Django-Upgrade 4.2 → 5.2 überhaupt vertretbar gemacht hat.
+
+```bash
+docker compose exec django-dev python manage.py test fitness \
+    --settings=meinprojekt.settings_test
+```
+
+**134 Tests** in `fitness/tests/`, Laufzeit ~5 Sekunden:
+
+| Datei | Deckt ab |
+|-------|----------|
+| `test_calibration.py` | Die Justier-Logik aus Feature 1 (alle `ratio`-Bänder, Clamping auf 1–7, das 0-Reps-Problem) |
+| `test_streak.py` | Serien-Berechnung: übersprungene Nicht-Trainingstage, Ruhetage, der heutige Tag |
+| `test_level_changes.py` | Auf- und Abstieg: Schwellen, `custom_target`-Zuschlag, Abstiegs-Schleifen-Schutz, Max-Level |
+| `test_api_smoke.py` | Alle Endpoints: Auth, Workout-Ablauf, Onboarding, Profil |
+
+**Warum eigene Settings?** `meinprojekt/settings_test.py` existiert nur, damit der
+Testlauf **nicht** die PostgreSQL-Instanz braucht (er nutzt SQLite im Speicher) und
+damit er unabhängig von den Env-Vars des Live-Containers läuft. Für alles andere
+gilt weiter `meinprojekt/settings.py`.
+
+> **Migrationskette:** Migration `0009_seed_exercises_and_progressions` legt Übungen,
+> die 21 Progressionen und die Startlevel **per Migration** an. Vorher kamen die
+> Stammdaten nur über ein Management-Command in die Datenbank — eine frische
+> Datenbank war damit nicht reproduzierbar, und genau daran scheiterten die Tests.
+> `0009` arbeitet durchgehend mit `get_or_create` auf `(exercise, level)`: auf der
+> Produktionsdatenbank ändert die Migration **nichts**, auf einer leeren baut sie
+> alles auf.
+
+---
+
+## 17. PWA & Benachrichtigungen
+
+CORVIS ist seit August 2026 eine **installierbare Progressive Web App**. Das war der
+Punkt, an dem die alte Absage an Reminder (§7, "verworfene Ideen") hinfällig wurde.
+
+**Was fertig ist:**
+- **`manifest.json`** (`fitness-frontend/public/`): `display: standalone`,
+  `start_url` und `scope` auf `/corvis-app/`, `orientation: portrait-primary`,
+  Theme/Background `#0a0a0a`. Icons in 192 und 512 px, das 512er zusätzlich als
+  `maskable`. Android/Chrome bietet damit "Zum Startbildschirm hinzufügen" an.
+- **Service Worker** (`public/sw.js`) — **bewusst minimal**: `install` +
+  `activate` (mit `skipWaiting` / `clients.claim`) und ein `notificationclick`-Handler,
+  der eine bereits offene CORVIS-Ansicht in den Vordergrund holt statt einen zweiten
+  Tab zu öffnen. Registriert wird er in `main.jsx` unter `/static/fitness/sw.js`.
+- **Lokale Benachrichtigungen** (`src/utils/notify.js`): Am Ende der Pause meldet
+  sich `showRestDoneNotification()` mit "Pause vorbei 💪" — auch wenn der Bildschirm
+  aus ist oder die App im Hintergrund liegt. Die Erlaubnis wird **nie** ungefragt
+  abgefragt, sondern nur per Tap im Profil ("Pausen-Benachrichtigung", `ProfileView.jsx`)
+  — iOS verlangt eine echte Nutzer-Geste.
+- **Sauberer Fallback:** Ohne Erlaubnis oder Unterstützung gibt die Funktion `false`
+  zurück (kein Fehler), und `RestTimer` fällt auf **Ton + Vibration** zurück.
+- **`IosInstallHint.jsx`:** iOS zeigt keinen automatischen Install-Prompt. Der Hinweis
+  erscheint deshalb nur auf iOS-Safari, nicht auf Desktop/Android, nicht wenn die App
+  schon `standalone` läuft, und nicht mehr nach dem Wegtippen (`localStorage`).
+
+> **iOS-Eigenheit:** Web-Benachrichtigungen funktionieren dort **nur als installierte
+> PWA** ("Zum Home-Bildschirm") und erst ab iOS 16.4. Im normalen Safari-Tab greift
+> stumm der Ton-Fallback — das ist kein Fehler.
+
+**Was NICHT drin ist (und warum):**
+- **Kein Offline-Caching.** Der Service Worker hat **absichtlich keinen
+  `fetch`-Handler** (so steht es auch als Kommentar in `sw.js`). Ein halbherziger
+  Cache hätte veraltete Bundles ausgeliefert — das Thema ist auf später vertagt.
+- **Kein echtes Server-Push.** Es gibt keinen `push`-Handler im Service Worker und
+  kein `PushManager.subscribe()`. Alle Benachrichtigungen entstehen **im Browser des
+  Nutzers**, während die App läuft. Eine Erinnerung "du hast heute noch nicht
+  trainiert", die ohne offene App ankommt, ist damit **nicht** möglich. Dafür bräuchte
+  es Web-Push mit VAPID-Schlüsseln und ein Abo-Modell im Backend (siehe §18).
+
+> **Nach jeder Änderung an `public/`** (Manifest, Icons, `sw.js`) gilt der volle
+> Frontend-Deploy aus §4 — die Dateien wandern über den Vite-Build nach
+> `static/fitness/` und müssen danach durch `collectstatic` + `restart`.
+
+---
+
+## 18. Mögliche nächste Schritte (Ideenraum für die andere KI)
 
 Bereits abgedeckt: adaptive Progression, Kalibrierung, Streak-Schutz, Timeline, Wochen-Rückblick, Drop-Set-Tracking. Verworfen wurde: adaptiver Rest-Timer, PRs, native Push-Notifications (siehe §7).
 
 Bereits erledigt im Security-Durchgang (siehe §14): DEBUG=False + WhiteNoise, Secrets in Env-Vars, Dependency-Updates, Cleanup (.bak-Dateien + totes CSS).
 
-Offene Baustellen / denkbare Richtungen (NICHT verifiziert, nur Anregung):
-- **Produktionsreife:** `runserver` → **gunicorn** (echter WSGI-Server), `ALLOWED_HOSTS` einschränken, Git-Historie der Secrets bereinigen + Keys rotieren (siehe §14).
-- **Django 5** Major-Upgrade (aktuell bewusst auf 4.2 LTS geblieben).
-- **PWA-Fähigkeit** (installierbar, dann wären Push-Notifications & Offline-Modus möglich — löst die verworfene Reminder-Idee aus §7).
-- **Soziale Komponente** (Freunde, geteilte Streaks) — die `community-stats` sind erst der Anfang.
-- **Mehr Übungen / Trainingspläne** ohne die "minimal & effektiv"-Philosophie zu verwässern.
-- **Audio/Voice-Guidance** während des Workouts.
+**Inzwischen ebenfalls erledigt (August 2026):** gunicorn statt `runserver`,
+`ALLOWED_HOSTS` eingeschränkt, Django 5.2 LTS + DRF 3.17, PWA installierbar mit
+lokalen Benachrichtigungen, 134 Tests (§16).
+
+Offene Baustellen, nach Aufwand sortiert:
+
+1. **Feature 4 fertigbauen** — der Wochen-Rückblick wird bei jedem App-Start geladen
+   und dann weggeworfen. Das Bauteil in `HomeView.jsx` fehlt, Daten und CSS liegen
+   bereit (siehe §7). Der billigste sichtbare Gewinn im ganzen Projekt.
+2. **`npm audit fix`** — 7 Findings, davon 5 reines Build-Werkzeug (siehe §14).
+3. **Echtes Server-Push (Web-Push + VAPID)** — Trainings-Erinnerungen, die auch
+   ankommen, wenn die App zu ist. Braucht `pywebpush`, VAPID-Schlüsselpaar,
+   ein `PushSubscription`-Modell und einen `push`-Handler im Service Worker (§17).
+4. **Offline-Modus** — der Service Worker hat bewusst **keinen** `fetch`-Handler.
+   Ein Cache für die App-Shell würde das Training auch ohne Netz ermöglichen.
+5. **Git-Historie der Secrets bereinigen** + Keys rotieren (siehe §14).
+6. **Soziale Komponente** (Freunde, geteilte Streaks) — die `community-stats` sind
+   erst der Anfang.
+7. **Mehr Übungen / Trainingspläne** ohne die "minimal & effektiv"-Philosophie zu
+   verwässern.
+8. **Audio/Voice-Guidance** während des Workouts.
 
 ---
 
-*Ende der Dokumentation. Bei Unklarheiten: der echte Code in `fitness/` (Backend) und `fitness-frontend/src/` (Frontend) ist die maßgebliche Quelle — diese Doku beschreibt den Stand Juni 2026.*
+## Historie dieser Datei
+
+Bis August 2026 lagen neben dieser Doku noch `FITNESS_APP_COMPLETE_SPEC.md` und
+`BUILD_WORKFLOW.md` im Repo, beide oben als „VERALTET" markiert. Sie wurden
+**gelöscht**, ihr brauchbarer Inhalt steht jetzt hier:
+
+- Der **9-Schritte-Trainingsablauf** und die **Pausenzeiten** (180 s / 300 s) aus der
+  SPEC stehen in §6.
+- Die **manuellen Build-Schritte** aus `BUILD_WORKFLOW.md` stehen in §4 — dort
+  allerdings **vollständig**: Die alte Datei kannte `collectstatic` nicht und
+  widersprach sich selbst (sie nannte `static/fitness/` gitignored und forderte zwei
+  Zeilen später `git add static/fitness/`).
+- Die **Startlevel-Tabelle** der SPEC war schlicht falsch (Push-ups L3, Planks L1
+  statt L4/L3) — die richtige Tabelle steht in §6, mitsamt Warnung.
+
+---
+
+*Ende der Dokumentation. Bei Unklarheiten: der echte Code in `fitness/` (Backend) und
+`fitness-frontend/src/` (Frontend) ist die maßgebliche Quelle — diese Doku beschreibt
+den Stand **August 2026**.*

@@ -118,8 +118,18 @@ Backend: Django + DRF + PostgreSQL + JWT, in Docker (`django-dev`), gunicorn + W
 Frontend: React 19 + Vite, Zustand (`authStore`, `workoutStore`), React Router v7 (`basename="/corvis-app"`), Axios. Styling: handgeschriebene `fitness-frontend/src/index.css` (App) + inline in `fitness-landing.html` (Landing).
 
 ## Offene nächste Schritte
-1. **Django-Upgrade 4.2 → 5.2 LTS** — 4.2 hat am 7. April 2026 EOL erreicht, es kommen keine Sicherheitspatches mehr. Analyse liegt vor, noch nicht durchgeführt.
-2. **PWA + Push-Notifications** — installierbar machen, Trainings-Reminder.
-3. Optional: `FITNESS_APP_COMPLETE_SPEC.md` und `BUILD_WORKFLOW.md` löschen (beide überholt, siehe `PROJEKT_LANDKARTE.md`).
+1. **Feature 4 (Wochen-Rückblick) fertigbauen** — der Endpoint `/weekly-review/` läuft, `workoutStore` lädt ihn bei jedem Start, die CSS-Klassen `.week-review*` stehen fertig in `index.css` — aber **keine `.jsx` rendert ihn**. Es fehlt nur das Bauteil in `HomeView.jsx`.
+2. **Echtes Server-Push (Web-Push + VAPID)** — die PWA ist installierbar und zeigt *lokale* Benachrichtigungen (Pausenende). Eine Erinnerung, die ankommt **ohne** offene App, geht noch nicht: kein `push`-Handler im Service Worker, kein `PushManager.subscribe()`.
+3. **`npm audit fix`** — 7 Findings (1 low, 6 high); 5 davon reines Build-Werkzeug, 2 (`react-router*`) landen im Bundle, betreffen aber nur den RSC-Modus, den CORVIS nicht nutzt.
+4. **Offline-Modus** — `sw.js` hat bewusst *keinen* `fetch`-Handler.
 
-*Erledigt:* Registration-Key liegt in der `.env` (`DJANGO_REGISTRATION_KEY`), im Code steht nur noch ein Platzhalter. geo-Reste sind entfernt.
+*Erledigt:* Django 5.2.17 LTS + DRF 3.17.0 (Branch `django-upgrade`, in `main` gemerged). 134 Tests unter `fitness/tests/`. Migrationskette bis `0009` von null reproduzierbar. gunicorn statt `runserver`. `ALLOWED_HOSTS` ohne Wildcard. PWA installierbar. Registration-Key in der `.env`. geo-Reste entfernt.
+
+## Tests
+```
+docker compose exec django-dev python manage.py test fitness --settings=meinprojekt.settings_test
+```
+134 Tests, ~5 s (SQLite im Speicher, braucht kein Postgres). **Vor jedem Dependency- oder Django-Upgrade laufen lassen.**
+
+## Startlevel (häufiger Irrtum)
+Neue Nutzer starten auf **Push-ups L4** (Standard Push-ups), **Pull-ups L1** (Dead Hang), **Planks L3** (Standard Plank) — gesetzt in `fitness/migrations/0009_*`, Konstante `STARTLEVEL`. Die gelöschte `FITNESS_APP_COMPLETE_SPEC.md` behauptete L3/L1; das war falsch. Die Trainings-**Ziele werden angezeigt** (`Ziel: 8 Wdh`), nicht versteckt.
