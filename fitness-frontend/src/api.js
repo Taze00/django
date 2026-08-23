@@ -30,10 +30,24 @@ api.interceptors.response.use(
           localStorage.setItem('access_token', res.data.access);
           api.defaults.headers.Authorization = `Bearer ${res.data.access}`;
           return api(original);
-        } catch (e) {
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('refresh_token');
-          window.location.href = '/fitness/login';
+        } catch {
+          // Auch der refresh_token ist hin - die Sitzung ist zu Ende.
+          //
+          // Kein window.location: das warf bisher die ganze SPA weg und
+          // zeigte dabei auf /fitness/login, eine Route, die es seit der
+          // Umbenennung zu /corvis-app/ nicht mehr gibt (HTTP 404).
+          //
+          // Stattdessen nur den Zustand zuruecksetzen. logout() loescht
+          // beide Token und setzt isAuthenticated auf false; PrivateRoute
+          // haengt an genau diesem Wert und leitet daraufhin von selbst
+          // auf /login um - innerhalb des Routers, ohne Neuladen.
+          //
+          // Der Import liegt bewusst hier drin und nicht oben: authStore
+          // importiert seinerseits diese Datei, ein statischer Import
+          // waere also ein Zyklus. Zum Zeitpunkt dieses Aufrufs sind
+          // beide Module laengst ausgewertet.
+          const { useAuthStore } = await import('./stores/authStore');
+          useAuthStore.getState().logout();
         }
       }
     }
