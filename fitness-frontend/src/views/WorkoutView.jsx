@@ -283,8 +283,21 @@ export default function WorkoutView() {
     };
   };
 
-  const getLastTime = (exerciseName, setNumber) =>
-    lastPerformance?.[exerciseName]?.[`set${setNumber}`] ?? null;
+  // last_performance ist nach Uebungs-ID abgelegt und traegt die Felder
+  // set1_reps/set1_seconds. Gesucht wurde frueher nach dem Uebungsnamen und
+  // einem Feld "set1", das es nie gab - "Letztes Mal" erschien deshalb nie.
+  // Der Typ kommt aus dem gefuellten Feld, nicht aus der heutigen Progression:
+  // nach einem Aufstieg von Dead Hang auf Scapular Shrugs waeren 31 Sekunden
+  // sonst als "31 Wdh" ausgewiesen.
+  const getLastTime = (exercise, setNumber) => {
+    const eintrag = lastPerformance?.[String(exercise.id)];
+    if (!eintrag) return null;
+    const reps = eintrag[`set${setNumber}_reps`];
+    const sekunden = eintrag[`set${setNumber}_seconds`];
+    if (reps != null) return { wert: reps, typ: 'reps' };
+    if (sekunden != null) return { wert: sekunden, typ: 'time' };
+    return null;
+  };
 
   const getNextLabel = nextStep => {
     if (!nextStep) return 'Fertig!';
@@ -533,7 +546,7 @@ export default function WorkoutView() {
     );
   }
 
-  const lastTime = getLastTime(step.exerciseName, step.setNumber);
+  const lastTime = getLastTime(progInfo.exercise, step.setNumber);
 
   return (
     <div className="workout-shell">
@@ -570,13 +583,13 @@ export default function WorkoutView() {
                 </strong>
               </p>
             )}
-            {lastTime !== null && lastTime !== undefined && (
+            {lastTime && (
               <p className="wv-last">
                 Letztes Mal:{' '}
                 <span>
-                  {progInfo.currentProgression.target_type === 'reps'
-                    ? `${lastTime} Wdh`
-                    : `${Math.floor(lastTime / 60)}:${String(lastTime % 60).padStart(2, '0')}`}
+                  {lastTime.typ === 'reps'
+                    ? `${lastTime.wert} Wdh`
+                    : `${Math.floor(lastTime.wert / 60)}:${String(lastTime.wert % 60).padStart(2, '0')}`}
                 </span>
               </p>
             )}

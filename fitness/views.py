@@ -405,6 +405,13 @@ class WorkoutViewSet(viewsets.ModelViewSet):
                 is_drop_set=False
             ).first()
 
+            set2 = WorkoutSet.objects.filter(
+                workout=last_workout,
+                exercise=exercise,
+                set_number=2,
+                is_drop_set=False
+            ).first()
+
             # Last reached drop-set variant (the progression saved on the
             # completed drop set) — shown as a "last time" comparison.
             drop_set = WorkoutSet.objects.filter(
@@ -414,12 +421,14 @@ class WorkoutViewSet(viewsets.ModelViewSet):
                 drop_set_completed=True,
             ).select_related('progression').first()
 
-            if set1 or drop_set:
+            if set1 or set2 or drop_set:
                 last_sets[str(exercise.id)] = {
                     'exercise_id': exercise.id,
                     'exercise_name': exercise.name,
                     'set1_reps': set1.reps if set1 else None,
                     'set1_seconds': set1.seconds if set1 else None,
+                    'set2_reps': set2.reps if set2 else None,
+                    'set2_seconds': set2.seconds if set2 else None,
                     'drop_reached': drop_set.progression.name if drop_set else None,
                     'drop_reached_level': drop_set.progression.level if drop_set else None,
                 }
