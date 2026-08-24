@@ -67,6 +67,9 @@ export default function ProfileView() {
     setResetting(true);
     try {
       await api.post('/onboarding/reset/', {});
+      // Progressionen, Workouts und Zeitleiste sind eben geloescht worden -
+      // der Store muss neu laden.
+      useWorkoutStore.setState({ isInitialized: false });
       useAuthStore.setState(s => ({ user: { ...s.user, onboarding_completed: false } }));
       setShowResetModal(false);
       setConfirmText('');

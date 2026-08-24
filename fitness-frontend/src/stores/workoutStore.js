@@ -31,10 +31,19 @@ export const useWorkoutStore = create((set, get) => ({
   isInitialized: false,
   isLoading: false,
 
+  // Laeuft gerade ein Ladevorgang? Dann wartet der zweite Aufrufer darauf,
+  // statt einen zweiten zu starten. isInitialized wird erst am ENDE gesetzt -
+  // zwei fast gleichzeitige Aufrufe (App.jsx nach der Anmeldung, HomeView nach
+  // dem Laden des Nutzers) kamen sonst beide durch die Sperre und feuerten
+  // jeder acht Anfragen ab.
+  initPromise: null,
+
   initialize: async () => {
     const state = get();
     if (state.isInitialized && state.exercises.length > 0) return;
+    if (state.initPromise) return state.initPromise;
 
+    const lauf = (async () => {
     set({ isLoading: true });
     try {
       const [exRes, progRes, workRes, settRes, streakRes, timelineRes, weeklyRes, statsRes] = await Promise.all([
@@ -70,6 +79,14 @@ export const useWorkoutStore = create((set, get) => ({
     } catch (error) {
       set({ isLoading: false });
       throw error;
+    }
+    })();
+
+    set({ initPromise: lauf });
+    try {
+      return await lauf;
+    } finally {
+      set({ initPromise: null });
     }
   },
 

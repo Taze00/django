@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
+import { useWorkoutStore } from '../stores/workoutStore';
 import api from '../api';
 
 const DAYS = [
@@ -205,7 +206,13 @@ export default function OnboardingView() {
     }
   };
 
-  const finish = () => navigate('/');
+  const finish = () => {
+    // Hier sind die Daten tatsaechlich veraltet: die Progressionen sind gerade
+    // erst entstanden. Frueher erledigte das die Startseite, indem sie bei
+    // jedem Besuch neu lud - der Fall gehoert aber hierher.
+    useWorkoutStore.setState({ isInitialized: false });
+    navigate('/');
+  };
 
   const totalSteps = 5; // days + 3 exercises + reveal
   const progress = Math.min(step, totalSteps) / totalSteps;

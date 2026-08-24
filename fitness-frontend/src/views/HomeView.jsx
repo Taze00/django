@@ -89,11 +89,14 @@ export default function HomeView() {
     if (user && user.onboarding_completed === false) navigate('/onboarding');
   }, [user, navigate]);
 
+  // initialize() hat eine eigene Sperre und tut nichts, wenn die Daten schon
+  // da sind. Vorher stand hier ein setState({ isInitialized: false }), das
+  // diese Sperre bei JEDEM Besuch der Startseite aushebelte - acht Anfragen
+  // pro Aufruf, zusaetzlich zu dem einen Lauf, den App.jsx nach der Anmeldung
+  // ohnehin startet. Wer die Daten wirklich fuer veraltet haelt, setzt die
+  // Sperre dort zurueck, wo sie veraltet sind (Onboarding, Reset, Levelwechsel).
   useEffect(() => {
-    if (user && user.onboarding_completed === true) {
-      useWorkoutStore.setState({ isInitialized: false });
-      initialize();
-    }
+    if (user && user.onboarding_completed === true) initialize();
   }, [user?.onboarding_completed, initialize]);
 
   const maxLevel = useMemo(() => maxLevelAus(exercises), [exercises]);
