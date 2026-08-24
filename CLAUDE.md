@@ -40,7 +40,7 @@ docker compose restart django-dev
   `docker compose exec django-dev bash -c "chmod 666 /code/PFAD"`
 - **Git-Objects:** vor `git add` ggf. `docker compose exec django-dev bash -c "chmod -R 777 /code/.git/objects"`
 - **Dateien NICHT vom Host löschen** (Permission denied) — im Container: `docker compose exec django-dev bash -c "rm ..."`
-- **`Workout.date` ist `auto_now_add=True`** — Workouts mit vergangenem Datum brauchen rohes SQL.
+- **`Workout.date` ist `default=heute`** (seit Migration 0010, vorher `auto_now_add`). Das Datum lässt sich beim Anlegen setzen — `Workout.objects.create(user=u, date=...)` genügt, rohes SQL braucht es dafür nicht mehr. `heute()` kommt aus `fitness/zeit.py` und liefert den Kalendertag in **deutscher** Zeit (`CORVIS_TIME_ZONE`), nicht in UTC: `TIME_ZONE` ist projektweit weiter `UTC`, weil das globale Umstellen auch Admin, Templates und die `films`-App treffen würde. Wer in `fitness/` nach „heute" fragt, nimmt `heute()` — nicht `timezone.now().date()` und nicht `datetime.date.today()`.
 - **`static/fitness/` ist gitignored** — nicht committen.
 - **Secrets** stehen in der gitignorten `.env` (nicht im Code). `SECRET_KEY` ist rotiert.
 - **Logs ansehen:** `docker compose logs django-dev`
