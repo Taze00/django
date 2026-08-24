@@ -37,7 +37,13 @@ export default function SetProgressionView() {
       }
 
       for (const ex of updates) {
-        await api.patch(`/user-progressions/${ex.id}/`, {
+        // Der Endpunkt adressiert die UserExerciseProgression, nicht die
+        // Uebung. Mit ex.id ging es nur bei Nutzer 1 gut, wo beide Zaehler
+        // zufaellig gleich laufen - jeder spaetere Nutzer aenderte damit die
+        // Stufe eines fremden Datensatzes oder bekam 404.
+        const eintrag = userProgressions[String(ex.id)];
+        if (!eintrag?.id) continue;
+        await api.patch(`/user-progressions/${eintrag.id}/`, {
           current_progression: selected[String(ex.id)]
         });
       }

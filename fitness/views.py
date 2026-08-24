@@ -75,10 +75,20 @@ class UserProgressionViewSet(viewsets.ModelViewSet):
             try:
                 prog_id = request.data['current_progression']
                 progression_obj = Progression.objects.get(id=prog_id)
-                progression.current_progression = progression_obj
-                print(f"DEBUG: Updated {progression.exercise.name} to progression {prog_id}")
             except Progression.DoesNotExist:
                 return Response({'error': 'Invalid progression'}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Die Stufe muss zu genau dieser Uebung gehoeren. Ohne die Pruefung
+            # laesst sich ein Push-up-Level an den Pull-ups setzen - die
+            # Levellogik vergliche danach Saetze gegen ein fremdes Ziel.
+            if progression_obj.exercise_id != progression.exercise_id:
+                return Response(
+                    {'error': f'Diese Stufe gehoert nicht zu {progression.exercise.name}.'},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            progression.current_progression = progression_obj
+            print(f"DEBUG: Updated {progression.exercise.name} to progression {prog_id}")
 
         # Update training days if provided
         if 'training_days' in request.data:
