@@ -65,6 +65,11 @@ class UserExerciseProgression(models.Model):
 
     class Meta:
         unique_together = ["user", "exercise"]
+        # Ohne ordering ist die Reihenfolge dem Datenbankplan ueberlassen. Beim
+        # paginierten /user-progressions/ warnte Django genau deswegen
+        # (UnorderedObjectListWarning) - eine Seite konnte denselben Eintrag
+        # zweimal zeigen und einen anderen gar nicht.
+        ordering = ["exercise__order", "id"]
 
     def __str__(self):
         return f"{self.user.username} - {self.exercise.name} ({self.current_progression.name})"
@@ -104,6 +109,9 @@ class WarmupChecklist(models.Model):
     elbows = models.BooleanField(default=False)
     back = models.BooleanField(default=False)
     legs = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["workout_id"]
 
     def __str__(self):
         return f"Warmup for {self.workout}"
@@ -189,6 +197,9 @@ class UserProfile(models.Model):
     onboarding_completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["user_id"]
 
     def __str__(self):
         return f"Profile for {self.user.username}"
