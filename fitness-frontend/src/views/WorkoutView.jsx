@@ -10,6 +10,7 @@ import CooldownChecklist from '../components/CooldownChecklist';
 import ProgressionModal from '../components/ProgressionModal';
 import FormTip from '../components/FormTip';
 import { requestWakeLock, releaseWakeLock } from '../utils/wakeLock';
+import { MAX_REPS, MAX_SECONDS, nurZiffern } from '../utils/eingabe';
 
 const REST_TIMES = { normal: 180, afterDrop: 300 };
 
@@ -83,9 +84,11 @@ function KorrekturFeld({ satz, progressionen, leiter, isSaving, onSpeichern, onA
   });
   const prog = progressionen.find(p => p.id === satz.progression);
 
+  const grenze = typ === 'reps' ? MAX_REPS : MAX_SECONDS;
+  const zuGross = !satz.is_drop_set && wert !== '' && parseInt(wert, 10) > grenze;
   const ungueltig = satz.is_drop_set
     ? false
-    : (wert === '' || Number.isNaN(parseInt(wert, 10)) || parseInt(wert, 10) < 0);
+    : (wert === '' || Number.isNaN(parseInt(wert, 10)) || zuGross);
 
   return (
     <div className="wv-korrektur" role="dialog" aria-label="Satz korrigieren">
@@ -125,15 +128,18 @@ function KorrekturFeld({ satz, progressionen, leiter, isSaving, onSpeichern, onA
         <div className="wv-korrektur-eingabe">
           <input
             className="wv-korrektur-input"
-            type="number"
+            type="text"
             inputMode="numeric"
-            min="0"
+            pattern="[0-9]*"
             value={wert}
-            onChange={e => setWert(e.target.value)}
+            onChange={e => setWert(nurZiffern(e.target.value))}
             autoFocus
           />
           <span className="wv-korrektur-einheit">{typ === 'reps' ? 'Wdh' : 'Sek'}</span>
         </div>
+      )}
+      {zuGross && (
+        <p className="eingabe-hinweis">Höchstens {grenze} {typ === 'reps' ? 'Wiederholungen' : 'Sekunden'}.</p>
       )}
 
       <div className="wv-korrektur-knoepfe">

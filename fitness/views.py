@@ -5,7 +5,10 @@ from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from django.db.models import Q
 from django.contrib.auth.models import User
-from fitness.models import Exercise, Progression, UserExerciseProgression, Workout, WorkoutSet, WarmupChecklist, UserProfile, RestDay, LevelEvent
+from fitness.models import (
+    Exercise, Progression, UserExerciseProgression, Workout, WorkoutSet,
+    WarmupChecklist, UserProfile, RestDay, LevelEvent, MAX_REPS, MAX_SECONDS,
+)
 from fitness.zeit import heute
 from fitness.serializers import (
     ExerciseSerializer, UserProgressionSerializer, WorkoutSerializer,
@@ -49,6 +52,34 @@ def community_stats(request):
         'plank_minutes': plank_seconds // 60,
         'level_ups': level_ups,
     })
+
+
+def _geprueft(wert, feld, maximum):
+    """Einen eingetragenen Wert pruefen.
+
+    Gibt (zahl, fehler) zurueck; fehler ist None, wenn alles stimmt. Leer
+    bleibt leer - nicht jeder Satz hat beide Felder.
+
+    Nachkommastellen werden abgewiesen statt abgeschnitten: parseInt('7.5')
+    ergibt still 7, und der Nutzer sieht nie, dass seine Eingabe veraendert
+    wurde.
+    """
+    if wert is None or wert == '':
+        return None, None
+    if isinstance(wert, bool):
+        return None, f'{feld}: keine Zahl.'
+    try:
+        zahl = float(wert)
+    except (TypeError, ValueError):
+        return None, f'{feld}: "{wert}" ist keine Zahl.'
+    if zahl != int(zahl):
+        return None, f'{feld} muss eine ganze Zahl sein, {wert} ist keine.'
+    zahl = int(zahl)
+    if zahl < 0:
+        return None, f'{feld} kann nicht negativ sein.'
+    if zahl > maximum:
+        return None, f'{feld}: hoechstens {maximum}.'
+    return zahl, None
 
 
 class ExerciseViewSet(viewsets.ReadOnlyModelViewSet):
@@ -147,6 +178,13 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         rest_time_seconds = request.data.get('rest_time_seconds', 180)
         is_drop_set = request.data.get('is_drop_set', False)
         drop_set_completed = request.data.get('drop_set_completed', False)
+
+        reps, fehler = _geprueft(reps, 'Wiederholungen', MAX_REPS)
+        if fehler:
+            return Response({'error': fehler}, status=status.HTTP_400_BAD_REQUEST)
+        seconds, fehler = _geprueft(seconds, 'Sekunden', MAX_SECONDS)
+        if fehler:
+            return Response({'error': fehler}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             exercise = Exercise.objects.get(id=exercise_id)

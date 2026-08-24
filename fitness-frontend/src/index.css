@@ -573,6 +573,11 @@ body {
 .lib-ladder-item.current .lib-ladder-status { color: var(--orange); }
 
 /* ─── STATISTICS VIEW ─── */
+.eingabe-hinweis {
+  font-size: 0.68rem; color: var(--orange);
+  text-align: center; margin-top: 0.5rem;
+}
+
 /* Verlauf seitenweise nachladen. Bewusst ein Knopf statt Nachladen beim
    Scrollen: die Liste steht unter Statistik, Serie und Zeitleiste - ein
    Scroll-Ausloeser wuerde beim Durchwischen dorthin ungewollt feuern. Der

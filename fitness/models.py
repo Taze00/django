@@ -117,6 +117,13 @@ class WarmupChecklist(models.Model):
         return f"Warmup for {self.workout}"
 
 
+# Obergrenzen fuer eingetragene Werte. Sie stehen hier bei den Feldern, die
+# sie begrenzen, und werden in views.add_set geprueft - die API nimmt sonst
+# jede Zahl an, egal was die Oberflaeche zulaesst.
+MAX_REPS = 500
+MAX_SECONDS = 7200  # zwei Stunden
+
+
 class WorkoutSet(models.Model):
     workout = models.ForeignKey(Workout, on_delete=models.CASCADE, related_name="sets")
     exercise = models.ForeignKey(Exercise, on_delete=models.PROTECT)
