@@ -69,7 +69,6 @@ class UserProgressionViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         """Update current progression level and training days"""
         progression = self.get_object()
-        print(f"DEBUG UPDATE: request.data = {request.data}")
 
         # Update progression if provided
         if 'current_progression' in request.data:
@@ -89,17 +88,12 @@ class UserProgressionViewSet(viewsets.ModelViewSet):
                 )
 
             progression.current_progression = progression_obj
-            print(f"DEBUG: Updated {progression.exercise.name} to progression {prog_id}")
 
         # Update training days if provided
         if 'training_days' in request.data:
             progression.training_days = request.data['training_days']
-            print(f"DEBUG: Updated training days to {request.data['training_days']}")
-        else:
-            print(f"DEBUG: No training_days in request.data!")
 
         progression.save()
-        print(f"DEBUG: After save - training_days = {progression.training_days}")
         return Response(UserProgressionSerializer(progression).data)
 
 
@@ -145,7 +139,6 @@ class WorkoutViewSet(viewsets.ModelViewSet):
         rest_time_seconds = request.data.get('rest_time_seconds', 180)
         is_drop_set = request.data.get('is_drop_set', False)
         drop_set_completed = request.data.get('drop_set_completed', False)
-        print(f'DEBUG: drop_set_completed={drop_set_completed}, is_drop_set={is_drop_set}')
 
         try:
             exercise = Exercise.objects.get(id=exercise_id)
@@ -538,7 +531,6 @@ def user_settings(request):
 @permission_classes([IsAuthenticated])
 def complete_onboarding(request):
     """Mark onboarding as complete and ensure all progressions exist"""
-    print(f"DEBUG: complete_onboarding called for user {request.user.username}")
     try:
         profile = UserProfile.objects.get(user=request.user)
     except UserProfile.DoesNotExist:
@@ -547,7 +539,6 @@ def complete_onboarding(request):
     # Get training days from existing progressions (set during onboarding)
     first_progression = UserExerciseProgression.objects.filter(user=request.user).first()
     training_days = first_progression.training_days if first_progression else [1, 2, 3, 4, 5]
-    print(f"DEBUG: Training days found: {training_days}")
 
     # Ensure all exercise progressions exist for the user (but don't overwrite existing ones)
     for exercise in Exercise.objects.all():
@@ -566,7 +557,6 @@ def complete_onboarding(request):
     profile.training_days = training_days
     profile.onboarding_completed = True
     profile.save()
-    print(f"DEBUG: Profile saved. training_days={profile.training_days}, onboarding_completed={profile.onboarding_completed}")
 
     serializer = UserProfileSerializer(profile)
     return Response(serializer.data, status=status.HTTP_200_OK)
