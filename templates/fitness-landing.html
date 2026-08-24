@@ -564,6 +564,11 @@ section {
 .live-num{ font-family:var(--display); font-size:3.5rem; line-height:1; color:var(--white); }
 .live-num span{ color:var(--orange); }
 .live-cell-label{ font-size:.62rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); margin-top:.6rem; }
+/* Zweiter Wert in anderer Einheit (Pull: Hang-Minuten neben Wiederholungen).
+   Als Unterzeile statt eigener Zelle - eine siebte Zelle wuerde das
+   3-Spalten-Raster zerreissen. */
+.live-cell-sub{ font-size:.62rem; letter-spacing:2px; text-transform:uppercase; color:var(--orange); opacity:.8; margin-top:.35rem; }
+.live-cell-sub[hidden]{ display:none; }
 .live-bar{ height:2px; background:var(--muted2); margin-top:1.2rem; overflow:hidden; }
 .live-bar-fill{ height:100%; width:0; background:var(--orange); }
 @media(max-width:700px){
@@ -1089,6 +1094,7 @@ footer {
       <div class="live-cell">
         <div class="live-num" id="lvPull">—</div>
         <div class="live-cell-label">Pull-ups total</div>
+        <div class="live-cell-sub" id="lvPullHang" hidden>+ <span id="lvPullHangNum">0</span> Hang-Minuten</div>
         <div class="live-bar"><div class="live-bar-fill" data-w="55"></div></div>
       </div>
       <div class="live-cell">
@@ -1186,6 +1192,12 @@ gsap.registerPlugin(ScrollTrigger);
     countUp(document.getElementById('lvLevelups'), data.level_ups);
     countUp(document.getElementById('lvPush'),     data.push_reps);
     countUp(document.getElementById('lvPull'),     data.pull_reps);
+    // Pull L1 Dead Hang und L3 Active Hang sind Zeitstufen - ohne diese Zeile
+    // faellt das Startlevel aus der Statistik.
+    if(data.pull_hang_minutes > 0){
+      document.getElementById('lvPullHang').hidden = false;
+      countUp(document.getElementById('lvPullHangNum'), data.pull_hang_minutes);
+    }
     countUp(document.getElementById('lvPlank'),    data.plank_minutes);
     gsap.to('.live-bar-fill',{width:(i,t)=>t.dataset.w+'%',duration:1.4,ease:'power3.out',stagger:.08});
   }

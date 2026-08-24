@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useWorkoutStore } from '../stores/workoutStore';
+import { formatTimeShort } from '../utils/formatTime';
 
 // Renders one timeline entry's content based on its type.
 function TimelineEntry({ event }) {
@@ -60,16 +61,30 @@ export default function StatisticsView() {
   const longestStreak = streak.longest;
 
   const stats = useMemo(() => {
-    const r = { pushReps: 0, pullReps: 0, plankSeconds: 0 };
+    const r = { pushReps: 0, pullReps: 0, pullSeconds: 0, plankSeconds: 0 };
     workouts.forEach(w => {
       (w.sets || []).forEach(s => {
         if (s.exercise_name === 'Push-ups' && s.reps) r.pushReps += s.reps;
-        else if (s.exercise_name === 'Pull-ups' && s.reps) r.pullReps += s.reps;
+        else if (s.exercise_name === 'Pull-ups') {
+          // Pull hat zeitbasierte Stufen (Dead Hang, Active Hang). Nur die
+          // Wiederholungen zu zaehlen laesst das Startlevel unsichtbar werden.
+          if (s.reps) r.pullReps += s.reps;
+          if (s.seconds) r.pullSeconds += s.seconds;
+        }
         else if (s.exercise_name === 'Planks' && s.seconds) r.plankSeconds += s.seconds;
       });
     });
     return r;
   }, [workouts]);
+
+  // Solange es noch keine Wiederholung gibt, ist die Hang-Zeit die Leistung -
+  // dann steht sie oben statt einer nichtssagenden 0.
+  const pullHead = stats.pullReps > 0
+    ? String(stats.pullReps)
+    : (stats.pullSeconds > 0 ? formatTimeShort(stats.pullSeconds) : '0');
+  const pullSub = stats.pullReps > 0
+    ? (stats.pullSeconds > 0 ? `+ ${formatTimeShort(stats.pullSeconds)} Hang` : null)
+    : (stats.pullSeconds > 0 ? 'Hang' : null);
 
   const completedWorkouts = workouts
     .filter(w => w.sets && w.sets.length > 0)
@@ -103,8 +118,9 @@ export default function StatisticsView() {
             <p className="stats-cell-label">Push-ups</p>
           </div>
           <div className="stats-cell">
-            <p className="stats-cell-val">{stats.pullReps}</p>
+            <p className="stats-cell-val">{pullHead}</p>
             <p className="stats-cell-label">Pull-ups</p>
+            {pullSub && <p className="stats-cell-sub">{pullSub}</p>}
           </div>
           <div className="stats-cell">
             <p className="stats-cell-val">{Math.floor(stats.plankSeconds / 60)}m</p>

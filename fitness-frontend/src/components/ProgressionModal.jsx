@@ -1,3 +1,5 @@
+import { formatTime } from '../utils/formatTime';
+
 function Confetti({ count = 60 }) {
   const colors = ['#FF4D00', '#ff6a2a', '#f0ede8', '#ffb347', '#fff'];
   const pieces = Array.from({ length: count }, (_, i) => ({
@@ -73,14 +75,6 @@ function DowngradeCard({ item, idx }) {
       </div>
     </div>
   );
-}
-
-function formatTime(totalSeconds) {
-  const s = Math.round(totalSeconds);
-  if (s < 60) return `${s}s`;
-  const m = Math.floor(s / 60);
-  const rem = s % 60;
-  return rem > 0 ? `${m}:${String(rem).padStart(2, '0')} min` : `${m} min`;
 }
 
 function getNextTrainingDay(trainingDays) {

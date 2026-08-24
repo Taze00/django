@@ -96,6 +96,7 @@ class OeffentlicheEndpunkteTest(ApiBasis):
                 "total_workouts",
                 "push_reps",
                 "pull_reps",
+                "pull_hang_minutes",
                 "plank_minutes",
                 "level_ups",
             },
@@ -420,7 +421,7 @@ class FortschrittEndpunkteTest(ApiBasis):
             {
                 "week_start", "week_end", "trainings_done",
                 "trainings_planned", "level_ups", "push_reps", "pull_reps",
-                "plank_seconds", "streak", "is_weekend",
+                "pull_seconds", "plank_seconds", "streak", "is_weekend",
             },
         )
 

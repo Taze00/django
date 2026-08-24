@@ -27,6 +27,12 @@ def community_stats(request):
     pull_reps = WorkoutSet.objects.filter(
         exercise__category='PULL', reps__isnull=False
     ).aggregate(s=Sum('reps'))['s'] or 0
+    # Pull hat zwei zeitbasierte Stufen (L1 Dead Hang, L3 Active Hang) - L1 ist
+    # das Startlevel. Wer nur haengt, hat keine Wiederholungen und faellt sonst
+    # komplett aus der Statistik.
+    pull_hang_seconds = WorkoutSet.objects.filter(
+        exercise__category='PULL', seconds__isnull=False
+    ).aggregate(s=Sum('seconds'))['s'] or 0
     plank_seconds = WorkoutSet.objects.filter(
         exercise__category='CORE', seconds__isnull=False
     ).aggregate(s=Sum('seconds'))['s'] or 0
@@ -38,6 +44,7 @@ def community_stats(request):
         'total_workouts': total_workouts,
         'push_reps': push_reps,
         'pull_reps': pull_reps,
+        'pull_hang_minutes': pull_hang_seconds // 60,
         'plank_minutes': plank_seconds // 60,
         'level_ups': level_ups,
     })
@@ -638,14 +645,19 @@ def weekly_review(request):
     ).count()
 
     # Volume this week from the week's workout sets.
-    push_reps = pull_reps = plank_seconds = 0
+    push_reps = pull_reps = pull_seconds = plank_seconds = 0
     for w in week_workouts:
         for s in WorkoutSet.objects.filter(workout=w).select_related('exercise'):
             cat = s.exercise.category
             if cat == 'PUSH' and s.reps:
                 push_reps += s.reps
-            elif cat == 'PULL' and s.reps:
-                pull_reps += s.reps
+            elif cat == 'PULL':
+                # Beide Typen zaehlen: die Zeitstufen (Dead Hang, Active Hang)
+                # sind sonst unsichtbar - und Dead Hang ist das Startlevel.
+                if s.reps:
+                    pull_reps += s.reps
+                if s.seconds:
+                    pull_seconds += s.seconds
             elif cat == 'CORE' and s.seconds:
                 plank_seconds += s.seconds
 
@@ -665,6 +677,7 @@ def weekly_review(request):
         'level_ups': level_ups,
         'push_reps': push_reps,
         'pull_reps': pull_reps,
+        'pull_seconds': pull_seconds,
         'plank_seconds': plank_seconds,
         'streak': streak,
         'is_weekend': today.weekday() >= 5,  # Sat=5, Sun=6

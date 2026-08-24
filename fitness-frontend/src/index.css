@@ -586,6 +586,12 @@ body {
   font-size: 0.5rem; letter-spacing: 2px;
   text-transform: uppercase; color: var(--muted); margin-top: 0.4rem;
 }
+/* Zweiter Wert einer Zelle in anderer Einheit (Pull: Hang-Zeit neben Wdh.).
+   Bewusst kleiner als das Label, damit die Schlagzeile die Schlagzeile bleibt. */
+.stats-cell-sub {
+  font-size: 0.55rem; letter-spacing: 1px;
+  color: var(--orange); opacity: 0.75; margin-top: 0.3rem;
+}
 .streak-row {
   display: grid; grid-template-columns: 1fr 1fr;
   gap: 1px; background: var(--muted2); margin-bottom: 1.5rem;
