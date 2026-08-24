@@ -137,7 +137,12 @@ export default function StatisticsView() {
             {pullSub && <p className="stats-cell-sub">{pullSub}</p>}
           </div>
           <div className="stats-cell">
-            <p className="stats-cell-val">{Math.floor(stats.plankSeconds / 60)}m</p>
+            {/* Nicht auf ganze Minuten abschneiden: 11 Sekunden Plank ergaben
+                so eine 0, und 67 Sekunden sahen aus wie 60. formatTimeShort
+                zeigt "11s" bzw. "1:07" - dieselbe Schreibweise wie bei Pull. */}
+            <p className="stats-cell-val">
+              {stats.plankSeconds > 0 ? formatTimeShort(stats.plankSeconds) : '0'}
+            </p>
             <p className="stats-cell-label">Core</p>
           </div>
         </div>
