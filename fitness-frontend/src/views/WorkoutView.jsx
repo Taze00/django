@@ -38,22 +38,115 @@ function satzWert(satz) {
 }
 
 // Was in dieser Sitzung schon steht - damit nach einem Neuladen sichtbar ist,
-// was bereits gespeichert wurde.
-function ErfassteSaetze({ saetze }) {
+// was bereits gespeichert wurde. Jeder Chip ist zugleich der Weg zur
+// Korrektur: ein Tippfehler in Satz 1 laesst sich auch von Schritt 8 aus
+// heilen, ohne sich Schritt fuer Schritt zurueckzuhangeln.
+function ErfassteSaetze({ saetze, onKorrigieren }) {
   if (!saetze.length) return null;
   return (
     <div className="wv-erfasst">
-      <p className="wv-erfasst-titel">Bereits eingetragen</p>
+      <p className="wv-erfasst-titel">Bereits eingetragen · antippen zum Ändern</p>
       <div className="wv-erfasst-liste">
         {saetze.map(satz => (
-          <span
+          <button
+            type="button"
             key={`${satz.exercise_name}-${satz.set_number}-${satz.is_drop_set}`}
             className={`wv-erfasst-chip ${satz.is_drop_set ? 'drop' : ''}`}
+            onClick={() => onKorrigieren(satz)}
           >
             <span className="wv-erfasst-ex">{satz.exercise_name}</span>
             {satz.is_drop_set ? satzWert(satz) : `S${satz.set_number}: ${satzWert(satz)}`}
-          </span>
+          </button>
         ))}
+      </div>
+    </div>
+  );
+}
+
+// Ist der Satz in Wiederholungen oder in Sekunden aufgezeichnet? Massgeblich
+// ist die Progression AM SATZ, nicht die aktuelle des Nutzers - dieselbe Regel
+// wie in der Levellogik.
+function satzTyp(satz, progressionen) {
+  const prog = progressionen.find(p => p.id === satz.progression);
+  if (prog) return prog.target_type;
+  return satz.seconds != null ? 'time' : 'reps';
+}
+
+// Korrekturfeld fuer einen bereits gespeicherten Satz. Der Wert wird als Zahl
+// geaendert - bei Zeitstufen muss der Timer also nicht noch einmal laufen, nur
+// um einen Tippfehler zu heilen.
+function KorrekturFeld({ satz, progressionen, leiter, isSaving, onSpeichern, onAbbrechen }) {
+  const typ = satzTyp(satz, progressionen);
+  const [wert, setWert] = useState(() => {
+    if (satz.is_drop_set) return satz.drop_set_completed ? satz.progression : '';
+    return String(satz.reps != null ? satz.reps : (satz.seconds != null ? satz.seconds : ''));
+  });
+  const prog = progressionen.find(p => p.id === satz.progression);
+
+  const ungueltig = satz.is_drop_set
+    ? false
+    : (wert === '' || Number.isNaN(parseInt(wert, 10)) || parseInt(wert, 10) < 0);
+
+  return (
+    <div className="wv-korrektur" role="dialog" aria-label="Satz korrigieren">
+      <p className="wv-korrektur-titel">
+        {satz.exercise_name} · {satz.is_drop_set ? 'Drop-Set' : `Satz ${satz.set_number}`}
+      </p>
+      <p className="wv-korrektur-sub">
+        {prog?.name || satz.progression_name}
+        {!satz.is_drop_set && prog?.target_value != null && (
+          <> · Ziel: {prog.target_type === 'reps' ? `${prog.target_value} Wdh` : `${prog.target_value} s`}</>
+        )}
+      </p>
+
+      {satz.is_drop_set ? (
+        <div className="wv-korrektur-leiter">
+          {leiter.map(p => (
+            <button
+              type="button"
+              key={p.id}
+              className={`drop-set-item ${wert === p.id ? 'reached' : ''}`}
+              onClick={() => setWert(p.id)}
+            >
+              <span className="drop-item-name">{p.name}</span>
+              <span className="drop-item-check">{wert === p.id ? '✓' : ''}</span>
+            </button>
+          ))}
+          <button
+            type="button"
+            className={`drop-set-item ${wert === '' ? 'reached' : ''}`}
+            onClick={() => setWert('')}
+          >
+            <span className="drop-item-name">Übersprungen</span>
+            <span className="drop-item-check">{wert === '' ? '✓' : ''}</span>
+          </button>
+        </div>
+      ) : (
+        <div className="wv-korrektur-eingabe">
+          <input
+            className="wv-korrektur-input"
+            type="number"
+            inputMode="numeric"
+            min="0"
+            value={wert}
+            onChange={e => setWert(e.target.value)}
+            autoFocus
+          />
+          <span className="wv-korrektur-einheit">{typ === 'reps' ? 'Wdh' : 'Sek'}</span>
+        </div>
+      )}
+
+      <div className="wv-korrektur-knoepfe">
+        <button className="btn-korrektur-ab" onClick={onAbbrechen} disabled={isSaving}>
+          Abbrechen
+        </button>
+        <button
+          className="btn-korrektur-ok"
+          onClick={() => onSpeichern(satz.is_drop_set ? (wert === '' ? false : wert) : parseInt(wert, 10))}
+          disabled={isSaving || ungueltig}
+        >
+          {isSaving ? 'Speichere …' : 'Speichern'}
+        </button>
       </div>
     </div>
   );
@@ -115,6 +208,7 @@ export default function WorkoutView() {
   const [saveState, setSaveState] = useState({ status: 'idle' });
   const [lastSaved, setLastSaved] = useState(null);
   const [erfasst, setErfasst] = useState([]);
+  const [korrektur, setKorrektur] = useState(null);
 
   const exercises = useWorkoutStore(state => state.exercises);
   const userProgressions = useWorkoutStore(state => state.userProgressions);
@@ -260,6 +354,80 @@ export default function WorkoutView() {
     }
   };
 
+  // Alle Progressionen flach, um die eines gespeicherten Satzes wiederzufinden.
+  const alleProgressionen = useMemo(
+    () => exercises.flatMap(e => e.progressions || []), [exercises]);
+
+  const leiterFuer = satz => {
+    const info = getProgInfo(satz.exercise_name);
+    return info ? [info.currentProgression, ...info.lowerProgressions] : [];
+  };
+
+  // Korrektur ist bewusst dasselbe add_set wie beim ersten Eintragen: es ist
+  // ein update_or_create auf (Workout, Uebung, Satznummer, Drop). Der alte Wert
+  // wird dadurch ersetzt, nicht ergaenzt - und die Levellogik liest in
+  // complete() ohnehin frisch aus der Datenbank. Der alte Wert kann also nicht
+  // mehr zaehlen.
+  const handleKorrekturSpeichern = async neuerWert => {
+    const satz = korrektur;
+    if (!satz) return;
+    setSaveState({ status: 'saving' });
+    try {
+      const istDrop = Boolean(satz.is_drop_set);
+      const typ = satzTyp(satz, alleProgressionen);
+      const dropAbgeschlossen = istDrop && neuerWert !== false;
+      // Die Progression des Satzes bleibt, wie sie war - nur der Wert aendert
+      // sich. Beim Drop-Set IST die Variante der Wert.
+      const progressionId = istDrop
+        ? (dropAbgeschlossen ? neuerWert : (leiterFuer(satz)[0]?.id ?? satz.progression))
+        : satz.progression;
+      const reps = (!istDrop && typ === 'reps') ? neuerWert : null;
+      const secs = (!istDrop && typ === 'time') ? neuerWert : null;
+
+      const gespeichert = await addSet(
+        currentWorkout.id, satz.exercise, progressionId, satz.set_number,
+        reps, secs, satz.rest_time_seconds, istDrop, dropAbgeschlossen);
+
+      setErfasst(bisher => bisher.map(x =>
+        (x.exercise_name === satz.exercise_name
+          && x.set_number === satz.set_number
+          && Boolean(x.is_drop_set) === istDrop) ? gespeichert : x));
+      setSaveState({ status: 'idle' });
+      setKorrektur(null);
+    } catch (err) {
+      console.error('Error correcting set:', err);
+      setSaveState({ status: 'korrekturError', message: fehlertext(err) });
+    }
+  };
+
+  const handleKorrekturOeffnen = satz => {
+    setSaveState({ status: 'idle' });
+    setKorrektur(satz);
+  };
+
+  // Bewusst eine schlichte Funktion, keine Komponente: eine im Rumpf definierte
+  // Komponente waere bei jedem Rendern eine neue Funktion, wuerde neu montiert -
+  // und KorrekturFeld verloere den gerade eingetippten Wert. So sieht React
+  // direkt das stabile KorrekturFeld an stabiler Stelle.
+  const korrekturSchicht = () => korrektur && (
+    <div className="wv-korrektur-schicht">
+      <SpeicherHinweis
+        zustand={saveState.status === 'korrekturError' ? saveState : null}
+        titel="Nicht gespeichert."
+        nachsatz="Der alte Wert steht noch."
+        onRetry={() => setSaveState({ status: 'idle' })}
+      />
+      <KorrekturFeld
+        satz={korrektur}
+        progressionen={alleProgressionen}
+        leiter={leiterFuer(korrektur)}
+        isSaving={saveState.status === 'saving'}
+        onSpeichern={handleKorrekturSpeichern}
+        onAbbrechen={() => { setKorrektur(null); setSaveState({ status: 'idle' }); }}
+      />
+    </div>
+  );
+
   const handleRestComplete = () => {
     setIsResting(false);
     setLastSaved(null);
@@ -351,7 +519,8 @@ export default function WorkoutView() {
           nachsatz="Deine Eingabe steht noch da."
           onRetry={() => handleSetComplete(saveState.value)}
         />
-        <ErfassteSaetze saetze={erfasst} />
+        <ErfassteSaetze saetze={erfasst} onKorrigieren={handleKorrekturOeffnen} />
+        {korrekturSchicht()}
         <DropSetInstructions
           exercise={progInfo.exercise}
           progressions={[progInfo.currentProgression, ...progInfo.lowerProgressions]}
@@ -386,7 +555,8 @@ export default function WorkoutView() {
             nachsatz="Deine Eingabe steht noch da."
             onRetry={() => handleSetComplete(saveState.value)}
           />
-          <ErfassteSaetze saetze={erfasst} />
+          <ErfassteSaetze saetze={erfasst} onKorrigieren={handleKorrekturOeffnen} />
+          {korrekturSchicht()}
           <div className="wv-info">
             <span className="wv-cat-pill">{progInfo.exercise.category}</span>
             <p className="wv-prog-name">{progInfo.currentProgression.name}</p>
