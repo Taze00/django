@@ -235,6 +235,16 @@ class WorkoutViewSet(viewsets.ModelViewSet):
 
         workout.completed = True
         workout.completed_at = timezone.now()
+
+        # Dauer aus den Satz-Zeitstempeln. Das Workout selbst taugt nicht als
+        # Startzeit: es entsteht schon beim Betreten des Trainingsschirms, und
+        # date ist ohnehin nur ein Kalendertag. Der erste eingetragene Satz ist
+        # der frueheste beobachtbare Anfang.
+        erster_satz = workout.sets.order_by('created_at').first()
+        if erster_satz:
+            workout.duration_seconds = max(
+                0, int((workout.completed_at - erster_satz.created_at).total_seconds()))
+
         workout.save()
 
         upgrades = []

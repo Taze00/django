@@ -573,6 +573,11 @@ body {
 .lib-ladder-item.current .lib-ladder-status { color: var(--orange); }
 
 /* ─── STATISTICS VIEW ─── */
+.history-card-dauer {
+  margin-left: auto; margin-right: 0.75rem;
+  font-size: 0.6rem; letter-spacing: 1px; color: var(--muted);
+}
+
 .eingabe-hinweis {
   font-size: 0.68rem; color: var(--orange);
   text-align: center; margin-top: 0.5rem;

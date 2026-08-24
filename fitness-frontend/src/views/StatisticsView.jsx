@@ -167,6 +167,9 @@ export default function StatisticsView() {
                   onClick={() => setExpandedDate(expandedDate === workout.date ? null : workout.date)}
                 >
                   <span className="history-card-date">{formatDate(workout.date)}</span>
+                  {workout.duration_seconds > 0 && (
+                    <span className="history-card-dauer">{formatTimeShort(workout.duration_seconds)}</span>
+                  )}
                   <span className="history-card-toggle">{expandedDate === workout.date ? '−' : '+'}</span>
                 </button>
                 {expandedDate === workout.date && (
