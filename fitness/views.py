@@ -750,6 +750,41 @@ def weekly_review(request):
     }, status=status.HTTP_200_OK)
 
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def stats_summary(request):
+    """Gesamtsummen ueber ALLE abgeschlossenen Workouts des Nutzers.
+
+    Frueher summierte die Statistik-Ansicht die Workout-Liste im Frontend -
+    die ist aber paginiert (PAGE_SIZE 20). Ab dem 21. Training fiel die
+    Gesamtsumme, ohne dass irgendwo stand warum. Serverseitig gibt es diese
+    Grenze nicht.
+
+    Gezaehlt werden nur abgeschlossene Workouts: ein Tag gilt als trainiert,
+    wenn das Workout abgeschlossen ist.
+    """
+    from django.db.models import Sum
+
+    saetze = WorkoutSet.objects.filter(
+        workout__user=request.user, workout__completed=True
+    )
+
+    def summe(kategorie, feld):
+        return saetze.filter(
+            exercise__category=kategorie, **{f'{feld}__isnull': False}
+        ).aggregate(s=Sum(feld))['s'] or 0
+
+    return Response({
+        'total_workouts': Workout.objects.filter(
+            user=request.user, completed=True).count(),
+        'push_reps': summe('PUSH', 'reps'),
+        # Pull hat zeitbasierte Stufen (Dead Hang, Active Hang) - beide Typen.
+        'pull_reps': summe('PULL', 'reps'),
+        'pull_seconds': summe('PULL', 'seconds'),
+        'plank_seconds': summe('CORE', 'seconds'),
+    }, status=status.HTTP_200_OK)
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def mark_rest_day(request):

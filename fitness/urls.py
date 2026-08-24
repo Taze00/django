@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from fitness.views import ExerciseViewSet, UserProgressionViewSet, WorkoutViewSet, user_detail, upload_profile_picture, delete_profile_picture, user_settings, complete_onboarding, reset_onboarding, calibrate_onboarding, streak_status, mark_rest_day, unmark_rest_day, timeline, weekly_review, community_stats
+from fitness.views import ExerciseViewSet, UserProgressionViewSet, WorkoutViewSet, user_detail, upload_profile_picture, delete_profile_picture, user_settings, complete_onboarding, reset_onboarding, calibrate_onboarding, streak_status, mark_rest_day, unmark_rest_day, timeline, weekly_review, community_stats, stats_summary
 
 router = DefaultRouter()
 router.register(r'exercises', ExerciseViewSet, basename='exercise')
@@ -20,6 +20,7 @@ urlpatterns = [
     path('streak/', streak_status, name='streak-status'),
     path('timeline/', timeline, name='timeline'),
     path('weekly-review/', weekly_review, name='weekly-review'),
+    path('stats/', stats_summary, name='stats-summary'),
     path('rest-day/', mark_rest_day, name='mark-rest-day'),
     path('rest-day/remove/', unmark_rest_day, name='unmark-rest-day'),
 ]

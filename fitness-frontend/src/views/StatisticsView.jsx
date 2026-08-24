@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useWorkoutStore } from '../stores/workoutStore';
 import { formatTimeShort } from '../utils/formatTime';
 
@@ -54,28 +54,22 @@ export default function StatisticsView() {
   const workouts = useWorkoutStore(state => state.workouts);
   const streak = useWorkoutStore(state => state.streak);
   const timeline = useWorkoutStore(state => state.timeline);
+  const serverStats = useWorkoutStore(state => state.stats);
   const [expandedDate, setExpandedDate] = useState(null);
 
   // Streak comes from the backend (training-day based, rest days excused).
   const currentStreak = streak.current;
   const longestStreak = streak.longest;
 
-  const stats = useMemo(() => {
-    const r = { pushReps: 0, pullReps: 0, pullSeconds: 0, plankSeconds: 0 };
-    workouts.forEach(w => {
-      (w.sets || []).forEach(s => {
-        if (s.exercise_name === 'Push-ups' && s.reps) r.pushReps += s.reps;
-        else if (s.exercise_name === 'Pull-ups') {
-          // Pull hat zeitbasierte Stufen (Dead Hang, Active Hang). Nur die
-          // Wiederholungen zu zaehlen laesst das Startlevel unsichtbar werden.
-          if (s.reps) r.pullReps += s.reps;
-          if (s.seconds) r.pullSeconds += s.seconds;
-        }
-        else if (s.exercise_name === 'Planks' && s.seconds) r.plankSeconds += s.seconds;
-      });
-    });
-    return r;
-  }, [workouts]);
+  // Die Summen kommen vom Server. Hier ueber `workouts` zu summieren ging nur
+  // bis zum 20. Training: die Liste ist paginiert (PAGE_SIZE 20), ab dem 21.
+  // fiel die Gesamtsumme, ohne dass irgendwo stand warum.
+  const stats = {
+    pushReps: serverStats.push_reps || 0,
+    pullReps: serverStats.pull_reps || 0,
+    pullSeconds: serverStats.pull_seconds || 0,
+    plankSeconds: serverStats.plank_seconds || 0,
+  };
 
   // Solange es noch keine Wiederholung gibt, ist die Hang-Zeit die Leistung -
   // dann steht sie oben statt einer nichtssagenden 0.

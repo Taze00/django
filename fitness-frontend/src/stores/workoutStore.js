@@ -19,6 +19,9 @@ export const useWorkoutStore = create((set, get) => ({
   streak: { current: 0, longest: 0, trained_today: false, rested_today: false, is_training_day_today: false },
   timeline: [],
   weeklyReview: null,
+  // Gesamtsummen kommen vom Server. Im Frontend ueber die Workout-Liste zu
+  // summieren ging nur bis zum 20. Training - die Liste ist paginiert.
+  stats: { total_workouts: 0, push_reps: 0, pull_reps: 0, pull_seconds: 0, plank_seconds: 0 },
   isInitialized: false,
   isLoading: false,
 
@@ -28,7 +31,7 @@ export const useWorkoutStore = create((set, get) => ({
 
     set({ isLoading: true });
     try {
-      const [exRes, progRes, workRes, settRes, streakRes, timelineRes, weeklyRes] = await Promise.all([
+      const [exRes, progRes, workRes, settRes, streakRes, timelineRes, weeklyRes, statsRes] = await Promise.all([
         api.get('/exercises/'),
         api.get('/user-progressions/'),
         api.get('/workouts/'),
@@ -36,6 +39,7 @@ export const useWorkoutStore = create((set, get) => ({
         api.get('/streak/').catch(() => ({ data: null })),
         api.get('/timeline/').catch(() => ({ data: { events: [] } })),
         api.get('/weekly-review/').catch(() => ({ data: null })),
+        api.get('/stats/').catch(() => ({ data: null })),
       ]);
 
       const progressionsMap = {};
@@ -51,6 +55,7 @@ export const useWorkoutStore = create((set, get) => ({
         streak: streakRes.data || get().streak,
         timeline: timelineRes.data?.events || [],
         weeklyReview: weeklyRes.data || null,
+        stats: statsRes.data || get().stats,
         isInitialized: true,
         isLoading: false,
       });
@@ -96,16 +101,18 @@ export const useWorkoutStore = create((set, get) => ({
     try {
       const res = await api.post(`/workouts/${workoutId}/complete/`);
       // Refresh workouts list + streak + timeline after completing
-      const [workRes, streakRes, timelineRes] = await Promise.all([
+      const [workRes, streakRes, timelineRes, statsRes] = await Promise.all([
         api.get('/workouts/'),
         api.get('/streak/').catch(() => ({ data: null })),
         api.get('/timeline/').catch(() => ({ data: { events: [] } })),
+        api.get('/stats/').catch(() => ({ data: null })),
       ]);
       set({
         workouts: workRes.data.results || [],
         currentWorkout: null,
         streak: streakRes.data || get().streak,
         timeline: timelineRes.data?.events || get().timeline,
+        stats: statsRes.data || get().stats,
       });
       // Clear localStorage when workout is done
       localStorage.removeItem('currentWorkout');
