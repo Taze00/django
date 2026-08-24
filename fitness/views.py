@@ -360,43 +360,47 @@ class WorkoutViewSet(viewsets.ModelViewSet):
                 user_prog.sessions_at_target += 1
 
                 if user_prog.sessions_at_target >= user_prog.current_progression.sessions_required:
-                    # Only upgrade if not at max level (7)
-                    if user_prog.current_progression.level < 7:
-                        from_level = user_prog.current_progression.level
-                        next_progression = Progression.objects.filter(
+                    from_level = user_prog.current_progression.level
+                    # Ob es weitergeht, sagen die Daten - nicht eine im Code
+                    # festgeschriebene 7. level__gt statt level+1 haelt
+                    # ausserdem eine Luecke in der Nummerierung aus.
+                    next_progression = Progression.objects.filter(
+                        exercise=exercise,
+                        level__gt=from_level,
+                    ).order_by('level').first()
+
+                    if next_progression:
+                        user_prog.current_progression = next_progression
+                        user_prog.sessions_at_target = 0
+                        user_prog.custom_target = None
+                        user_prog.is_first_session = True
+                        user_prog.save()
+
+                        upgrades.append({
+                            'exercise': exercise.name,
+                            'from_level': from_level,
+                            'to_level': next_progression.level,
+                            'to_progression': next_progression.name,
+                        })
+
+                        # Timeline: log the level-up.
+                        LevelEvent.objects.create(
+                            user=request.user,
+                            event_type='level_up',
                             exercise=exercise,
-                            level=from_level + 1
-                        ).first()
+                            from_level=from_level,
+                            to_level=next_progression.level,
+                            progression_name=next_progression.name,
+                        )
 
-                        if next_progression:
-                            user_prog.current_progression = next_progression
-                            user_prog.sessions_at_target = 0
-                            user_prog.custom_target = None
-                            user_prog.is_first_session = True
-                            user_prog.save()
-
-                            upgrades.append({
-                                'exercise': exercise.name,
-                                'from_level': from_level,
-                                'to_level': next_progression.level,
-                                'to_progression': next_progression.name,
-                            })
-
-                            # Timeline: log the level-up.
-                            LevelEvent.objects.create(
-                                user=request.user,
-                                event_type='level_up',
-                                exercise=exercise,
-                                from_level=from_level,
-                                to_level=next_progression.level,
-                                progression_name=next_progression.name,
-                            )
-
-                            # Timeline: log first-time milestone for the iconic
-                            # threshold variants (first real pull-up / push-up).
-                            _log_first_time_milestone(request.user, exercise, next_progression)
+                        # Timeline: log first-time milestone for the iconic
+                        # threshold variants (first real pull-up / push-up).
+                        _log_first_time_milestone(request.user, exercise, next_progression)
                     else:
-                        # Already at max level
+                        # Hoechste vorhandene Stufe. Frueher hing dieser Zweig an
+                        # "level < 7": fehlte bei einem niedrigeren Level die
+                        # naechste Stufe, passierte gar nichts - kein Aufstieg,
+                        # keine Meldung, und sessions_at_target wuchs weiter.
                         user_prog.sessions_at_target = 0  # Reset but stay at level
                         user_prog.save()
                         upgrades.append({

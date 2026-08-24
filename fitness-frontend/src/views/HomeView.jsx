@@ -5,10 +5,19 @@ import { useWorkoutStore } from '../stores/workoutStore';
 
 const ALL_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const DAY_SHORT = { Mon: 'Mo', Tue: 'Di', Wed: 'Mi', Thu: 'Do', Fri: 'Fr', Sat: 'Sa', Sun: 'So' };
-const MAX_LEVEL = 7;
+// Wie viele Stufen es gibt, sagen die Daten. Frueher stand hier eine 7,
+// unabhaengig von der Levellogik im Backend und von den Progressionen in der
+// Datenbank - drei Stellen, die dieselbe Zahl getrennt behaupteten.
+const FALLBACK_MAX_LEVEL = 7;
+
+export function maxLevelAus(exercises) {
+  const stufen = (exercises || []).flatMap(e => (e.progressions || []).map(p => p.level));
+  return stufen.length ? Math.max(...stufen) : FALLBACK_MAX_LEVEL;
+}
 
 // ── Radar triangle SVG — labels inside, scales with screen width ──
-function StrengthTriangle({ push, pull, core }) {
+function StrengthTriangle({ push, pull, core, maxLevel = FALLBACK_MAX_LEVEL }) {
+  const MAX_LEVEL = maxLevel;
   const clamp = v => Math.max(0, Math.min(MAX_LEVEL, v || 0));
   const p = clamp(push), u = clamp(pull), c = clamp(core);
 
@@ -86,6 +95,8 @@ export default function HomeView() {
       initialize();
     }
   }, [user?.onboarding_completed, initialize]);
+
+  const maxLevel = useMemo(() => maxLevelAus(exercises), [exercises]);
 
   const levels = useMemo(() => {
     const get = cat => {
@@ -190,7 +201,10 @@ export default function HomeView() {
 
         {/* Stärke-Dreieck — section fills the dead vertical space */}
         <section className="home-triangle-section">
-          <StrengthTriangle push={levels.push} pull={levels.pull} core={levels.core} />
+          <StrengthTriangle
+            push={levels.push} pull={levels.pull} core={levels.core}
+            maxLevel={maxLevel}
+          />
         </section>
 
         {/* Stats */}
