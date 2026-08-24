@@ -142,3 +142,76 @@ class CompleteIstIdempotentTest(AbschlussBasis):
         self.assertEqual(prog.current_progression.level, 4, "Abstieg beim zweiten Aufruf")
         self.assertEqual(daten["downgrades"], [])
         self.assertIsNone(prog.custom_target)
+
+
+class AddSetNachAbschlussTest(AbschlussBasis):
+    """Ein abgeschlossenes Workout nimmt keine Saetze mehr auf."""
+
+    def add_set(self, workout, nummer, reps, level=3, is_drop_set=False):
+        return self.client.post(
+            reverse("workout-add-set", args=[workout.pk]),
+            {
+                "exercise": self.uebung.id,
+                "progression": self.stufen[level].id,
+                "set_number": nummer,
+                "reps": reps,
+                "seconds": None,
+                "is_drop_set": is_drop_set,
+                "drop_set_completed": False,
+                "rest_time_seconds": 180,
+            },
+            format="json",
+        )
+
+    def test_neuer_satz_nach_abschluss_wird_abgewiesen(self):
+        self.nutzer_auf(3)
+        w = self.workout_mit_zwei_saetzen(3)
+        self.abschliessen(w)
+
+        antwort = self.add_set(w, 3, 15)
+
+        self.assertEqual(antwort.status_code, 409)
+        self.assertIn("abgeschlossen", antwort.data["error"])
+        self.assertEqual(w.sets.count(), 2, "es ist kein Satz dazugekommen")
+
+    def test_bestehender_satz_wird_nach_abschluss_nicht_ueberschrieben(self):
+        """add_set ist ein update_or_create - auch das Aendern muss aufhoeren."""
+        self.nutzer_auf(3)
+        w = self.workout_mit_zwei_saetzen(3, wert=12)
+        self.abschliessen(w)
+
+        antwort = self.add_set(w, 1, 99)
+
+        self.assertEqual(antwort.status_code, 409)
+        satz = w.sets.get(set_number=1, is_drop_set=False)
+        self.assertEqual(satz.reps, 12, "der aufgezeichnete Wert hat sich geaendert")
+
+    def test_auch_drop_saetze_kommen_nicht_mehr_dazu(self):
+        self.nutzer_auf(3)
+        w = self.workout_mit_zwei_saetzen(3)
+        self.abschliessen(w)
+
+        antwort = self.add_set(w, 3, 4, is_drop_set=True)
+
+        self.assertEqual(antwort.status_code, 409)
+        self.assertFalse(w.sets.filter(is_drop_set=True).exists())
+
+    def test_vor_dem_abschluss_bleibt_alles_erlaubt(self):
+        """Gegenprobe: der Schutz greift erst nach dem Abschluss."""
+        self.nutzer_auf(3)
+        w = Workout.objects.create(user=self.user)
+
+        antwort = self.add_set(w, 1, 12)
+
+        self.assertEqual(antwort.status_code, 201)
+        self.assertEqual(w.sets.get(set_number=1).reps, 12)
+
+    def test_aendern_vor_dem_abschluss_bleibt_erlaubt(self):
+        self.nutzer_auf(3)
+        w = Workout.objects.create(user=self.user)
+        self.add_set(w, 1, 12)
+
+        antwort = self.add_set(w, 1, 14)
+
+        self.assertEqual(antwort.status_code, 200)
+        self.assertEqual(w.sets.get(set_number=1).reps, 14)

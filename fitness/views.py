@@ -115,7 +115,17 @@ class WorkoutViewSet(viewsets.ModelViewSet):
     def add_set(self, request, pk=None):
         """Add or update a set in the workout"""
         workout = self.get_object()
-        
+
+        # Nach dem Abschluss ist die Sitzung Historie. Kaemen jetzt noch Saetze
+        # dazu, liefen Zaehler und Verlauf dauerhaft auseinander: die Levellogik
+        # hat einen Stand gewertet, den die Historie hinterher nicht mehr zeigt.
+        if workout.completed:
+            return Response(
+                {'error': 'Dieses Workout ist bereits abgeschlossen - '
+                          'es koennen keine Saetze mehr dazukommen.'},
+                status=status.HTTP_409_CONFLICT,
+            )
+
         exercise_id = request.data.get('exercise')
         progression_id = request.data.get('progression')
         set_number = request.data.get('set_number')
