@@ -374,18 +374,23 @@ class OnboardingEndpunkteTest(ApiBasis):
         self.assertEqual(antwort.data["status"], "onboarding_reset")
         self.assertFalse(Workout.objects.filter(user=self.user).exists())
 
-    def test_reset_onboarding_scheitert_ohne_profil(self):
-        """Bestehendes Verhalten, festgehalten - nicht gutgeheissen:
+    def test_reset_onboarding_legt_ein_fehlendes_profil_an(self):
+        """Ein fehlendes Profil ist kein Fehler, sondern genau der Zustand,
+        den das Zuruecksetzen herstellen soll.
 
-        reset_onboarding holt das Profil mit `UserProfile.objects.get()`
-        statt get_or_create. Hat ein Nutzer noch keins, fliegt
-        UserProfile.DoesNotExist, wird vom breiten `except Exception`
-        gefangen und als 400 gemeldet. Der Reset ist fuer solche Nutzer
-        also nicht durchfuehrbar."""
+        Frueher holte reset_onboarding das Profil mit get() statt
+        get_or_create; ohne Profil flog DoesNotExist, das breite
+        `except Exception` machte daraus eine 400 - der Reset war fuer solche
+        Nutzer gar nicht durchfuehrbar."""
         self.assertFalse(UserProfile.objects.filter(user=self.user).exists())
+
         antwort = self.client.post(reverse("reset-onboarding"))
-        self.assertEqual(antwort.status_code, 400)
-        self.assertIn("Failed to reset onboarding", antwort.data["error"])
+
+        self.assertEqual(antwort.status_code, 200)
+        self.assertEqual(antwort.data["status"], "onboarding_reset")
+        profil = UserProfile.objects.get(user=self.user)
+        self.assertFalse(profil.onboarding_completed)
+        self.assertEqual(profil.training_days, [])
 
 
 class FortschrittEndpunkteTest(ApiBasis):
@@ -483,3 +488,56 @@ class ProgressionEndpunkteTest(ApiBasis):
             reverse("user-progression-detail", args=[fremde.pk])
         )
         self.assertEqual(antwort.status_code, 404)
+
+
+class ResetOnboardingTest(ApiBasis):
+    """Zuruecksetzen raeumt wirklich auf - auch ohne vorhandenes Profil."""
+
+    def test_reset_setzt_progressionen_auf_den_start(self):
+        prog = self.nutzer_progression()
+        prog.current_progression = self.prog2
+        prog.sessions_at_target = 2
+        prog.custom_target = 15
+        prog.is_first_session = False
+        prog.save()
+
+        antwort = self.client.post(reverse("reset-onboarding"))
+
+        self.assertEqual(antwort.status_code, 200)
+        prog.refresh_from_db()
+        self.assertEqual(prog.current_progression, self.prog1)
+        self.assertEqual(prog.sessions_at_target, 0)
+        self.assertIsNone(prog.custom_target)
+        self.assertTrue(prog.is_first_session)
+
+    def test_reset_loescht_workouts_und_zeitleiste(self):
+        from fitness.models import LevelEvent, RestDay
+        import datetime as dt
+        self.nutzer_progression()
+        Workout.objects.create(user=self.user, date=dt.date(2026, 1, 1), completed=True)
+        LevelEvent.objects.create(user=self.user, event_type="journey_start", label="Start")
+        RestDay.objects.create(user=self.user, date=dt.date(2026, 1, 2))
+
+        self.client.post(reverse("reset-onboarding"))
+
+        self.assertEqual(Workout.objects.filter(user=self.user).count(), 0)
+        self.assertEqual(LevelEvent.objects.filter(user=self.user).count(), 0)
+        self.assertEqual(RestDay.objects.filter(user=self.user).count(), 0)
+
+    def test_reset_ist_wiederholbar(self):
+        self.nutzer_progression()
+
+        for _ in range(3):
+            antwort = self.client.post(reverse("reset-onboarding"))
+            self.assertEqual(antwort.status_code, 200)
+
+        self.assertEqual(UserProfile.objects.filter(user=self.user).count(), 1)
+
+    def test_reset_ruehrt_fremde_nutzer_nicht_an(self):
+        import datetime as dt
+        fremd = User.objects.create_user(username="fremd", password="geheim1234")
+        Workout.objects.create(user=fremd, date=dt.date(2026, 1, 1), completed=True)
+
+        self.client.post(reverse("reset-onboarding"))
+
+        self.assertEqual(Workout.objects.filter(user=fremd).count(), 1)

@@ -952,46 +952,42 @@ def reset_onboarding(request):
     """Reset onboarding and all user progress for the current user"""
     user = request.user
 
-    try:
-        # Mark onboarding as incomplete and reset training days
-        profile = UserProfile.objects.get(user=user)
-        profile.onboarding_completed = False
-        profile.training_days = []
-        profile.save()
+    # Ein fehlendes Profil ist kein Fehler, sondern genau der Zustand, den das
+    # Zuruecksetzen herstellen soll. Frueher warf get() DoesNotExist, das
+    # blanke except unten machte daraus eine 400 - und der Reset lief nie.
+    profile, _ = UserProfile.objects.get_or_create(user=user)
+    profile.onboarding_completed = False
+    profile.training_days = []
+    profile.save()
 
-        # Reset all exercise progressions to starting level
-        for exercise in Exercise.objects.all():
-            start_progression = exercise.progressions.filter(user_starts_here=True).first()
-            if start_progression:
-                user_prog, created = UserExerciseProgression.objects.get_or_create(
-                    user=user,
-                    exercise=exercise,
-                    defaults={
-                        'current_progression': start_progression,
-                        'training_days': [1, 2, 3, 4, 5],
-                    }
-                )
-                if not created:
-                    user_prog.current_progression = start_progression
-                    user_prog.sessions_at_target = 0
-                    user_prog.custom_target = None
-                    user_prog.is_first_session = True
-                    user_prog.training_days = []
-                    user_prog.save()
+    # Reset all exercise progressions to starting level
+    for exercise in Exercise.objects.all():
+        start_progression = exercise.progressions.filter(user_starts_here=True).first()
+        if start_progression:
+            user_prog, created = UserExerciseProgression.objects.get_or_create(
+                user=user,
+                exercise=exercise,
+                defaults={
+                    'current_progression': start_progression,
+                    'training_days': [1, 2, 3, 4, 5],
+                }
+            )
+            if not created:
+                user_prog.current_progression = start_progression
+                user_prog.sessions_at_target = 0
+                user_prog.custom_target = None
+                user_prog.is_first_session = True
+                user_prog.training_days = []
+                user_prog.save()
 
-        # Delete all workouts
-        Workout.objects.filter(user=user).delete()
+    # Delete all workouts
+    Workout.objects.filter(user=user).delete()
 
-        # Clear timeline + rest days for a clean restart.
-        LevelEvent.objects.filter(user=user).delete()
-        RestDay.objects.filter(user=user).delete()
+    # Clear timeline + rest days for a clean restart.
+    LevelEvent.objects.filter(user=user).delete()
+    RestDay.objects.filter(user=user).delete()
 
-        return Response({'status': 'onboarding_reset'}, status=status.HTTP_200_OK)
-    except Exception as e:
-        return Response(
-            {'error': f'Failed to reset onboarding: {str(e)}'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+    return Response({'status': 'onboarding_reset'}, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
