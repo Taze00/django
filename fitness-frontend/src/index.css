@@ -573,6 +573,24 @@ body {
 .lib-ladder-item.current .lib-ladder-status { color: var(--orange); }
 
 /* ─── STATISTICS VIEW ─── */
+/* ── Was in dieser Sitzung schon eingetragen ist ───────────────────────── */
+.wv-erfasst { margin: 0 0 1.25rem; }
+.wv-erfasst-titel {
+  font-size: 0.5rem; letter-spacing: 2px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 0.5rem;
+}
+.wv-erfasst-liste { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.wv-erfasst-chip {
+  display: inline-flex; align-items: baseline; gap: 0.4rem;
+  background: var(--bg2); padding: 0.3rem 0.5rem;
+  font-size: 0.68rem; color: var(--white);
+}
+.wv-erfasst-chip.drop { color: var(--muted); }
+.wv-erfasst-ex {
+  font-size: 0.5rem; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--muted);
+}
+
 /* ── Speicher-Rueckmeldung im Workout ──────────────────────────────────── */
 .save-note {
   display: flex; align-items: center; justify-content: space-between;

@@ -13,6 +13,52 @@ import { requestWakeLock, releaseWakeLock } from '../utils/wakeLock';
 
 const REST_TIMES = { normal: 180, afterDrop: 300 };
 
+// Passt ein gespeicherter Satz zu diesem Schritt?
+function passtZuSchritt(satz, schritt) {
+  return satz.exercise_name === schritt.exerciseName
+    && satz.set_number === schritt.setNumber
+    && Boolean(satz.is_drop_set) === (schritt.type === 'drop');
+}
+
+// Erster Schritt, zu dem noch kein Satz gespeichert ist. Nach einem Neuladen
+// geht der Ablauf dort weiter, statt wieder bei Schritt 1 zu beginnen.
+function naechsterOffenerSchritt(schritte, saetze) {
+  const offen = schritte.findIndex(
+    schritt => !saetze.some(satz => passtZuSchritt(satz, schritt)));
+  return offen === -1 ? schritte.length : offen;
+}
+
+function satzWert(satz) {
+  if (satz.is_drop_set) {
+    return satz.drop_set_completed ? `Drop → ${satz.progression_name}` : 'Drop übersprungen';
+  }
+  if (satz.reps != null) return `${satz.reps}`;
+  if (satz.seconds != null) return `${satz.seconds}s`;
+  return '—';
+}
+
+// Was in dieser Sitzung schon steht - damit nach einem Neuladen sichtbar ist,
+// was bereits gespeichert wurde.
+function ErfassteSaetze({ saetze }) {
+  if (!saetze.length) return null;
+  return (
+    <div className="wv-erfasst">
+      <p className="wv-erfasst-titel">Bereits eingetragen</p>
+      <div className="wv-erfasst-liste">
+        {saetze.map(satz => (
+          <span
+            key={`${satz.exercise_name}-${satz.set_number}-${satz.is_drop_set}`}
+            className={`wv-erfasst-chip ${satz.is_drop_set ? 'drop' : ''}`}
+          >
+            <span className="wv-erfasst-ex">{satz.exercise_name}</span>
+            {satz.is_drop_set ? satzWert(satz) : `S${satz.set_number}: ${satzWert(satz)}`}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // Sichtbare Rueckmeldung, ob gespeichert wurde. Bewusst auf Modulebene: eine
 // im Rumpf von WorkoutView definierte Komponente waere bei jedem Rendern eine
 // neue Funktion und wuerde jedes Mal neu montiert - genau das Muster, das
@@ -68,6 +114,7 @@ export default function WorkoutView() {
   const [isLoading, setIsLoading] = useState(true);
   const [saveState, setSaveState] = useState({ status: 'idle' });
   const [lastSaved, setLastSaved] = useState(null);
+  const [erfasst, setErfasst] = useState([]);
 
   const exercises = useWorkoutStore(state => state.exercises);
   const userProgressions = useWorkoutStore(state => state.userProgressions);
@@ -105,6 +152,24 @@ export default function WorkoutView() {
     try {
       const workout = await getCurrentWorkout();
       setCurrentWorkout(workout);
+
+      // Die Saetze liegen bereits auf dem Server. Nach einem Neuladen setzt der
+      // Ablauf deshalb am ersten offenen Schritt fort statt wieder bei 1 - und
+      // das Aufwaermen entfaellt, wenn erkennbar schon trainiert wurde.
+      const gespeichert = workout?.sets || [];
+      setErfasst(gespeichert);
+      if (gespeichert.length > 0) {
+        const schritte = buildWorkoutSteps(exercises);
+        const weiterAb = naechsterOffenerSchritt(schritte, gespeichert);
+        setIsWarmupComplete(true);
+        if (weiterAb >= schritte.length) {
+          setCurrentStep(schritte.length - 1);
+          setShowCooldown(true);
+        } else {
+          setCurrentStep(weiterAb);
+        }
+      }
+
       try { await getLastPerformance(); } catch {}
     } catch {}
     setIsLoading(false);
@@ -162,7 +227,7 @@ export default function WorkoutView() {
       const reps = (!isDropSet && progInfo.currentProgression.target_type === 'reps') ? value : null;
       const secs = (!isDropSet && progInfo.currentProgression.target_type === 'time') ? value : null;
 
-      await addSet(
+      const gespeicherterSatz = await addSet(
         currentWorkout.id,
         progInfo.exercise.id,
         isDropSet ? dropProgressionId : progInfo.currentProgression.id,
@@ -176,6 +241,10 @@ export default function WorkoutView() {
 
       // Erst nach der bestaetigten Antwort weiterschalten.
       setSaveState({ status: 'idle' });
+      setErfasst(bisher => [
+        ...bisher.filter(satz => !passtZuSchritt(satz, step)),
+        gespeicherterSatz,
+      ]);
       setLastSaved(isDropSet ? 'Drop-Set gespeichert' : `Satz ${step.setNumber} gespeichert`);
       if (currentStep === WORKOUT_STEPS.length - 1) {
         setShowCooldown(true);
@@ -282,6 +351,7 @@ export default function WorkoutView() {
           nachsatz="Deine Eingabe steht noch da."
           onRetry={() => handleSetComplete(saveState.value)}
         />
+        <ErfassteSaetze saetze={erfasst} />
         <DropSetInstructions
           exercise={progInfo.exercise}
           progressions={[progInfo.currentProgression, ...progInfo.lowerProgressions]}
@@ -316,6 +386,7 @@ export default function WorkoutView() {
             nachsatz="Deine Eingabe steht noch da."
             onRetry={() => handleSetComplete(saveState.value)}
           />
+          <ErfassteSaetze saetze={erfasst} />
           <div className="wv-info">
             <span className="wv-cat-pill">{progInfo.exercise.category}</span>
             <p className="wv-prog-name">{progInfo.currentProgression.name}</p>
