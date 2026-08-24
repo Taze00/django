@@ -578,6 +578,28 @@ body {
   font-size: 0.6rem; letter-spacing: 1px; color: var(--muted);
 }
 
+.drop-set-wert { margin: 1.2rem 0 0.4rem; text-align: center; }
+.drop-set-wert-label {
+  display: block; font-size: 0.62rem; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--muted);
+}
+.drop-set-wert-label span { opacity: 0.6; text-transform: none; letter-spacing: 0; }
+.drop-set-wert-zeile {
+  display: flex; align-items: baseline; justify-content: center;
+  gap: 0.5rem; margin-top: 0.5rem;
+}
+.drop-set-wert-input {
+  width: 4em; background: transparent; border: none;
+  border-bottom: 1px solid var(--muted3);
+  font-family: var(--display); font-size: 1.8rem; text-align: center;
+  color: var(--white); padding: 0.1rem 0;
+  -moz-appearance: textfield;
+}
+.drop-set-wert-input:focus { outline: none; border-color: var(--orange); }
+.drop-set-wert-einheit {
+  font-size: 0.62rem; letter-spacing: 2px; text-transform: uppercase; color: var(--muted);
+}
+
 .eingabe-hinweis {
   font-size: 0.68rem; color: var(--orange);
   text-align: center; margin-top: 0.5rem;

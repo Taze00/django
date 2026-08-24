@@ -50,7 +50,9 @@ function TimelineEntry({ event }) {
 // den Zeitzweig und ergab "S1: nulls", weil seconds null war.
 function satzText(s) {
   if (s.is_drop_set) {
-    return s.drop_set_completed ? `Drop → ${s.progression_name}` : 'Drop übersprungen';
+    if (!s.drop_set_completed) return 'Drop übersprungen';
+    const zahl = s.reps != null ? `${s.reps}` : s.seconds != null ? `${s.seconds}s` : null;
+    return zahl ? `Drop → ${s.progression_name} · ${zahl}` : `Drop → ${s.progression_name}`;
   }
   if (s.reps != null) return `S${s.set_number}: ${s.reps}`;
   if (s.seconds != null) return `S${s.set_number}: ${s.seconds}s`;

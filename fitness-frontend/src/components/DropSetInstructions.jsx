@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import FormTip from './FormTip';
+import { MAX_REPS, MAX_SECONDS, nurZiffern } from '../utils/eingabe';
 
 /**
  * Drop-set: the user descends through easier variants to exhaustion, then taps
@@ -15,6 +16,15 @@ export default function DropSetInstructions({ exercise, progressions, lastReache
   // die Aufforderung, bis zur Erschoepfung zu machen.
   const ohneLeiter = progressions.length <= 1;
   const [selected, setSelected] = useState(ohneLeiter ? (progressions[0]?.id ?? null) : null);
+  // Der Drop-Satz speicherte bisher nur, WELCHE Variante erreicht wurde - nie,
+  // wie viel davon. In der Datenbank standen reps und seconds beide auf null,
+  // der Satz zaehlte also nirgends mit. Die Zahl ist freiwillig: wer sie beim
+  // Ausbelasten nicht mitzaehlt, kommt trotzdem weiter.
+  const [wert, setWert] = useState('');
+  const erreicht = progressions.find(p => p.id === selected);
+  const zeitbasiert = erreicht?.target_type === 'time';
+  const grenze = zeitbasiert ? MAX_SECONDS : MAX_REPS;
+  const zuGross = wert !== '' && parseInt(wert, 10) > grenze;
 
   return (
     <div className="workout-main">
@@ -53,10 +63,35 @@ export default function DropSetInstructions({ exercise, progressions, lastReache
         </div>
       )}
 
+      {selected && (
+        <div className="drop-set-wert">
+          <label className="drop-set-wert-label" htmlFor="drop-wert">
+            Wie viele bei {erreicht?.name}? <span>freiwillig</span>
+          </label>
+          <div className="drop-set-wert-zeile">
+            <input
+              id="drop-wert"
+              className="drop-set-wert-input"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              value={wert}
+              onChange={e => setWert(nurZiffern(e.target.value))}
+              placeholder="—"
+            />
+            <span className="drop-set-wert-einheit">{zeitbasiert ? 'Sek' : 'Wdh'}</span>
+          </div>
+          {zuGross && <p className="eingabe-hinweis">Höchstens {grenze}.</p>}
+        </div>
+      )}
+
       <button
         className="btn-drop-done"
-        onClick={() => onComplete(selected)}
-        disabled={isSaving || !selected}
+        onClick={() => onComplete({
+          progression: selected,
+          wert: wert === '' ? null : parseInt(wert, 10),
+        })}
+        disabled={isSaving || !selected || zuGross}
       >
         {isSaving ? 'Speichere …' : 'Drop-Set abschließen ✓'}
       </button>

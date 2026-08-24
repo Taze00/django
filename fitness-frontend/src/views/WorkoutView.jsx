@@ -31,7 +31,10 @@ function naechsterOffenerSchritt(schritte, saetze) {
 
 function satzWert(satz) {
   if (satz.is_drop_set) {
-    return satz.drop_set_completed ? `Drop → ${satz.progression_name}` : 'Drop übersprungen';
+    if (!satz.drop_set_completed) return 'Drop übersprungen';
+    const zahl = satz.reps != null ? `${satz.reps}`
+      : satz.seconds != null ? `${satz.seconds}s` : null;
+    return zahl ? `Drop → ${satz.progression_name} · ${zahl}` : `Drop → ${satz.progression_name}`;
   }
   if (satz.reps != null) return `${satz.reps}`;
   if (satz.seconds != null) return `${satz.seconds}s`;
@@ -82,6 +85,9 @@ function KorrekturFeld({ satz, progressionen, leiter, isSaving, onSpeichern, onA
     if (satz.is_drop_set) return satz.drop_set_completed ? satz.progression : '';
     return String(satz.reps != null ? satz.reps : (satz.seconds != null ? satz.seconds : ''));
   });
+  // Beim Drop-Satz ist die Variante der eine Wert und die Zahl der andere.
+  const [dropZahl, setDropZahl] = useState(
+    () => String(satz.reps != null ? satz.reps : (satz.seconds != null ? satz.seconds : '')));
   const prog = progressionen.find(p => p.id === satz.progression);
 
   const grenze = typ === 'reps' ? MAX_REPS : MAX_SECONDS;
@@ -123,6 +129,22 @@ function KorrekturFeld({ satz, progressionen, leiter, isSaving, onSpeichern, onA
             <span className="drop-item-name">Übersprungen</span>
             <span className="drop-item-check">{wert === '' ? '✓' : ''}</span>
           </button>
+          {wert !== '' && (
+            <div className="wv-korrektur-eingabe">
+              <input
+                className="wv-korrektur-input"
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                value={dropZahl}
+                onChange={e => setDropZahl(nurZiffern(e.target.value))}
+                placeholder="—"
+              />
+              <span className="wv-korrektur-einheit">
+                {leiter.find(p => p.id === wert)?.target_type === 'time' ? 'Sek' : 'Wdh'}
+              </span>
+            </div>
+          )}
         </div>
       ) : (
         <div className="wv-korrektur-eingabe">
@@ -148,7 +170,10 @@ function KorrekturFeld({ satz, progressionen, leiter, isSaving, onSpeichern, onA
         </button>
         <button
           className="btn-korrektur-ok"
-          onClick={() => onSpeichern(satz.is_drop_set ? (wert === '' ? false : wert) : parseInt(wert, 10))}
+          onClick={() => onSpeichern(
+            satz.is_drop_set
+              ? (wert === '' ? false : { progression: wert, wert: dropZahl === '' ? null : parseInt(dropZahl, 10) })
+              : parseInt(wert, 10))}
           disabled={isSaving || ungueltig}
         >
           {isSaving ? 'Speichere …' : 'Speichern'}
@@ -332,13 +357,26 @@ export default function WorkoutView() {
       // We store that reached variant as the drop-set's progression so history
       // shows how far down the user had to go. This is a progress signal only —
       // it does NOT feed the level logic.
+      // Beim Drop-Set traegt value die erreichte Variante und, wenn eingetragen,
+      // die Zahl dazu: { progression, wert }. false heisst uebersprungen.
       const dropCompleted = isDropSet && value !== false;
-      const dropProgressionId = (isDropSet && value !== false)
-        ? value
+      const dropProgressionId = dropCompleted
+        ? value.progression
         : progInfo.currentProgression.id;
 
-      const reps = (!isDropSet && progInfo.currentProgression.target_type === 'reps') ? value : null;
-      const secs = (!isDropSet && progInfo.currentProgression.target_type === 'time') ? value : null;
+      let reps = null;
+      let secs = null;
+      if (isDropSet) {
+        if (dropCompleted && value.wert != null) {
+          // Nach dem Typ der ERREICHTEN Variante ablegen, nicht nach der
+          // aktuellen Stufe - beim Absteigen kann sich der Typ aendern.
+          const erreicht = progInfo.exercise.progressions.find(p => p.id === value.progression);
+          if (erreicht?.target_type === 'time') secs = value.wert; else reps = value.wert;
+        }
+      } else {
+        reps = progInfo.currentProgression.target_type === 'reps' ? value : null;
+        secs = progInfo.currentProgression.target_type === 'time' ? value : null;
+      }
 
       const gespeicherterSatz = await addSet(
         currentWorkout.id,
@@ -396,12 +434,22 @@ export default function WorkoutView() {
       const typ = satzTyp(satz, alleProgressionen);
       const dropAbgeschlossen = istDrop && neuerWert !== false;
       // Die Progression des Satzes bleibt, wie sie war - nur der Wert aendert
-      // sich. Beim Drop-Set IST die Variante der Wert.
+      // sich. Beim Drop-Set gehoert die Variante zum Wert dazu.
       const progressionId = istDrop
-        ? (dropAbgeschlossen ? neuerWert : (leiterFuer(satz)[0]?.id ?? satz.progression))
+        ? (dropAbgeschlossen ? neuerWert.progression : (leiterFuer(satz)[0]?.id ?? satz.progression))
         : satz.progression;
-      const reps = (!istDrop && typ === 'reps') ? neuerWert : null;
-      const secs = (!istDrop && typ === 'time') ? neuerWert : null;
+
+      let reps = null;
+      let secs = null;
+      if (istDrop) {
+        if (dropAbgeschlossen && neuerWert.wert != null) {
+          const erreicht = alleProgressionen.find(p => p.id === neuerWert.progression);
+          if (erreicht?.target_type === 'time') secs = neuerWert.wert; else reps = neuerWert.wert;
+        }
+      } else {
+        reps = typ === 'reps' ? neuerWert : null;
+        secs = typ === 'time' ? neuerWert : null;
+      }
 
       const gespeichert = await addSet(
         currentWorkout.id, satz.exercise, progressionId, satz.set_number,
