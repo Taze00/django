@@ -159,7 +159,8 @@ class AufstiegTest(LevelWechselBasis):
 
         prog.refresh_from_db()
         self.assertEqual(prog.current_progression.level, 3)
-        self.assertEqual(prog.sessions_at_target, 2)
+        self.assertEqual(prog.sessions_at_target, 0,
+                         "eine verfehlte Sitzung setzt den Zaehler zurueck")
 
     def test_ueber_dem_ziel_zaehlt_wie_genau_am_ziel(self):
         prog = self.nutzer_auf_level(3, sessions_at_target=2)
@@ -540,10 +541,14 @@ class UnvollstaendigeDatenTest(LevelWechselBasis):
 class ZaehlerVerhaltenTest(LevelWechselBasis):
     """Wie sich sessions_at_target ueber mehrere Sitzungen verhaelt."""
 
-    def test_verfehltes_ziel_setzt_den_zaehler_NICHT_zurueck(self):
-        """Bestehendes Verhalten: wer zweimal trifft, einmal verfehlt und
-        dann wieder trifft, steigt trotzdem auf. Der Zaehler ueberlebt
-        die schwache Sitzung."""
+    def test_verfehltes_ziel_setzt_den_zaehler_zurueck(self):
+        """Der Zaehler heisst sessions_at_target - er zaehlt Sitzungen AM
+        ZIEL, nicht Sitzungen ueberhaupt. Wer zweimal trifft und dann
+        verfehlt, faengt wieder bei null an.
+
+        Frueher ueberlebte der Zaehler die schwache Sitzung, "3 Sitzungen am
+        Ziel" hiess also in Wahrheit "3 jemals" - der Aufstieg kam irgendwann
+        unabhaengig von Bestaendigkeit."""
         prog = self.nutzer_auf_level(3, sessions_at_target=2)
         workout = self.workout_mit_saetzen(
             self.uebung, self.progressionen[3], 5, 5
@@ -552,7 +557,7 @@ class ZaehlerVerhaltenTest(LevelWechselBasis):
         self.abschliessen(workout)
 
         prog.refresh_from_db()
-        self.assertEqual(prog.sessions_at_target, 2)
+        self.assertEqual(prog.sessions_at_target, 0)
         self.assertEqual(prog.current_progression.level, 3)
 
     def test_verfehltes_ziel_loescht_den_erstsitzungsmarker(self):
@@ -577,3 +582,101 @@ class ZaehlerVerhaltenTest(LevelWechselBasis):
         workout.refresh_from_db()
         self.assertTrue(workout.completed)
         self.assertIsNotNone(workout.completed_at)
+
+
+class ZaehlerZuruecksetzenTest(LevelWechselBasis):
+    """sessions_at_target zaehlt Sitzungen AM ZIEL - nicht Sitzungen ueberhaupt."""
+
+    def test_treffen_verfehlen_treffen_steigt_nicht_auf(self):
+        """Der gemeldete Fall: frueher reichten drei Treffer irgendwann, egal
+        was dazwischen lag."""
+        prog = self.nutzer_auf_level(3, sessions_at_target=2)
+
+        workout = self.workout_mit_saetzen(self.uebung, self.progressionen[3], 5, 5)
+        self.abschliessen(workout)
+        prog.refresh_from_db()
+        self.assertEqual(prog.sessions_at_target, 0)
+
+        workout.delete()
+        workout = self.workout_mit_saetzen(self.uebung, self.progressionen[3], 30, 30)
+        self.abschliessen(workout)
+
+        prog.refresh_from_db()
+        self.assertEqual(prog.current_progression.level, 3, "geschenkter Aufstieg")
+        self.assertEqual(prog.sessions_at_target, 1)
+
+    def test_drei_treffer_am_stueck_steigen_auf(self):
+        """Gegenprobe: Bestaendigkeit fuehrt weiterhin zum Aufstieg."""
+        prog = self.nutzer_auf_level(3)
+
+        for erwartet in (1, 2, 3):
+            workout = self.workout_mit_saetzen(
+                self.uebung, self.progressionen[3], 30, 30)
+            self.abschliessen(workout)
+            prog.refresh_from_db()
+            if erwartet < 3:
+                self.assertEqual(prog.sessions_at_target, erwartet)
+            workout.delete()
+
+        self.assertEqual(prog.current_progression.level, 4)
+
+    def test_nur_der_erste_satz_verfehlt_setzt_auch_zurueck(self):
+        prog = self.nutzer_auf_level(3, sessions_at_target=2)
+        workout = self.workout_mit_saetzen(self.uebung, self.progressionen[3], 29, 30)
+
+        self.abschliessen(workout)
+
+        prog.refresh_from_db()
+        self.assertEqual(prog.sessions_at_target, 0)
+
+
+class ErstsitzungsmarkerTest(LevelWechselBasis):
+    """is_first_session gilt fuer die erste Sitzung auf einer Stufe - danach
+    ist bewiesen, dass die Stufe tragbar ist."""
+
+    def test_marker_faellt_auch_bei_erfolg(self):
+        prog = self.nutzer_auf_level(3, is_first_session=True)
+        workout = self.workout_mit_saetzen(self.uebung, self.progressionen[3], 30, 30)
+
+        self.abschliessen(workout)
+
+        prog.refresh_from_db()
+        self.assertFalse(prog.is_first_session,
+                         "Marker bleibt scharf, obwohl die Stufe getragen hat")
+
+    def test_schwacher_tag_nach_erfolgreicher_erstsitzung_stuft_nicht_ab(self):
+        """Der gemeldete Fall: der Marker blieb bei Erfolg auf True, die
+        Abstiegspruefung damit dauerhaft scharf."""
+        prog = self.nutzer_auf_level(3, is_first_session=True)
+
+        gut = self.workout_mit_saetzen(self.uebung, self.progressionen[3], 30, 30)
+        self.abschliessen(gut)
+        gut.delete()
+
+        schwach = self.workout_mit_saetzen(self.uebung, self.progressionen[3], 1, 1)
+        daten = self.abschliessen(schwach)
+
+        prog.refresh_from_db()
+        self.assertEqual(prog.current_progression.level, 3, "Abstieg nach schwachem Tag")
+        self.assertEqual(daten["downgrades"], [])
+
+    def test_die_echte_erstsitzung_stuft_weiterhin_ab(self):
+        """Gegenprobe: der Schutz vor einer zu schweren Stufe bleibt."""
+        prog = self.nutzer_auf_level(3, is_first_session=True)
+        workout = self.workout_mit_saetzen(self.uebung, self.progressionen[3], 1, 1)
+
+        daten = self.abschliessen(workout)
+
+        prog.refresh_from_db()
+        self.assertEqual(prog.current_progression.level, 2)
+        self.assertEqual(len(daten["downgrades"]), 1)
+
+    def test_nach_dem_aufstieg_ist_es_wieder_eine_erstsitzung(self):
+        prog = self.nutzer_auf_level(3, sessions_at_target=2, is_first_session=False)
+        workout = self.workout_mit_saetzen(self.uebung, self.progressionen[3], 30, 30)
+
+        self.abschliessen(workout)
+
+        prog.refresh_from_db()
+        self.assertEqual(prog.current_progression.level, 4)
+        self.assertTrue(prog.is_first_session, "die neue Stufe ist ungeprueft")

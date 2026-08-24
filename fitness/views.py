@@ -252,8 +252,18 @@ class WorkoutViewSet(viewsets.ModelViewSet):
 
             effective_target = user_prog.effective_target
 
+            # Diese Sitzung ist gelaufen. Der Marker gilt nur fuer die ERSTE
+            # Sitzung auf einer Stufe - danach ist bewiesen, dass die Stufe
+            # tragbar ist. Frueher wurde er bei Erfolg nie geloescht, die
+            # Abstiegspruefung blieb also dauerhaft scharf: ein schwacher Tag
+            # nach Monaten auf derselben Stufe stufte ab wie am ersten Tag.
+            # Beim Aufstieg wird er weiter unten wieder auf True gesetzt - dort
+            # ist es tatsaechlich eine erste Sitzung.
+            erste_sitzung = user_prog.is_first_session
+            user_prog.is_first_session = False
+
             # CHECK DOWNGRADE (only if first session at this level)
-            if user_prog.is_first_session and user_prog.current_progression.level > 1:
+            if erste_sitzung and user_prog.current_progression.level > 1:
                 if gemessen.target_type == 'reps':
                     should_downgrade = val1 < 3 or (val1 + val2) < 5
                 else:
@@ -348,8 +358,11 @@ class WorkoutViewSet(viewsets.ModelViewSet):
                 else:
                     user_prog.save()
             else:
-                # Did not reach target, but mark first session as done
-                user_prog.is_first_session = False
+                # Ziel verfehlt. Der Zaehler zaehlt Sitzungen AM ZIEL, nicht
+                # Sitzungen ueberhaupt - ohne das Zuruecksetzen hiess "3
+                # Sitzungen am Ziel" in Wahrheit "3 jemals", und der Aufstieg
+                # kam irgendwann unabhaengig von Bestaendigkeit.
+                user_prog.sessions_at_target = 0
                 user_prog.save()
 
         # Timeline: check for a streak milestone now that today is completed.
