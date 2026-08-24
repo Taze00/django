@@ -240,6 +240,7 @@ export default function WorkoutView() {
   const [lastSaved, setLastSaved] = useState(null);
   const [erfasst, setErfasst] = useState([]);
   const [korrektur, setKorrektur] = useState(null);
+  const [anderswoAbgeschlossen, setAnderswoAbgeschlossen] = useState(false);
 
   const exercises = useWorkoutStore(state => state.exercises);
   const userProgressions = useWorkoutStore(state => state.userProgressions);
@@ -261,13 +262,34 @@ export default function WorkoutView() {
   // beim Tab-Wechsel automatisch aufhebt.
   useEffect(() => {
     requestWakeLock();
-    const onVisibility = () => { if (!document.hidden) requestWakeLock(); };
+
+    // Beim Zurueckkehren den Stand nachziehen. Zwei Geraete gleichzeitig im
+    // selben Training gibt es praktisch nicht - der haeufige Fall ist ein Tab,
+    // der lange im Hintergrund lag und eine veraltete Leiste zeigt. Ein echtes
+    // Sperren (Version pro Workout, 409, Zusammenfuehren) waere fuer den Nutzen
+    // zu viel Maschinerie; das hier beseitigt die uebliche Quelle veralteter
+    // Zustaende, ohne zu behaupten, gleichzeitige Schreibvorgaenge seien
+    // geloest.
+    const onVisibility = async () => {
+      if (document.hidden) return;
+      requestWakeLock();
+      try {
+        const frisch = await getCurrentWorkout();
+        if (!frisch) return;
+        setCurrentWorkout(frisch);
+        setErfasst(frisch.sets || []);
+        if (frisch.completed) setAnderswoAbgeschlossen(true);
+      } catch {
+        // Offline: der bisherige Stand bleibt stehen, das ist besser als leer.
+      }
+    };
+
     document.addEventListener('visibilitychange', onVisibility);
     return () => {
       document.removeEventListener('visibilitychange', onVisibility);
       releaseWakeLock();
     };
-  }, []);
+  }, [getCurrentWorkout]);
 
   useEffect(() => {
     if (isInitialized && exercises.length > 0) initializeWorkout();
@@ -524,6 +546,16 @@ export default function WorkoutView() {
         <div className="loading-logo">COR<span>VIS</span></div>
         <div className="loading-spinner" />
         <p className="loading-text">Lade Training</p>
+      </div>
+    );
+  }
+
+  if (anderswoAbgeschlossen) {
+    return (
+      <div className="loading-shell">
+        <div className="loading-logo">COR<span>VIS</span></div>
+        <p className="loading-text">Dieses Training wurde bereits abgeschlossen.</p>
+        <button className="btn-skip-rest" onClick={() => navigate('/')}>Zur Startseite →</button>
       </div>
     );
   }
