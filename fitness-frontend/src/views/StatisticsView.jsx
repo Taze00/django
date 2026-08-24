@@ -44,6 +44,19 @@ function TimelineEntry({ event }) {
   return null;
 }
 
+// Was in einem Satz steht. Der Test muss auf null pruefen, nicht auf
+// Wahrheitswert: 0 Wiederholungen sind ein gueltiger Eintrag - wer keine
+// einzige geschafft hat, traegt 0 ein. Mit `s.reps ? ...` fiel dieser Fall in
+// den Zeitzweig und ergab "S1: nulls", weil seconds null war.
+function satzText(s) {
+  if (s.is_drop_set) {
+    return s.drop_set_completed ? `Drop → ${s.progression_name}` : 'Drop übersprungen';
+  }
+  if (s.reps != null) return `S${s.set_number}: ${s.reps}`;
+  if (s.seconds != null) return `S${s.set_number}: ${s.seconds}s`;
+  return `S${s.set_number}: —`;
+}
+
 function formatTLDate(iso) {
   if (!iso) return '';
   const d = new Date(iso);
@@ -180,11 +193,7 @@ export default function StatisticsView() {
                         <div className="history-sets">
                           {sets.map((s, i) => (
                             <span key={i} className={`history-set-chip ${s.is_drop_set ? 'drop' : ''}`}>
-                              {s.is_drop_set
-                                ? (s.drop_set_completed
-                                    ? `Drop → ${s.progression_name}`
-                                    : 'Drop übersprungen')
-                                : s.reps ? `S${s.set_number}: ${s.reps}` : `S${s.set_number}: ${s.seconds}s`}
+                              {satzText(s)}
                             </span>
                           ))}
                         </div>
