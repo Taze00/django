@@ -151,6 +151,14 @@ USE_I18N = True
 
 USE_TZ = True
 
+# CORVIS rechnet Kalendertage in deutscher Zeit, nicht in UTC. Ein Training um
+# 00:30 landete sonst auf gestern, und mit unique_together (user, date) schrieben
+# Sonntagabend und Montag nach Mitternacht in dieselbe Zeile.
+# Bewusst NICHT ueber das globale TIME_ZONE geloest - das wirkt auf Admin,
+# Templates und die films-App mit. Benutzt wird die Einstellung nur in
+# fitness/zeit.py.
+CORVIS_TIME_ZONE = os.environ.get('CORVIS_TIME_ZONE', 'Europe/Berlin')
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/

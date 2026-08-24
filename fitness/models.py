@@ -8,6 +8,8 @@ import io
 from django.core.files.base import ContentFile
 from django.db.models import JSONField
 
+from fitness.zeit import heute
+
 
 class Exercise(models.Model):
     CATEGORY_CHOICES = [
@@ -76,7 +78,13 @@ class UserExerciseProgression(models.Model):
 
 class Workout(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="workouts")
-    date = models.DateField(auto_now_add=True)
+    # default statt auto_now_add: auto_now_add haette zwei Nachteile. Es schreibt
+    # den UTC-Tag, und es verwirft einen ausdruecklich gesetzten Wert - der
+    # get_or_create in WorkoutViewSet.current haette nachts nach dem deutschen
+    # Tag gesucht, eine Zeile mit dem UTC-Tag angelegt und beim naechsten Mal
+    # in unique_together (user, date) gelaufen. Mit default laesst sich das
+    # Datum ausserdem beim Anlegen setzen (frueher brauchte das rohes SQL).
+    date = models.DateField(default=heute)
     completed = models.BooleanField(default=False)
     completed_at = models.DateTimeField(null=True, blank=True)
     duration_seconds = models.IntegerField(null=True, blank=True)

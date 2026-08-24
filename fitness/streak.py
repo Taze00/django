@@ -28,14 +28,19 @@ def _weekday_1_7(d):
     return d.weekday() + 1
 
 
-def calculate_streak(training_days, trained_dates, rest_dates, today=None,
+def calculate_streak(training_days, trained_dates, rest_dates, today,
                      max_lookback=400):
     """
     Args:
         training_days: list/set of weekday numbers (1=Mon..7=Sun) the user trains.
         trained_dates: set of datetime.date the user completed a workout.
         rest_dates:    set of datetime.date marked as "Heute nicht".
-        today:         datetime.date (defaults to real today).
+        today:         datetime.date - der laufende Kalendertag. Pflicht:
+                       frueher stand hier datetime.date.today(), also die
+                       Zeit des Betriebssystems, waehrend die Workout-Daten
+                       aus Django kamen. Zwei Quellen fuer dieselbe Frage.
+                       Wer hier rechnet, muss sagen, welcher Tag gilt -
+                       fitness.zeit.heute() liefert ihn.
         max_lookback:  safety bound on how many days back to scan.
 
     Returns:
@@ -46,9 +51,6 @@ def calculate_streak(training_days, trained_dates, rest_dates, today=None,
           - is_training_day_today: bool
           - rested_today: bool
     """
-    if today is None:
-        today = datetime.date.today()
-
     training_days = set(training_days or [])
     trained_dates = set(trained_dates or [])
     rest_dates = set(rest_dates or [])
@@ -95,16 +97,13 @@ def calculate_streak(training_days, trained_dates, rest_dates, today=None,
     }
 
 
-def longest_streak(training_days, trained_dates, rest_dates, today=None,
+def longest_streak(training_days, trained_dates, rest_dates, today,
                    max_lookback=400):
     """
     Longest run of consecutive scheduled training days that were trained
     (rest days excused, non-training weekdays skipped). Scans backwards from
     today over `max_lookback` days.
     """
-    if today is None:
-        today = datetime.date.today()
-
     training_days = set(training_days or [])
     trained_dates = set(trained_dates or [])
     rest_dates = set(rest_dates or [])

@@ -6,6 +6,7 @@ from django.utils import timezone
 from django.db.models import Q
 from django.contrib.auth.models import User
 from fitness.models import Exercise, Progression, UserExerciseProgression, Workout, WorkoutSet, WarmupChecklist, UserProfile, RestDay, LevelEvent
+from fitness.zeit import heute
 from fitness.serializers import (
     ExerciseSerializer, UserProgressionSerializer, WorkoutSerializer,
     WorkoutSetSerializer, WarmupChecklistSerializer, UserProfileSerializer
@@ -113,7 +114,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def current(self, request):
         """Get or create today's workout"""
-        today = timezone.now().date()
+        today = heute()
         workout, created = Workout.objects.get_or_create(
             user=request.user,
             date=today
@@ -358,7 +359,8 @@ class WorkoutViewSet(viewsets.ModelViewSet):
             Workout.objects.filter(user=request.user, completed=True).values_list('date', flat=True)
         )
         rest_dates = set(RestDay.objects.filter(user=request.user).values_list('date', flat=True))
-        streak_now = calculate_streak(training_days, trained_dates, rest_dates)['current']
+        streak_now = calculate_streak(training_days, trained_dates, rest_dates,
+                                      today=heute())['current']
         _log_streak_milestone(request.user, streak_now)
 
         return Response({
@@ -370,7 +372,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def last_performance(self, request):
         """Get last recorded values for each exercise"""
-        today = timezone.now().date()
+        today = heute()
         yesterday = today - timezone.timedelta(days=1)
 
         last_workout = Workout.objects.filter(
@@ -636,8 +638,9 @@ def streak_status(request):
         RestDay.objects.filter(user=user).values_list('date', flat=True)
     )
 
-    cur = calculate_streak(training_days, trained_dates, rest_dates)
-    longest = longest_streak(training_days, trained_dates, rest_dates)
+    tag = heute()
+    cur = calculate_streak(training_days, trained_dates, rest_dates, today=tag)
+    longest = longest_streak(training_days, trained_dates, rest_dates, today=tag)
 
     return Response({
         'current': cur['current'],
@@ -681,7 +684,7 @@ def weekly_review(request):
     import datetime as dt
 
     user = request.user
-    today = timezone.now().date()
+    today = heute()
     # Monday of the current week.
     monday = today - dt.timedelta(days=today.weekday())
     sunday = monday + dt.timedelta(days=6)
@@ -729,7 +732,8 @@ def weekly_review(request):
         Workout.objects.filter(user=user, completed=True).values_list('date', flat=True)
     )
     rest_dates = set(RestDay.objects.filter(user=user).values_list('date', flat=True))
-    streak = calculate_streak(training_days, trained_dates, rest_dates)['current']
+    streak = calculate_streak(training_days, trained_dates, rest_dates,
+                              today=heute())['current']
 
     return Response({
         'week_start': monday.isoformat(),
@@ -758,7 +762,7 @@ def mark_rest_day(request):
         except (ValueError, TypeError):
             return Response({'error': 'Invalid date'}, status=status.HTTP_400_BAD_REQUEST)
     else:
-        day = timezone.now().date()
+        day = heute()
 
     rest, created = RestDay.objects.get_or_create(user=user, date=day)
 
@@ -768,7 +772,7 @@ def mark_rest_day(request):
         Workout.objects.filter(user=user, completed=True).values_list('date', flat=True)
     )
     rest_dates = set(RestDay.objects.filter(user=user).values_list('date', flat=True))
-    cur = calculate_streak(training_days, trained_dates, rest_dates)
+    cur = calculate_streak(training_days, trained_dates, rest_dates, today=heute())
 
     return Response({
         'status': 'rest_day_marked',
@@ -783,7 +787,7 @@ def mark_rest_day(request):
 def unmark_rest_day(request):
     """Undo today's rest day (in case of a misclick)."""
     user = request.user
-    day = timezone.now().date()
+    day = heute()
     RestDay.objects.filter(user=user, date=day).delete()
     return Response({'status': 'rest_day_removed', 'date': day.isoformat()},
                     status=status.HTTP_200_OK)
