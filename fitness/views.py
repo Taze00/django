@@ -195,19 +195,32 @@ class WorkoutViewSet(viewsets.ModelViewSet):
             if not set1 or not set2:
                 continue
 
-            # Get values based on progression type
-            if user_prog.current_progression.target_type == 'reps':
-                val1 = set1.reps or 0
-                val2 = set2.reps or 0
-            else:
-                val1 = set1.seconds or 0
-                val2 = set2.seconds or 0
+            # Ein Satz wird mit dem Typ gelesen, unter dem er aufgezeichnet
+            # wurde - nicht mit dem der aktuellen Progression. Bei Pull wechselt
+            # der Typ zwischen den Stufen (L1 Zeit, L2 Wdh., L3 Zeit, L4 Wdh.).
+            # Vorher schaute die Levellogik nach einem solchen Wechsel im
+            # falschen Feld nach, fand dort None, las das als 0 - und stufte
+            # den Nutzer fuer eine Sitzung ab, die er tatsaechlich bestanden
+            # hatte.
+            if set1.progression_id != set2.progression_id:
+                # Progression mitten im Workout gewechselt: die beiden Saetze
+                # gehoeren zu verschiedenen Stufen und sind nicht vergleichbar.
+                continue
+            if set1.progression_id != user_prog.current_progression_id:
+                # Die Sitzung wurde auf einer anderen Stufe geleistet, als der
+                # Nutzer jetzt steht. Sie gegen das Ziel der jetzigen Stufe zu
+                # messen waere weder ein fairer Auf- noch ein fairer Abstieg.
+                continue
+
+            gemessen = set1.progression
+            val1 = _satzwert(set1, gemessen)
+            val2 = _satzwert(set2, gemessen)
 
             effective_target = user_prog.effective_target
 
             # CHECK DOWNGRADE (only if first session at this level)
             if user_prog.is_first_session and user_prog.current_progression.level > 1:
-                if user_prog.current_progression.target_type == 'reps':
+                if gemessen.target_type == 'reps':
                     should_downgrade = val1 < 3 or (val1 + val2) < 5
                 else:
                     should_downgrade = val1 < (effective_target // 3) or (val1 + val2) < (effective_target // 2)
@@ -220,7 +233,7 @@ class WorkoutViewSet(viewsets.ModelViewSet):
 
                     if prev_progression:
                         adjustment = 0
-                        if user_prog.current_progression.target_type == 'reps':
+                        if gemessen.target_type == 'reps':
                             if val1 == 0:
                                 adjustment = 6
                             elif val1 == 1:
@@ -512,6 +525,22 @@ _FIRST_TIME_MILESTONES = {
 
 # Streak counts that earn a milestone event.
 _STREAK_MILESTONES = [7, 14, 30, 50, 100, 200, 365]
+
+
+def _satzwert(workout_set, progression):
+    """Den Wert eines Satzes so lesen, wie er aufgezeichnet wurde.
+
+    Massgeblich ist der Typ der Progression, die am Satz haengt. Ist das
+    dazugehoerige Feld leer, das andere aber gefuellt, gilt das gefuellte:
+    die aufgezeichnete Zahl ist die Wahrheit, nicht das Schema.
+    """
+    if progression.target_type == 'reps':
+        if workout_set.reps is not None:
+            return workout_set.reps
+        return workout_set.seconds or 0
+    if workout_set.seconds is not None:
+        return workout_set.seconds
+    return workout_set.reps or 0
 
 
 def _log_first_time_milestone(user, exercise, progression):
