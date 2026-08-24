@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 
-export default function TimerInput({ setNumber, exerciseName, progressionName, targetSeconds, onComplete }) {
+export default function TimerInput({ setNumber, exerciseName, progressionName, targetSeconds, onComplete, isSaving = false }) {
   const [elapsed, setElapsed] = useState(0);
   const [running, setRunning] = useState(false);
   const intervalRef = useRef(null);
@@ -30,8 +30,8 @@ export default function TimerInput({ setNumber, exerciseName, progressionName, t
       >
         {running ? '⏸ Pause' : elapsed > 0 ? '▶ Weiter' : '▶ Start'}
       </button>
-      <button className="btn-done" onClick={handleDone} disabled={elapsed === 0}>
-        Satz abschließen →
+      <button className="btn-done" onClick={handleDone} disabled={isSaving || elapsed === 0}>
+        {isSaving ? 'Speichere …' : 'Satz abschließen →'}
       </button>
     </div>
   );

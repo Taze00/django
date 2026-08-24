@@ -8,7 +8,7 @@ const ITEMS = [
   { name: 'Rumpf & Bauch',        desc: 'Sanfte Cobra / leichtes Zurückbeugen' },
 ];
 
-export default function CooldownChecklist({ onComplete }) {
+export default function CooldownChecklist({ onComplete, isSaving = false }) {
   const [checked, setChecked] = useState({});
 
   const toggle = name => setChecked(prev => ({ ...prev, [name]: !prev[name] }));
@@ -37,10 +37,11 @@ export default function CooldownChecklist({ onComplete }) {
         ))}
       </div>
 
-      <button className="btn-warmup-done" onClick={onComplete} disabled={!allDone}>
-        {allDone ? 'Fertig →' : `Noch ${ITEMS.filter(i => !checked[i.name]).length} offen`}
+      <button className="btn-warmup-done" onClick={onComplete} disabled={isSaving || !allDone}>
+        {isSaving ? 'Schließe ab …'
+          : allDone ? 'Fertig →' : `Noch ${ITEMS.filter(i => !checked[i.name]).length} offen`}
       </button>
-      <button className="btn-cooldown-skip" onClick={onComplete}>
+      <button className="btn-cooldown-skip" onClick={onComplete} disabled={isSaving}>
         Überspringen
       </button>
     </div>

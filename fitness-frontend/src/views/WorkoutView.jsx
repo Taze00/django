@@ -13,6 +13,22 @@ import { requestWakeLock, releaseWakeLock } from '../utils/wakeLock';
 
 const REST_TIMES = { normal: 180, afterDrop: 300 };
 
+// Sichtbare Rueckmeldung, ob gespeichert wurde. Bewusst auf Modulebene: eine
+// im Rumpf von WorkoutView definierte Komponente waere bei jedem Rendern eine
+// neue Funktion und wuerde jedes Mal neu montiert - genau das Muster, das
+// hier eigentlich abgestellt wird.
+function SpeicherHinweis({ zustand, titel, nachsatz, onRetry }) {
+  if (!zustand) return null;
+  return (
+    <div className="save-note save-note--fehler" role="alert">
+      <span className="save-note-text">
+        <strong>{titel}</strong> {zustand.message} {nachsatz}
+      </span>
+      <button className="save-note-retry" onClick={onRetry}>Nochmal versuchen</button>
+    </div>
+  );
+}
+
 function buildWorkoutSteps(exercises) {
   const steps = [];
   const main = exercises.filter(e => e.category !== 'CORE');
@@ -45,7 +61,13 @@ export default function WorkoutView() {
   const [progressionData, setProgressionData] = useState(null);
   const [isWarmupComplete, setIsWarmupComplete] = useState(false);
   const [showCooldown, setShowCooldown] = useState(false);
+  // isLoading gilt NUR fuer das anfaengliche Laden - es haengt den ganzen
+  // Baum aus (siehe Guard unten). Das Speichern eines Satzes hat deshalb einen
+  // eigenen Zustand: haenge SetInput/TimerInput waehrenddessen aus, ist die
+  // Eingabe des Nutzers weg, sobald die Verbindung wackelt.
   const [isLoading, setIsLoading] = useState(true);
+  const [saveState, setSaveState] = useState({ status: 'idle' });
+  const [lastSaved, setLastSaved] = useState(null);
 
   const exercises = useWorkoutStore(state => state.exercises);
   const userProgressions = useWorkoutStore(state => state.userProgressions);
@@ -111,13 +133,22 @@ export default function WorkoutView() {
     return getProgInfo(nextStep.exerciseName)?.currentProgression?.name || nextStep.exerciseName;
   };
 
+  const fehlertext = err => {
+    if (!err?.response) return 'Keine Verbindung zum Server.';
+    if (err.response.status === 409) {
+      return err.response.data?.error || 'Dieses Workout ist bereits abgeschlossen.';
+    }
+    if (err.response.status === 401) return 'Sitzung abgelaufen — bitte neu anmelden.';
+    return `Server-Fehler (${err.response.status}).`;
+  };
+
   const handleSetComplete = async (value = null) => {
-    setIsLoading(true);
+    setSaveState({ status: 'saving' });
     try {
       const step = WORKOUT_STEPS[currentStep];
       const isDropSet = step.type === 'drop';
       const progInfo = getProgInfo(step.exerciseName);
-      if (!progInfo) { setIsLoading(false); return; }
+      if (!progInfo) { setSaveState({ status: 'idle' }); return; }
 
       // For drop-sets, `value` is the reached progression id (or false = skip).
       // We store that reached variant as the drop-set's progression so history
@@ -143,33 +174,43 @@ export default function WorkoutView() {
         dropCompleted
       );
 
+      // Erst nach der bestaetigten Antwort weiterschalten.
+      setSaveState({ status: 'idle' });
+      setLastSaved(isDropSet ? 'Drop-Set gespeichert' : `Satz ${step.setNumber} gespeichert`);
       if (currentStep === WORKOUT_STEPS.length - 1) {
         setShowCooldown(true);
       } else {
         setIsResting(true);
       }
     } catch (err) {
+      // Nicht weiterschalten: der Schritt bleibt stehen, die Eingabe steht noch
+      // im Feld (SetInput/TimerInput bleiben montiert) und laesst sich erneut
+      // abschicken.
       console.error('Error saving set:', err);
-    } finally {
-      setIsLoading(false);
+      setSaveState({ status: 'error', value, message: fehlertext(err) });
     }
   };
 
-  const handleRestComplete = () => { setIsResting(false); setCurrentStep(s => s + 1); };
+  const handleRestComplete = () => {
+    setIsResting(false);
+    setLastSaved(null);
+    setCurrentStep(s => s + 1);
+  };
+
   const handleExit = () => { if (window.confirm('Workout beenden?')) navigate('/'); };
   const handleModalClose = () => { setShowModal(false); navigate('/'); };
 
   const handleCooldownDone = async () => {
-    setIsLoading(true);
+    setSaveState({ status: 'saving' });
     try {
       const result = await completeWorkout(currentWorkout.id);
+      setSaveState({ status: 'idle' });
       setProgressionData(result);
       setShowCooldown(false);
       setShowModal(true);
     } catch (err) {
       console.error('Error completing workout:', err);
-    } finally {
-      setIsLoading(false);
+      setSaveState({ status: 'cooldownError', message: fehlertext(err) });
     }
   };
 
@@ -188,7 +229,20 @@ export default function WorkoutView() {
   }
 
   if (showCooldown) {
-    return <CooldownChecklist onComplete={handleCooldownDone} />;
+    return (
+      <>
+        <SpeicherHinweis
+          zustand={saveState.status === 'cooldownError' ? saveState : null}
+          titel="Nicht abgeschlossen."
+          nachsatz="Deine Sätze sind gespeichert."
+          onRetry={handleCooldownDone}
+        />
+        <CooldownChecklist
+          onComplete={handleCooldownDone}
+          isSaving={saveState.status === 'saving'}
+        />
+      </>
+    );
   }
 
   if (isResting) {
@@ -199,6 +253,7 @@ export default function WorkoutView() {
         seconds={step.type === 'drop' ? REST_TIMES.afterDrop : REST_TIMES.normal}
         nextExercise={getNextLabel(nextStep)}
         onComplete={handleRestComplete}
+        hinweis={lastSaved}
       />
     );
   }
@@ -221,11 +276,18 @@ export default function WorkoutView() {
             </div>
           </div>
         </header>
+        <SpeicherHinweis
+          zustand={saveState.status === 'error' ? saveState : null}
+          titel="Nicht gespeichert."
+          nachsatz="Deine Eingabe steht noch da."
+          onRetry={() => handleSetComplete(saveState.value)}
+        />
         <DropSetInstructions
           exercise={progInfo.exercise}
           progressions={[progInfo.currentProgression, ...progInfo.lowerProgressions]}
           lastReachedName={lastPerformance?.[String(progInfo.exercise.id)]?.drop_reached}
           onComplete={handleSetComplete}
+          isSaving={saveState.status === 'saving'}
         />
         {showModal && <ProgressionModal upgrades={progressionData?.upgrades || []} downgrades={progressionData?.downgrades || []} workouts={workouts} streak={streak} trainingDays={trainingDays} onClose={handleModalClose} />}
       </div>
@@ -248,6 +310,12 @@ export default function WorkoutView() {
 
       <div className="workout-main">
         <div className="workout-main-center">
+          <SpeicherHinweis
+            zustand={saveState.status === 'error' ? saveState : null}
+            titel="Nicht gespeichert."
+            nachsatz="Deine Eingabe steht noch da."
+            onRetry={() => handleSetComplete(saveState.value)}
+          />
           <div className="wv-info">
             <span className="wv-cat-pill">{progInfo.exercise.category}</span>
             <p className="wv-prog-name">{progInfo.currentProgression.name}</p>
@@ -279,6 +347,7 @@ export default function WorkoutView() {
               exerciseName={step.exerciseName}
               progressionName={progInfo.currentProgression.name}
               onComplete={handleSetComplete}
+              isSaving={saveState.status === 'saving'}
             />
           ) : (
             <TimerInput
@@ -287,6 +356,7 @@ export default function WorkoutView() {
               progressionName={progInfo.currentProgression.name}
               targetSeconds={progInfo.currentProgression.target_value}
               onComplete={handleSetComplete}
+              isSaving={saveState.status === 'saving'}
             />
           )}
         </div>

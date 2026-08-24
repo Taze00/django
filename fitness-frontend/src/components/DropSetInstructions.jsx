@@ -8,7 +8,7 @@ import FormTip from './FormTip';
  * variant = stronger. This does NOT affect level progression — it's a visible
  * fatigue/progress signal only.
  */
-export default function DropSetInstructions({ exercise, progressions, lastReachedName, onComplete }) {
+export default function DropSetInstructions({ exercise, progressions, lastReachedName, onComplete, isSaving = false }) {
   const [selected, setSelected] = useState(null);
 
   return (
@@ -44,11 +44,11 @@ export default function DropSetInstructions({ exercise, progressions, lastReache
       <button
         className="btn-drop-done"
         onClick={() => onComplete(selected)}
-        disabled={!selected}
+        disabled={isSaving || !selected}
       >
-        Drop-Set abschließen ✓
+        {isSaving ? 'Speichere …' : 'Drop-Set abschließen ✓'}
       </button>
-      <button className="btn-drop-skip" onClick={() => onComplete(false)}>
+      <button className="btn-drop-skip" onClick={() => onComplete(false)} disabled={isSaving}>
         Überspringen
       </button>
     </div>

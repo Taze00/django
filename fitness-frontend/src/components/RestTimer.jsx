@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { restAlert } from '../utils/restAlert';
 import { showRestDoneNotification } from '../utils/notify';
 
-export default function RestTimer({ seconds, nextExercise, onComplete }) {
+export default function RestTimer({ seconds, nextExercise, onComplete, hinweis = null }) {
   // Ziel-Zeitstempel statt Runterzählen: bleibt korrekt, auch wenn der Browser
   // den Timer drosselt/pausiert (z.B. App im Hintergrund).
   const endAtRef = useRef(Date.now() + seconds * 1000);
@@ -71,6 +71,7 @@ export default function RestTimer({ seconds, nextExercise, onComplete }) {
   if (finishedWhileHidden) {
     return (
       <div className="rest-shell">
+        {hinweis && <p className="save-note save-note--ok">{hinweis}</p>}
         <p className="rest-label">Pause vorbei</p>
         <p className="rest-timer">0:00</p>
         <div className="rest-next">
@@ -84,6 +85,7 @@ export default function RestTimer({ seconds, nextExercise, onComplete }) {
 
   return (
     <div className="rest-shell">
+      {hinweis && <p className="save-note save-note--ok">{hinweis}</p>}
       <p className="rest-label">Pause</p>
       <p className="rest-timer">{fmt(remaining)}</p>
       <div className="rest-next">
