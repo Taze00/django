@@ -160,6 +160,19 @@ class WorkoutViewSet(viewsets.ModelViewSet):
     def complete(self, request, pk=None):
         """Complete workout and check for upgrades/downgrades"""
         workout = self.get_object()
+
+        # Idempotent: ein bereits abgeschlossenes Workout loest die Levellogik
+        # nicht erneut aus. Sonst schenkt jeder weitere Aufruf - Doppeltipp,
+        # Neuladen, Wiederholung nach Verbindungsabbruch - eine gezaehlte
+        # Sitzung und damit auf Dauer geschenkte Levelaufstiege.
+        if workout.completed:
+            return Response({
+                'status': 'already_completed',
+                'completed_at': workout.completed_at,
+                'upgrades': [],
+                'downgrades': [],
+            }, status=status.HTTP_200_OK)
+
         workout.completed = True
         workout.completed_at = timezone.now()
         workout.save()
