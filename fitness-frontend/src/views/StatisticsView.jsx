@@ -55,6 +55,10 @@ export default function StatisticsView() {
   const streak = useWorkoutStore(state => state.streak);
   const timeline = useWorkoutStore(state => state.timeline);
   const serverStats = useWorkoutStore(state => state.stats);
+  const workoutsCount = useWorkoutStore(state => state.workoutsCount);
+  const workoutsNextPage = useWorkoutStore(state => state.workoutsNextPage);
+  const isLoadingMore = useWorkoutStore(state => state.isLoadingMore);
+  const loadMoreWorkouts = useWorkoutStore(state => state.loadMoreWorkouts);
   const [expandedDate, setExpandedDate] = useState(null);
 
   // Streak comes from the backend (training-day based, rest days excused).
@@ -187,6 +191,18 @@ export default function StatisticsView() {
                 )}
               </div>
             ))}
+
+            {workoutsNextPage && (
+              <button
+                className="btn-mehr-laden"
+                onClick={() => loadMoreWorkouts()}
+                disabled={isLoadingMore}
+              >
+                {isLoadingMore
+                  ? 'Lädt …'
+                  : `Weitere ${workoutsCount - completedWorkouts.length} von ${workoutsCount} laden`}
+              </button>
+            )}
           </>
         )}
       </div>

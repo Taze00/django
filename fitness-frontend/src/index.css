@@ -573,6 +573,20 @@ body {
 .lib-ladder-item.current .lib-ladder-status { color: var(--orange); }
 
 /* ─── STATISTICS VIEW ─── */
+/* Verlauf seitenweise nachladen. Bewusst ein Knopf statt Nachladen beim
+   Scrollen: die Liste steht unter Statistik, Serie und Zeitleiste - ein
+   Scroll-Ausloeser wuerde beim Durchwischen dorthin ungewollt feuern. Der
+   Knopf sagt ausserdem, wie viel noch kommt. */
+.btn-mehr-laden {
+  width: 100%; margin-top: 1px;
+  background: var(--bg2); color: var(--muted); border: none;
+  font-family: inherit; font-size: 0.62rem;
+  letter-spacing: 2px; text-transform: uppercase;
+  padding: 1rem; cursor: pointer;
+}
+.btn-mehr-laden:hover { color: var(--orange); }
+.btn-mehr-laden:disabled { opacity: 0.5; cursor: default; }
+
 /* ── Was in dieser Sitzung schon eingetragen ist ───────────────────────── */
 .wv-erfasst { margin: 0 0 1.25rem; }
 .wv-erfasst-titel {

@@ -103,7 +103,15 @@ class WorkoutViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Workout.objects.filter(user=self.request.user)
+        qs = Workout.objects.filter(user=self.request.user)
+        # ?completed=true|false grenzt die Liste ein. Der Verlauf zeigt nur
+        # abgeschlossene Trainings - ohne den Filter zaehlte das count der
+        # Paginierung auch die leeren Zeilen mit, die workouts/current/ beim
+        # blossen Betreten des Trainingsschirms anlegt.
+        wert = self.request.query_params.get('completed')
+        if wert is not None:
+            qs = qs.filter(completed=wert.lower() in ('1', 'true', 'yes'))
+        return qs
 
     @action(detail=False, methods=['get'])
     def current(self, request):

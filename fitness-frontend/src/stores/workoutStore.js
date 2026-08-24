@@ -22,6 +22,12 @@ export const useWorkoutStore = create((set, get) => ({
   // Gesamtsummen kommen vom Server. Im Frontend ueber die Workout-Liste zu
   // summieren ging nur bis zum 20. Training - die Liste ist paginiert.
   stats: { total_workouts: 0, push_reps: 0, pull_reps: 0, pull_seconds: 0, plank_seconds: 0 },
+  // Der Verlauf wird seitenweise geladen (PAGE_SIZE 20). workoutsCount ist die
+  // Gesamtzahl abgeschlossener Trainings, workoutsNextPage die naechste Seite
+  // oder null, wenn alles da ist.
+  workoutsCount: 0,
+  workoutsNextPage: null,
+  isLoadingMore: false,
   isInitialized: false,
   isLoading: false,
 
@@ -34,7 +40,7 @@ export const useWorkoutStore = create((set, get) => ({
       const [exRes, progRes, workRes, settRes, streakRes, timelineRes, weeklyRes, statsRes] = await Promise.all([
         api.get('/exercises/'),
         api.get('/user-progressions/'),
-        api.get('/workouts/'),
+        api.get('/workouts/', { params: { completed: true } }),
         api.get('/profile/settings/').catch(() => ({ data: { training_days: [1, 2, 3, 4, 5] } })),
         api.get('/streak/').catch(() => ({ data: null })),
         api.get('/timeline/').catch(() => ({ data: { events: [] } })),
@@ -51,6 +57,8 @@ export const useWorkoutStore = create((set, get) => ({
         exercises: exRes.data.results || [],
         userProgressions: progressionsMap,
         workouts: workRes.data.results || [],
+        workoutsCount: workRes.data.count || 0,
+        workoutsNextPage: workRes.data.next ? 2 : null,
         trainingDays: settRes.data.training_days || [1, 2, 3, 4, 5],
         streak: streakRes.data || get().streak,
         timeline: timelineRes.data?.events || [],
@@ -102,13 +110,15 @@ export const useWorkoutStore = create((set, get) => ({
       const res = await api.post(`/workouts/${workoutId}/complete/`);
       // Refresh workouts list + streak + timeline after completing
       const [workRes, streakRes, timelineRes, statsRes] = await Promise.all([
-        api.get('/workouts/'),
+        api.get('/workouts/', { params: { completed: true } }),
         api.get('/streak/').catch(() => ({ data: null })),
         api.get('/timeline/').catch(() => ({ data: { events: [] } })),
         api.get('/stats/').catch(() => ({ data: null })),
       ]);
       set({
         workouts: workRes.data.results || [],
+        workoutsCount: workRes.data.count || 0,
+        workoutsNextPage: workRes.data.next ? 2 : null,
         currentWorkout: null,
         streak: streakRes.data || get().streak,
         timeline: timelineRes.data?.events || get().timeline,
@@ -118,6 +128,25 @@ export const useWorkoutStore = create((set, get) => ({
       localStorage.removeItem('currentWorkout');
       return res.data;
     } catch (error) {
+      throw error;
+    }
+  },
+
+  // Naechste Seite des Verlaufs anhaengen.
+  loadMoreWorkouts: async () => {
+    const seite = get().workoutsNextPage;
+    if (!seite || get().isLoadingMore) return;
+    set({ isLoadingMore: true });
+    try {
+      const res = await api.get('/workouts/', { params: { completed: true, page: seite } });
+      set({
+        workouts: [...get().workouts, ...(res.data.results || [])],
+        workoutsCount: res.data.count ?? get().workoutsCount,
+        workoutsNextPage: res.data.next ? seite + 1 : null,
+        isLoadingMore: false,
+      });
+    } catch (error) {
+      set({ isLoadingMore: false });
       throw error;
     }
   },
@@ -168,8 +197,12 @@ export const useWorkoutStore = create((set, get) => ({
     try {
       const res = await api.post(`/workouts/${workoutId}/reset/`);
       // Refresh workouts list after reset (workout is deleted)
-      const workRes = await api.get('/workouts/');
-      set({ workouts: workRes.data.results || [] });
+      const workRes = await api.get('/workouts/', { params: { completed: true } });
+      set({
+        workouts: workRes.data.results || [],
+        workoutsCount: workRes.data.count || 0,
+        workoutsNextPage: workRes.data.next ? 2 : null,
+      });
       return res.data;
     } catch (error) {
       throw error;
