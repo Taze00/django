@@ -80,8 +80,11 @@ export default function StatisticsView() {
     ? (stats.pullSeconds > 0 ? `+ ${formatTimeShort(stats.pullSeconds)} Hang` : null)
     : (stats.pullSeconds > 0 ? 'Hang' : null);
 
+  // Dieselbe Regel wie ueberall sonst: ein Tag zaehlt, wenn das Workout
+  // abgeschlossen ist. Vorher genuegte hier ein einziger Satz - ein
+  // abgebrochenes Training stand damit im Verlauf, ohne anderswo zu zaehlen.
   const completedWorkouts = workouts
-    .filter(w => w.sets && w.sets.length > 0)
+    .filter(w => w.completed)
     .sort((a, b) => new Date(b.date) - new Date(a.date));
 
   const formatDate = ds => new Date(ds).toLocaleDateString('de-DE', {

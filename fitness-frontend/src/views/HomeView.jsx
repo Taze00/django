@@ -72,6 +72,7 @@ export default function HomeView() {
   const streak = useWorkoutStore(state => state.streak);
   const markRestDay = useWorkoutStore(state => state.markRestDay);
   const isLoading = useWorkoutStore(state => state.isLoading);
+  const stats = useWorkoutStore(state => state.stats);
   const [restConfirm, setRestConfirm] = useState(false);
   const [resting, setResting] = useState(false);
 
@@ -106,7 +107,11 @@ export default function HomeView() {
     monday.setHours(0, 0, 0, 0);
     const status = {};
     ALL_DAYS.forEach(d => { status[d] = false; });
-    workouts.forEach(workout => {
+    // Ein Tag gilt als trainiert, wenn das Workout ABGESCHLOSSEN ist.
+    // workouts/current/ legt schon beim Betreten des Trainingsschirms eine
+    // Zeile an - ohne diese Bedingung malte die Wochenleiste den Tag als
+    // erledigt, sobald man nur hineingeschaut hatte.
+    workouts.filter(w => w.completed).forEach(workout => {
       const d = new Date(workout.date);
       d.setHours(0, 0, 0, 0);
       if (d >= monday) {
@@ -136,7 +141,8 @@ export default function HomeView() {
   const showRestOption =
     streak.is_training_day_today && !streak.trained_today && !streak.rested_today;
 
-  const completedWorkouts = workouts.filter(w => w.completed).length;
+  // Vom Server, nicht aus der Liste: die ist paginiert und bliebe bei 20 stehen.
+  const completedWorkouts = stats.total_workouts;
 
   if (isLoading) {
     return (
