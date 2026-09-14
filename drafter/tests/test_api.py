@@ -65,6 +65,59 @@ class ApiTest(DrafterTest):
         self.assertEqual(len(daten["endanalyse"]["team"]), 3)
         self.assertTrue(daten["endanalyse"]["win_condition"])
 
+    def test_endanalyse_enthaelt_alle_bausteine_des_coaches(self):
+        """Die Liste der zugesagten Auskuenfte - Stueck fuer Stueck."""
+        analyse = self.post(reverse("drafter:api_final_analysis"), {
+            "map": "hart-rock-mine",
+            "own_picks": ["gale", "belle", "max"],
+            "enemy_picks": ["buster", "gene", "tick"],
+        }).json()["endanalyse"]
+
+        for schluessel in ("siegchance", "datenlage", "win_condition", "schwaechen",
+                           "lanes", "matchups", "lane_tausch", "team"):
+            self.assertIn(schluessel, analyse)
+
+        for spieler in analyse["team"]:
+            for schluessel in ("rolle", "hauptaufgabe", "bevorzugtes_matchup",
+                               "zu_vermeidendes_matchup", "lane", "warnungen", "build"):
+                self.assertIn(schluessel, spieler, msg=spieler["name"])
+            self.assertTrue(spieler["rolle"])
+            self.assertTrue(spieler["hauptaufgabe"])
+            self.assertTrue(spieler["lane"])
+
+        self.assertTrue(analyse["siegchance"]["ist_heuristik"])
+        self.assertTrue(analyse["datenlage"]["nur_demo"])
+
+    def test_jeder_spieler_bekommt_einen_eigenen_gegner_zugewiesen(self):
+        """Team-Zuordnung und Spielerkarte duerfen sich nicht widersprechen."""
+        analyse = self.post(reverse("drafter:api_final_analysis"), {
+            "map": "hart-rock-mine",
+            "own_picks": ["gale", "belle", "max"],
+            "enemy_picks": ["buster", "gene", "tick"],
+        }).json()["endanalyse"]
+
+        aus_karten = {
+            s["bevorzugtes_matchup"]["gegner"] for s in analyse["team"]
+            if s["bevorzugtes_matchup"]
+        }
+        aus_teamplan = {m["gegner"] for m in analyse["matchups"]}
+        self.assertEqual(len(aus_karten), 3, "Zwei Spieler auf denselben Gegner angesetzt")
+        self.assertEqual(aus_karten, aus_teamplan)
+
+    def test_jede_empfehlung_liefert_die_aufschluesselung(self):
+        daten = self.post(reverse("drafter:api_recommend"), {
+            "map": "hart-rock-mine", "own_picks": ["gale"], "enemy_picks": ["bull"],
+        }).json()
+        self.assertTrue(daten["empfehlungen"])
+        for e in daten["empfehlungen"]:
+            self.assertEqual(len(e["komponenten"]), 11, msg=e["name"])
+            summe = sum(k["beitrag"] for k in e["komponenten"])
+            self.assertAlmostEqual(50 + summe, e["score"], delta=1.0, msg=e["name"])
+            self.assertTrue(e["groesster_treiber"])
+            # Coach-Auskuenfte ebenfalls fuer jede angezeigte Empfehlung.
+            self.assertIn("build", e)
+            self.assertIn("warnungen", e)
+
     def test_detail_liefert_die_aufschluesselung(self):
         daten = self.post(reverse("drafter:api_detail"), {
             "map": "hart-rock-mine", "enemy_picks": ["bull"], "brawler": "gale",

@@ -54,3 +54,32 @@ class DrafterTest(TestCase):
             if e.brawler.slug == slug:
                 return e.score
         return None
+
+    # --- Zugriff auf einzelne Score-Komponenten -------------------------
+    # Verhaltenstests messen hier und nicht an der Platzierung: ein Platz
+    # haengt von zwanzig Kandidaten ab und wackelt, sobald sich irgendwo
+    # eine Zahl aendert. Der Beitrag einer Komponente sagt dagegen genau
+    # das aus, was geprueft werden soll - "reagiert das Modell richtig
+    # auf diese Lage".
+    def empfehlung(self, empfehlungen, slug):
+        for e in empfehlungen:
+            if e.brawler.slug == slug:
+                return e
+        return None
+
+    def komponente(self, empfehlungen, slug, key):
+        e = self.empfehlung(empfehlungen, slug)
+        self.assertIsNotNone(e, f"{slug} ist in dieser Lage nicht waehlbar")
+        return e.komponenten[key]
+
+    def wert(self, empfehlungen, slug, key):
+        """Rohwert einer Komponente in [-1, +1] - ohne Phasengewicht."""
+        return self.komponente(empfehlungen, slug, key).wert
+
+    def beitrag(self, empfehlungen, slug, key):
+        """Gewichteter Beitrag zum Score."""
+        return self.komponente(empfehlungen, slug, key).beitrag
+
+    def alle(self, **kwargs):
+        """Alle waehlbaren Kandidaten bewertet - fuer Vergleiche."""
+        return self.engine(**kwargs).empfehlungen(anzahl=50, mit_details=0)
