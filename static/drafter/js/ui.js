@@ -122,6 +122,48 @@ function gruendeListe(pro, contra) {
   return liste;
 }
 
+// ─── Score-Aufschlüsselung ──────────────────────────────────
+/**
+ * Die Komponententabelle. Kommt bei jeder Empfehlung zum Einsatz und im
+ * Detailfenster - deshalb eine Funktion und nicht zweimal gebaut.
+ *
+ * `kompakt` steuert nur die Größe: im Panel ohne Rohwert-Spalte, im
+ * Modal mit. Die Zeilen sind in beiden Fällen dieselben und in
+ * derselben Reihenfolge - der Server liefert sie vollständig, auch die
+ * mit Beitrag 0. Genau daran sieht man, dass eine Komponente nichts
+ * beigetragen hat, statt sie nur zu vermissen.
+ */
+function aufschluesselung(komponenten, kompakt) {
+  const kasten = el('div', 'komponenten');
+  const groesster = Math.max(...komponenten.map((k) => Math.abs(k.beitrag)), 1);
+
+  komponenten.forEach((k) => {
+    const zeile = el('div', `komponente${kompakt ? ' komponente--kompakt' : ''}`);
+    if (Math.abs(k.beitrag) < 0.05) zeile.classList.add('ist-ohne-wirkung');
+
+    const label = el('span', 'komponente-label', k.label);
+    if (k.gruende && k.gruende.length) {
+      label.title = k.gruende.map((g) => g.text).join('\n');
+    }
+    zeile.appendChild(label);
+
+    const balken = el('div', 'komponente-balken');
+    const fuellung = el('div', `komponente-fuellung ${k.beitrag >= 0 ? 'ist-plus' : 'ist-minus'}`);
+    fuellung.style.width = `${(Math.abs(k.beitrag) / groesster) * 50}%`;
+    balken.appendChild(fuellung);
+    zeile.appendChild(balken);
+
+    if (!kompakt) {
+      zeile.appendChild(el('span', 'komponente-roh',
+        `${k.wert >= 0 ? '+' : ''}${k.wert.toFixed(2)} × ${k.gewicht.toFixed(2)}`));
+    }
+    zeile.appendChild(el('span', 'komponente-wert',
+      `${k.beitrag > 0 ? '+' : ''}${k.beitrag.toFixed(1)}`));
+    kasten.appendChild(zeile);
+  });
+  return kasten;
+}
+
 // ─── Empfehlungspanel ───────────────────────────────────────
 export function zeichnePanel(antwort) {
   const panel = $('panel');
@@ -147,11 +189,16 @@ export function zeichnePanel(antwort) {
   if (antwort.empfehlungen && antwort.empfehlungen.length) {
     panel.appendChild(el('h2', null, 'Empfehlungen'));
     antwort.empfehlungen.forEach((e, i) => {
-      const karte = el('button', `vorschlag${i === 0 ? ' vorschlag--top' : ''}`);
-      karte.type = 'button';
-      karte.dataset.detail = e.slug;
+      // Ein div statt eines button: die Karte enthält jetzt selbst
+      // Bedienelemente (das Aufklappen der Aufschlüsselung), und ein
+      // Button im Button wäre ungültiges HTML und für Tastatur und
+      // Screenreader kaputt. Klickbar ist stattdessen der Kopf.
+      const karte = el('div', `vorschlag${i === 0 ? ' vorschlag--top' : ''}`);
 
-      const kopf = el('div', 'vorschlag-kopf');
+      const kopf = el('button', 'vorschlag-kopf');
+      kopf.type = 'button';
+      kopf.dataset.detail = e.slug;
+      kopf.title = `${e.name}: vollständige Begründung öffnen`;
       kopf.appendChild(bild(e, 'vorschlag-bild'));
       const namen = el('div');
       namen.appendChild(el('div', 'vorschlag-name', e.name));
@@ -162,6 +209,20 @@ export function zeichnePanel(antwort) {
       kopf.appendChild(score);
       karte.appendChild(kopf);
       karte.appendChild(gruendeListe(e.pro, e.contra));
+
+      if (e.komponenten && e.komponenten.length) {
+        const klappe = document.createElement('details');
+        klappe.className = 'klappe';
+        const titel = document.createElement('summary');
+        titel.textContent = e.groesster_treiber
+          ? `Aufschlüsselung · stärkster Faktor: ${e.groesster_treiber}`
+          : 'Aufschlüsselung';
+        klappe.appendChild(titel);
+        klappe.appendChild(aufschluesselung(e.komponenten, true));
+        klappe.appendChild(el('p', 'komponenten-fuss',
+          `Summe = Score ${e.score} (50 = durchschnittlicher Pick)`));
+        karte.appendChild(klappe);
+      }
       panel.appendChild(karte);
     });
   }
@@ -214,6 +275,18 @@ export function zeichneMatchplan(analyse) {
   panel.replaceChildren();
   panel.appendChild(el('h2', null, 'Matchplan'));
 
+  // 1. Datenlage zuerst. Wer die Einschätzung liest, soll vorher
+  //    wissen, worauf sie sich stützt - nicht hinterher.
+  if (analyse.datenlage) {
+    const kasten = el('div', 'datenlage-kasten');
+    kasten.appendChild(el('strong', null,
+      `Data Confidence: ${analyse.datenlage.confidence_label} `
+      + `(${analyse.datenlage.confidence})`));
+    kasten.appendChild(el('p', null, analyse.datenlage.hinweis));
+    panel.appendChild(kasten);
+  }
+
+  // 2. Win Condition - der eine Satz, wie dieses Team gewinnt.
   if (analyse.win_condition) {
     const abschnitt = el('div', 'abschnitt');
     abschnitt.appendChild(el('h3', null, 'Win Condition'));
@@ -221,61 +294,118 @@ export function zeichneMatchplan(analyse) {
     panel.appendChild(abschnitt);
   }
 
+  // 3. Die drei Spieler.
   const plan = el('div', 'matchplan');
   analyse.team.forEach((spieler) => {
     const kasten = el('div', 'matchplan-spieler');
     kasten.style.borderLeftColor = spieler.farbe;
+
     const kopf = el('div', 'matchplan-kopf');
     kopf.appendChild(el('span', 'matchplan-name', spieler.name));
     kopf.appendChild(el('span', 'matchplan-rolle', spieler.rolle));
+    if (spieler.lane) {
+      const lane = el('span', 'matchplan-lane', spieler.lane);
+      if (spieler.lane_grund) lane.title = spieler.lane_grund;
+      kopf.appendChild(lane);
+    }
     kasten.appendChild(kopf);
 
-    // Das bevorzugte Matchup steht oft schon als erste Aufgabe. Zweimal
-    // derselbe Satz untereinander liest sich wie ein Fehler - also nur
-    // anzeigen, wenn die Aufgabenliste ihn nicht ohnehin nennt.
-    const gegnerName = spieler.bevorzugtes_matchup && spieler.bevorzugtes_matchup.gegner;
-    const schonGenannt = gegnerName
-      && spieler.aufgaben.some((a) => a.includes(gegnerName) && a.startsWith('Nimm dir'));
-    if (gegnerName && !schonGenannt) {
-      kasten.appendChild(el('div', 'bankarte-grund', `Nimm dir ${gegnerName} vor`));
-    }
-    const liste = el('ul', 'liste');
-    spieler.aufgaben.forEach((a) => liste.appendChild(el('li', null, a)));
-    kasten.appendChild(liste);
+    const zeile = (art, text, klasse) => {
+      if (!text) return;
+      const z = el('div', `matchplan-zeile ${klasse || ''}`);
+      z.appendChild(el('span', 'matchplan-art', art));
+      z.appendChild(el('span', null, text));
+      kasten.appendChild(z);
+    };
 
-    if (spieler.vermeiden.length) {
-      const warn = el('ul', 'liste liste--warnung');
-      spieler.vermeiden.forEach((v) => warn.appendChild(el('li', null, v)));
-      kasten.appendChild(warn);
+    zeile('Hauptaufgabe', spieler.hauptaufgabe);
+    if (spieler.bevorzugtes_matchup) {
+      zeile('Bevorzugt',
+        `gegen ${spieler.bevorzugtes_matchup.gegner} `
+        + `(${spieler.bevorzugtes_matchup.vorteil > 0 ? '+' : ''}${spieler.bevorzugtes_matchup.vorteil})`,
+        'ist-gut');
     }
-    if (spieler.build && spieler.build.gadget) {
-      const teile = [spieler.build.gadget.name];
+    if (spieler.zu_vermeidendes_matchup) {
+      zeile('Vermeiden',
+        `gegen ${spieler.zu_vermeidendes_matchup.gegner} `
+        + `(${spieler.zu_vermeidendes_matchup.vorteil})`,
+        'ist-schlecht');
+    }
+
+    // Weitere Aufgaben unterhalb der Hauptaufgabe - ohne sie zu doppeln.
+    const weitere = (spieler.aufgaben || []).filter((a) => a !== spieler.hauptaufgabe);
+    if (weitere.length) {
+      const liste = el('ul', 'liste');
+      weitere.forEach((a) => liste.appendChild(el('li', null, a)));
+      kasten.appendChild(liste);
+    }
+    if ((spieler.vermeiden || []).length) {
+      const liste = el('ul', 'liste liste--warnung');
+      spieler.vermeiden.forEach((v) => liste.appendChild(el('li', null, v)));
+      kasten.appendChild(liste);
+    }
+    if ((spieler.warnungen || []).length) {
+      const klappe = document.createElement('details');
+      klappe.className = 'klappe';
+      const titel = document.createElement('summary');
+      titel.textContent = `Worauf ${spieler.name} achten muss (${spieler.warnungen.length})`;
+      klappe.appendChild(titel);
+      const liste = el('ul', 'liste liste--warnung');
+      spieler.warnungen.forEach((w) => liste.appendChild(el('li', null, w)));
+      klappe.appendChild(liste);
+      kasten.appendChild(klappe);
+    }
+    if (spieler.build) {
+      const teile = [];
+      if (spieler.build.gadget) teile.push(spieler.build.gadget.name);
       if (spieler.build.star_power) teile.push(spieler.build.star_power.name);
       if ((spieler.build.gears || []).length) teile.push(spieler.build.gears.join(', '));
-      kasten.appendChild(el('div', 'bankarte-grund', `Build: ${teile.join(' · ')}`));
+      if (spieler.build.hypercharge) teile.push(spieler.build.hypercharge.name);
+      if (teile.length) zeile('Build', teile.join(' · '));
+      if (spieler.build.hinweis) {
+        kasten.appendChild(el('p', 'panel-leer', spieler.build.hinweis));
+      }
     }
     plan.appendChild(kasten);
   });
   panel.appendChild(plan);
 
+  // 4. Matchup-Zuordnung als Teamübersicht.
   if (analyse.matchups && analyse.matchups.length) {
     const abschnitt = el('div', 'abschnitt');
     abschnitt.appendChild(el('h3', null, 'Matchup-Zuordnung'));
     analyse.matchups.forEach((m) => {
       const zeile = el('div', 'matchplan-paar');
       zeile.appendChild(el('span', null, `${m.unser} → ${m.gegner}`));
-      zeile.appendChild(el('span', 'luecke-wert', m.vorteil > 0 ? `+${m.vorteil}` : `${m.vorteil}`));
+      const wert = el('span', 'luecke-wert', m.vorteil > 0 ? `+${m.vorteil}` : `${m.vorteil}`);
+      wert.style.color = m.vorteil > 0.05 ? 'var(--gut)'
+        : m.vorteil < -0.05 ? 'var(--gegner)' : 'var(--text-leise)';
+      zeile.appendChild(wert);
       abschnitt.appendChild(zeile);
     });
     panel.appendChild(abschnitt);
   }
 
+  // 5. Was tun, wenn der Gegner die Zuordnung aufbricht.
   if (analyse.lane_tausch && analyse.lane_tausch.length) {
     const abschnitt = el('div', 'abschnitt');
     abschnitt.appendChild(el('h3', null, 'Wenn der Gegner tauscht'));
     const liste = el('ul', 'liste');
     analyse.lane_tausch.forEach((p) => liste.appendChild(el('li', null, `${p.wenn} → ${p.dann}`)));
     abschnitt.appendChild(liste);
+    panel.appendChild(abschnitt);
+  }
+
+  // 6. Teamschwächen - mit der Angabe, wer sie ausnutzen kann.
+  if (analyse.schwaechen && analyse.schwaechen.length) {
+    const abschnitt = el('div', 'abschnitt');
+    abschnitt.appendChild(el('h3', null, 'Schwächen unseres Teams'));
+    analyse.schwaechen.forEach((sch) => {
+      const zeile = el('div', `schwaeche${sch.ausgenutzt_von ? ' ist-ausnutzbar' : ''}`);
+      zeile.appendChild(el('span', 'schwaeche-punkt'));
+      zeile.appendChild(el('span', null, sch.text));
+      abschnitt.appendChild(zeile);
+    });
     panel.appendChild(abschnitt);
   }
 
@@ -288,13 +418,15 @@ export function zeichneMatchplan(analyse) {
     panel.appendChild(abschnitt);
   }
 
+  // 7. Startpositionen zuletzt - ausdrücklich ein Vorschlag.
   if (analyse.lanes && analyse.lanes.length) {
     const abschnitt = el('div', 'abschnitt');
     abschnitt.appendChild(el('h3', null, 'Startpositionen (Vorschlag)'));
     analyse.lanes.forEach((l) => {
       const zeile = el('div', 'matchplan-paar');
       zeile.appendChild(el('span', null, l.lane));
-      zeile.appendChild(el('span', null, l.brawler));
+      zeile.appendChild(el('span', 'luecke-wert', l.brawler));
+      if (l.grund) zeile.title = l.grund;
       abschnitt.appendChild(zeile);
     });
     panel.appendChild(abschnitt);
@@ -320,20 +452,29 @@ export function zeigeDetail(e) {
 
   if (e.komponenten) {
     inhalt.appendChild(el('h3', null, 'Woraus der Score entsteht'));
-    const kasten = el('div', 'komponenten');
-    const groesster = Math.max(...e.komponenten.map((k) => Math.abs(k.beitrag)), 1);
-    e.komponenten.forEach((k) => {
-      const zeile = el('div', 'komponente');
-      zeile.appendChild(el('span', 'komponente-label', k.label));
-      const balken = el('div', 'komponente-balken');
-      const fuellung = el('div', `komponente-fuellung ${k.beitrag >= 0 ? 'ist-plus' : 'ist-minus'}`);
-      fuellung.style.width = `${(Math.abs(k.beitrag) / groesster) * 50}%`;
-      balken.appendChild(fuellung);
-      zeile.appendChild(balken);
-      zeile.appendChild(el('span', 'komponente-wert',
-        `${k.beitrag > 0 ? '+' : ''}${k.beitrag.toFixed(1)}`));
-      kasten.appendChild(zeile);
-    });
+    inhalt.appendChild(aufschluesselung(e.komponenten, false));
+    inhalt.appendChild(el('p', 'komponenten-fuss',
+      `Beitrag = Wert × Gewicht. Summe ${(e.score - 50) > 0 ? '+' : ''}`
+      + `${e.score - 50} auf den Anker 50 ergibt Score ${e.score}.`));
+  }
+
+  if (e.bevorzugtes_matchup || e.zu_vermeidendes_matchup) {
+    inhalt.appendChild(el('h3', null, 'Matchups'));
+    const kasten = el('div', 'build');
+    if (e.bevorzugtes_matchup) {
+      const z = el('div', 'build-zeile');
+      z.appendChild(el('span', 'build-art', 'Bevorzugt'));
+      z.appendChild(el('span', null,
+        `gegen ${e.bevorzugtes_matchup.gegner} (${e.bevorzugtes_matchup.vorteil > 0 ? '+' : ''}${e.bevorzugtes_matchup.vorteil})`));
+      kasten.appendChild(z);
+    }
+    if (e.zu_vermeidendes_matchup) {
+      const z = el('div', 'build-zeile');
+      z.appendChild(el('span', 'build-art', 'Vermeiden'));
+      z.appendChild(el('span', null,
+        `gegen ${e.zu_vermeidendes_matchup.gegner} (${e.zu_vermeidendes_matchup.vorteil})`));
+      kasten.appendChild(z);
+    }
     inhalt.appendChild(kasten);
   }
 

@@ -274,7 +274,14 @@ a { color: inherit; text-decoration: none; }
 }
 .vorschlag:hover { border-color: var(--rand-hell); }
 .vorschlag--top { border-color: var(--akzent); }
-.vorschlag-kopf { display: flex; align-items: center; gap: 9px; margin-bottom: 7px; }
+/* Der Kopf ist das Bedienelement, nicht die ganze Karte: darin steckt
+   die aufklappbare Aufschlüsselung, und ein Button im Button wäre
+   ungültiges HTML. */
+.vorschlag-kopf {
+  display: flex; align-items: center; gap: 9px; margin-bottom: 7px;
+  width: 100%; text-align: left; cursor: pointer;
+}
+.vorschlag-kopf:hover .vorschlag-name { color: var(--akzent); }
 .vorschlag-bild {
   width: 34px; height: 34px; border-radius: 4px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
@@ -316,6 +323,68 @@ a { color: inherit; text-decoration: none; }
 .bankarte-text { flex: 1; }
 .bankarte-name { font-size: 12.5px; margin-bottom: 3px; }
 .bankarte-grund { font-size: 11px; color: var(--text-leise); }
+
+/* ─── Aufschlüsselung und Matchplan-Details ───────────────── */
+/* Modifikator-Regeln stehen IMMER hinter ihrer Basisregel - bei
+   gleicher Spezifität gewinnt die spätere. Siehe CLAUDE.md. */
+
+.klappe { margin-top: 9px; border-top: 1px solid var(--rand); padding-top: 7px; }
+.klappe summary {
+  font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-sehr-leise); cursor: pointer; list-style: none;
+}
+.klappe summary::-webkit-details-marker { display: none; }
+.klappe summary::before { content: "▸ "; }
+.klappe[open] summary::before { content: "▾ "; }
+.klappe summary:hover { color: var(--text-leise); }
+.klappe > .komponenten, .klappe > .liste { margin-top: 8px; }
+
+.komponenten-fuss {
+  margin-top: 7px; font-size: 10px; color: var(--text-sehr-leise);
+}
+.komponente-roh {
+  min-width: 92px; text-align: right;
+  font-size: 10px; color: var(--text-sehr-leise);
+}
+.komponente--kompakt { font-size: 11px; gap: 7px; }
+.komponente--kompakt .komponente-label { min-width: 92px; }
+.komponente.ist-ohne-wirkung { opacity: .4; }
+
+.matchplan-lane {
+  margin-left: auto; padding: 2px 8px; border-radius: 20px;
+  font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--text-leise); border: 1px solid var(--rand-hell);
+}
+.matchplan-zeile {
+  display: flex; gap: 9px; font-size: 12px; padding: 3px 0;
+  color: var(--text-leise);
+}
+.matchplan-art {
+  min-width: 82px; flex-shrink: 0;
+  font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-sehr-leise);
+}
+.matchplan-zeile.ist-gut .matchplan-art { color: var(--gut); }
+.matchplan-zeile.ist-schlecht .matchplan-art { color: var(--gegner); }
+
+.datenlage-kasten {
+  padding: 9px 11px; margin-bottom: 12px;
+  background: var(--bg-3); border: 1px solid var(--rand);
+  border-left: 3px solid var(--warn); border-radius: 4px;
+}
+.datenlage-kasten strong { font-size: 12px; font-weight: 500; color: var(--warn); }
+.datenlage-kasten p { margin-top: 4px; font-size: 11px; color: var(--text-leise); }
+
+.schwaeche {
+  display: flex; align-items: baseline; gap: 8px;
+  font-size: 11.5px; color: var(--text-leise); padding: 3px 0;
+}
+.schwaeche-punkt {
+  width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+  background: var(--text-sehr-leise);
+}
+.schwaeche.ist-ausnutzbar { color: var(--text); }
+.schwaeche.ist-ausnutzbar .schwaeche-punkt { background: var(--gegner); }
 
 /* ─── 8. Modal ────────────────────────────────────────────── */
 .modal {
