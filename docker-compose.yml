@@ -34,6 +34,10 @@ services:
       - DJANGO_REGISTRATION_KEY=${DJANGO_REGISTRATION_KEY}
       # Optional: ohne Key laeuft die Filmsektion, nur ohne Poster.
       - TMDB_API_KEY=${TMDB_API_KEY:-}
+      # Optional: ohne Key laeuft der Drafter auf Demo-Daten. Gebraucht
+      # wird er erst fuer den Matchsammler. Wert gehoert in die .env -
+      # Supercell bindet Keys an die IP des abrufenden Servers.
+      - BRAWL_STARS_API_KEY=${BRAWL_STARS_API_KEY:-}
     depends_on:
       - db
     labels:
