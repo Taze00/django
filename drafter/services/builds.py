@@ -17,11 +17,49 @@ Gegenstaende, liefert diese Datei `None` - die Empfehlung erscheint dann
 ohne Build statt mit einem erfundenen.
 """
 
+from django.db import models
+
 from drafter.models import BrawlerItem
 from drafter.services.scoring import klemme
 
 # Wie viele Gears ein Build hat.
 GEAR_PLAETZE = 2
+
+
+class Ausruestungskatalog:
+    """Alle Ausruestungsgegenstaende einer Anfrage, einmal geladen.
+
+    Ohne ihn fragt jeder Kandidat seine eigenen Gegenstaende UND die
+    generischen Gears einzeln ab - bei acht angezeigten Empfehlungen
+    sechzehn Abfragen fuer Daten, die sich waehrend einer Anfrage nicht
+    aendern. Dieselbe Ueberlegung wie beim Datenraum, nur fuer Builds.
+
+    Ohne Katalog funktioniert alles weiter (dann eben mit Einzelabfragen)
+    - die Aufrufer muessen ihn nicht kennen.
+    """
+
+    def __init__(self, brawler=None):
+        gegenstaende = BrawlerItem.objects.filter(is_active=True).prefetch_related("rules")
+        if brawler is not None:
+            ids = [b.id for b in brawler]
+            gegenstaende = gegenstaende.filter(
+                models.Q(brawler_id__in=ids) | models.Q(brawler__isnull=True)
+            )
+
+        self._nach_brawler = {}
+        self._generische = []
+        for gegenstand in gegenstaende:
+            if gegenstand.brawler_id is None:
+                self._generische.append(gegenstand)
+            else:
+                self._nach_brawler.setdefault(gegenstand.brawler_id, []).append(gegenstand)
+
+    def fuer(self, brawler):
+        return self._nach_brawler.get(brawler.id, [])
+
+    @property
+    def generische(self):
+        return self._generische
 
 
 def _erfuellt(bedingung, kandidat, ctx):
@@ -116,17 +154,24 @@ def _text(regel, kandidat, ctx):
     )
 
 
-def empfehlung(kandidat, ctx):
+def empfehlung(kandidat, ctx, katalog=None):
     """Build fuer einen Brawler im aktuellen Draftkontext.
 
     Gibt None zurueck, wenn zu diesem Brawler nichts gepflegt ist.
+    `katalog` ist optional - ohne ihn wird einzeln abgefragt.
     """
-    eigene = list(
-        BrawlerItem.objects.filter(brawler=kandidat, is_active=True).prefetch_related("rules")
-    )
-    generische = list(
-        BrawlerItem.objects.filter(brawler__isnull=True, is_active=True).prefetch_related("rules")
-    )
+    if katalog is not None:
+        eigene = list(katalog.fuer(kandidat))
+        generische = list(katalog.generische)
+    else:
+        eigene = list(
+            BrawlerItem.objects.filter(brawler=kandidat, is_active=True)
+            .prefetch_related("rules")
+        )
+        generische = list(
+            BrawlerItem.objects.filter(brawler__isnull=True, is_active=True)
+            .prefetch_related("rules")
+        )
     if not eigene and not generische:
         return None
 

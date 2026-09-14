@@ -63,20 +63,38 @@ class Datenraum:
         if self._geladen:
             return self
 
-        self.brawler = list(Brawler.objects.filter(is_active=True))
+        # Balanceaenderungen gleich mitladen: die Meta-Komponente fragt
+        # fuer JEDEN Kandidaten, ob er seit der Messung veraendert wurde
+        # (services/patch_weighting.py). Ohne prefetch ist das eine
+        # Abfrage je Brawler - genau die Art N+1, gegen die es diese
+        # Klasse gibt. Faellt nur auf, wenn ein Patch gesetzt ist, also
+        # ueber die API und nicht im schnellen Direkttest.
+        self.brawler = list(
+            Brawler.objects.filter(is_active=True)
+            .prefetch_related("balance_changes__patch")
+        )
         self._nach_id = {b.id: b for b in self.brawler}
         ids = set(self._nach_id)
 
+        # select_related("patch") ist kein Feinschliff, sondern
+        # notwendig: die Patchgewichtung liest `stat.patch` fuer JEDEN
+        # Kandidaten, und ohne das Mitladen holt Django den Patch je
+        # Zeile einzeln nach - zwanzig Abfragen fuer einen einzigen
+        # Datensatz, den alle teilen.
         self._counter = self._bestes_je_schluessel(
-            CounterStat.objects.filter(brawler_id__in=ids, enemy_id__in=ids),
+            CounterStat.objects.filter(
+                brawler_id__in=ids, enemy_id__in=ids
+            ).select_related("patch"),
             lambda z: (z.brawler_id, z.enemy_id),
         )
         self._synergie = self._bestes_je_schluessel(
-            SynergyStat.objects.filter(brawler_a_id__in=ids, brawler_b_id__in=ids),
+            SynergyStat.objects.filter(
+                brawler_a_id__in=ids, brawler_b_id__in=ids
+            ).select_related("patch"),
             lambda z: (z.brawler_a_id, z.brawler_b_id),
         )
         self._stat = self._bestes_je_schluessel(
-            BrawlerStat.objects.filter(brawler_id__in=ids),
+            BrawlerStat.objects.filter(brawler_id__in=ids).select_related("patch"),
             lambda z: z.brawler_id,
         )
         self._geladen = True
