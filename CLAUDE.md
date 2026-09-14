@@ -6,7 +6,7 @@
 Minimalistische Calisthenics-App: 3 Übungen (Push-ups, Pull-ups, Planks), adaptives 7-Stufen-Progressionssystem. Domain: `alex.volkmann.com`.
 
 ## ⚠️ WICHTIG: Was zu CORVIS gehört — und was NICHT
-Dieses Django-Projekt bedient **vier unabhängige Seiten** (Portfolio `/`, Filme `/filme/`, Impressum `/impressum/`, CORVIS). **Nur diese Pfade gehören zu CORVIS:**
+Dieses Django-Projekt bedient **fünf unabhängige Seiten** (Portfolio `/`, Filme `/filme/`, Impressum `/impressum/`, CORVIS, Draft Coach `/draft/`). **Nur diese Pfade gehören zu CORVIS:**
 - `fitness/` — Backend (Django-App: models, views, calibration, streak, serializers, urls)
 - `fitness-frontend/` — Frontend (React-Quelle; der eigentliche Code in `fitness-frontend/src/`)
 - `static/fitness/` — gebautes Frontend (generiert, gitignored)
@@ -14,7 +14,7 @@ Dieses Django-Projekt bedient **vier unabhängige Seiten** (Portfolio `/`, Filme
 - `templates/fitness-landing.html` — Landing Page (`/corvis/`)
 - API-Routen: `/api/fitness/`, `/api/token/`, `/api/register/`
 
-**NICHT zu CORVIS gehört** (nicht lesen/ändern bei CORVIS-Arbeit): die Portfolio-Welt — `static/css/styles.css`, `static/js/main.js`, `templates/index.html`, `filme.html`, `impressum.html`, `404.html`, alles unter `templates/includes/`, sowie die `films/`-App. Siehe `PROJEKT_LANDKARTE.md` für die volle Übersicht.
+**NICHT zu CORVIS gehört** (nicht lesen/ändern bei CORVIS-Arbeit): die Portfolio-Welt — `static/css/styles.css`, `static/js/main.js`, `templates/index.html`, `filme.html`, `impressum.html`, `404.html`, alles unter `templates/includes/`, sowie die `films/`-App und die `drafter/`-App. Siehe `PROJEKT_LANDKARTE.md` für die volle Übersicht.
 
 > Die Seiten `/schubi/`, `/skills/`, `/festival/`, `/aurelia/` und die geo-App **gibt es nicht mehr** (August 2026). Wenn dir noch ein Verweis darauf begegnet, ist der Verweis der Fehler — nicht die fehlende Datei.
 
@@ -103,6 +103,31 @@ docker compose restart django-dev
 
 - **Das Sicherheitsnetz des Ladebildschirms steht als Inline-Skript im `<head>` von `index.html`**, nicht in `main.js` — damit es auch greift, wenn `main.js` gar nicht lädt oder einen Syntaxfehler hat. Es räumt den Vorhang nach 3,5s notfalls selbst weg; die DOM-Schritte liegen außerhalb des `try`, damit ein Fehler in `introBeenden()` sie nicht verschluckt. **Nicht nach `main.js` verschieben** — der Vorhang sperrt das Scrollen, ein hängender Vorhang macht die Seite unerreichbar.
 
+## 🎯 Draft Coach (`/draft/`) — die fünfte Seite
+
+Brawl-Stars-Ranked-Draft-Assistent. **Genauso isoliert wie CORVIS** — eigene App, eigene Templates, eigenes CSS/JS, keine Berührung mit `styles.css` oder `main.js`.
+
+Dazu gehören: `drafter/`, `templates/drafter/`, `static/drafter/`, die Route `path('draft/', include('drafter.urls'))` in `meinprojekt/urls.py`.
+
+**Kein Build-Schritt.** Das Frontend sind ES-Module ohne Werkzeugkette:
+```
+docker compose exec django-dev python manage.py collectstatic --noinput   # nur bei CSS/JS
+docker compose restart django-dev
+```
+
+**Vier Dinge, die man wissen muss, bevor man dort etwas ändert:**
+
+1. **`drafter/config.py` hält ALLE Zahlen.** Gewichte, Schwellen, Grenzen. Eine Zahl im Engine-Code ist unauffindbar — deshalb steht dort keine.
+2. **Jede Score-Komponente liefert [-1, +1].** Roh-Winrates (0–1) und Attribute (0–100) werden nie direkt addiert. Die Umrechnung auf 0–100 passiert genau einmal, in `Empfehlung.anzeige_score`.
+3. **Strafgewichte sind Beträge, nicht negative Zahlen.** Das Vorzeichen steckt im *Wert* der Komponente. Wären beide negativ, würde aus jeder Strafe ein Bonus — und das fällt beim Lesen nicht auf, weil die Zahlen einzeln richtig aussehen. Ein Test hält es fest.
+4. **`drafter/attributes.py` ist das einzige Vokabular.** Dieselben 32 Schlüssel beschreiben Brawler („was ich kann"), Maps („was hier zählt") und Teams („was uns fehlt"). Neue Eigenschaft nur dort eintragen — die Modelle validieren dagegen.
+
+**Anzeigetexte mit echten Umlauten, Kommentare in ASCII-Umschrift.** Die Engine erzeugt ihre Sätze aus Attributen; sie landen unverändert auf der Seite. „Flaechenkontrolle zaehlt" sieht dort falsch aus.
+
+**Demo-Daten:** Alles ist mit `source="demo"` gekennzeichnet, die Confidence dadurch auf 0,35 gedeckelt, und die Oberfläche weist oben darauf hin. `python manage.py seed_brawl_data [--reset]` legt sie an (idempotent; `--reset` löscht nur Demo-Zeilen, keine manuell gepflegten).
+
+Volle Erklärung: `DRAFTER_DOKUMENTATION.md`.
+
 ## Arbeits-Konventionen
 - **Pro Feature ein Commit** (nicht in Batches), mit `Co-Authored-By`-Trailer.
 - **Bei Bugs/Fehlern: erst Logs/Fehler holen, nie raten.**
@@ -129,7 +154,13 @@ Frontend: React 19 + Vite, Zustand (`authStore`, `workoutStore`), React Router v
 ```
 docker compose exec django-dev python manage.py test fitness --settings=meinprojekt.settings_test
 ```
-134 Tests, ~5 s (SQLite im Speicher, braucht kein Postgres). **Vor jedem Dependency- oder Django-Upgrade laufen lassen.**
+253 Tests, ~15 s. Für den Drafter:
+```
+docker compose exec django-dev python manage.py test drafter --settings=meinprojekt.settings_test
+```
+93 Tests, ~30 s. **Vor jedem Dependency- oder Django-Upgrade beide laufen lassen** (zusammen 346).
+
+> Frühere Fassungen dieser Datei nannten 134 Tests und „SQLite im Speicher". Beides stimmt nicht mehr bzw. stimmte nie: `settings_test` unterscheidet sich von `settings` **nur** im Passwort-Hasher, die Testdatenbank ist dieselbe Postgres-Instanz.
 
 ## Startlevel (häufiger Irrtum)
 Neue Nutzer starten auf **Push-ups L4** (Standard Push-ups), **Pull-ups L1** (Dead Hang), **Planks L3** (Standard Plank) — gesetzt in `fitness/migrations/0009_*`, Konstante `STARTLEVEL`. Die gelöschte `FITNESS_APP_COMPLETE_SPEC.md` behauptete L3/L1; das war falsch. Die Trainings-**Ziele werden angezeigt** (`Ziel: 8 Wdh`), nicht versteckt.

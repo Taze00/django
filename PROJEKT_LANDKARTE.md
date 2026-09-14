@@ -1,12 +1,12 @@
 # 🗺️ Projekt-Landkarte — alex-django
 
-> **Zweck:** Dieses eine Django-Projekt (`meinprojekt`) bedient **vier unabhängige Webseiten**. Diese Datei sagt dir auf einen Blick, **welche Datei zu welcher Seite gehört**. Stand: August 2026.
+> **Zweck:** Dieses eine Django-Projekt (`meinprojekt`) bedient **fünf unabhängige Webseiten**. Diese Datei sagt dir auf einen Blick, **welche Datei zu welcher Seite gehört**. Stand: August 2026.
 >
 > **Wichtigste Erkenntnis:** **CORVIS und die Portfolio-Welt berühren sich nirgends** — du kannst an einer Seite arbeiten, ohne die andere zu gefährden. Innerhalb der Portfolio-Welt ist es umgekehrt: dort teilen sich *alle* Seiten dieselbe `styles.css` und `main.js`.
 
 ---
 
-## Die vier Seiten im Überblick
+## Die fünf Seiten im Überblick
 
 | Seite | URL | Template | Eigene Dateien (CSS/JS/Assets) | Status |
 |-------|-----|----------|-------------------------------|--------|
@@ -14,6 +14,7 @@
 | **Filme** | `/filme/` | `filme.html` | *keine eigenen* — nutzt `styles.css` + `main.js` | 🟡 teilt CSS/JS (s.u.) |
 | **Impressum** | `/impressum/` | `impressum.html` | *keine eigenen* — nutzt `styles.css` + `main.js` | 🟡 teilt CSS/JS (s.u.) |
 | **CORVIS** (Fitness-App) | `/corvis/` + `/corvis-app/` | `fitness-landing.html` + `fitness.html` | siehe `CLAUDE.md` | 🟢 komplett isoliert |
+| **Draft Coach** (Brawl Stars) | `/draft/` | `drafter/draft.html` u.a. | `static/drafter/` | 🟢 komplett isoliert |
 
 Dazu `404.html` als Catch-All für alles Übrige — ebenfalls in der Portfolio-Gestaltung, also auch an `styles.css`/`main.js` hängend.
 
@@ -71,6 +72,7 @@ Diese Seiten und Dateien gibt es **nicht mehr** — falls dir irgendwo noch ein 
 alex-django/
 ├── data/              → Postgres-Datenbank — NICHT anfassen
 ├── docker/            → Dockerfile + requirements.txt
+├── drafter/           → DRAFT COACH (Brawl Stars, /draft/) - eigene Welt
 ├── films/             → FILME-App (Models, Views, Daten für /filme/)
 ├── fitness/           → CORVIS BACKEND (Django-App)
 ├── fitness-frontend/  → CORVIS FRONTEND (React-Quelle)
