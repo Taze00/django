@@ -1,0 +1,210 @@
+"""Das Vokabular des Drafters.
+
+Eine Liste, drei Verwendungen - das ist die zentrale Entwurfsentscheidung
+dieser App:
+
+1. **Brawler** tragen zu jedem Schluessel einen Wert 0-100
+   ("wie stark bin ich darin").
+2. **Maps** tragen zu denselben Schluesseln einen Wert 0-100
+   ("wie wichtig ist das hier").
+3. **Teams** bekommen daraus ein Profil und einen Bedarf
+   ("was fehlt uns noch").
+
+Dadurch ist Map-Fit ein gewichtetes Skalarprodukt, Team-Coverage ein
+Vergleich zweier Vektoren und Redundanz ein Ueberschuss im selben Raum.
+Waeren das drei getrennte Vokabulare, muesste jede Kombination von Hand
+verdrahtet werden.
+
+Neue Eigenschaft? Hier eintragen, sonst nirgends. Modelle validieren
+gegen diese Liste, das Admin baut daraus seine Formulare, die Engine
+iteriert darueber. Ein Tippfehler in einem JSONField faellt damit beim
+Speichern auf und nicht erst in einer stillen Fehlempfehlung.
+"""
+
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class Eigenschaft:
+    """Ein Schluessel des Vokabulars.
+
+    `label` ist Anzeigetext (UI, Admin, Coach-Saetze), `gruppe` sortiert
+    die Darstellung, `knapp` markiert Eigenschaften, bei denen *Fehlen*
+    ein Team hart bestraft - daran haengt die Coverage-Luecken-Logik.
+    """
+
+    key: str
+    label: str
+    gruppe: str
+    knapp: bool = False
+    beschreibung: str = ""
+
+
+# --- Reichweite ----------------------------------------------------------
+# Bewusst drei Baender statt einer Zahl: ein Brawler kann auf mittlerer
+# Distanz stark und auf kurzer wehrlos sein. Eine einzelne "range"-Zahl
+# koennte das nicht ausdruecken.
+_REICHWEITE = [
+    Eigenschaft("long_range", "Lange Reichweite", "Reichweite", knapp=True),
+    Eigenschaft("mid_range", "Mittlere Reichweite", "Reichweite"),
+    Eigenschaft("close_range", "Nahkampf", "Reichweite"),
+]
+
+# --- Schaden -------------------------------------------------------------
+_SCHADEN = [
+    Eigenschaft("burst_damage", "Burst-Schaden", "Schaden"),
+    Eigenschaft("sustained_damage", "Dauerschaden", "Schaden"),
+    Eigenschaft("objective_damage", "Schaden aufs Ziel", "Schaden",
+                beschreibung="Safe, Tresor, Ball, Heist-Objekte"),
+    Eigenschaft("safe_damage", "Sicherer Schaden", "Schaden",
+                beschreibung="Schaden ohne eigenes Risiko"),
+    Eigenschaft("poke", "Poke", "Schaden"),
+]
+
+# --- Kontrolle -----------------------------------------------------------
+_KONTROLLE = [
+    Eigenschaft("area_control", "Flächenkontrolle", "Kontrolle", knapp=True),
+    Eigenschaft("lane_control", "Lane-Kontrolle", "Kontrolle"),
+    Eigenschaft("mid_control", "Mid-Kontrolle", "Kontrolle", knapp=True),
+    Eigenschaft("zone_control", "Zonen verweigern", "Kontrolle"),
+    Eigenschaft("crowd_control", "Crowd Control", "Kontrolle"),
+    Eigenschaft("knockback", "Rückstoß", "Kontrolle"),
+    Eigenschaft("slow", "Verlangsamung", "Kontrolle"),
+    Eigenschaft("stun", "Betäubung", "Kontrolle"),
+]
+
+# --- Antworten auf gegnerische Archetypen --------------------------------
+# Diese vier sind der Kern des "drei Tanks sind kein Team"-Problems:
+# fehlen sie, hat der Gegner eine Gewinnbedingung, auf die wir keine
+# Antwort haben. Alle sind deshalb `knapp`.
+_ANTWORTEN = [
+    Eigenschaft("anti_tank", "Anti-Tank", "Antworten", knapp=True),
+    Eigenschaft("anti_assassin", "Anti-Assassin", "Antworten", knapp=True),
+    Eigenschaft("anti_thrower", "Anti-Thrower", "Antworten", knapp=True),
+    Eigenschaft("backline_pressure", "Druck auf die Backline", "Antworten", knapp=True),
+]
+
+# --- Ueberleben und Raum halten ------------------------------------------
+_ROBUSTHEIT = [
+    Eigenschaft("tankiness", "Robustheit", "Robustheit"),
+    Eigenschaft("frontline", "Frontline", "Robustheit", knapp=True),
+    Eigenschaft("survivability", "Überlebensfähigkeit", "Robustheit"),
+    Eigenschaft("disengage", "Lösen aus Kämpfen", "Robustheit"),
+    Eigenschaft("peel", "Peel für Mitspieler", "Robustheit", knapp=True),
+]
+
+# --- Bewegung ------------------------------------------------------------
+_BEWEGUNG = [
+    Eigenschaft("mobility", "Mobilität", "Bewegung", knapp=True),
+    Eigenschaft("engage", "Angriff einleiten", "Bewegung"),
+]
+
+# --- Werkzeuge -----------------------------------------------------------
+_WERKZEUG = [
+    Eigenschaft("wallbreak", "Wände brechen", "Werkzeuge"),
+    Eigenschaft("bush_control", "Buschkontrolle", "Werkzeuge"),
+    Eigenschaft("vision", "Sicht verschaffen", "Werkzeuge"),
+    Eigenschaft("healing", "Heilung", "Werkzeuge"),
+    Eigenschaft("support", "Support", "Werkzeuge"),
+]
+
+EIGENSCHAFTEN = (
+    _REICHWEITE + _SCHADEN + _KONTROLLE + _ANTWORTEN
+    + _ROBUSTHEIT + _BEWEGUNG + _WERKZEUG
+)
+
+# Nachschlagewerke - einmal gebaut, ueberall benutzt.
+EIGENSCHAFT_NACH_KEY = {e.key: e for e in EIGENSCHAFTEN}
+ATTRIBUT_KEYS = tuple(e.key for e in EIGENSCHAFTEN)
+KNAPPE_KEYS = tuple(e.key for e in EIGENSCHAFTEN if e.knapp)
+GRUPPEN = tuple(dict.fromkeys(e.gruppe for e in EIGENSCHAFTEN))
+
+
+# --- Draft-Werte ---------------------------------------------------------
+# Kein Teil des Coverage-Vokabulars: diese Werte beschreiben nicht, was
+# ein Brawler im Kampf kann, sondern wie er sich im *Draft* verhaelt.
+# Sie gehen in die Pick-Order-Komponente ein, nie in Map-Fit oder
+# Coverage - ein Brawler soll keine Teamluecke schliessen, nur weil er
+# ein guter Blind Pick ist.
+
+@dataclass(frozen=True)
+class Draftwert:
+    key: str
+    label: str
+    beschreibung: str = ""
+
+
+DRAFTWERTE = [
+    Draftwert("blind_pick_value", "Blind Pick",
+              "Wie sicher ist er, wenn noch nichts vom Gegner bekannt ist"),
+    Draftwert("early_pick_value", "Früher Pick",
+              "Wert in den ersten Picks, wenn noch wenig feststeht"),
+    Draftwert("last_pick_value", "Last Pick",
+              "Wert als letzter Pick mit voller Information"),
+    Draftwert("counter_pick_value", "Counter Pick",
+              "Wie stark bestraft er gezielt bestimmte Picks"),
+    Draftwert("flexibility_value", "Flexibilität",
+              "Wie viele Rollen und Maps er abdecken kann"),
+    Draftwert("counterability", "Konterbarkeit",
+              "Wie leicht ihn der Gegner selbst kontern kann - hoch = leicht konterbar"),
+]
+
+DRAFTWERT_NACH_KEY = {d.key: d for d in DRAFTWERTE}
+DRAFTWERT_KEYS = tuple(d.key for d in DRAFTWERTE)
+
+# Fehlt ein Draftwert, ist 50 die Annahme "durchschnittlich" - nicht 0.
+# 0 hiesse "voellig unbrauchbar als Blind Pick" und wuerde jeden Brawler
+# bestrafen, dessen Datensatz einfach noch unvollstaendig ist.
+DRAFTWERT_STANDARD = 50
+
+
+# --- Rollen --------------------------------------------------------------
+# Grobe Archetypen. Sie ersetzen die Eigenschaften nicht, sondern
+# buendeln sie fuer Anzeige, Filter und Redundanzpruefung ("schon zwei
+# Assassinen im Team").
+ROLLEN = [
+    ("tank", "Tank"),
+    ("assassin", "Assassin"),
+    ("marksman", "Marksman"),
+    ("sniper", "Sniper"),
+    ("thrower", "Thrower"),
+    ("controller", "Controller"),
+    ("support", "Support"),
+    ("damage", "Damage Dealer"),
+    ("aggro", "Aggro"),
+]
+
+ROLLEN_KEYS = tuple(k for k, _ in ROLLEN)
+ROLLEN_LABEL = dict(ROLLEN)
+
+
+def pruefe_attribute(werte, erlaubt=ATTRIBUT_KEYS, feldname="attributes"):
+    """Ein JSON-Dict gegen das Vokabular pruefen.
+
+    Gibt eine Liste von Fehlertexten zurueck - leer heisst in Ordnung.
+    Bewusst kein Exception-Wurf: Modelle wollen daraus ein
+    ValidationError bauen, das Seed-Kommando lieber eine Warnung.
+    """
+    fehler = []
+    if not isinstance(werte, dict):
+        return [f"{feldname}: erwartet ein Objekt, bekommen {type(werte).__name__}"]
+
+    for key, wert in werte.items():
+        if key not in erlaubt:
+            fehler.append(f"{feldname}: unbekannter Schlüssel '{key}'")
+            continue
+        if not isinstance(wert, (int, float)) or isinstance(wert, bool):
+            fehler.append(f"{feldname}['{key}']: erwartet eine Zahl, bekommen {wert!r}")
+            continue
+        if not 0 <= wert <= 100:
+            fehler.append(f"{feldname}['{key}']: {wert} liegt außerhalb 0-100")
+    return fehler
+
+
+def als_vektor(werte, keys=ATTRIBUT_KEYS, standard=0.0):
+    """JSON-Dict zu vollstaendigem Vektor 0-1 in fester Reihenfolge.
+
+    Fehlende Schluessel werden zu `standard`. Die feste Reihenfolge ist
+    wichtig: die Engine rechnet spaeter paarweise ueber zwei Vektoren.
+    """
+    return {k: float(werte.get(k, standard)) / 100.0 for k in keys}

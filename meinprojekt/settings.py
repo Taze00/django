@@ -69,6 +69,10 @@ INSTALLED_APPS = [
     'fitness',
     # Kein Datenmodell - nur wegen der templatetags registriert.
     'films',
+    # Brawl-Stars-Draft-Coach unter /draft/. Eigenstaendig wie CORVIS:
+    # eigene Templates, eigenes CSS/JS, keine Beruehrung mit den
+    # Portfolio-Seiten.
+    'drafter',
 ]
 
 MIDDLEWARE = [
@@ -225,6 +229,20 @@ REGISTRATION_SECRET_KEY = os.environ.get(
     'DJANGO_REGISTRATION_KEY',
     'set-in-env',
 )
+
+
+# --- Brawl Stars Drafter ------------------------------------------------
+
+# Offizielle Brawl-Stars-API. Ohne Key laeuft der Drafter vollstaendig
+# auf gepflegten Demo-Daten; der Key wird erst fuer den Matchsammler
+# (Phase 14) gebraucht. Wert gehoert in die gitignorte .env.
+BRAWL_STARS_API_KEY = os.environ.get('BRAWL_STARS_API_KEY', '')
+
+# Wohin Djangos LoginView nach dem Anmelden schickt. Der Drafter ist die
+# einzige Seite des Projekts mit Session-Login - CORVIS benutzt JWT.
+LOGIN_URL = '/draft/login/'
+LOGIN_REDIRECT_URL = '/draft/'
+LOGOUT_REDIRECT_URL = '/draft/'
 
 
 # --- Filmsektion der Startseite ------------------------------------------
