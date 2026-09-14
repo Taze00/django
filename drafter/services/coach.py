@@ -53,8 +53,16 @@ def rolle_im_team(brawler, analyse=None):
     return haupt
 
 
-def aufgaben(brawler, ctx, analyse, raum):
-    """Was dieser Spieler tun soll - in der Reihenfolge der Wichtigkeit."""
+def aufgaben(brawler, ctx, analyse, raum, zugewiesener_gegner=None):
+    """Was dieser Spieler tun soll - in der Reihenfolge der Wichtigkeit.
+
+    `zugewiesener_gegner` kommt aus der Team-Zuordnung. Ohne ihn sucht
+    sich jeder Spieler sein bestes Matchup selbst - und dann bekommen
+    zwei Spieler denselben Gegner zugewiesen, waehrend der dritte
+    unbeaufsichtigt bleibt. Der Teamplan sagt dann etwas anderes als die
+    Spielerkarte daneben. Im fertigen Matchplan wird deshalb die
+    abgestimmte Zuordnung durchgereicht.
+    """
     saetze = []
 
     # 1. Die Luecke, die er schliesst, ist sein Hauptauftrag.
@@ -64,16 +72,28 @@ def aufgaben(brawler, ctx, analyse, raum):
         for eigenschaft, _ in kritisch[:1]:
             if zuwachs.get(eigenschaft.key, 0) > 0.15:
                 saetze.append(
-                    f"Du bist unsere Antwort auf {eigenschaft.label.lower()} - "
+                    # Label NICHT kleinschreiben: die Beschriftungen sind
+                    # Substantive ("Lange Reichweite"), und .lower() macht
+                    # daraus mitten im Satz einen Rechtschreibfehler.
+                    f"Du bist unsere Antwort auf {eigenschaft.label} - "
                     "das fällt sonst niemandem im Team zu."
                 )
 
     # 2. Sein bevorzugtes Matchup.
-    bestes = bestes_matchup(brawler, list(ctx.enemy_picks), raum)
-    if bestes:
+    if zugewiesener_gegner is not None:
+        wert = vorteil(brawler, zugewiesener_gegner, raum)[0]
         saetze.append(
-            f"Nimm dir {bestes['gegner']} vor - dieses Matchup gewinnst du."
+            f"Nimm dir {zugewiesener_gegner.name} vor - dieses Matchup gewinnst du."
+            if wert > 0.05 else
+            f"Du stehst gegen {zugewiesener_gegner.name} - das Matchup ist nicht "
+            "geschenkt, halte es offen, statt es zu erzwingen."
         )
+    else:
+        bestes = bestes_matchup(brawler, list(ctx.enemy_picks), raum)
+        if bestes:
+            saetze.append(
+                f"Nimm dir {bestes['gegner']} vor - dieses Matchup gewinnst du."
+            )
 
     # 3. Schutzauftrag fuer empfindliche Mitspieler.
     #
@@ -142,8 +162,13 @@ def vermeiden(brawler, ctx, raum):
     return saetze[:3]
 
 
-def warnungen(brawler, ctx, raum):
-    """Worauf dieser Spieler achten muss - konkrete Gefahren des Gegners."""
+def warnungen(brawler, ctx, raum, katalog=None):
+    """Worauf dieser Spieler achten muss - konkrete Gefahren des Gegners.
+
+    `katalog` ist optional. Er lohnt sich, sobald mehrere Kandidaten
+    hintereinander bewertet werden: die gegnerische Ausruestung ist fuer
+    alle dieselbe und wuerde sonst je Kandidat neu abgefragt.
+    """
     hinweise = []
 
     for gegner in ctx.enemy_picks:
@@ -153,11 +178,18 @@ def warnungen(brawler, ctx, raum):
 
     # Gepflegte gegnerische Gadgets/Star Powers als konkrete Gefahr.
     # Nur wenn wirklich etwas gepflegt ist - nichts erfinden.
-    gefahren = BrawlerItem.objects.filter(
-        brawler__in=list(ctx.enemy_picks),
-        kind__in=[BrawlerItem.Kind.GADGET, BrawlerItem.Kind.STAR_POWER],
-        is_active=True,
-    ).select_related("brawler")[:3]
+    gefaehrlich = (BrawlerItem.Kind.GADGET, BrawlerItem.Kind.STAR_POWER)
+    if katalog is not None:
+        gefahren = [
+            g for gegner in ctx.enemy_picks
+            for g in katalog.fuer(gegner) if g.kind in gefaehrlich
+        ][:3]
+    else:
+        gefahren = list(BrawlerItem.objects.filter(
+            brawler__in=list(ctx.enemy_picks),
+            kind__in=list(gefaehrlich),
+            is_active=True,
+        ).select_related("brawler")[:3])
     for gegenstand in gefahren:
         if gegenstand.description:
             hinweise.append(
@@ -202,7 +234,11 @@ def matchup_zuordnung(eigene, gegner, raum):
             beste = paare
 
     return [
-        {"unser": a.name, "gegner": b.name, "vorteil": round(w, 2)}
+        {
+            "unser": a.name, "unser_slug": a.slug,
+            "gegner": b.name, "gegner_slug": b.slug,
+            "vorteil": round(w, 2),
+        }
         for a, b, w in (beste or [])
     ]
 
@@ -221,9 +257,15 @@ def lane_vorschlag(eigene, ctx):
     mitte = nach_mid[0]
     rest = [b for b in eigene if b.id != mitte.id]
 
-    zuordnung = [{"lane": "Mitte", "brawler": mitte.name}]
-    for lane, b in zip(("Links", "Rechts"), rest):
-        zuordnung.append({"lane": lane, "brawler": b.name})
+    # Die aeusseren Lanes nach Eigenstaendigkeit verteilen: wer allein
+    # zurechtkommt, geht auf die Seite, die weiter vom Team weg liegt.
+    rest.sort(key=lambda b: -(b.wert("survivability") + b.wert("mobility")))
+
+    zuordnung = [{"lane": "Mitte", "brawler": mitte.name, "slug": mitte.slug,
+                  "grund": "beste Mid-Kontrolle im Team"}]
+    gruende = ("kommt auf der Seite allein zurecht", "bleibt nah am Team")
+    for lane, b, grund in zip(("Links", "Rechts"), rest, gruende):
+        zuordnung.append({"lane": lane, "brawler": b.name, "slug": b.slug, "grund": grund})
     return zuordnung
 
 
@@ -274,6 +316,59 @@ def gefahren(ctx, analyse, raum):
     return punkte[:4]
 
 
+def team_schwaechen(ctx, analyse, raum):
+    """Die wichtigsten Schwaechen des fertigen Teams - benannt und bewertet.
+
+    Unterschied zu `gefahren()`: dort stehen Saetze fuer den Spieler,
+    hier steht die Auswertung. Jede Schwaeche traegt mit, ob der Gegner
+    sie ueberhaupt bespielen kann - eine Luecke, die niemand im
+    gegnerischen Team ausnutzen kann, ist im Draft keine.
+    """
+    # Wer beim Gegner welche Luecke bestraft. Dieselben Paarungen wie in
+    # services/team_need.py - sie stehen dort fuer die Bewertung, hier
+    # fuer die Erklaerung.
+    ausnutzer = {
+        "anti_tank": lambda g: g.wert("tankiness"),
+        "anti_assassin": lambda g: max(g.wert("engage"), g.wert("mobility"))
+            if {"assassin", "aggro"} & set(g.alle_rollen) else 0.0,
+        "anti_thrower": lambda g: 1.0 if "thrower" in g.alle_rollen else 0.0,
+        "long_range": lambda g: g.wert("long_range"),
+        "frontline": lambda g: g.wert("frontline"),
+        "mobility": lambda g: g.wert("area_control"),
+        "peel": lambda g: max(g.wert("engage"), g.wert("backline_pressure")),
+    }
+
+    schwaechen = []
+    for eigenschaft, dringlichkeit in analyse.groesste_luecken(anzahl=6, mindestens=0.12):
+        pruefung = ausnutzer.get(eigenschaft.key)
+        bedrohung = None
+        staerke = 0.0
+        if pruefung is not None and ctx.enemy_picks:
+            bewertet = [(pruefung(g), g) for g in ctx.enemy_picks]
+            staerke, kandidat = max(bewertet, key=lambda paar: paar[0])
+            if staerke >= 0.5:
+                bedrohung = kandidat
+
+        schwaechen.append({
+            "key": eigenschaft.key,
+            "label": eigenschaft.label,
+            "dringlichkeit": round(dringlichkeit * 100),
+            "kritisch": eigenschaft.knapp,
+            "ausgenutzt_von": bedrohung.name if bedrohung else None,
+            "text": (
+                f"{eigenschaft.label} fehlt - und {bedrohung.name} kann genau das bespielen."
+                if bedrohung else
+                f"{eigenschaft.label} fehlt, aber im gegnerischen Team steht niemand, "
+                "der es ausnutzt."
+            ),
+        })
+
+    # Ausnutzbare Schwaechen zuerst - sie kosten im Spiel tatsaechlich
+    # etwas, die uebrigen sind Schoenheitsfehler.
+    schwaechen.sort(key=lambda s: (s["ausgenutzt_von"] is None, -s["dringlichkeit"]))
+    return schwaechen[:4]
+
+
 def lane_tausch_plan(ctx, raum):
     """Was tun, wenn der Gegner die Lanes tauscht?
 
@@ -294,6 +389,8 @@ def lane_tausch_plan(ctx, raum):
         if bester[0] - schlechtester[0] > 0.3:
             plan.append({
                 "wenn": f"{gegner.name} geht auf {schlechtester[1].name}",
-                "dann": f"{bester[1].name} übernimmt ihn - tauscht die Position",
+                "dann": (
+                    f"{bester[1].name} übernimmt {gegner.name} - tauscht die Position"
+                ),
             })
     return plan[:3]
