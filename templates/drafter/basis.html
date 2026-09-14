@@ -1,0 +1,41 @@
+{% load static %}<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block titel %}Draft Coach{% endblock %} | Alex Volkmann</title>
+<meta name="description" content="Ranked-Draft-Coach für Brawl Stars: Empfehlungen mit Begründung, Teamanalyse und Matchplan.">
+{# Die Seite arbeitet mit gekennzeichneten Demo-Daten - nicht indexieren. #}
+<meta name="robots" content="noindex">
+<link rel="icon" href="{% static 'css/images/favicon.ico' %}" type="image/x-icon">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'drafter/draft.css' %}?v=20260914-1">
+</head>
+<body class="drafter">
+
+<header class="kopf">
+  <a class="kopf-marke" href="{% url 'drafter:draft' %}">
+    <span class="kopf-marke-stark">DRAFT</span><span class="kopf-marke-leicht">COACH</span>
+  </a>
+  <nav class="kopf-nav">
+    <a href="{% url 'drafter:draft' %}"{% if aktiv == 'draft' %} class="ist-aktiv"{% endif %}>Drafter</a>
+    <a href="{% url 'drafter:meine_brawler' %}"{% if aktiv == 'brawler' %} class="ist-aktiv"{% endif %}>Meine Brawler</a>
+    {% if user.is_authenticated %}
+      <form method="post" action="{% url 'drafter:logout' %}" class="kopf-abmelden">
+        {% csrf_token %}
+        <button type="submit">Abmelden ({{ user.username }})</button>
+      </form>
+    {% else %}
+      <a href="{% url 'drafter:login' %}">Anmelden</a>
+    {% endif %}
+    <a href="/" class="kopf-zurueck">← Startseite</a>
+  </nav>
+</header>
+
+{% block inhalt %}{% endblock %}
+
+{% block skripte %}{% endblock %}
+</body>
+</html>

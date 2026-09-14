@@ -1,0 +1,69 @@
+{% extends "drafter/basis.html" %}
+{% load static %}
+{% block titel %}Meine Brawler{% endblock %}
+
+{% block inhalt %}
+<main class="seite">
+  <h1>Meine Brawler</h1>
+  <p class="seite-einleitung">
+    Wie sicher spielst du jeden Brawler? Der Wert fließt in die Empfehlungen ein —
+    aber nur schwach: er verschiebt die Reihenfolge zwischen gleichwertigen
+    Vorschlägen und kann einen Pick, der nicht in den Draft passt, nicht nach oben
+    heben. 50 ist neutral. Jede Änderung wird sofort gespeichert.
+  </p>
+
+  <div class="confidence-liste">
+    {% for eintrag in eintraege %}
+      <div class="confidence-zeile" data-slug="{{ eintrag.brawler.slug }}">
+        <div class="confidence-bild"
+             {% if eintrag.brawler.image_url %}style="background-image: url('{{ eintrag.brawler.image_url }}')"
+             {% else %}style="background: {{ eintrag.brawler.color }}"{% endif %}>
+          {% if not eintrag.brawler.image_url %}{{ eintrag.brawler.initialen }}{% endif %}
+        </div>
+        <span class="confidence-name">{{ eintrag.brawler.name }}</span>
+        <input type="range" class="confidence-regler" min="0" max="100" step="5"
+               value="{{ eintrag.confidence }}"
+               aria-label="Sicherheit für {{ eintrag.brawler.name }}">
+        <span class="confidence-wert">{{ eintrag.confidence }}</span>
+        <span class="confidence-status"></span>
+      </div>
+    {% endfor %}
+  </div>
+</main>
+{% endblock %}
+
+{% block skripte %}
+<script>
+  window.DRAFTER = { csrf: "{{ csrf_token }}" };
+</script>
+<script type="module">
+  // Absichtlich klein und hier statt in einer eigenen Datei: diese
+  // Seite tut genau eine Sache, und dafuer lohnt kein weiteres Modul.
+  import { confidenceSpeichern } from "{% static 'drafter/js/api.js' %}";
+
+  let zeitgeber = null;
+  document.querySelectorAll('.confidence-zeile').forEach((zeile) => {
+    const regler = zeile.querySelector('.confidence-regler');
+    const wert = zeile.querySelector('.confidence-wert');
+    const status = zeile.querySelector('.confidence-status');
+
+    regler.addEventListener('input', () => {
+      wert.textContent = regler.value;
+      // Erst speichern, wenn der Regler kurz ruht - sonst schickt ein
+      // einziges Ziehen zwanzig Anfragen.
+      clearTimeout(zeitgeber);
+      zeitgeber = setTimeout(async () => {
+        status.textContent = '…';
+        try {
+          await confidenceSpeichern(zeile.dataset.slug, Number(regler.value));
+          status.textContent = 'gespeichert';
+          setTimeout(() => { status.textContent = ''; }, 1500);
+        } catch (fehler) {
+          status.textContent = 'Fehler';
+          status.style.color = 'var(--gegner)';
+        }
+      }, 400);
+    });
+  });
+</script>
+{% endblock %}

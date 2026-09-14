@@ -44,6 +44,9 @@ urlpatterns = [
     re_path(r'^corvis-app/.*$', views.fitness_page, name='fitness_catch_all'),
     # CORVIS landing page
     path('corvis/', views.fitness_landing_page, name='fitness_landing_page'),
+    # Brawl-Stars-Draft-Coach. Muss VOR dem Catch-all weiter unten stehen,
+    # sonst faengt der 404-Handler die Route ab.
+    path('draft/', include('drafter.urls')),
 ]
 
 # Serve uploaded media files. Works regardless of DEBUG — under gunicorn +

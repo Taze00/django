@@ -1,0 +1,33 @@
+{% extends "drafter/basis.html" %}
+{% block titel %}Anmelden{% endblock %}
+
+{% comment %}
+Die einzige Session-Anmeldung des Projekts. Sie benutzt Djangos
+LoginView - hier steht nur das Formular, keine eigene Passwortpruefung.
+{% endcomment %}
+
+{% block inhalt %}
+<main class="anmeldung">
+  <h1>Anmelden</h1>
+  <p class="vorschlag-rolle">Nur nötig, um deine Brawler-Sicherheit dauerhaft zu speichern.</p>
+
+  <form method="post">
+    {% csrf_token %}
+    <label for="{{ form.username.id_for_label }}">Benutzername</label>
+    {{ form.username }}
+    <label for="{{ form.password.id_for_label }}">Passwort</label>
+    {{ form.password }}
+    {% if form.errors %}
+      <p class="fehler">Benutzername oder Passwort stimmt nicht.</p>
+    {% endif %}
+    <button type="submit">Anmelden</button>
+    <input type="hidden" name="next" value="{{ next }}">
+  </form>
+
+  <p class="hinweis">
+    Ohne Anmeldung funktioniert der Drafter vollständig — deine
+    Sicherheitswerte liegen dann nur in diesem Browser.
+    <a href="{% url 'drafter:draft' %}" style="color: var(--akzent)">Zurück zum Drafter</a>
+  </p>
+</main>
+{% endblock %}

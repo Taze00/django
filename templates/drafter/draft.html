@@ -1,0 +1,106 @@
+{% extends "drafter/basis.html" %}
+{% load static %}
+{% block titel %}Ranked Draft Coach{% endblock %}
+
+{% comment %}
+Die Seite wird EINMAL gerendert. Danach laeuft alles ueber
+static/drafter/js - ein Klick auf einen Pick laedt nichts neu, sondern
+schickt den Draftzustand an /draft/api/recommend/. Genau deshalb steht
+hier fast kein Inhalt, sondern nur das Geruest, das JavaScript fuellt.
+{% endcomment %}
+
+{% block inhalt %}
+<div class="hinweis-demo" role="status">
+  <strong>Demo-Daten.</strong> Alle Werte sind gepflegte Einschätzungen, keine
+  gemessenen Statistiken. Die Empfehlungslogik ist echt — die Zahlenbasis noch nicht.
+</div>
+
+<main class="drafter-raster" id="app">
+
+  <!-- ─── Steuerleiste ─────────────────────────────────────── -->
+  <section class="leiste" aria-label="Draft-Einstellungen">
+    <div class="feld">
+      <label for="modus">Modus</label>
+      <select id="modus"></select>
+    </div>
+    <div class="feld">
+      <label for="karte">Map</label>
+      <select id="karte"></select>
+    </div>
+    <div class="feld">
+      <label id="pickorder-label">First Pick</label>
+      <div class="schalter" role="group" aria-labelledby="pickorder-label">
+        <button type="button" data-firstpick="wir" class="ist-aktiv">Wir</button>
+        <button type="button" data-firstpick="gegner">Gegner</button>
+      </div>
+    </div>
+    <div class="feld feld--weit">
+      <label>Phase</label>
+      <div class="phase" id="phase">Ban-Phase</div>
+    </div>
+    <div class="feld">
+      <label>Datenlage</label>
+      <div class="datenlage" id="datenlage">—</div>
+    </div>
+    <button type="button" class="knopf-zuruecksetzen" id="zuruecksetzen">Draft zurücksetzen</button>
+  </section>
+
+  <!-- ─── Draft-Bereich ────────────────────────────────────── -->
+  <section class="draftbereich" aria-label="Draftzustand">
+    <div class="team team--gegner">
+      <h2>Gegner <span class="team-hinweis" id="gegner-hinweis"></span></h2>
+      <div class="slots" id="slots-gegner"></div>
+    </div>
+
+    <div class="bans">
+      <h2>Bans</h2>
+      <div class="slots slots--ban" id="slots-ban"></div>
+      <button type="button" class="knopf-klein" id="ban-fertig">Ban-Phase beenden</button>
+    </div>
+
+    <div class="team team--wir">
+      <h2>Unser Team <span class="team-hinweis" id="wir-hinweis"></span></h2>
+      <div class="slots" id="slots-wir"></div>
+    </div>
+
+    <div class="siegchance" id="siegchance"></div>
+  </section>
+
+  <!-- ─── Brawler-Auswahl ──────────────────────────────────── -->
+  <section class="auswahl" aria-label="Brawler auswählen">
+    <div class="auswahl-kopf">
+      <input type="search" id="suche" placeholder="Brawler suchen…" autocomplete="off"
+             aria-label="Brawler suchen">
+      <div class="rollenfilter" id="rollenfilter" role="group" aria-label="Nach Rolle filtern"></div>
+      <div class="ziel" id="ziel" aria-live="polite"></div>
+    </div>
+    <div class="gitter" id="gitter"></div>
+  </section>
+
+  <!-- ─── Empfehlungen ─────────────────────────────────────── -->
+  <aside class="panel" aria-label="Empfehlungen" aria-live="polite">
+    <div class="panel-inhalt" id="panel">
+      <p class="panel-leer">Modus und Map wählen — dann beginnt die Ban-Phase.</p>
+    </div>
+  </aside>
+
+</main>
+
+<!-- Detailfenster fuer den Klick auf eine Empfehlung -->
+<div class="modal" id="modal" hidden>
+  <div class="modal-kasten" role="dialog" aria-modal="true" aria-labelledby="modal-titel">
+    <button type="button" class="modal-schliessen" id="modal-schliessen" aria-label="Schließen">×</button>
+    <div id="modal-inhalt"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block skripte %}
+<script>
+  // Der einzige Wert, den das Skript vom Server braucht, bevor es den
+  // Katalog holt. Steht hier statt in einem Cookie-Leseversuch, weil
+  // Django das Token ohnehin ins Template rendert.
+  window.DRAFTER = { csrf: "{{ csrf_token }}" };
+</script>
+<script type="module" src="{% static 'drafter/js/main.js' %}?v=20260914-1"></script>
+{% endblock %}
