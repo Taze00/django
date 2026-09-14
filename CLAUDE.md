@@ -115,12 +115,13 @@ docker compose exec django-dev python manage.py collectstatic --noinput   # nur 
 docker compose restart django-dev
 ```
 
-**Vier Dinge, die man wissen muss, bevor man dort etwas ändert:**
+**Fünf Dinge, die man wissen muss, bevor man dort etwas ändert:**
 
 1. **`drafter/config.py` hält ALLE Zahlen.** Gewichte, Schwellen, Grenzen. Eine Zahl im Engine-Code ist unauffindbar — deshalb steht dort keine.
 2. **Jede Score-Komponente liefert [-1, +1].** Roh-Winrates (0–1) und Attribute (0–100) werden nie direkt addiert. Die Umrechnung auf 0–100 passiert genau einmal, in `Empfehlung.anzeige_score`.
 3. **Strafgewichte sind Beträge, nicht negative Zahlen.** Das Vorzeichen steckt im *Wert* der Komponente. Wären beide negativ, würde aus jeder Strafe ein Bonus — und das fällt beim Lesen nicht auf, weil die Zahlen einzeln richtig aussehen. Ein Test hält es fest.
-4. **`drafter/attributes.py` ist das einzige Vokabular.** Dieselben 32 Schlüssel beschreiben Brawler („was ich kann"), Maps („was hier zählt") und Teams („was uns fehlt"). Neue Eigenschaft nur dort eintragen — die Modelle validieren dagegen.
+4. **Verhaltenstests statt Platzierungstests.** `tests/test_modellverhalten.py` prüft Richtungen an den Score-Komponenten („gegen zwei Tanks muss der Anti-Tank-Beitrag *stärker* steigen als bei einem Kandidaten ohne Anti-Tank"), nie Ränge. Ein Platz hängt von allen Kandidaten ab — Tests darauf verleiten dazu, Gewichte zu drehen, bis ein Lieblingsbeispiel wieder oben steht.
+5. **`drafter/attributes.py` ist das einzige Vokabular.** Dieselben 32 Schlüssel beschreiben Brawler („was ich kann"), Maps („was hier zählt") und Teams („was uns fehlt"). Neue Eigenschaft nur dort eintragen — die Modelle validieren dagegen.
 
 **Anzeigetexte mit echten Umlauten, Kommentare in ASCII-Umschrift.** Die Engine erzeugt ihre Sätze aus Attributen; sie landen unverändert auf der Seite. „Flaechenkontrolle zaehlt" sieht dort falsch aus.
 
@@ -158,7 +159,7 @@ docker compose exec django-dev python manage.py test fitness --settings=meinproj
 ```
 docker compose exec django-dev python manage.py test drafter --settings=meinprojekt.settings_test
 ```
-93 Tests, ~30 s. **Vor jedem Dependency- oder Django-Upgrade beide laufen lassen** (zusammen 346).
+114 Tests, ~30 s. **Vor jedem Dependency- oder Django-Upgrade beide laufen lassen** (zusammen 367).
 
 > Frühere Fassungen dieser Datei nannten 134 Tests und „SQLite im Speicher". Beides stimmt nicht mehr bzw. stimmte nie: `settings_test` unterscheidet sich von `settings` **nur** im Passwort-Hasher, die Testdatenbank ist dieselbe Postgres-Instanz.
 

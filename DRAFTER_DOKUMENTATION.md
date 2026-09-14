@@ -133,6 +133,24 @@ Vorschlag auch dann 95 gäbe, wenn alle schlecht sind.
 | − Angreifbarkeit | Restlücken × Fähigkeit des Gegners, sie auszunutzen |
 | − Datenlage | `−(1 − Confidence)` |
 
+### Die Aufschlüsselung
+**Jede** Empfehlung trägt ihre vollständige Aufschlüsselung — nicht nur
+die Spitze. Sie kostet nichts extra: die Komponenten sind ohnehin
+gerechnet, sonst gäbe es keinen Score.
+
+Die elf Zeilen stehen in **fester Reihenfolge**
+(`config.KOMPONENTEN_REIHENFOLGE`), auch die mit Beitrag 0. Zwei Gründe:
+zwei Empfehlungen lassen sich nur vergleichen, wenn dieselben Zeilen an
+denselben Stellen stehen — und eine fehlende Zeile wäre nicht von einer
+Null zu unterscheiden. Dass „Counter" beim First Pick nichts beiträgt,
+ist eine Aussage; sie soll sichtbar sein.
+
+Jede Zeile nennt **Wert × Gewicht = Beitrag** und trägt ihre eigenen
+Begründungen mit. Ohne den Rohwert könnte man „schwache Komponente"
+nicht von „kleines Gewicht" unterscheiden. Die Summe der Beiträge ergibt
+exakt `Score − 50`; ein Test hält das fest, sonst wäre die
+Aufschlüsselung Dekoration.
+
 > ⚠️ **Alle Gewichte sind Beträge, auch die der Strafkomponenten.** Das
 > Vorzeichen steckt im *Wert*. Wären Gewicht und Wert negativ, würde aus
 > jeder Strafe ein Bonus — ein Fehler, der beim Lesen nicht auffällt,
@@ -264,11 +282,33 @@ Werten, die anderswo berechnet wurden. Das hat zwei erwünschte Folgen:
 2. Neue Brawler brauchen keine neuen Texte. Wer Attribute pflegt,
    bekommt die Sätze umsonst.
 
-Geliefert werden je Spieler: Rolle im Team, bis zu drei Aufgaben,
-„nicht deine Aufgabe", Warnungen, bevorzugtes Matchup und Build — und
-fürs Team: Win Condition, Matchup-Zuordnung (beste **Gesamtsumme** über
-alle sechs Permutationen, nicht das beste Einzelduell),
-Startpositionen als *Vorschlag* und ein Lane-Tausch-Plan.
+### Was der fertige Draft liefert
+
+**Je Spieler:** Rolle im Team · Hauptaufgabe · weitere Aufgaben ·
+„nicht deine Aufgabe" · bevorzugtes Matchup · zu vermeidendes Matchup ·
+Opening-Lane mit Begründung · Watch-outs · empfohlener Build.
+
+**Fürs Team:** Win Condition · Matchup-Zuordnung · Lane-Swap-Plan ·
+Team-Schwächen · Gefahren · Startpositionen · geschätzte Draft-Stärke ·
+Data Confidence.
+
+Zwei Dinge daran sind bewusst so gebaut:
+
+**Eine Zuordnung für alle.** Die Matchups entstehen einmal für das Team
+(beste **Gesamtsumme** über alle sechs Permutationen, nicht das beste
+Einzelduell) und werden dann an die Spielerkarten verteilt. Rechnete
+jeder Spieler sein bestes Matchup selbst aus, bekämen zwei denselben
+Gegner und der dritte gar keinen — der Teamplan würde etwas anderes
+sagen als die Karte daneben. Dasselbe gilt für die Lanes.
+
+**Team-Schwächen werden nach Ausnutzbarkeit sortiert.** Eine Lücke, die
+im gegnerischen Team niemand bespielen kann, ist im Draft keine — sie
+wird genannt, aber als das, was sie ist. Ausnutzbare Lücken stehen oben
+und nennen den Gegner, der sie bestraft.
+
+Ist ein Matchup nicht klar gewonnen, sagt der Coach das auch so
+(„das Matchup ist nicht geschenkt, halte es offen") statt eine
+Überlegenheit zu behaupten, die die Zahlen nicht hergeben.
 
 ---
 
@@ -311,9 +351,22 @@ Drafter schlichte Django-Views mit Session und CSRF.
 React-App mit, die Portfolio-Seiten sind Vanilla; eine dritte
 Werkzeugkette wäre unnötig.
 
-**Geschwindigkeit:** rund 30 ms und 17 Abfragen je Empfehlung. Der
-Datenraum lädt alles einmal vor, teure Auskünfte (Siegchance,
-Coach-Texte, Build) entstehen nur für die angezeigte Spitze.
+**Geschwindigkeit:** rund 40 ms und 14 Abfragen je Empfehlungsanfrage,
+Antwort ~33 KB — inklusive Aufschlüsselung, Coach-Texten und Build für
+alle acht angezeigten Empfehlungen.
+
+Drei Dinge halten das niedrig, und alle drei sind gegen dieselbe Falle
+gebaut (eine Abfrage je Kandidat statt einer für alle):
+- der **Datenraum** lädt Statistiken, Balanceänderungen und Patches
+  vorab (`prefetch_related` + `select_related`),
+- der **Ausrüstungskatalog** lädt Gadgets, Star Powers und Gears einmal
+  je Anfrage — die gegnerischen Gadgets sind für jeden Kandidaten
+  dieselben,
+- teure Auskünfte entstehen nur für das, was angezeigt wird.
+
+> Diese N+1-Fallen fallen im Direkttest **nicht** auf: ohne gesetzten
+> Patch überspringt die Engine die Patchgewichtung ganz. Gemessen wird
+> deshalb über die API, nicht über die Engine allein.
 
 ---
 
@@ -355,9 +408,34 @@ docker compose exec django-dev python manage.py test drafter \
     --settings=meinprojekt.settings_test
 ```
 
-93 Tests, rund 30 s. Sie laufen gegen den echten Demo-Datensatz statt
+114 Tests, rund 30 s. Sie laufen gegen den echten Demo-Datensatz statt
 gegen erfundene Testobjekte: der Seed ist Teil der Auslieferung, und mit
 handgebauten Miniaturbrawlern würden die Tests an ihm vorbeiprüfen.
+
+### Verhaltenstests statt Platzierungstests
+`tests/test_modellverhalten.py` prüft **keine Platzierungen**. Ein Platz
+hängt von allen zwanzig Kandidaten gleichzeitig ab, verschiebt sich bei
+jeder Attributänderung, und ein Fehlschlag sagt nicht, was kaputt ist.
+Schlimmer: solche Tests verleiten dazu, an den Gewichten zu drehen, bis
+ein Lieblingsbeispiel wieder oben steht — also genau zum Übertrainieren
+auf Einzelfälle.
+
+Geprüft wird stattdessen die **Richtung**, gemessen an den
+Score-Komponenten selbst, mit zwei Läufen derselben Engine und genau
+einem Unterschied:
+
+| Ändert sich die Lage so … | … muss das passieren |
+|---|---|
+| Gegner pickt zwei Tanks | Teambedarfs-Beitrag eines Anti-Tanks steigt — **und stärker** als der eines Brawlers ohne Anti-Tank |
+| Gegner pickt einen Thrower | Anti-Thrower gewinnt relativ gegen einen Kandidaten ohne diese Antwort |
+| Eigenes Team hat zwei Nahkämpfer | Abstand Reichweite ↔ weiterer Nahkämpfer wird größer |
+| Ein gleichartiger Pick mehr im Team | Redundanzstrafe wächst monoton |
+| Persönliche Sicherheit gesetzt | **nur** die persönliche Komponente ändert sich |
+
+Die relativen Vergleiche sind der Kern: gegen Tanks steigt der Bedarf
+für alle; die Aussage ist, dass er für den Anti-Tank *stärker* steigt.
+Ein absoluter Vergleich würde auch anschlagen, wenn sich nur das Niveau
+verschoben hätte.
 
 Abgedeckt sind unter anderem: gebannte/gepickte Brawler verschwinden aus
 den Vorschlägen, Anti-Tank steigt gegen Tanks, der dritte Tank wird
