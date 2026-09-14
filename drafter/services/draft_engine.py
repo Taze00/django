@@ -67,6 +67,22 @@ class DraftEngine:
             list(ctx.enemy_picks),
             anforderungen_mit_gegner(self.anforderungen, list(ctx.own_picks)),
         )
+        # Ausruestung wird erst geladen, wenn jemand nach Builds oder
+        # Warnungen fragt - eine reine Score-Abfrage braucht sie nicht.
+        self._katalog = None
+
+    @property
+    def katalog(self):
+        """Ausruestungskatalog der Anfrage, einmal geladen.
+
+        Die gegnerischen Gadgets sind fuer JEDEN Kandidaten dieselben -
+        ohne den Katalog fragt sie jede einzelne Empfehlung neu ab.
+        """
+        if self._katalog is None:
+            self._katalog = builds.Ausruestungskatalog(
+                list(self.raum.brawler) + list(self.ctx.enemy_picks)
+            )
+        return self._katalog
 
     def _anforderungen(self):
         """Was Map und Modus verlangen, als {key: 0-1}."""
@@ -78,8 +94,13 @@ class DraftEngine:
         return {}
 
     # --- Empfehlungen ---------------------------------------------------
-    def empfehlungen(self, anzahl=None, mit_details=3):
-        """Bewertete Kandidaten, bester zuerst."""
+    def empfehlungen(self, anzahl=None, mit_details=None):
+        """Bewertete Kandidaten, bester zuerst.
+
+        `mit_details=None` heisst: Coach-Texte und Build fuer alles, was
+        angezeigt wird. Die Score-Aufschluesselung haengt nicht daran -
+        die bekommt jede Empfehlung, weil sie ohnehin gerechnet ist.
+        """
         anzahl = anzahl or config.EMPFEHLUNGEN_ANZAHL
         kandidaten = self.raum.verfuegbare(self.ctx.gesperrte_ids)
         if not kandidaten:
@@ -146,6 +167,7 @@ class DraftEngine:
 
         ergebnisse.sort(key=lambda e: -e.score)
         spitze = ergebnisse[:anzahl]
+        details_bis = len(spitze) if mit_details is None else mit_details
 
         # Teure Auskuenfte nur fuer das, was angezeigt wird.
         provider = win_probability.hole_provider()
@@ -157,19 +179,23 @@ class DraftEngine:
             empfehlung.win_probability, _ = provider.vorhersage(
                 nachher, self.raum, analyse_nachher, self.gegner_analyse
             )
-            if rang < mit_details:
+            if rang < details_bis:
                 self._details_ergaenzen(empfehlung)
 
         return spitze
 
     def _details_ergaenzen(self, empfehlung):
         b = empfehlung.brawler
+        gegner = list(self.ctx.enemy_picks)
         empfehlung.aufgaben = coach.aufgaben(b, self.ctx, self.eigene_analyse, self.raum)
         empfehlung.vermeiden = coach.vermeiden(b, self.ctx, self.raum)
-        empfehlung.warnungen = coach.warnungen(b, self.ctx, self.raum)
-        bestes = coach.bestes_matchup(b, list(self.ctx.enemy_picks), self.raum)
+        empfehlung.warnungen = coach.warnungen(b, self.ctx, self.raum, self.katalog)
+        bestes = coach.bestes_matchup(b, gegner, self.raum)
         empfehlung.bevorzugte_matchups = [bestes] if bestes else []
-        empfehlung.build = builds.empfehlung(b, self.ctx)
+        empfehlung.zu_vermeidendes_matchup = coach.schlechtestes_matchup(
+            b, gegner, self.raum
+        )
+        empfehlung.build = builds.empfehlung(b, self.ctx, self.katalog)
 
     def detail(self, brawler):
         """Vollstaendige Bewertung eines einzelnen Brawlers.
@@ -209,13 +235,41 @@ class DraftEngine:
         }
 
     def endanalyse(self):
-        """Der Matchplan nach abgeschlossenem Draft."""
+        """Der Matchplan nach abgeschlossenem Draft.
+
+        Alles hier entsteht aus denselben Strukturen, die auch den Score
+        erzeugt haben - Attribute, Counter, Synergien, Teamluecken,
+        Build-Regeln. Kein eigener Textbestand: was der Coach sagt, kann
+        die Bewertung belegen, und was die Bewertung nicht hergibt, sagt
+        der Coach nicht.
+        """
         eigene = list(self.ctx.own_picks)
         gegner = list(self.ctx.enemy_picks)
 
+        # Lanes einmal fuer das Team bestimmen und danach je Spieler
+        # zuordnen - sonst koennte jeder Spieler eine andere Aufstellung
+        # angezeigt bekommen als der Teamplan darunter.
+        lanes = coach.lane_vorschlag(eigene, self.ctx)
+        lane_nach_slug = {eintrag["slug"]: eintrag for eintrag in lanes}
+
+        # Dasselbe fuer die Matchups: EINE abgestimmte Zuordnung fuer das
+        # Team, aus der sich jede Spielerkarte bedient. Rechnet jeder
+        # Spieler sein bestes Matchup selbst aus, bekommen zwei denselben
+        # Gegner und der dritte gar keinen.
+        matchups = coach.matchup_zuordnung(eigene, gegner, self.raum)
+        gegner_nach_slug = {b.slug: b for b in gegner}
+        zuweisung = {
+            eintrag["unser_slug"]: gegner_nach_slug.get(eintrag["gegner_slug"])
+            for eintrag in matchups
+        }
+
         spieler = []
         for b in eigene:
-            bestes = coach.bestes_matchup(b, gegner, self.raum)
+            zugewiesen = zuweisung.get(b.slug)
+            aufgaben = coach.aufgaben(
+                b, self.ctx, self.eigene_analyse, self.raum, zugewiesen
+            )
+            lane = lane_nach_slug.get(b.slug, {})
             spieler.append({
                 "name": b.name,
                 "slug": b.slug,
@@ -223,20 +277,39 @@ class DraftEngine:
                 "initialen": b.initialen,
                 "image_url": b.image_url,
                 "rolle": coach.rolle_im_team(b, self.eigene_analyse),
-                "aufgaben": coach.aufgaben(b, self.ctx, self.eigene_analyse, self.raum),
+                "hauptaufgabe": aufgaben[0] if aufgaben else None,
+                "aufgaben": aufgaben,
                 "vermeiden": coach.vermeiden(b, self.ctx, self.raum),
-                "warnungen": coach.warnungen(b, self.ctx, self.raum),
-                "bevorzugtes_matchup": bestes,
-                "build": builds.empfehlung(b, self.ctx),
+                "warnungen": coach.warnungen(b, self.ctx, self.raum, self.katalog),
+                # Aus der abgestimmten Zuordnung, nicht unabhaengig gesucht.
+                "bevorzugtes_matchup": next(
+                    (m for m in matchups if m["unser_slug"] == b.slug), None
+                ),
+                "zu_vermeidendes_matchup": coach.schlechtestes_matchup(
+                    b, gegner, self.raum
+                ),
+                "lane": lane.get("lane"),
+                "lane_grund": lane.get("grund"),
+                "build": builds.empfehlung(b, self.ctx, self.katalog),
             })
 
+        siegchance = self.siegchance()
         return {
-            "siegchance": self.siegchance(),
+            "siegchance": siegchance,
+            "datenlage": {
+                "nur_demo": self.raum.nur_demo,
+                "confidence": siegchance["confidence"],
+                "confidence_label": siegchance["confidence_label"],
+                "hinweis": confidence.erklaerung(
+                    siegchance["confidence"], self.raum, self.ctx
+                ),
+            },
             "team": spieler,
             "win_condition": coach.win_condition(self.ctx, self.eigene_analyse, self.raum),
+            "schwaechen": coach.team_schwaechen(self.ctx, self.eigene_analyse, self.raum),
             "gefahren": coach.gefahren(self.ctx, self.eigene_analyse, self.raum),
-            "lanes": coach.lane_vorschlag(eigene, self.ctx),
-            "matchups": coach.matchup_zuordnung(eigene, gegner, self.raum),
+            "lanes": lanes,
+            "matchups": matchups,
             "lane_tausch": coach.lane_tausch_plan(self.ctx, self.raum),
             "eigene_analyse": self.eigene_analyse.als_dict(),
             "gegner_analyse": self.gegner_analyse.als_dict(),
@@ -250,9 +323,11 @@ class DraftEngine:
         daten = {
             "draft_state": self.ctx.als_dict(),
             "hinweise": self.hinweise,
-            "empfehlungen": [
-                e.als_dict(ausfuehrlich=i < 3) for i, e in enumerate(empfehlungen)
-            ],
+            # Ausfuehrlich fuer alle angezeigten Empfehlungen: die
+            # Aufschluesselung, der Build und die Coach-Auskuenfte sind
+            # ohnehin berechnet (siehe empfehlungen()), und eine
+            # Empfehlung ohne Begruendung ist in diesem Werkzeug keine.
+            "empfehlungen": [e.als_dict(ausfuehrlich=True) for e in empfehlungen],
             "team_analyse": self.eigene_analyse.als_dict(),
             "gegner_analyse": self.gegner_analyse.als_dict(),
             "siegchance": self.siegchance(),

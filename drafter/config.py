@@ -72,6 +72,21 @@ KOMPONENTEN_LABEL = {
 # ihr GEWICHT ist wie bei allen anderen ein positiver Betrag.
 STRAF_KOMPONENTEN = (K_REDUNDANCY, K_WEAKNESS, K_UNCERTAINTY)
 
+# Reihenfolge der Aufschluesselung in der Oberflaeche.
+#
+# Bewusst fest und NICHT nach Betrag sortiert: die Tabelle soll bei
+# jedem Brawler dieselben Zeilen an denselben Stellen haben, sonst kann
+# man zwei Empfehlungen nicht vergleichen. Erst Bewertung, dann Strafen,
+# Datenlage zuletzt - sie bewertet die anderen Komponenten.
+#
+# Das ist reine Darstellung. Die Gewichte stehen unveraendert oben; an
+# dieser Liste zu drehen aendert nichts am Score.
+KOMPONENTEN_REIHENFOLGE = (
+    K_MAP_MODE, K_META, K_COUNTER, K_SYNERGY, K_TEAM_NEED,
+    K_DRAFT_POSITION, K_FLEXIBILITY, K_PERSONAL,
+    K_REDUNDANCY, K_WEAKNESS, K_UNCERTAINTY,
+)
+
 
 # =========================================================================
 # Gewichtungsprofile je Phase
