@@ -3,7 +3,7 @@
 > Die vollständige Erklärung zum Drafter unter `/draft/`. Die kompakte
 > Arbeitsreferenz steht in `CLAUDE.md`; diese Datei erklärt das *Warum*.
 >
-> **Stand:** September 2026 · MVP mit gekennzeichneten Demo-Daten
+> **Stand:** September 2026 · MVP mit gekennzeichneten Demo-Daten · Datenpipeline für echte Daten vorbereitet
 
 ---
 
@@ -39,9 +39,10 @@ zeigt deshalb nie „Confidence: Hoch", solange keine echten Daten
 vorliegen.
 
 Die **Empfehlungslogik ist vollständig und echt**. Was fehlt, ist die
-Zahlenbasis. Sobald Matchdaten existieren, treten sie neben die
-Demo-Zeilen — die Kontextfelder der Stat-Tabellen sind von Anfang an
-dafür gebaut, es braucht keine Migration der Wertespalten.
+Zahlenbasis. Die Pipeline, die sie liefern wird — Import, Deduplizierung,
+Aggregation, Provider — steht und ist getestet (§16–§19); sie läuft
+vollständig ohne API-Key auf gespeicherten Dateien. Sobald gemessene
+Statistiken existieren, schaltet die Engine automatisch darauf um.
 
 ---
 
@@ -50,36 +51,33 @@ dafür gebaut, es braucht keine Migration der Wertespalten.
 ```
 drafter/
 ├── attributes.py     ← das Vokabular (32 Eigenschaften, 6 Draftwerte, 9 Rollen)
-├── config.py         ← ALLE Stellschrauben (Gewichte, Schwellen, Grenzen)
+├── config.py         ← ALLE Stellschrauben (Gewichte, Schwellen, Pipeline)
 ├── seed_data.py      ← der Demo-Datensatz
-├── models/           ← Katalog, Maps, Patches, Statistiken, Builds, Nutzerwerte
-├── services/         ← die gesamte Logik, ein Thema je Datei
-│   ├── context.py         DraftContext — der Zustand als ein Objekt
-│   ├── scoring.py         der Score-Vertrag ([-1,+1]) und die Ergebnistypen
-│   ├── daten.py           lädt alle Statistiken in wenigen Abfragen
-│   ├── team_coverage.py   Teamprofil, Lücken, Redundanz  ← Herzstück
-│   ├── team_need.py       Bedarf, Redundanz, Angreifbarkeit als Komponenten
-│   ├── counters.py        Counter (gepflegt + Heuristik)
-│   ├── synergies.py       Synergie als Mehrwert, nicht als gemeinsame Winrate
-│   ├── map_fit.py         Passung zu Map und Modus
-│   ├── meta.py            aktuelle Stärke aus Statistiken
-│   ├── patch_weighting.py Zeit- und Patchabschlag, Bayes-Glättung
-│   ├── draft_position.py  Blind Pick vs. Last Pick
-│   ├── personal.py        persönliche Sicherheit (hart gedeckelt)
-│   ├── confidence.py      wie sicher ist sich das System
-│   ├── bans.py            Ban-Coach
-│   ├── builds.py          Gadget/Star Power/Gears aus Regeln
-│   ├── coach.py           aus Struktur werden Sätze
-│   ├── win_probability.py Provider-Interface + Heuristik
-│   ├── draft_engine.py    der Orchestrator — rechnet selbst nichts
-│   ├── brawl_api_client.py  Gerüst für die offizielle API
-│   └── providers/         MatchData / MetaData / BuildData
-├── views/            ← pages.py (3 Seiten) + api.py (5 Endpunkte)
-└── tests/            ← 93 Tests, ein Thema je Datei
+├── testdaten/        ← synthetische Match-Dateien (versioniert, klar markiert)
+├── models/
+│   ├── brawler.py, maps.py, patches.py, builds.py, prefs.py   Katalog und Nutzer
+│   ├── stats.py      ← VORAGGREGIERTE Statistiken (das Einzige, was die Engine sieht)
+│   └── matches.py    ← ROHDATEN: Lieferungen, Partien, Spieler, Bans
+├── services/
+│   ├── context.py, scoring.py, draft_engine.py     Engine
+│   ├── team_coverage.py, team_need.py, counters.py, synergies.py,
+│   │   map_fit.py, meta.py, draft_position.py, personal.py         Komponenten
+│   ├── confidence.py, win_probability.py, bans.py, builds.py, coach.py
+│   ├── patch_weighting.py   Zeit-/Patchgewicht, Bayes
+│   ├── daten.py             Datenraum: fragt den StatProvider, wählt je Kontext die beste Zeile
+│   ├── providers/           StatProvider + MatchProvider (§16)
+│   ├── ingest/              Fingerabdruck, Parser, Importer (§17)
+│   ├── aggregation/         Rohmatches → Statistiken (§18)
+│   └── brawl_api_client.py  HTTP-Hülle für die offizielle API
+├── management/commands/  seed_brawl_data, import_brawl_fixture,
+│                         aggregate_brawl_stats, rebuild_draft_stats
+├── views/                pages.py (3 Seiten) + api.py (5 Endpunkte)
+└── tests/                ein Thema je Datei
 ```
 
 Dazu außerhalb der App, der Projektkonvention folgend:
-`templates/drafter/` und `static/drafter/`.
+`templates/drafter/`, `static/drafter/` und `data/brawl_fixtures/`
+(gitignored — mitgeschnittene API-Antworten enthalten Spieler-Tags).
 
 ---
 
@@ -224,7 +222,7 @@ nicht sehen kann.**
 **Counter sind keine Winrates.** „Gale gewinnt 62 % gegen Bull" heißt
 nicht „Gale ist ein 62-%-Counter" — da stecken Map, Rang, Mitspieler und
 Patch mit drin. `CounterStat.advantage` ist die bereinigte Größe,
-`win_rate` behält die Rohmessung daneben. Gibt es keinen gepflegten
+`raw_rate` und `games` behalten die Rohmessung daneben. Gibt es keinen gepflegten
 Eintrag, greift eine Heuristik aus sechs Attributsignalen — und
 kennzeichnet ihre Gründe als „geschätzt".
 
@@ -408,7 +406,7 @@ docker compose exec django-dev python manage.py test drafter \
     --settings=meinprojekt.settings_test
 ```
 
-114 Tests, rund 30 s. Sie laufen gegen den echten Demo-Datensatz statt
+215 Tests, rund zwei Minuten. Sie laufen gegen den echten Demo-Datensatz statt
 gegen erfundene Testobjekte: der Seed ist Teil der Auslieferung, und mit
 handgebauten Miniaturbrawlern würden die Tests an ihm vorbeiprüfen.
 
@@ -447,39 +445,289 @@ abgewiesen.
 
 ---
 
-## 16. Die offizielle API — bewusst noch nicht angebunden
+## 16. Datenarchitektur
 
-`services/brawl_api_client.py` steht als Gerüst: Key ausschließlich aus
-der Umgebung (`BRAWL_STARS_API_KEY`), Ratenbegrenzung, Zeitlimits,
-saubere Fehlertypen, Tag-Normalisierung.
+### Zwei Rollen, streng getrennt
 
-**Er interpretiert bewusst keine Antwortfelder.** Es ist ungeprüft, ob
-die API historische Draft-Bans, Build-Daten oder die genaue
-Pick-Reihenfolge überhaupt liefert. Wer jetzt
-`antwort["battles"][0]["battle"]["teams"]` schreibt, erfindet eine
-Struktur und baut den Rest darauf. Die Auswertung entsteht, wenn eine
-echte Antwort vorliegt.
+```
+                    ┌─────────── Import (§17) ───────────┐   ┌──── Aggregation (§18) ────┐
+MatchProvider ──▶ Lieferung ──▶ RawPayload ──▶ Match/Spieler ──▶ Brawler-/Counter-/Synergie-/Build-Stats
+ · Fixture                     (unverändert)   (dedupliziert)                    │
+ · offizielle API                                                                 ▼
+                                                  StatProvider ──▶ Datenraum ──▶ DraftEngine
+                                                   · Demo                         (Coach, Builds, Bans)
+                                                   · gemessen / synthetisch
+                                                   · Momentaufnahme
+```
 
-> Nicht vergessen: Supercell bindet API-Keys an die **IP des abrufenden
-> Servers**. Ein Key, der lokal funktioniert, funktioniert auf dem
-> Server nicht automatisch.
+| Rolle | Liefert | Wer benutzt es | Methoden |
+|---|---|---|---|
+| `MatchProvider` | Rohmatches | nur der **Import** | `lieferungen()` |
+| `StatProvider` | voraggregierte Statistiken | nur die **Engine** | `brawler_stats` (Meta), `counter_stats`, `synergy_stats`, `build_stats` |
+
+**Die Engine liest nie Rohmatches.** Zwei Gründe: Eine Empfehlung hat rund
+50 ms, eine Aggregation über hunderttausende Partien nicht. Und Glättung,
+Zeit- und Patchgewichtung sollen an genau einer Stelle passieren — läse die
+Engine Rohdaten, entstünde daneben eine zweite, abweichende Statistik. Ein
+Test prüft auf SQL-Ebene, dass keine Empfehlung die Rohdaten-Tabellen berührt.
+
+### Die Provider
+
+| Provider | Rolle | Quelle |
+|---|---|---|
+| `DemoDataProvider` | Stat | gepflegte Werte (`demo` + `manual`) — die bisherigen Zahlen |
+| `DatenbankStatProvider(quellen)` | Stat | voraggregierte Zeilen genau dieser Quellen |
+| `SnapshotStatProvider` | Stat | feste Datensätze im Speicher (Tests, später Backtesting) |
+| `FixtureDataProvider` | Match | JSON-Dateien (§17) |
+| `OfficialBrawlAPIProvider` | Match | offizielle API — vorbereitet, **ohne** Parser (§19) |
+
+`providers/registry.py` entscheidet, welcher Stat-Provider gilt
+(`config.STAT_PROVIDER`, überschreibbar über `settings.DRAFTER_STAT_PROVIDER`):
+
+- **`auto`** (Standard): gemessene Statistiken, sobald es welche gibt, sonst Demo.
+  Synthetische Daten wählt `auto` **nie**.
+- `demo`, `gemessen`, `synthetisch`: ausdrücklich.
+
+Umgeschaltet wird **ganz, nicht zeilenweise**. Gibt es gemessene Daten, gelten
+nur diese; fehlt für einen Brawler eine Messung, fällt die Engine auf ihre
+Heuristik zurück und kennzeichnet das — statt eine ausgedachte Demo-Zahl neben
+eine gemessene zu stellen, die in der Aufschlüsselung gleich aussähe.
+
+### Datensätze statt Modellzeilen
+
+Provider liefern `StatRecord`s, keine ORM-Objekte. Sonst hinge die Engine an
+Feldnamen, Fremdschlüsseln und Lazy Loading der Datenbank, und jeder andere
+Provider müsste so tun, als wäre er eine Tabelle. Die Attributnamen entsprechen
+bewusst den Modellfeldern — die Umstellung hat keine Score-Komponente verändert.
+Nachgewiesen: dieselben Datensätze aus einem anderen Provider ergeben
+**identische** Empfehlungen und Matchpläne.
+
+### Was jede Statistik kennt
+
+| Feld | Bedeutung |
+|---|---|
+| `games`, `wins` | tatsächlich gezählt |
+| `sample_size` | effektive Stichprobe: Summe der Zeit- und Patchgewichte (≤ games) |
+| `raw_rate` | wins / games — ungeglättet, ungewichtet |
+| `adjusted_rate` | gewichtet und Bayes-geglättet — **damit wird gerechnet** |
+| `source` | demo · manual · fixture · synthetic · api · aggregated |
+| `window_start`, `window_end`, `window_label` | Zeitraum (7d, 30d, 90d, seit_patch) |
+| `patch`, `rank_pool`, `confidence` | Kontext und Belastbarkeit |
+
+`sample_size` neben `games` ist der Punkt: 30 Spiele von vor einem Rework haben
+`games=30`, aber kaum effektive Stichprobe — und genau das soll sichtbar sein.
+
+Nicht gemessen sind `demo`, `manual` und `synthetic`. Beruht ein Draft nur auf
+solchen Quellen, bleibt die Confidence bei höchstens 0,35.
+
+### Welche Zeile der Datenraum nimmt
+
+Zu einem Brawler kann es viele Zeilen geben. Jede Stufe schlägt alle folgenden:
+
+```
+Map (4) > Modus (2) > Rangbereich (0,5) > Zeitfenster (≤ 0,3) > Stichprobe (≤ 0,1)
+```
+
+Zeilen für eine *andere* Map oder einen *anderen* Modus sind nicht schwach
+passend, sondern falsch und werden verworfen. Fenster-Vorrang:
+`config.STAT_FENSTER_VORRANG` (seit Patch vor 7d vor 30d vor 90d).
 
 ---
 
-## 17. Nächste Schritte
+## 17. Rohdaten und Import
 
-1. **Matchsammler** (`collect_brawl_matches`) — sobald der Key da ist:
-   erst echte Antworten ansehen, dann Rohmatch-Modelle entwerfen.
-   Deduplikation über einen Fingerabdruck, Ratenlimit, `last_fetched_at`,
-   keine Endlosschleife.
-2. **Aggregator** (`aggregate_brawl_stats`) — Rohmatches → Stat-Tabellen,
-   mit Zeitfenstern, Rangpools und Bayes-Glättung. Nie live aggregieren.
-3. **Gelernte Gewichte** statt `config.PHASEN_GEWICHTE`.
-4. **Backtesting** — „was hätte das System an diesem Punkt empfohlen?"
-   Dabei dürfen **nur** Informationen einfließen, die zu diesem Zeitpunkt
-   im Draft bekannt waren; spätere Picks als Merkmal zu benutzen, wäre
-   Data Leakage und würde die Bewertung wertlos machen.
-5. **Brawler-Bilder** — `Brawler.image_url` ist vorbereitet. Die Artworks
-   gehören Supercell und liegen deshalb nicht im Repository; ohne URL
-   zeigt die Oberfläche eine eingefärbte Kachel mit Kürzel.
-6. **Mehr Brawler** — die Architektur trägt alle; gepflegt sind 20.
+```bash
+docker compose run --rm --no-deps -T django-dev python manage.py import_brawl_fixture PFAD [--trockenlauf]
+```
+
+### Das Austauschformat `drafter.match.v1`
+
+Eigenes, vollständig definiertes Format — kein erratenes API-Format.
+
+```json
+{
+  "format": "drafter.match.v1",
+  "herkunft": "synthetisch",
+  "matches": [{
+    "played_at": "2026-09-01T18:30:00Z",
+    "mode": "Gem Grab",  "map": "Hard Rock Mine",
+    "rank_pool": "masters",  "ranked": true,
+    "winner": "a",  "first_pick": "a",
+    "teams": {
+      "a": [{"brawler": "Gale", "player_tag": "#…", "pick_order": 1,
+             "build": {"gadget": "twister", "star_power": "freezing-snow", "gears": ["damage-gear"]}},
+            {"brawler": "Belle"}, {"brawler": "Max"}],
+      "b": [{"brawler": "Buster"}, {"brawler": "Gene"}, {"brawler": "Tick"}]
+    },
+    "bans": [{"brawler": "Mortis", "side": "a", "order": 1}],
+    "duration_seconds": 142,  "external_id": null
+  }]
+}
+```
+
+- **`herkunft` ist Pflicht:** `synthetisch` · `api-mitschnitt` · `manuell-erfasst`.
+  Ohne Herkunft wird nichts gespeichert — sonst läge eine Datei unbekannter
+  Echtheit in den Rohdaten.
+- `played_at` braucht eine Zeitzone; `winner` ist `a`, `b`, `draw` oder `null`.
+- **Unbekannte Felder bleiben leer, nie geraten.** Pick-Reihenfolge, First Pick,
+  Bans, Builds, Dauer und `external_id` sind optional.
+- Eine fehlerhafte Partie verwirft nicht die Datei — sie wird benannt und übersprungen.
+
+### Drei Garantien
+
+1. **Idempotent je Lieferung.** Dieselbe Datei zweimal einspielen ändert nichts —
+   erkannt am Inhaltshash (unabhängig von Einrückung und Schlüsselreihenfolge).
+2. **Dedupliziert je Partie.** Dieselbe Partie steht in bis zu sechs Battlelogs,
+   jeweils aus Sicht eines anderen Spielers. Der Fingerabdruck kanonisiert erst
+   die Seiten (Sieger, First Pick und Bans wandern mit) und nutzt dann einen
+   Zeit-Eimer von `MATCH_ZEITTOLERANZ_SEKUNDEN` samt Nachbar-Eimern. **Nicht** im
+   Fingerabdruck: das Ergebnis (Widersprüche sollen als Konflikt auffallen) und
+   Spieler-Tags (nicht jede Quelle liefert sie). Liefert die Quelle eine eigene
+   Partie-ID, gewinnt diese.
+3. **Nichts wird geraten.** Unbekannte Brawler und Maps bleiben mit ihrem
+   gelieferten Namen gespeichert (Fremdschlüssel leer) und stehen im Bericht.
+   Widersprüchliche Ergebnisse markieren die Partie als **Konflikt** — sie wird
+   nie gezählt. Unentschieden und unbekannte Ergebnisse ebenso.
+
+Die Rohantwort wird **unverändert** gespeichert (`RawPayload`). Ein später
+korrigierter Parser kann alte Lieferungen neu auswerten, ohne die Quelle erneut
+abzufragen.
+
+---
+
+## 18. Aggregation
+
+```bash
+docker compose run --rm --no-deps -T django-dev python manage.py aggregate_brawl_stats [--quelle gemessen|fixture|api|synthetisch] [--fenster …] [--rank-pool …] [--stichtag JJJJ-MM-TT]
+docker compose run --rm --no-deps -T django-dev python manage.py rebuild_draft_stats   [--quelle …]
+```
+
+Je **Quelle × Rangbereich × Zeitfenster** entstehen Statistiken für Brawler
+(Winrate, Pickrate, Banrate — global, je Modus, je Map), Counter, Synergien
+(global, je Modus) und Builds, sofern Partien Build-Angaben tragen.
+
+### Gewicht je Partie
+
+```
+gewicht = zeit_gewicht(Spieldatum) × patch_gewicht(je beteiligtem Brawler)
+```
+
+Wird Gale generft, verlieren **Gales** alte Partien an Gewicht — Belles in
+denselben Partien nicht. Counter und Synergien bekommen das Produkt beider.
+
+### Glättung mit dem besten verfügbaren Prior
+
+| Statistik | Prior | Maßstab für den Vorteil |
+|---|---|---|
+| Brawler global | 90-Tage-Rate (im 90-Tage-Fenster selbst: 50 %) | — |
+| Brawler je Modus / Map | Rate der gröberen Ebene | — |
+| **Counter** A gegen B | **log5**: pA(1−pB) / (pA(1−pB) + pB(1−pA)) | Abweichung davon |
+| **Synergie** A mit B | **additive Log-Odds**: logit P = logit pA + logit pB | Abweichung davon |
+| Build | Grundrate des Brawlers | Abweichung davon |
+
+Das beantwortet die beiden Denkfehler aus §7 mit Zahlen: ein Brawler, der gegen
+alle 80 % holt, ist gegen einen bestimmten Gegner **kein** Counter; zwei starke
+Brawler sind **keine** Synergie. Kleine Paar-Stichproben landen durch den Prior
+bei „kein besonderer Vorteil" statt bei einem Zufallswert. Beides ist als Test
+festgehalten.
+
+Kurze Fenster schrumpfen zur langfristigen Rate statt zu 50 %: zwei aktuelle
+Niederlagen kippen keine lange 80-%-Historie.
+
+### Weitere Regeln
+
+- **Banrate** nur über Partien, deren Quelle Bans kennt. Brawler, die nur
+  gebannt und nie gespielt wurden, bekommen eine Zeile mit Banrate und
+  **ohne** Winrate — sonst ginge ausgerechnet die aussagekräftigste
+  Ban-Information verloren.
+- **Synthetische Partien werden nie mit echten zusammen aggregiert**; Demo-
+  und gepflegte Daten werden weder gelesen noch geschrieben.
+- **Idempotent:** jeder Lauf ersetzt die Zeilen seines Kontexts vollständig.
+- `rebuild_draft_stats` ordnet zusätzlich allen Partien ihren Patch neu zu —
+  nötig, wenn ein Patch nachträglich eingetragen wird.
+- `--stichtag` aggregiert rückwirkend, „aktueller Patch" gilt dann relativ
+  dazu (Grundlage für Backtesting).
+
+### Build-Statistiken in der Empfehlung
+
+Gibt es sie, fließen sie in `builds.py` ein: Zuschlag
+`BUILD_STAT_EINFLUSS × Vorteil × Confidence` auf die regelbasierten Punkte, mit
+Begründung („in 500 vergleichbaren Partien über Gales Durchschnitt"). Nicht
+gemessene Build-Statistiken werden als solche benannt. Ohne Build-Statistik ist
+die Empfehlung **exakt** die regelbasierte.
+
+---
+
+## 19. Die offizielle API anschließen
+
+Heute: ohne `BRAWL_STARS_API_KEY` meldet sich `OfficialBrawlAPIProvider` als
+**nicht verfügbar**, ruft nichts ab und stürzt nicht ab. Mit Key speichert er
+Antworten unverändert und markiert sie als „noch nicht auswertbar" — für das
+offizielle Format ist **bewusst kein Parser registriert**.
+
+Der Weg zu echten Daten, ohne Engine, Coach oder Frontend anzufassen:
+
+1. **Key setzen** in der `.env` (`BRAWL_STARS_API_KEY=…`). Supercell bindet Keys
+   an die **IP des abrufenden Servers**.
+2. **Antworten mitschneiden** — der einzige Schritt, der das Netz braucht:
+   ```python
+   from drafter import config
+   from drafter.services.providers.official_api import OfficialBrawlAPIProvider
+   OfficialBrawlAPIProvider().rohantwort_sichern("#SPIELERTAG", config.FIXTURE_VERZEICHNIS)
+   ```
+   Die Datei enthält die Antwort **unverändert** unter `"antwort"`, in einer
+   Hülle aus ausschließlich eigenen Schlüsseln.
+3. **Dateien ansehen** und die tatsächliche Struktur dokumentieren: Gibt es eine
+   Partie-ID? Wie genau stimmen Zeitstempel zwischen Spielern überein? Stehen
+   Ranked-Bans, Pick-Reihenfolge, Builds, Rangangaben darin? (§20)
+4. **Parser schreiben** — `parse_offizieller_battlelog(daten) -> ParseErgebnis`
+   in `services/ingest/parser.py`, getestet gegen genau diese Dateien — und
+   registrieren:
+   ```python
+   PARSER[FORMAT_OFFIZIELLER_BATTLELOG] = parse_offizieller_battlelog
+   ```
+   Der Parser übersetzt in `MatchRecord`s mit **perspektivfreien** Seiten a/b
+   und lässt alles leer, was die Antwort nicht enthält.
+5. **Importieren und aggregieren** — `import_brawl_fixture`, dann
+   `aggregate_brawl_stats --quelle fixture`. Ab jetzt nimmt `auto` die
+   gemessenen Statistiken, und die Oberfläche hebt den Demo-Hinweis auf.
+6. Später: Crawler (Ranglisten → Battlelogs → neu entdeckte Spieler), mit
+   Ratenlimit, `last_fetched_at` und Priorität — als weiterer `MatchProvider`,
+   ohne dass sich Import oder Aggregation ändern.
+
+---
+
+## 20. Offene Datenfragen
+
+Bewusst **nicht** beantwortet, weil sie nur echte Antworten beantworten können:
+
+| Frage | Warum sie zählt | Wo es hängt |
+|---|---|---|
+| Welche Felder hat eine Battlelog-Antwort, und was bedeuten sie? | Grundlage des Parsers | §19 Schritt 3 |
+| Gibt es eine eindeutige Partie-ID? | sonst Rekonstruktion per Fingerabdruck | `fingerprint.py` |
+| Wie genau stimmen Zeitstempel derselben Partie überein? | Toleranz `MATCH_ZEITTOLERANZ_SEKUNDEN` (60 s) ist geschätzt | `config.py` |
+| Liefert die API Ranked-**Bans**? Die **Pick-Reihenfolge**? First Pick? | ohne sie keine Banrate, keine gelernten Draft-Positionen | Aggregation zählt nur Vorhandenes |
+| Liefert sie **Builds** historischer Partien? | sonst bleibt `BuildStat` leer | Build-Empfehlung läuft weiter auf Regeln |
+| Wie ist der **Rangbereich** einer Partie erkennbar? | Rang-Pools (Legendary+, Masters, Pro) | `Match.rank_pool` |
+| Heißen Maps/Modi/Brawler in der API wie im Katalog? | sonst unbekannt im Import-Bericht; ggf. Aliasliste nötig | `katalog_schluessel()` |
+| Wie viele Partien sind realistisch? | Paarzeilen wachsen quadratisch mit Brawlern × Ebenen × Fenstern × Pools — bei ~90 Brawlern Hunderttausende Zeilen; ggf. Mindeststichprobe für Paare | `aggregator.py` |
+| Gewichtete Kombination der Rang-Pools (`RANG_POOL_GEWICHT`)? | derzeit je Pool getrennt aggregiert, die Gewichte werden noch nicht benutzt | `config.py` |
+| Counter in beide Richtungen gemessen | `counters.vorteil` zieht die Gegenrichtung mit Faktor 0,8 ab; gemessene Counter sind symmetrisch, ein Matchup zählt dann effektiv 1,8-fach. Vor dem Umstieg prüfen — **nicht** jetzt an Demo-Daten tunen | `counters.py` |
+
+---
+
+## 21. Nächste Schritte
+
+1. **Echte Antworten mitschneiden und den Parser schreiben** (§19).
+2. **Crawler** als weiterer `MatchProvider`, mit Ratenlimit und Deduplizierung
+   über den bestehenden Import.
+3. **Aggregation planen** (Cron, später Celery Beat) — nie live aggregieren.
+4. **Gelernte Gewichte** statt `config.PHASEN_GEWICHTE`, sobald genug saubere
+   Partien vorliegen.
+5. **Backtesting** mit `--stichtag` und `SnapshotStatProvider`: „was hätte das
+   System an diesem Punkt empfohlen?" Dabei dürfen **nur** Informationen
+   einfließen, die zu diesem Zeitpunkt im Draft bekannt waren — spätere Picks
+   als Merkmal zu benutzen wäre Data Leakage.
+6. **Brawler-Bilder** — `Brawler.image_url` ist vorbereitet; die Artworks
+   gehören Supercell und liegen deshalb nicht im Repository.
+7. **Mehr Brawler** — die Architektur trägt alle; gepflegt sind 20.

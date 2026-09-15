@@ -115,17 +115,27 @@ docker compose exec django-dev python manage.py collectstatic --noinput   # nur 
 docker compose restart django-dev
 ```
 
-**Fünf Dinge, die man wissen muss, bevor man dort etwas ändert:**
+**Sieben Dinge, die man wissen muss, bevor man dort etwas ändert:**
 
 1. **`drafter/config.py` hält ALLE Zahlen.** Gewichte, Schwellen, Grenzen. Eine Zahl im Engine-Code ist unauffindbar — deshalb steht dort keine.
 2. **Jede Score-Komponente liefert [-1, +1].** Roh-Winrates (0–1) und Attribute (0–100) werden nie direkt addiert. Die Umrechnung auf 0–100 passiert genau einmal, in `Empfehlung.anzeige_score`.
 3. **Strafgewichte sind Beträge, nicht negative Zahlen.** Das Vorzeichen steckt im *Wert* der Komponente. Wären beide negativ, würde aus jeder Strafe ein Bonus — und das fällt beim Lesen nicht auf, weil die Zahlen einzeln richtig aussehen. Ein Test hält es fest.
 4. **Verhaltenstests statt Platzierungstests.** `tests/test_modellverhalten.py` prüft Richtungen an den Score-Komponenten („gegen zwei Tanks muss der Anti-Tank-Beitrag *stärker* steigen als bei einem Kandidaten ohne Anti-Tank"), nie Ränge. Ein Platz hängt von allen Kandidaten ab — Tests darauf verleiten dazu, Gewichte zu drehen, bis ein Lieblingsbeispiel wieder oben steht.
-5. **`drafter/attributes.py` ist das einzige Vokabular.** Dieselben 32 Schlüssel beschreiben Brawler („was ich kann"), Maps („was hier zählt") und Teams („was uns fehlt"). Neue Eigenschaft nur dort eintragen — die Modelle validieren dagegen.
+5. **Die Engine liest nie Rohmatches.** Statistiken kommen ausschließlich über einen `StatProvider` (`services/providers/registry.py`, Standard `auto`: gemessen wenn vorhanden, sonst Demo, synthetisch nie). Eine neue Datenquelle ist ein neuer Provider bzw. Parser — keine Änderung an Engine, Coach oder Frontend. Rohdaten (`models/matches.py`) und Statistiken (`models/stats.py`) sind getrennte Tabellen; dazwischen liegt die Aggregation.
+6. **Keine API-Felder erfinden.** Für die offizielle API ist bewusst kein Parser registriert. Erst echte Antworten mitschneiden (`OfficialBrawlAPIProvider.rohantwort_sichern`), ansehen, dann parsen — Weg und offene Fragen in `DRAFTER_DOKUMENTATION.md` §19–§20.
+7. **`drafter/attributes.py` ist das einzige Vokabular.** Dieselben 32 Schlüssel beschreiben Brawler („was ich kann"), Maps („was hier zählt") und Teams („was uns fehlt"). Neue Eigenschaft nur dort eintragen — die Modelle validieren dagegen.
 
 **Anzeigetexte mit echten Umlauten, Kommentare in ASCII-Umschrift.** Die Engine erzeugt ihre Sätze aus Attributen; sie landen unverändert auf der Seite. „Flaechenkontrolle zaehlt" sieht dort falsch aus.
 
 **Demo-Daten:** Alles ist mit `source="demo"` gekennzeichnet, die Confidence dadurch auf 0,35 gedeckelt, und die Oberfläche weist oben darauf hin. `python manage.py seed_brawl_data [--reset]` legt sie an (idempotent; `--reset` löscht nur Demo-Zeilen, keine manuell gepflegten).
+
+**Datenpipeline** (läuft komplett ohne API-Key):
+```
+python manage.py import_brawl_fixture PFAD            # Rohdaten: idempotent, dedupliziert
+python manage.py aggregate_brawl_stats --quelle …     # Statistiken: gemessen | fixture | api | synthetisch
+python manage.py rebuild_draft_stats --quelle …       # Patches neu zuordnen + alles neu aggregieren
+```
+Synthetische Testpartien (`drafter/testdaten/`) landen als `source="synthetic"` und werden nie mit echten gemischt. Mitgeschnittene API-Antworten gehören nach `data/brawl_fixtures/` (gitignored, enthalten Spieler-Tags).
 
 Volle Erklärung: `DRAFTER_DOKUMENTATION.md`.
 
@@ -159,7 +169,7 @@ docker compose exec django-dev python manage.py test fitness --settings=meinproj
 ```
 docker compose exec django-dev python manage.py test drafter --settings=meinprojekt.settings_test
 ```
-114 Tests, ~30 s. **Vor jedem Dependency- oder Django-Upgrade beide laufen lassen** (zusammen 367).
+215 Tests, ~2 min. **Vor jedem Dependency- oder Django-Upgrade beide laufen lassen** (zusammen 468). Nie zwei Testläufe gleichzeitig — beide legen `test_postgres` an.
 
 > Frühere Fassungen dieser Datei nannten 134 Tests und „SQLite im Speicher". Beides stimmt nicht mehr bzw. stimmte nie: `settings_test` unterscheidet sich von `settings` **nur** im Passwort-Hasher, die Testdatenbank ist dieselbe Postgres-Instanz.
 
