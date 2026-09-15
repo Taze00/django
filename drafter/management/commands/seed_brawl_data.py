@@ -151,7 +151,7 @@ class Command(BaseCommand):
             if not b:
                 continue
             stat = BrawlerStat(
-                brawler=b, patch=patch, win_rate=winrate, confidence=confidence,
+                brawler=b, patch=patch, adjusted_rate=winrate, confidence=confidence,
                 source=Datenquelle.DEMO, games=0,
             )
             # update_or_create geht hier nicht: context_key entsteht erst

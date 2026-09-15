@@ -32,9 +32,6 @@ class BrawlerStat(StatBasis):
         "drafter.Brawler", on_delete=models.CASCADE, related_name="stats"
     )
 
-    # 0-1. Bei aggregierten Daten das Bayes-geglaettete Ergebnis, bei
-    # Demo-Daten die gepflegte Einschaetzung.
-    win_rate = models.FloatField(default=0.5)
     pick_rate = models.FloatField(default=0.0, help_text="0-1, Anteil der Drafts")
     ban_rate = models.FloatField(default=0.0, help_text="0-1")
 
@@ -50,7 +47,8 @@ class BrawlerStat(StatBasis):
 
     def __str__(self):
         wo = self.brawl_map or self.game_mode or "allgemein"
-        return f"{self.brawler} @ {wo}: {self.win_rate:.0%}"
+        rate = f"{self.adjusted_rate:.0%}" if self.adjusted_rate is not None else "?"
+        return f"{self.brawler} @ {wo}: {rate}"
 
     @property
     def staerke(self):
@@ -60,7 +58,8 @@ class BrawlerStat(StatBasis):
         die Scoring-Engine rechnet. Winrates direkt zu addieren waere der
         Fehler, den config.py ausdruecklich verbietet.
         """
-        return max(-1.0, min(1.0, (self.win_rate - 0.5) * 2))
+        rate = self.adjusted_rate if self.adjusted_rate is not None else 0.5
+        return max(-1.0, min(1.0, (rate - 0.5) * 2))
 
 
 class CounterStat(StatBasis):
@@ -70,7 +69,7 @@ class CounterStat(StatBasis):
     keine Winrate. Grund steht in der Aufgabenstellung und ist wichtig:
     eine gemessene 62-%-Winrate ist kein 62-%-Counter, weil Map, Rang,
     Mitspieler und Patch mitreden. Der Vorteil ist die bereinigte
-    Groesse, `win_rate` und `games` behalten die Rohmessung daneben.
+    Groesse, `raw_rate` und `games` behalten die Rohmessung daneben.
 
     Die Beziehung ist **nicht** automatisch symmetrisch: der
     Gegenvorteil wird als eigene Zeile gepflegt, sonst kann man
@@ -87,7 +86,6 @@ class CounterStat(StatBasis):
     advantage = models.FloatField(
         default=0.0, help_text="-1 bis +1. Positiv = brawler ist im Vorteil."
     )
-    win_rate = models.FloatField(null=True, blank=True, help_text="Rohmessung, falls vorhanden")
     reason = models.CharField(
         max_length=200, blank=True,
         help_text="Warum - wird im Coach-Text zitiert, z.B. 'schiebt ihn aus der Reichweite'",
@@ -136,7 +134,6 @@ class SynergyStat(StatBasis):
     synergy = models.FloatField(
         default=0.0, help_text="-1 bis +1. Positiv = mehr als die Summe der Teile."
     )
-    win_rate = models.FloatField(null=True, blank=True, help_text="Gemeinsame Rohwinrate")
     reason = models.CharField(max_length=200, blank=True)
 
     class Meta:
@@ -162,3 +159,46 @@ class SynergyStat(StatBasis):
         if self.brawler_a_id and self.brawler_b_id and self.brawler_a_id > self.brawler_b_id:
             self.brawler_a_id, self.brawler_b_id = self.brawler_b_id, self.brawler_a_id
         super().save(*args, **kwargs)
+
+
+class BuildStat(StatBasis):
+    """Wie sich ein Ausruestungsgegenstand in gespielten Matches bewaehrt.
+
+    Bleibt leer, solange keine Quelle Builds liefert - und ob die
+    offizielle API das fuer historische Matches tut, ist ungeprueft. Die
+    Build-Empfehlung kommt dann weiter aus den gepflegten Regeln.
+
+    `item_slug` ist immer gesetzt, `item` nur, wenn der Gegenstand im
+    eigenen Katalog steht. So geht ein Gegenstand, den eine Quelle
+    meldet, der Katalog aber (noch) nicht kennt, nicht verloren.
+    """
+
+    brawler = models.ForeignKey(
+        "drafter.Brawler", on_delete=models.CASCADE, related_name="build_stats"
+    )
+    item = models.ForeignKey(
+        "drafter.BrawlerItem", on_delete=models.SET_NULL,
+        null=True, blank=True, related_name="stats",
+    )
+    item_kind = models.CharField(max_length=20)
+    item_slug = models.SlugField(max_length=90)
+
+    # Vorteil gegenueber der Grundleistung des Brawlers im selben Kontext,
+    # -1 bis +1. Nicht die Winrate selbst: ein Gadget, das auf einem
+    # starken Brawler 55 % holt, ist schlechter als eines, das auf einem
+    # schwachen 52 % holt.
+    advantage = models.FloatField(default=0.0)
+
+    class Meta:
+        verbose_name = "Build-Statistik"
+        verbose_name_plural = "Build-Statistiken"
+        indexes = [models.Index(fields=["brawler", "item_kind"])]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["brawler", "item_kind", "item_slug", "context_key"],
+                name="drafter_buildstat_eindeutig",
+            ),
+        ]
+
+    def __str__(self):
+        return f"{self.brawler} {self.item_kind}:{self.item_slug} {self.advantage:+.2f}"

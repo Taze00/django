@@ -13,7 +13,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 
 from drafter.models import (
-    Brawler, BrawlerBalanceChange, BrawlerItem, BrawlerStat, BrawlMap,
+    Brawler, BrawlerBalanceChange, BrawlerItem, BrawlerStat, BrawlMap, BuildStat,
     BuildRule, CounterStat, Datenquelle, GameMode, Patch, SynergyStat,
     UserBrawlerPreference,
 )
@@ -124,8 +124,11 @@ class BalanceChangeAdmin(admin.ModelAdmin):
 
 @admin.register(BrawlerStat)
 class BrawlerStatAdmin(admin.ModelAdmin):
-    list_display = ("brawler", "kontext", "win_rate", "games", "confidence", "quelle")
-    list_filter = ("rank_pool", "game_mode", "patch", QuelleFilter)
+    list_display = (
+        "brawler", "kontext", "window_label", "adjusted_rate", "raw_rate",
+        "games", "sample_size", "confidence", "quelle",
+    )
+    list_filter = ("rank_pool", "window_label", "game_mode", "patch", QuelleFilter)
     search_fields = ("brawler__name",)
     autocomplete_fields = ("brawler",)
     readonly_fields = ("context_key", "created_at", "updated_at")
@@ -141,7 +144,7 @@ class BrawlerStatAdmin(admin.ModelAdmin):
 
 @admin.register(CounterStat)
 class CounterStatAdmin(admin.ModelAdmin):
-    list_display = ("brawler", "enemy", "advantage", "reason", "quelle")
+    list_display = ("brawler", "enemy", "advantage", "games", "confidence", "reason", "quelle")
     list_filter = ("rank_pool", "game_mode", QuelleFilter)
     search_fields = ("brawler__name", "enemy__name", "reason")
     autocomplete_fields = ("brawler", "enemy")
@@ -154,10 +157,26 @@ class CounterStatAdmin(admin.ModelAdmin):
 
 @admin.register(SynergyStat)
 class SynergyStatAdmin(admin.ModelAdmin):
-    list_display = ("brawler_a", "brawler_b", "synergy", "reason", "quelle")
+    list_display = ("brawler_a", "brawler_b", "synergy", "games", "confidence", "reason", "quelle")
     list_filter = ("rank_pool", "game_mode", QuelleFilter)
     search_fields = ("brawler_a__name", "brawler_b__name", "reason")
     autocomplete_fields = ("brawler_a", "brawler_b")
+    readonly_fields = ("context_key",)
+
+    @admin.display(description="Quelle")
+    def quelle(self, objekt):
+        return objekt.get_source_display()
+
+
+@admin.register(BuildStat)
+class BuildStatAdmin(admin.ModelAdmin):
+    list_display = (
+        "brawler", "item_kind", "item_slug", "advantage", "adjusted_rate",
+        "games", "sample_size", "confidence", "window_label", "quelle",
+    )
+    list_filter = ("item_kind", "rank_pool", "window_label", QuelleFilter)
+    search_fields = ("brawler__name", "item_slug")
+    autocomplete_fields = ("brawler", "item")
     readonly_fields = ("context_key",)
 
     @admin.display(description="Quelle")

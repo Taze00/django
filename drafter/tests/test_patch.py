@@ -75,7 +75,7 @@ class PatchgewichtTest(DrafterTest):
 
     def test_veraenderter_brawler_verliert_meta_gewicht(self):
         stat = BrawlerStat.objects.create(
-            brawler=self.gale, patch=self.alt, win_rate=0.60, confidence=0.8,
+            brawler=self.gale, patch=self.alt, adjusted_rate=0.60, confidence=0.8,
             window_end=date.today(),
         )
         ohne = statistik_gewicht(stat, self.gale, self.neu)

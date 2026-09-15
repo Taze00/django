@@ -70,7 +70,9 @@ def empfehlungen(ctx, raum, anzahl=None):
         roh["map_strength"][b.id] = roh_passung(b, anforderungen)
 
         stat = raum.stat(b)
-        roh["meta_strength"][b.id] = stat.win_rate if stat else 0.5
+        roh["meta_strength"][b.id] = (
+            stat.adjusted_rate if stat and stat.adjusted_rate is not None else 0.5
+        )
 
         # Was ihn in der gegnerischen Pickposition gefaehrlich macht.
         if gegner_hat_first:

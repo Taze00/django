@@ -19,7 +19,9 @@ def komponenten_fuer_pool(kandidaten, raum, patch=None):
     for b in kandidaten:
         komp = Komponente(key=config.K_META)
         stat = raum.stat(b)
-        if not stat:
+        # Eine Zeile ohne geglaettete Rate ist keine Auskunft - dann gilt
+        # dasselbe wie ohne Zeile: Wert 0, niedrige Confidence.
+        if not stat or stat.adjusted_rate is None:
             komp.confidence = 0.1
             ergebnis[b.id] = komp
             continue
@@ -28,15 +30,20 @@ def komponenten_fuer_pool(kandidaten, raum, patch=None):
         komp.wert = stat.staerke * gewicht
         komp.confidence = stat.confidence * gewicht
 
-        if stat.win_rate >= 0.55 and gewicht > 0.5:
+        rate = stat.adjusted_rate
+        quelle = "demo" if stat.is_demo else "daten"
+        # Bei gemessenen Daten die Stichprobe mitnennen: "58 %" aus 40
+        # Spielen und aus 40 000 Spielen sind verschiedene Aussagen.
+        umfang = f", {stat.games} Spiele" if stat.games else ""
+        if rate >= 0.55 and gewicht > 0.5:
             komp.gruende.append(Grund(
-                text=f"läuft im aktuellen Patch stark ({stat.win_rate:.0%} Siegquote)",
-                positiv=True, staerke=0.55, quelle="demo" if stat.is_demo else "daten",
+                text=f"läuft im aktuellen Patch stark ({rate:.0%} Siegquote{umfang})",
+                positiv=True, staerke=0.55, quelle=quelle,
             ))
-        elif stat.win_rate <= 0.45 and gewicht > 0.5:
+        elif rate <= 0.45 and gewicht > 0.5:
             komp.gruende.append(Grund(
-                text=f"läuft derzeit schwach ({stat.win_rate:.0%} Siegquote)",
-                positiv=False, staerke=0.5, quelle="demo" if stat.is_demo else "daten",
+                text=f"läuft derzeit schwach ({rate:.0%} Siegquote{umfang})",
+                positiv=False, staerke=0.5, quelle=quelle,
             ))
         if gewicht < 0.5:
             komp.gruende.append(Grund(
