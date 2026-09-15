@@ -131,7 +131,7 @@ docker compose restart django-dev
 3. **Strafgewichte sind Beträge, nicht negative Zahlen.** Das Vorzeichen steckt im *Wert* der Komponente. Wären beide negativ, würde aus jeder Strafe ein Bonus — und das fällt beim Lesen nicht auf, weil die Zahlen einzeln richtig aussehen. Ein Test hält es fest.
 4. **Verhaltenstests statt Platzierungstests.** `tests/test_modellverhalten.py` prüft Richtungen an den Score-Komponenten („gegen zwei Tanks muss der Anti-Tank-Beitrag *stärker* steigen als bei einem Kandidaten ohne Anti-Tank"), nie Ränge. Ein Platz hängt von allen Kandidaten ab — Tests darauf verleiten dazu, Gewichte zu drehen, bis ein Lieblingsbeispiel wieder oben steht.
 5. **Die Engine liest nie Rohmatches.** Statistiken kommen ausschließlich über einen `StatProvider` (`services/providers/registry.py`, Standard `auto`: gemessen wenn vorhanden, sonst Demo, synthetisch nie). Eine neue Datenquelle ist ein neuer Provider bzw. Parser — keine Änderung an Engine, Coach oder Frontend. Rohdaten (`models/matches.py`) und Statistiken (`models/stats.py`) sind getrennte Tabellen; dazwischen liegt die Aggregation.
-6. **Keine API-Felder erfinden.** Für die offizielle API ist bewusst kein Parser registriert. Erst echte Antworten mitschneiden (`OfficialBrawlAPIProvider.rohantwort_sichern`), ansehen, dann parsen — Weg und offene Fragen in `DRAFTER_DOKUMENTATION.md` §19–§20.
+6. **Keine API-Felder erfinden.** `parse_offizieller_battlelog` liest nur Felder, die in echten Antworten beobachtet wurden (anonymisiert: `drafter/testdaten/offizieller_battlelog_anonymisiert.json`). Neues Feld? Erst in einer echten Antwort nachweisen, dann parsen. Fallen: `battle.type == "ranked"` ist die **Trophäen**-Rangliste, Ranked heißt `soloRanked`; `result` gilt aus Sicht des abgefragten Spielers, der auch in `teams[1]` stehen kann; es gibt keine Partie-ID, keine Bans, keine Picks, keine Builds. Details in `DRAFTER_DOKUMENTATION.md` §19–§20.
 7. **Gemessene Counter zählen genau einmal.** Aus Partien berechnete Counter (`measured_counter_advantage`) sind die Abweichung von der log5-Erwartung, liegen je Paar nur in einer Richtung vor (kleinere Brawler-ID zuerst, per DB-Constraint erzwungen) und die Gegenrichtung ist ihr Negativ. Der 0,8-Abzug der Gegenrichtung gilt **nur** für gepflegte (`manual_counter_score`) und heuristische Counter — auf gemessene angewandt, zählte dasselbe Matchup 1,8-fach. Zuordnung beim Import: Katalog-`external_id` vor Namen, Partie-ID vor Zeittoleranz.
 8. **`drafter/attributes.py` ist das einzige Vokabular.** Dieselben 32 Schlüssel beschreiben Brawler („was ich kann"), Maps („was hier zählt") und Teams („was uns fehlt"). Neue Eigenschaft nur dort eintragen — die Modelle validieren dagegen.
 
@@ -179,7 +179,7 @@ docker compose run --rm --no-deps -T django-dev python manage.py test fitness --
 ```
 docker compose run --rm --no-deps -T django-dev python manage.py test drafter --settings=meinprojekt.settings_test
 ```
-256 Tests, ~2 min. **Vor jedem Dependency- oder Django-Upgrade beide laufen lassen** (zusammen 509). Nie zwei Testläufe gleichzeitig — beide legen `test_postgres` an.
+277 Tests, ~2,5 min. **Vor jedem Dependency- oder Django-Upgrade beide laufen lassen** (zusammen 530). Nie zwei Testläufe gleichzeitig — beide legen `test_postgres` an.
 
 > Frühere Fassungen dieser Datei nannten 134 Tests und „SQLite im Speicher". Beides stimmt nicht mehr bzw. stimmte nie: `settings_test` unterscheidet sich von `settings` **nur** im Passwort-Hasher, die Testdatenbank ist dieselbe Postgres-Instanz.
 

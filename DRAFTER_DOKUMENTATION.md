@@ -781,43 +781,104 @@ ausdrücklich gewünschten Pfade `/players/{playerTag}`,
 eingebaut**, bis ihre Pfade aus der Spezifikation vorliegen.
 
 
-Heute: ohne `BRAWL_STARS_API_KEY` meldet sich `OfficialBrawlAPIProvider` als
-**nicht verfügbar**, ruft nichts ab und stürzt nicht ab. Mit Key speichert er
-Antworten unverändert und markiert sie als „noch nicht auswertbar" — für das
-offizielle Format ist **bewusst kein Parser registriert**.
+### Was die echten Antworten enthalten (Mitschnitt 2026-09-15)
 
-Der Weg zu echten Daten, ohne Engine, Coach oder Frontend anzufassen:
+Ausgewertet wurden drei Antworten: `/brawlers`, `/players/{tag}` und
+`/players/{tag}/battlelog` eines Spielers (25 Einträge). Alles hier ist
+**beobachtet**, nicht aus Swagger-Modellnamen abgeleitet. Eine anonymisierte
+Kopie des Battlelogs liegt als Test-Fixture unter
+`drafter/testdaten/offizieller_battlelog_anonymisiert.json`.
 
-1. **Key setzen** in der `.env` (`BRAWL_STARS_API_KEY=…`). Supercell bindet Keys
-   an die **IP des abrufenden Servers**.
-2. **Antworten mitschneiden** — der einzige Schritt, der das Netz braucht:
-   ```python
-   from drafter import config
-   from drafter.services.providers.official_api import OfficialBrawlAPIProvider
-   OfficialBrawlAPIProvider().rohantwort_sichern("#SPIELERTAG", config.FIXTURE_VERZEICHNIS)
-   ```
-   Die Datei enthält die Antwort **unverändert** unter `"antwort"`, in einer
-   Hülle aus ausschließlich eigenen Schlüsseln.
-3. **Dateien ansehen** und die tatsächliche Struktur dokumentieren: Gibt es eine
-   Partie-ID? Wie genau stimmen Zeitstempel zwischen Spielern überein? Stehen
-   Ranked-Bans, Pick-Reihenfolge, Builds, Rangangaben darin? (§20)
-4. **Parser schreiben** — `parse_offizieller_battlelog(daten) -> ParseErgebnis`
-   in `services/ingest/parser.py`, getestet gegen genau diese Dateien — und
-   registrieren:
-   ```python
-   PARSER[FORMAT_OFFIZIELLER_BATTLELOG] = parse_offizieller_battlelog
-   ```
-   Der Parser übersetzt in `MatchRecord`s mit **perspektivfreien** Seiten a/b
-   und lässt alles leer, was die Antwort nicht enthält. Enthält die
-   Antwort IDs für Brawler, Maps oder Modi, gehören sie in `brawler_id` /
-   `map_id` / `mode_id` — und die IDs selbst in die `external_id`-Felder des
-   Katalogs (Admin). Ab dann läuft die Zuordnung über IDs statt Namen.
-5. **Importieren und aggregieren** — `import_brawl_fixture`, dann
-   `aggregate_brawl_stats --quelle fixture`. Ab jetzt nimmt `auto` die
-   gemessenen Statistiken, und die Oberfläche hebt den Demo-Hinweis auf.
-6. Später: Crawler (Ranglisten → Battlelogs → neu entdeckte Spieler), mit
-   Ratenlimit, `last_fetched_at` und Priorität — als weiterer `MatchProvider`,
-   ohne dass sich Import oder Aggregation ändern.
+**Antwort-Header:** `date`, `content-type`, `content-length`, `connection`,
+`x-content-type-options`, `strict-transport-security`, `cache-control: max-age=3`.
+**Keine** Rate-Limit-Header. Über das erlaubte Limit ist damit nichts bekannt.
+
+**Battlelog** — Wurzel `items` (25) und `paging` (`cursors: {}`). Ein Eintrag:
+
+| Feld | Beobachtung |
+|---|---|
+| `battleTime` | `20260914T184146.000Z` — UTC, sekundengenau |
+| `event.id` | Ganzzahl, in diesem Log 1:1 zur Map (7 Maps). Stabilität über Zeit **unbelegt** |
+| `event.map` | Name, z. B. `Undermine` |
+| `event.mode` / `battle.mode` | camelCase: `brawlBall`, `gemGrab`, `hotZone`, `knockout`, `bounty`, `soloShowdown` — immer gleich |
+| `event.modeId` | Ganzzahl, 1:1 zum Modus (`gemGrab` 0, `bounty` 3, `brawlBall` 5, `soloShowdown` 6, `hotZone` 17, `knockout` 20) |
+| `battle.type` | `ranked` (21×) oder `soloRanked` (4×) — siehe unten |
+| `battle.result` | `victory` / `defeat`, **aus Sicht des abgefragten Spielers**; fehlt bei Showdown |
+| `battle.duration` | 21–150, Einheit nicht dokumentiert (plausibel: Sekunden) |
+| `battle.trophyChange` | nur bei `ranked` (20 von 21) |
+| `battle.starPlayer` | `{tag, name, brawler}`, immer auch in `teams` |
+| `battle.teams` | 2 × 3 Spieler `{tag, name, brawler{id, name, power, trophies}}` |
+| `battle.players` + `battle.rank` | statt `teams` bei `soloShowdown` |
+
+**`ranked` ist nicht Ranked.** `ranked` ist die Trophäen-Rangliste: mit
+`trophyChange`, Brawler-Trophäen bis 2188, auch Showdown. Der Ranked-Modus
+heißt `soloRanked`. Dort gibt es keine `trophyChange`, und `brawler.trophies`
+ist bei allen sechs Spielern gleich (11–12). Das entspricht dem `rankedRank` 12
+im Profil des abgefragten Spielers. **Beleg: 4 Partien eines Spielers.** Der
+Parser setzt `is_ranked` deshalb nur für `soloRanked` und speichert den Rohwert
+in `Match.battle_type`, damit sich die Deutung korrigieren lässt.
+
+**Die Seiten sind nicht fest.** Der abgefragte Spieler stand 11× in `teams[0]`
+und 6× in `teams[1]`. Der Parser rechnet `result` über den Spieler-Tag aus
+`referenz` auf eine Seite um.
+
+**Nicht im Battlelog:** Partie-ID, Bans, Pick-Reihenfolge, First Pick, Gadget,
+Star Power, Gear, Hypercharge, Elo, Rangbereich der Partie. Keins dieser Felder
+wird gelesen oder rekonstruiert.
+
+**Spielerprofil** — nur hier, nicht pro Partie: Trophäen/Rekord, Siege je Modus,
+Club, `rankedSeasonId`, `rankedRank`/`rankedRankName`/`rankedElo`, Saison- und
+Allzeit-Höchstwerte, und je besessenem Brawler `power`, `rank`, Trophäen,
+Win-Streaks, Skin, `gadgets`/`starPowers`/`gears`/`hyperCharges` (**besessen**,
+nicht ausgerüstet) und `buffies`.
+
+**`/brawlers`** — 108 Brawler mit stabil aussehenden Ganzzahl-IDs
+(16000000–16000110), Namen in GROSSBUCHSTABEN (`8-BIT`, `MR. P`, `LARRY & LAWRIE`).
+Dazu je 2 Gadgets, 2 Star Powers, 0–1 Hypercharge und 6–8 Gears (globaler Katalog von
+19 Gear-IDs). Alle 20 Demo-Brawler sind per Namen auffindbar. `external_id` ist im
+Katalog **noch nicht gesetzt** (Demo-Daten unverändert). Die Zuordnung läuft
+bis dahin über Namen.
+
+### Der Parser `parse_offizieller_battlelog`
+
+Registriert für `brawlstars.battlelog.raw`. Er erwartet die eigene Hülle
+(die Perspektive kommt aus `referenz`) und liest ausschließlich die Felder oben:
+
+| MatchRecord | aus |
+|---|---|
+| `played_at` | `battleTime` (UTC) |
+| `mode` / `external_mode_id` | `battle.mode` / `event.modeId` |
+| `map` / `external_map_id` | `event.map` / `event.id` |
+| `teams["a"]` / `["b"]` | `battle.teams[0]` / `[1]`, je Spieler Tag, Brawler-ID **vor** Name, `power`, `trophies` (roh) |
+| `winner` | `result` über den Tag aus `referenz` umgerechnet; unbekannter Wert → leer |
+| `duration_seconds` | `battle.duration` |
+| `battle_type` / `ranked` | `battle.type` / `type == "soloRanked"` |
+| `external_id` | **leer** — es gibt keine Partie-ID |
+| `bans`, `first_pick`, `pick_order`, `build`, `rank_pool` | leer bzw. `alle` |
+
+Einträge ohne zwei Teams (Showdown) sind **übersprungen**, nicht ungültig: Sie
+werden getrennt gezählt und in `RawPayload.parse_message` genannt. Ein kaputter
+Eintrag verwirft nur sich selbst. Unbekannte Zusatzfelder werden ignoriert.
+
+`katalog_schluessel()` trennt camelCase (`brawlBall` → `brawl-ball`), damit die
+Namens-Rückfallsuche die Modi findet. `Match.mode_name` bleibt roh.
+
+**Wiedererkennung:** Ohne Partie-ID läuft sie über den rekonstruierten
+Fingerabdruck (Brawler-Aufstellung, Ort, Zeit-Eimer). Dieselbe Partie aus dem
+Battlelog eines Gegners — Seiten und Ergebnis gespiegelt — ist eine Dublette
+ohne Konflikt. Der Test hält es fest. Wie genau `battleTime` bei zwei Spielern
+derselben Partie übereinstimmt, ist mit einem einzigen Battlelog **nicht messbar**.
+Die 60 s Toleranz bleibt deshalb geschätzt.
+
+### Weiter zu echten Statistiken
+
+1. **Mitschneiden**: `test_brawl_api --player "#TAG"` (einzelne Spieler, kein Crawler).
+2. **Importieren**: `import_brawl_fixture data/brawl_api_raw/battlelog_….json` —
+   idempotent, dieselbe Datei zweimal ergibt keine neuen Partien.
+3. **Aggregieren** (`aggregate_brawl_stats --quelle fixture`) erst, wenn genug
+   Partien vorliegen. Aus 17 Partien eines Spielers entsteht keine Statistik.
+4. Später: Crawler als weiterer `MatchProvider`, mit Ratenlimit — ohne dass
+   sich Import oder Aggregation ändern.
 
 ---
 
@@ -827,13 +888,13 @@ Bewusst **nicht** beantwortet, weil sie nur echte Antworten beantworten können:
 
 | Frage | Warum sie zählt | Wo es hängt |
 |---|---|---|
-| Welche Felder hat eine Battlelog-Antwort, und was bedeuten sie? | Grundlage des Parsers | §19 Schritt 3 |
-| Gibt es eine eindeutige Partie-ID? | sonst Rekonstruktion per Fingerabdruck | `fingerprint.py` |
-| Wie genau stimmen Zeitstempel derselben Partie überein? | Toleranz `MATCH_ZEITTOLERANZ_SEKUNDEN` (60 s) ist geschätzt | `config.py` |
-| Liefert die API Ranked-**Bans**? Die **Pick-Reihenfolge**? First Pick? | ohne sie keine Banrate, keine gelernten Draft-Positionen | Aggregation zählt nur Vorhandenes |
-| Liefert sie **Builds** historischer Partien? | sonst bleibt `BuildStat` leer | Build-Empfehlung läuft weiter auf Regeln |
-| Wie ist der **Rangbereich** einer Partie erkennbar? | Rang-Pools (Legendary+, Masters, Pro) | `Match.rank_pool` |
-| Welche IDs führt die API für Brawler, Maps und Modi — und sind sie stabil? | Zuordnung läuft bevorzugt über `external_id`; bis dahin über Namen, die sich in Schreibweise und Übersetzung ändern können | `external_id` im Katalog, `importer._brawler_fuer()` |
+| Bedeutet `brawler.trophies` bei `soloRanked` wirklich den Ranked-Rang? | belegt nur durch 4 Partien eines Spielers | `Match.battle_type`, `MatchPlayer.trophies` |
+| Gibt es eine eindeutige Partie-ID? | **Nein** (beobachtet) — Rekonstruktion per Fingerabdruck | `fingerprint.py` |
+| Wie genau stimmen Zeitstempel derselben Partie überein? | Toleranz `MATCH_ZEITTOLERANZ_SEKUNDEN` (60 s) ist geschätzt; messbar erst mit Battlelogs zweier Spieler derselben Partie | `config.py` |
+| Ranked-**Bans**, **Pick-Reihenfolge**, First Pick? | **Nicht im Battlelog** (beobachtet) — keine Banrate, keine gelernten Draft-Positionen; Quelle offen | Aggregation zählt nur Vorhandenes |
+| **Builds** historischer Partien? | **Nicht im Battlelog** (beobachtet); das Profil nennt nur Besessenes — `BuildStat` bleibt leer | Build-Empfehlung läuft weiter auf Regeln |
+| Wie ist der **Rangbereich** einer Partie erkennbar? | kein Feld dafür; bei `soloRanked` evtl. über `brawler.trophies` (s. o.) | `Match.rank_pool` |
+| Sind Brawler-ID, `event.id` und `modeId` über Zeit stabil? In einem Log 1:1 — über Wochen unbelegt | Zuordnung läuft bevorzugt über `external_id`; bis dahin über Namen, die sich in Schreibweise und Übersetzung ändern können | `external_id` im Katalog, `importer._brawler_fuer()` |
 | Wie viele Partien sind realistisch? | Paarzeilen wachsen quadratisch mit Brawlern × Ebenen × Fenstern × Pools — bei ~90 Brawlern Hunderttausende Zeilen; ggf. Mindeststichprobe für Paare | `aggregator.py` |
 | Gewichtete Kombination der Rang-Pools (`RANG_POOL_GEWICHT`)? | derzeit je Pool getrennt aggregiert, die Gewichte werden noch nicht benutzt | `config.py` |
 
@@ -841,7 +902,7 @@ Bewusst **nicht** beantwortet, weil sie nur echte Antworten beantworten können:
 
 ## 21. Nächste Schritte
 
-1. **Echte Antworten mitschneiden und den Parser schreiben** (§19).
+1. **Mehr Battlelogs mitschneiden** (einzelne Spieler, §19) — genug für eine erste Aggregation und um die offenen Fragen in §20 zu klären.
 2. **Crawler** als weiterer `MatchProvider`, mit Ratenlimit und Deduplizierung
    über den bestehenden Import.
 3. **Aggregation planen** (Cron, später Celery Beat) — nie live aggregieren.
