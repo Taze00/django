@@ -8,6 +8,7 @@ from drafter.models.base import NICHT_GEMESSEN, Datenquelle, StatBasis, Zeitstem
 from drafter.models.brawler import Brawler
 from drafter.models.builds import BrawlerItem, BuildRule
 from drafter.models.maps import BrawlMap, GameMode
+from drafter.models.matches import Match, MatchBan, MatchPlayer, RawPayload
 from drafter.models.patches import BrawlerBalanceChange, Patch
 from drafter.models.prefs import UserBrawlerPreference
 from drafter.models.stats import BrawlerStat, BuildStat, CounterStat, SynergyStat
@@ -20,4 +21,5 @@ __all__ = [
     "BrawlerStat", "BuildStat", "CounterStat", "SynergyStat",
     "BrawlerItem", "BuildRule",
     "UserBrawlerPreference",
+    "RawPayload", "Match", "MatchPlayer", "MatchBan",
 ]

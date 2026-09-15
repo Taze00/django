@@ -58,3 +58,8 @@ static/css/images/projects/corvis-app.png
 
 # Datenbank-Sicherungen
 backups/
+
+# Drafter: mitgeschnittene API-Antworten. Enthalten Spieler-Tags und
+# gehoeren nicht ins oeffentliche Repo. Synthetische Testdaten liegen
+# stattdessen versioniert unter drafter/testdaten/.
+data/brawl_fixtures/

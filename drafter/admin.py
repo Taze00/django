@@ -224,4 +224,69 @@ class UserBrawlerPreferenceAdmin(admin.ModelAdmin):
     autocomplete_fields = ("brawler",)
 
 
+# --- Rohdaten ---------------------------------------------------------------
+# Nur zum Ansehen und fuer Konflikte. Rohdaten entstehen ausschliesslich
+# ueber den Import - eine von Hand angelegte Partie haette keine
+# Lieferung, aus der sie stammt, und waere nicht nachvollziehbar.
+
+from drafter.models.matches import Match, MatchBan, MatchPlayer, RawPayload  # noqa: E402
+
+
+class MatchPlayerInline(admin.TabularInline):
+    model = MatchPlayer
+    extra = 0
+    can_delete = False
+    fields = ("side", "brawler_name", "brawler", "player_tag", "pick_order", "build")
+    readonly_fields = fields
+
+
+class MatchBanInline(admin.TabularInline):
+    model = MatchBan
+    extra = 0
+    can_delete = False
+    fields = ("side", "brawler_name", "brawler", "order")
+    readonly_fields = fields
+
+
+@admin.register(Match)
+class MatchAdmin(admin.ModelAdmin):
+    list_display = (
+        "played_at", "mode_name", "map_name", "source", "rank_pool",
+        "winner_side", "has_conflict", "gesehen",
+    )
+    list_filter = ("source", "rank_pool", "has_conflict", "is_ranked", "game_mode")
+    search_fields = ("map_name", "mode_name", "fingerprint", "external_id", "players__brawler_name")
+    date_hierarchy = "played_at"
+    inlines = [MatchPlayerInline, MatchBanInline]
+    readonly_fields = (
+        "fingerprint", "external_id", "source", "played_at", "game_mode", "brawl_map",
+        "mode_name", "map_name", "patch", "rank_pool", "is_ranked", "winner_side",
+        "first_pick_side", "duration_seconds", "payloads",
+    )
+
+    def has_add_permission(self, request):
+        return False
+
+    @admin.display(description="Gesehen")
+    def gesehen(self, objekt):
+        return objekt.gesehen
+
+
+@admin.register(RawPayload)
+class RawPayloadAdmin(admin.ModelAdmin):
+    list_display = (
+        "fetched_at", "reference", "format", "source", "parse_status",
+        "match_count", "new_match_count",
+    )
+    list_filter = ("source", "format", "parse_status")
+    search_fields = ("reference", "content_hash")
+    readonly_fields = (
+        "source", "format", "reference", "content_hash", "payload", "fetched_at",
+        "parse_status", "parse_message", "match_count", "new_match_count",
+    )
+
+    def has_add_permission(self, request):
+        return False
+
+
 admin.site.site_header = "alex.volkmann.com"
