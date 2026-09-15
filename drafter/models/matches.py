@@ -119,6 +119,11 @@ class Match(Zeitstempel):
     winner_side = models.CharField(max_length=5, blank=True, choices=Seite.choices)
     first_pick_side = models.CharField(max_length=1, blank=True)
     duration_seconds = models.PositiveIntegerField(null=True, blank=True)
+    # Partietyp, wie die Quelle ihn liefert. Offizielle API, beobachtet am
+    # 2026-09-15: "ranked" = Trophaeen-Rangliste (trotz des Namens; mit
+    # trophyChange), "soloRanked" = Ranked-Modus. `is_ranked` wird daraus
+    # abgeleitet; der Rohwert bleibt, falls sich die Deutung als falsch erweist.
+    battle_type = models.CharField(max_length=40, blank=True, db_index=True)
 
     has_conflict = models.BooleanField(default=False, db_index=True)
     conflict_note = models.CharField(max_length=300, blank=True)
@@ -159,6 +164,11 @@ class MatchPlayer(models.Model):
     player_tag = models.CharField(max_length=20, blank=True)
     pick_order = models.PositiveSmallIntegerField(null=True, blank=True)
     build = models.JSONField(null=True, blank=True)
+    # Roh aus der Quelle. `trophies` bedeutet je nach Match.battle_type
+    # etwas anderes: bei "soloRanked" war es in allen beobachteten Partien
+    # der Ranked-Rang (bei allen sechs Spielern gleich), sonst Trophaeen.
+    power = models.IntegerField(null=True, blank=True)
+    trophies = models.IntegerField(null=True, blank=True)
 
     class Meta:
         indexes = [models.Index(fields=["brawler", "side"])]

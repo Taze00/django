@@ -1,26 +1,17 @@
 # -*- coding: utf-8 -*-
-"""Der Provider fuer die offizielle Brawl-Stars-API - vorbereitet, nicht fertig.
+"""Der Provider fuer die offizielle Brawl-Stars-API.
 
-Was er heute tut:
-- ohne `BRAWL_STARS_API_KEY` meldet er sich sauber als nicht verfuegbar
-  und liefert nichts. Kein Absturz, keine Netzwerkanfrage.
-- mit Key kann er Battlelogs abrufen und UNVERAENDERT als Lieferung
-  weitergeben bzw. als Fixture-Datei ablegen (`rohantwort_sichern`).
+Ohne `BRAWL_STARS_API_KEY` meldet er sich als nicht verfuegbar und liefert
+nichts - kein Absturz, keine Netzwerkanfrage.
 
-Was er bewusst NICHT tut: Antwortfelder interpretieren. Welche Felder
-eine Battlelog-Antwort hat, ob sie Ranked-Bans, Pick-Reihenfolge oder
-Builds enthaelt und wie ein Match eindeutig zu identifizieren ist, ist
-ungeprueft. Die Antworten werden deshalb als "noch nicht auswertbar"
-gespeichert, bis ein Parser auf Grundlage echter Antworten geschrieben
-ist.
+Mit Key ruft er Battlelogs ab und reicht sie als Lieferung weiter. Der
+Parser dafuer (`parse_offizieller_battlelog` in ingest/parser.py) ist seit
+dem 2026-09-15 anhand echter Antworten geschrieben und liest nur Felder,
+die darin tatsaechlich vorkommen. Die Rohantwort bleibt unveraendert
+gespeichert, damit der Parser spaeter erweitert werden kann, ohne neu
+abzurufen.
 
-Der Weg zu echten Daten (siehe DRAFTER_DOKUMENTATION.md):
-  1. Key setzen, einige Antworten mit `rohantwort_sichern` mitschneiden
-  2. die Dateien ansehen und die tatsaechliche Struktur dokumentieren
-  3. `parse_offizieller_battlelog` schreiben und in ingest/parser.py
-     registrieren - gegen genau diese Dateien getestet
-  4. danach liefert dieser Provider MatchRecords, und Import,
-     Aggregation und Engine laufen unveraendert
+Kein Crawler: dieser Provider ruft genau die uebergebenen Spieler-Tags ab.
 """
 
 import json
@@ -147,6 +138,7 @@ class OfficialBrawlAPIProvider(MatchProvider):
             yield Lieferung(
                 referenz=tag, format=FORMAT_OFFIZIELLER_BATTLELOG, rohdaten=huelle,
                 source=Datenquelle.API, matches=ergebnis.matches, fehler=ergebnis.fehler,
+                uebersprungen=ergebnis.uebersprungen,
             )
 
     def rohantwort_sichern(self, tag, verzeichnis):

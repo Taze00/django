@@ -1,23 +1,22 @@
 # -*- coding: utf-8 -*-
 """Lieferungen in MatchRecords uebersetzen - nur fuer GEPRUEFTE Formate.
 
-Registriert ist genau ein Format: `drafter.match.v1`, das eigene,
-vollstaendig dokumentierte Austauschformat (siehe DRAFTER_DOKUMENTATION.md).
+Registriert sind zwei Formate:
 
-Das Format der offiziellen Brawl-Stars-API ist ABSICHTLICH NICHT
-registriert. Dafuer braeuchte es Feldnamen und Bedeutungen, die erst
-feststehen, wenn eine echte Antwort vorliegt und angesehen wurde. Bis
-dahin werden solche Antworten unveraendert gespeichert und als "noch
-nicht auswertbar" markiert - nichts wird aus erfundenen Feldern gelesen.
+- `drafter.match.v1` - das eigene, vollstaendig dokumentierte Austauschformat.
+- `brawlstars.battlelog.raw` - ein Mitschnitt von /players/{tag}/battlelog
+  der offiziellen API. Der Parser dafuer ist auf Grundlage ECHTER
+  Antworten geschrieben (Mitschnitt vom 2026-09-15, anonymisiert unter
+  drafter/testdaten/offizieller_battlelog_anonymisiert.json) und liest nur
+  Felder, die dort tatsaechlich vorkommen. Swagger-Modellnamen spielen
+  keine Rolle - was nicht in der Antwort steht, wird nicht gelesen.
 
-Einen neuen Parser einstecken:
-
-    def parse_offizieller_battlelog(daten): ...  -> ParseErgebnis
-    PARSER[FORMAT_OFFIZIELLER_BATTLELOG] = parse_offizieller_battlelog
+Spieler-, Brawler- und Ranglisten-Mitschnitte enthalten keine Partien und
+bekommen keinen Parser; sie werden nur gespeichert.
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 
 from drafter import config
 from drafter.models.base import Datenquelle
@@ -55,6 +54,8 @@ class ParseErgebnis:
     # Einzelne verworfene Partien. Eine fehlerhafte Partie verwirft nicht
     # die ganze Datei - aber sie wird benannt, nicht verschwiegen.
     fehler: list = field(default_factory=list)
+    # Gueltige Partien, die nicht in dieses System gehoeren (z.B. Showdown).
+    uebersprungen: list = field(default_factory=list)
 
 
 def quelle_fuer(daten):
@@ -223,9 +224,172 @@ def parse_normalisiert_v1(daten):
     return ergebnis
 
 
+# =========================================================================
+# Offizieller Battlelog (/players/{tag}/battlelog)
+# =========================================================================
+# Beobachtete Struktur eines Eintrags (25 Eintraege, 2026-09-15):
+#
+#   battleTime            "20260914T184146.000Z"
+#   event                 {id, mode, modeId, map}
+#   battle.mode           == event.mode
+#   battle.type           "ranked" | "soloRanked"
+#   battle.result         "victory" | "defeat"   - nur bei zwei Teams
+#   battle.duration       21..150                - nur bei zwei Teams
+#   battle.trophyChange   nur bei "ranked"
+#   battle.starPlayer     {tag, name, brawler}   - nur bei zwei Teams
+#   battle.teams          [[{tag, name, brawler{id, name, power, trophies}}]x3]x2
+#   battle.players        [...]x10 + battle.rank - Showdown statt teams
+#
+# NICHT vorhanden: Partie-ID, Bans, Pick-Reihenfolge, Gadgets, Star Powers,
+# Gears, Hypercharges, Elo. Sie bleiben im MatchRecord leer.
+
+BATTLE_TIME_FORMAT = "%Y%m%dT%H%M%S.%fZ"
+
+# "soloRanked" ist der Ranked-Modus: keine trophyChange, und brawler.trophies
+# ist bei allen sechs Spielern gleich und entspricht dem rankedRank des
+# Profils. "ranked" ist - trotz des Namens - die Trophaeen-Rangliste (mit
+# trophyChange, Trophaeen bis 2188, auch Showdown). Beleg: 4 bzw. 21
+# Eintraege eines Spielers; bei neuen Typen oder Gegenbelegen hier anpassen.
+RANKED_DRAFT_TYPEN = frozenset({"soloRanked"})
+
+# Beobachtete Werte von battle.result. Andere Werte (etwa ein Unentschieden,
+# das in den Daten nicht vorkam) ergeben KEIN Ergebnis statt eines geratenen.
+ERGEBNIS_EIGENES_TEAM = {"victory": True, "defeat": False}
+
+
+def _api_tag(wert):
+    text = str(wert or "").strip().upper().lstrip("#")
+    return f"#{text}" if text else None
+
+
+def _api_ganzzahl(wert):
+    return wert if isinstance(wert, int) and not isinstance(wert, bool) else None
+
+
+def _api_text(wert):
+    return wert if isinstance(wert, str) else ""
+
+
+def _api_id(wert):
+    """IDs kommen als Ganzzahl; gespeichert wird Text."""
+    return str(wert) if _api_ganzzahl(wert) is not None else None
+
+
+def _api_spieler(eintrag, pfad):
+    if not isinstance(eintrag, dict):
+        raise ValueError(f"{pfad} ist kein Objekt")
+    brawler = eintrag.get("brawler") if isinstance(eintrag.get("brawler"), dict) else {}
+    brawler_id = _api_id(brawler.get("id"))
+    name = _api_text(brawler.get("name"))
+    if brawler_id is None and not name:
+        raise ValueError(f"{pfad}.brawler hat weder id noch name")
+    return SpielerRecord(
+        brawler=name,
+        player_tag=_api_text(eintrag.get("tag")),
+        external_brawler_id=brawler_id,
+        power=_api_ganzzahl(brawler.get("power")),
+        trophies=_api_ganzzahl(brawler.get("trophies")),
+    )
+
+
+def _api_partie(eintrag, pfad, perspektive):
+    """(MatchRecord, None) - oder (None, Grund), wenn es keine Draft-Partie ist."""
+    if not isinstance(eintrag, dict):
+        raise ValueError(f"{pfad} ist kein Objekt")
+    battle = eintrag.get("battle")
+    if not isinstance(battle, dict):
+        raise ValueError(f"{pfad}.battle fehlt")
+    event = eintrag.get("event") if isinstance(eintrag.get("event"), dict) else {}
+    modus = _api_text(battle.get("mode")) or _api_text(event.get("mode"))
+
+    teams = battle.get("teams")
+    if not (isinstance(teams, list) and len(teams) == 2
+            and all(isinstance(t, list) and t for t in teams)):
+        form = "Spielerliste statt Teams" if "players" in battle else "keine zwei Teams"
+        return None, f"{pfad}: {modus or 'unbekannter Modus'} - {form}, keine Draft-Partie"
+
+    zeitpunkt_text = eintrag.get("battleTime")
+    try:
+        zeitpunkt = datetime.strptime(str(zeitpunkt_text), BATTLE_TIME_FORMAT).replace(
+            tzinfo=timezone.utc)
+    except ValueError:
+        raise ValueError(f"{pfad}.battleTime hat ein unbekanntes Format: {zeitpunkt_text!r}")
+
+    seiten = {
+        seite: [_api_spieler(s, f"{pfad}.battle.teams[{i}][{j}]") for j, s in enumerate(team)]
+        for i, (seite, team) in enumerate(zip(("a", "b"), teams))
+    }
+
+    # `result` gilt aus Sicht des abgefragten Spielers - und der steht nicht
+    # immer im ersten Team (beobachtet: 11x teams[0], 6x teams[1]). Ohne
+    # Umrechnung waere jedes dritte Ergebnis vertauscht.
+    sieger = None
+    eigenes_team_gewinnt = ERGEBNIS_EIGENES_TEAM.get(battle.get("result"))
+    if perspektive and eigenes_team_gewinnt is not None:
+        eigene = [
+            seite for seite, spieler in seiten.items()
+            if any(_api_tag(s.player_tag) == perspektive for s in spieler)
+        ]
+        if len(eigene) == 1:
+            sieger = eigene[0] if eigenes_team_gewinnt else ("b" if eigene[0] == "a" else "a")
+
+    typ = _api_text(battle.get("type"))
+    return MatchRecord(
+        played_at=zeitpunkt,
+        mode=modus,
+        map=_api_text(event.get("map")),
+        teams=seiten,
+        winner=sieger,
+        # Der Battlelog nennt keinen Rangbereich der Partie. Ob sich einer
+        # aus dem Rang-Wert der Spieler ableiten laesst, ist offen.
+        rank_pool="alle",
+        ranked=typ in RANKED_DRAFT_TYPEN,
+        duration_seconds=_api_ganzzahl(battle.get("duration")),
+        # Keine Partie-ID in der Antwort - die Wiedererkennung laeuft ueber
+        # den rekonstruierten Fingerabdruck.
+        external_id=None,
+        external_mode_id=_api_id(event.get("modeId")),
+        external_map_id=_api_id(event.get("id")),
+        battle_type=typ or None,
+    ), None
+
+
+def parse_offizieller_battlelog(daten):
+    """Mitschnitt von /players/{tag}/battlelog lesen.
+
+    Erwartet die eigene Huelle (siehe providers/official_api.py) mit der
+    unveraenderten Antwort unter "antwort" und dem abgefragten Spieler-Tag
+    unter "referenz" - ohne ihn laesst sich `result` keiner Seite zuordnen.
+    Unbekannte Felder werden ignoriert, fehlende optionale bleiben leer.
+    """
+    if not isinstance(daten, dict):
+        raise ParserFehler("Die Datei muss ein JSON-Objekt sein")
+    if daten.get("format") != FORMAT_OFFIZIELLER_BATTLELOG:
+        raise ParserFehler(f"Falsches Format: {daten.get('format')!r}")
+    quelle_fuer(daten)
+    antwort = daten.get("antwort")
+    if not isinstance(antwort, dict) or not isinstance(antwort.get("items"), list):
+        raise ParserFehler("Die Antwort enthält keine Liste 'items' - kein Battlelog")
+
+    perspektive = _api_tag(daten.get("referenz"))
+    ergebnis = ParseErgebnis()
+    for i, eintrag in enumerate(antwort["items"]):
+        pfad = f"antwort.items[{i}]"
+        try:
+            record, grund = _api_partie(eintrag, pfad, perspektive)
+        except ValueError as fehler:
+            ergebnis.fehler.append(str(fehler))
+            continue
+        if record is None:
+            ergebnis.uebersprungen.append(grund)
+        else:
+            ergebnis.matches.append(record)
+    return ergebnis
+
+
 PARSER = {
     FORMAT_NORMALISIERT: parse_normalisiert_v1,
-    # FORMAT_OFFIZIELLER_BATTLELOG: bewusst nicht registriert - siehe oben.
+    FORMAT_OFFIZIELLER_BATTLELOG: parse_offizieller_battlelog,
 }
 
 

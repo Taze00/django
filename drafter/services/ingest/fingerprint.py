@@ -43,6 +43,7 @@ Bewusst NICHT im Fingerabdruck:
 
 import hashlib
 import json
+import re
 from dataclasses import replace
 
 from django.utils.text import slugify
@@ -53,8 +54,17 @@ GEGENSEITE = {"a": "b", "b": "a"}
 
 
 def katalog_schluessel(name):
-    """Name wie geliefert -> Schluessel wie im Katalog ("EL PRIMO" -> "el-primo")."""
-    return slugify(str(name or ""))
+    """Name wie geliefert -> Schluessel wie im Katalog.
+
+        "EL PRIMO" -> "el-primo"      "brawlBall" -> "brawl-ball"
+
+    camelCase wird an Uebergaengen klein->gross getrennt: die offizielle
+    API liefert Modi als "brawlBall", "gemGrab", "hotZone" - ohne Trennung
+    wuerde daraus "brawlball" und selbst die Namens-Rueckfallsuche faende den
+    Modus nicht. Grossgeschriebene Namen ("GALE", "MR. P") bleiben unberuehrt.
+    """
+    text = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", str(name or ""))
+    return slugify(text)
 
 
 # --- Identitaeten ohne Katalog (Rueckfall und fuer Tests) -----------------

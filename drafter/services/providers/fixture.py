@@ -98,4 +98,5 @@ class FixtureDataProvider(MatchProvider):
         return Lieferung(
             referenz=referenz, format=format_name, rohdaten=daten, source=quelle,
             matches=ergebnis.matches, fehler=ergebnis.fehler,
+            uebersprungen=ergebnis.uebersprungen,
         )

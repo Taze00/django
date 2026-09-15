@@ -12,7 +12,7 @@ from django.test import override_settings
 from drafter.models import Datenquelle, Patch
 from drafter.models.matches import Match, MatchPlayer, RawPayload
 from drafter.services.ingest.importer import MatchImporter
-from drafter.services.ingest.parser import FORMAT_OFFIZIELLER_BATTLELOG
+from drafter.services.ingest.parser import FORMAT_OFFIZIELLER_SPIELER
 from drafter.services.providers.fixture import FixtureDataProvider
 from drafter.services.providers.official_api import OfficialBrawlAPIProvider
 from drafter.tests.basis import DrafterTest
@@ -198,9 +198,10 @@ class LieferungsfehlerTest(FixtureMixin, DrafterTest):
         quellen = set(Match.objects.values_list("source", flat=True))
         self.assertEqual(quellen, {Datenquelle.SYNTHETIC, Datenquelle.FIXTURE})
 
-    def test_offizielles_format_wird_gespeichert_aber_nicht_ausgewertet(self):
+    def test_format_ohne_parser_wird_gespeichert_aber_nicht_ausgewertet(self):
+        # Spieler-Mitschnitte enthalten keine Partien und haben keinen Parser.
         inhalt = {
-            "format": FORMAT_OFFIZIELLER_BATTLELOG, "herkunft": "api-mitschnitt",
+            "format": FORMAT_OFFIZIELLER_SPIELER, "herkunft": "api-mitschnitt",
             "antwort": {"hinweis": "Platzhalter - keine echte API-Antwort"},
         }
         bericht = MatchImporter(FixtureDataProvider(self.schreibe(inhalt))).ausfuehren()
@@ -273,13 +274,15 @@ class OffiziellerApiProviderTest(FixtureMixin, DrafterTest):
         client = _FakeClient(mit_key=True)
         provider = OfficialBrawlAPIProvider(client=client, spieler_tags=["#SYNTH01"])
         self.assertTrue(provider.status().verfuegbar)
-        self.assertIn("Parser", provider.status().grund)
 
+        # Die Platzhalter-Antwort hat keine Liste 'items' - sie ist kein
+        # Battlelog. Gespeichert wird sie trotzdem, ausgewertet nicht.
         bericht = MatchImporter(provider).ausfuehren()
-        self.assertEqual(bericht.nicht_unterstuetzt, 1)
+        self.assertEqual(bericht.fehlerhaft, 1)
         self.assertEqual(Match.objects.count(), 0)
         payload = RawPayload.objects.get()
         self.assertEqual(payload.source, Datenquelle.API)
+        self.assertEqual(payload.parse_status, RawPayload.ParseStatus.ERROR)
         self.assertEqual(payload.payload["antwort"], {"hinweis": "Platzhalter - keine echte API-Antwort"})
 
     def test_mitschnitt_laeuft_danach_ohne_netz_ueber_fixtures(self):
@@ -294,7 +297,7 @@ class OffiziellerApiProviderTest(FixtureMixin, DrafterTest):
         self.assertNotIn("authorization", pfad.read_text(encoding="utf-8").lower())
 
         bericht = MatchImporter(FixtureDataProvider(pfad)).ausfuehren()
-        self.assertEqual(bericht.nicht_unterstuetzt, 1)
+        self.assertEqual(bericht.fehlerhaft, 1, "Platzhalter ohne 'items' ist kein Battlelog")
 
     def test_mitschnitt_ohne_key_scheitert_laut(self):
         from drafter.services.brawl_api_client import KeinKeyFehler

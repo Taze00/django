@@ -1,0 +1,2520 @@
+{
+  "format": "brawlstars.battlelog.raw",
+  "herkunft": "api-mitschnitt",
+  "referenz": "#TEST0001",
+  "endpoint": "/players/%23TEST0001/battlelog",
+  "http_status": 200,
+  "antwort_header": {
+    "date": "Tue, 15 Sep 2026 21:47:08 GMT",
+    "content-type": "application/json; charset=utf-8",
+    "content-length": "27039",
+    "connection": "close",
+    "x-content-type-options": "nosniff",
+    "strict-transport-security": "max-age=43200",
+    "cache-control": "max-age=3"
+  },
+  "abgerufen_am": "2026-09-15T21:47:08.728373+00:00",
+  "antwort": {
+    "items": [
+      {
+        "battleTime": "20260915T045141.000Z",
+        "event": {
+          "id": 15001202,
+          "mode": "hotZone",
+          "modeId": 17,
+          "map": "Golden Bay"
+        },
+        "battle": {
+          "mode": "hotZone",
+          "type": "ranked",
+          "result": "defeat",
+          "duration": 103,
+          "trophyChange": -1,
+          "starPlayer": {
+            "tag": "#TEST0006",
+            "name": "Spieler 6",
+            "brawler": {
+              "id": 16000050,
+              "name": "GRIFF",
+              "power": 11,
+              "trophies": 774
+            }
+          },
+          "teams": [
+            [
+              {
+                "tag": "#TEST0002",
+                "name": "Spieler 2",
+                "brawler": {
+                  "id": 16000097,
+                  "name": "MINA",
+                  "power": 11,
+                  "trophies": 756
+                }
+              },
+              {
+                "tag": "#TEST0003",
+                "name": "Spieler 3",
+                "brawler": {
+                  "id": 16000056,
+                  "name": "EVE",
+                  "power": 8,
+                  "trophies": 539
+                }
+              },
+              {
+                "tag": "#TEST0001",
+                "name": "Spieler 1",
+                "brawler": {
+                  "id": 16000109,
+                  "name": "COSMO",
+                  "power": 11,
+                  "trophies": 225
+                }
+              }
+            ],
+            [
+              {
+                "tag": "#TEST0004",
+                "name": "Spieler 4",
+                "brawler": {
+                  "id": 16000013,
+                  "name": "POCO",
+                  "power": 10,
+                  "trophies": 672
+                }
+              },
+              {
+                "tag": "#TEST0005",
+                "name": "Spieler 5",
+                "brawler": {
+                  "id": 16000065,
+                  "name": "MANDY",
+                  "power": 11,
+                  "trophies": 965
+                }
+              },
+              {
+                "tag": "#TEST0006",
+                "name": "Spieler 6",
+                "brawler": {
+                  "id": 16000050,
+                  "name": "GRIFF",
+                  "power": 11,
+                  "trophies": 774
+                }
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "battleTime": "20260915T044559.000Z",
+        "event": {
+          "id": 15001202,
+          "mode": "hotZone",
+          "modeId": 17,
+          "map": "Golden Bay"
+        },
+        "battle": {
+          "mode": "hotZone",
+          "type": "ranked",
+          "result": "victory",
+          "duration": 148,
+          "trophyChange": 20,
+          "starPlayer": {
+            "tag": "#TEST0009",
+            "name": "Spieler 9",
+            "brawler": {
+              "id": 16000083,
+              "name": "CLANCY",
+              "power": 11,
+              "trophies": 1411
+            }
+          },
+          "teams": [
+            [
+              {
+                "tag": "#TEST0001",
+                "name": "Spieler 1",
+                "brawler": {
+                  "id": 16000109,
+                  "name": "COSMO",
+                  "power": 11,
+                  "trophies": 205
+                }
+              },
+              {
+                "tag": "#TEST0007",
+                "name": "Spieler 7",
+                "brawler": {
+                  "id": 16000030,
+                  "name": "EMZ",
+                  "power": 9,
+                  "trophies": 880
+                }
+              },
+              {
+                "tag": "#TEST0008",
+                "name": "Spieler 8",
+                "brawler": {
+                  "id": 16000022,
+                  "name": "TICK",
+                  "power": 11,
+                  "trophies": 1446
+                }
+              }
+            ],
+            [
+              {
+                "tag": "#TEST0009",
+                "name": "Spieler 9",
+                "brawler": {
+                  "id": 16000083,
+                  "name": "CLANCY",
+                  "power": 11,
+                  "trophies": 1411
+                }
+              },
+              {
+                "tag": "#TEST0010",
+                "name": "Spieler 10",
+                "brawler": {
+                  "id": 16000012,
+                  "name": "CROW",
+                  "power": 11,
+                  "trophies": 492
+                }
+              },
+              {
+                "tag": "#TEST0011",
+                "name": "Spieler 11",
+                "brawler": {
+                  "id": 16000022,
+                  "name": "TICK",
+                  "power": 11,
+                  "trophies": 917
+                }
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T184146.000Z",
+        "event": {
+          "id": 15000011,
+          "mode": "gemGrab",
+          "modeId": 0,
+          "map": "Undermine"
+        },
+        "battle": {
+          "mode": "gemGrab",
+          "type": "soloRanked",
+          "result": "defeat",
+          "duration": 137,
+          "starPlayer": {
+            "tag": "#TEST0014",
+            "name": "Spieler 14",
+            "brawler": {
+              "id": 16000107,
+              "name": "NORI",
+              "power": 11,
+              "trophies": 12
+            }
+          },
+          "teams": [
+            [
+              {
+                "tag": "#TEST0001",
+                "name": "Spieler 1",
+                "brawler": {
+                  "id": 16000052,
+                  "name": "MEG",
+                  "power": 11,
+                  "trophies": 12
+                }
+              },
+              {
+                "tag": "#TEST0012",
+                "name": "Spieler 12",
+                "brawler": {
+                  "id": 16000102,
+                  "name": "SIRIUS",
+                  "power": 11,
+                  "trophies": 12
+                }
+              },
+              {
+                "tag": "#TEST0013",
+                "name": "Spieler 13",
+                "brawler": {
+                  "id": 16000040,
+                  "name": "AMBER",
+                  "power": 11,
+                  "trophies": 12
+                }
+              }
+            ],
+            [
+              {
+                "tag": "#TEST0014",
+                "name": "Spieler 14",
+                "brawler": {
+                  "id": 16000107,
+                  "name": "NORI",
+                  "power": 11,
+                  "trophies": 12
+                }
+              },
+              {
+                "tag": "#TEST0015",
+                "name": "Spieler 15",
+                "brawler": {
+                  "id": 16000043,
+                  "name": "EDGAR",
+                  "power": 11,
+                  "trophies": 12
+                }
+              },
+              {
+                "tag": "#TEST0016",
+                "name": "Spieler 16",
+                "brawler": {
+                  "id": 16000011,
+                  "name": "MORTIS",
+                  "power": 11,
+                  "trophies": 12
+                }
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T183731.000Z",
+        "event": {
+          "id": 15001021,
+          "mode": "brawlBall",
+          "modeId": 5,
+          "map": "Spiraling Out"
+        },
+        "battle": {
+          "mode": "brawlBall",
+          "type": "soloRanked",
+          "result": "victory",
+          "duration": 150,
+          "starPlayer": {
+            "tag": "#TEST0018",
+            "name": "Spieler 18",
+            "brawler": {
+              "id": 16000004,
+              "name": "RICO",
+              "power": 11,
+              "trophies": 12
+            }
+          },
+          "teams": [
+            [
+              {
+                "tag": "#TEST0017",
+                "name": "Spieler 17",
+                "brawler": {
+                  "id": 16000050,
+                  "name": "GRIFF",
+                  "power": 11,
+                  "trophies": 12
+                }
+              },
+              {
+                "tag": "#TEST0018",
+                "name": "Spieler 18",
+                "brawler": {
+                  "id": 16000004,
+                  "name": "RICO",
+                  "power": 11,
+                  "trophies": 12
+                }
+              },
+              {
+                "tag": "#TEST0001",
+                "name": "Spieler 1",
+                "brawler": {
+                  "id": 16000039,
+                  "name": "COLETTE",
+                  "power": 11,
+                  "trophies": 12
+                }
+              }
+            ],
+            [
+              {
+                "tag": "#TEST0019",
+                "name": "Spieler 19",
+                "brawler": {
+                  "id": 16000008,
+                  "name": "NITA",
+                  "power": 11,
+                  "trophies": 12
+                }
+              },
+              {
+                "tag": "#TEST0020",
+                "name": "Spieler 20",
+                "brawler": {
+                  "id": 16000017,
+                  "name": "TARA",
+                  "power": 11,
+                  "trophies": 12
+                }
+              },
+              {
+                "tag": "#TEST0021",
+                "name": "Spieler 21",
+                "brawler": {
+                  "id": 16000009,
+                  "name": "DYNAMIKE",
+                  "power": 11,
+                  "trophies": 12
+                }
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T183316.000Z",
+        "event": {
+          "id": 15001021,
+          "mode": "brawlBall",
+          "modeId": 5,
+          "map": "Spiraling Out"
+        },
+        "battle": {
+          "mode": "brawlBall",
+          "type": "soloRanked",
+          "result": "victory",
+          "duration": 83,
+          "starPlayer": {
+            "tag": "#TEST0023",
+            "name": "Spieler 23",
+            "brawler": {
+              "id": 16000026,
+              "name": "BIBI",
+              "power": 11,
+              "trophies": 11
+            }
+          },
+          "teams": [
+            [
+              {
+                "tag": "#TEST0022",
+                "name": "Spieler 22",
+                "brawler": {
+                  "id": 16000050,
+                  "name": "GRIFF",
+                  "power": 9,
+                  "trophies": 11
+                }
+              },
+              {
+                "tag": "#TEST0023",
+                "name": "Spieler 23",
+                "brawler": {
+                  "id": 16000026,
+                  "name": "BIBI",
+                  "power": 11,
+                  "trophies": 11
+                }
+              },
+              {
+                "tag": "#TEST0001",
+                "name": "Spieler 1",
+                "brawler": {
+                  "id": 16000061,
+                  "name": "GUS",
+                  "power": 11,
+                  "trophies": 11
+                }
+              }
+            ],
+            [
+              {
+                "tag": "#TEST0024",
+                "name": "Spieler 24",
+                "brawler": {
+                  "id": 16000007,
+                  "name": "JESSIE",
+                  "power": 11,
+                  "trophies": 11
+                }
+              },
+              {
+                "tag": "#TEST0025",
+                "name": "Spieler 25",
+                "brawler": {
+                  "id": 16000071,
+                  "name": "DOUG",
+                  "power": 11,
+                  "trophies": 11
+                }
+              },
+              {
+                "tag": "#TEST0026",
+                "name": "Spieler 26",
+                "brawler": {
+                  "id": 16000049,
+                  "name": "BUZZ",
+                  "power": 11,
+                  "trophies": 11
+                }
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T183048.000Z",
+        "event": {
+          "id": 15000083,
+          "mode": "bounty",
+          "modeId": 3,
+          "map": "Dry Season"
+        },
+        "battle": {
+          "mode": "bounty",
+          "type": "soloRanked",
+          "result": "victory",
+          "duration": 109,
+          "starPlayer": {
+            "tag": "#TEST0001",
+            "name": "Spieler 1",
+            "brawler": {
+              "id": 16000003,
+              "name": "BROCK",
+              "power": 11,
+              "trophies": 11
+            }
+          },
+          "teams": [
+            [
+              {
+                "tag": "#TEST0027",
+                "name": "Spieler 27",
+                "brawler": {
+                  "id": 16000003,
+                  "name": "BROCK",
+                  "power": 9,
+                  "trophies": 11
+                }
+              },
+              {
+                "tag": "#TEST0028",
+                "name": "Spieler 28",
+                "brawler": {
+                  "id": 16000000,
+                  "name": "SHELLY",
+                  "power": 11,
+                  "trophies": 11
+                }
+              },
+              {
+                "tag": "#TEST0029",
+                "name": "Spieler 29",
+                "brawler": {
+                  "id": 16000052,
+                  "name": "MEG",
+                  "power": 11,
+                  "trophies": 11
+                }
+              }
+            ],
+            [
+              {
+                "tag": "#TEST0030",
+                "name": "Spieler 30",
+                "brawler": {
+                  "id": 16000022,
+                  "name": "TICK",
+                  "power": 11,
+                  "trophies": 11
+                }
+              },
+              {
+                "tag": "#TEST0001",
+                "name": "Spieler 1",
+                "brawler": {
+                  "id": 16000003,
+                  "name": "BROCK",
+                  "power": 11,
+                  "trophies": 11
+                }
+              },
+              {
+                "tag": "#TEST0031",
+                "name": "Spieler 31",
+                "brawler": {
+                  "id": 16000025,
+                  "name": "CARL",
+                  "power": 11,
+                  "trophies": 11
+                }
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T182310.000Z",
+        "event": {
+          "id": 15001054,
+          "mode": "brawlBall",
+          "modeId": 5,
+          "map": "Match 1123581321"
+        },
+        "battle": {
+          "mode": "brawlBall",
+          "type": "ranked",
+          "result": "victory",
+          "duration": 104,
+          "trophyChange": 12,
+          "starPlayer": {
+            "tag": "#TEST0001",
+            "name": "Spieler 1",
+            "brawler": {
+              "id": 16000060,
+              "name": "SAM",
+              "power": 11,
+              "trophies": 331
+            }
+          },
+          "teams": [
+            [
+              {
+                "tag": "#TEST0032",
+                "name": "Spieler 32",
+                "brawler": {
+                  "id": 16000087,
+                  "name": "JUJU",
+                  "power": 9,
+                  "trophies": 273
+                }
+              },
+              {
+                "tag": "#TEST0001",
+                "name": "Spieler 1",
+                "brawler": {
+                  "id": 16000060,
+                  "name": "SAM",
+                  "power": 11,
+                  "trophies": 331
+                }
+              },
+              {
+                "tag": "#TEST0033",
+                "name": "Spieler 33",
+                "brawler": {
+                  "id": 16000107,
+                  "name": "NORI",
+                  "power": 8,
+                  "trophies": 335
+                }
+              }
+            ],
+            [
+              {
+                "tag": "#TEST0034",
+                "name": "Spieler 34",
+                "brawler": {
+                  "id": 16000086,
+                  "name": "SHADE",
+                  "power": 8,
+                  "trophies": 288
+                }
+              },
+              {
+                "tag": "#TEST0035",
+                "name": "Spieler 35",
+                "brawler": {
+                  "id": 16000036,
+                  "name": "NANI",
+                  "power": 8,
+                  "trophies": 400
+                }
+              },
+              {
+                "tag": "#TEST0036",
+                "name": "Spieler 36",
+                "brawler": {
+                  "id": 16000020,
+                  "name": "FRANK",
+                  "power": 8,
+                  "trophies": 284
+                }
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T181854.000Z",
+        "event": {
+          "id": 15001054,
+          "mode": "brawlBall",
+          "modeId": 5,
+          "map": "Match 1123581321"
+        },
+        "battle": {
+          "mode": "brawlBall",
+          "type": "ranked",
+          "result": "victory",
+          "duration": 121,
+          "trophyChange": 11,
+          "starPlayer": {
+            "tag": "#TEST0001",
+            "name": "Spieler 1",
+            "brawler": {
+              "id": 16000060,
+              "name": "SAM",
+              "power": 11,
+              "trophies": 320
+            }
+          },
+          "teams": [
+            [
+              {
+                "tag": "#TEST0037",
+                "name": "Spieler 37",
+                "brawler": {
+                  "id": 16000084,
+                  "name": "MOE",
+                  "power": 11,
+                  "trophies": 317
+                }
+              },
+              {
+                "tag": "#TEST0038",
+                "name": "Spieler 38",
+                "brawler": {
+                  "id": 16000003,
+                  "name": "BROCK",
+                  "power": 9,
+                  "trophies": 699
+                }
+              },
+              {
+                "tag": "#TEST0001",
+                "name": "Spieler 1",
+                "brawler": {
+                  "id": 16000060,
+                  "name": "SAM",
+                  "power": 11,
+                  "trophies": 320
+                }
+              }
+            ],
+            [
+              {
+                "tag": "#TEST0039",
+                "name": "Spieler 39",
+                "brawler": {
+                  "id": 16000045,
+                  "name": "STU",
+                  "power": 10,
+                  "trophies": 1127
+                }
+              },
+              {
+                "tag": "#TEST0040",
+                "name": "Spieler 40",
+                "brawler": {
+                  "id": 16000003,
+                  "name": "BROCK",
+                  "power": 11,
+                  "trophies": 868
+                }
+              },
+              {
+                "tag": "#TEST0041",
+                "name": "Spieler 41",
+                "brawler": {
+                  "id": 16000013,
+                  "name": "POCO",
+                  "power": 9,
+                  "trophies": 635
+                }
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T181629.000Z",
+        "event": {
+          "id": 15001054,
+          "mode": "brawlBall",
+          "modeId": 5,
+          "map": "Match 1123581321"
+        },
+        "battle": {
+          "mode": "brawlBall",
+          "type": "ranked",
+          "result": "victory",
+          "duration": 21,
+          "trophyChange": 10,
+          "starPlayer": {
+            "tag": "#TEST0037",
+            "name": "Spieler 37",
+            "brawler": {
+              "id": 16000084,
+              "name": "MOE",
+              "power": 11,
+              "trophies": 307
+            }
+          },
+          "teams": [
+            [
+              {
+                "tag": "#TEST0001",
+                "name": "Spieler 1",
+                "brawler": {
+                  "id": 16000060,
+                  "name": "SAM",
+                  "power": 11,
+                  "trophies": 310
+                }
+              },
+              {
+                "tag": "#TEST0038",
+                "name": "Spieler 38",
+                "brawler": {
+                  "id": 16000003,
+                  "name": "BROCK",
+                  "power": 9,
+                  "trophies": 689
+                }
+              },
+              {
+                "tag": "#TEST0037",
+                "name": "Spieler 37",
+                "brawler": {
+                  "id": 16000084,
+                  "name": "MOE",
+                  "power": 11,
+                  "trophies": 307
+                }
+              }
+            ],
+            [
+              {
+                "tag": "#TEST0042",
+                "name": "Spieler 42",
+                "brawler": {
+                  "id": 16000041,
+                  "name": "LOU",
+                  "power": 11,
+                  "trophies": 367
+                }
+              },
+              {
+                "tag": "#TEST0043",
+                "name": "Spieler 43",
+                "brawler": {
+                  "id": 16000003,
+                  "name": "BROCK",
+                  "power": 9,
+                  "trophies": 467
+                }
+              },
+              {
+                "tag": "#TEST0044",
+                "name": "Spieler 44",
+                "brawler": {
+                  "id": 16000072,
+                  "name": "PEARL",
+                  "power": 9,
+                  "trophies": 505
+                }
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T181401.000Z",
+        "event": {
+          "id": 15000990,
+          "mode": "soloShowdown",
+          "modeId": 6,
+          "map": "Lilypond Grove"
+        },
+        "battle": {
+          "mode": "soloShowdown",
+          "type": "ranked",
+          "rank": 1,
+          "trophyChange": 13,
+          "players": [
+            {
+              "tag": "#TEST0001",
+              "name": "Spieler 1",
+              "brawler": {
+                "id": 16000108,
+                "name": "WENDY",
+                "power": 11,
+                "trophies": 496
+              }
+            },
+            {
+              "tag": "#TEST0045",
+              "name": "Spieler 45",
+              "brawler": {
+                "id": 16000056,
+                "name": "EVE",
+                "power": 10,
+                "trophies": 531
+              }
+            },
+            {
+              "tag": "#TEST0046",
+              "name": "Spieler 46",
+              "brawler": {
+                "id": 16000074,
+                "name": "CHARLIE",
+                "power": 11,
+                "trophies": 548
+              }
+            },
+            {
+              "tag": "#TEST0047",
+              "name": "Spieler 47",
+              "brawler": {
+                "id": 16000023,
+                "name": "LEON",
+                "power": 8,
+                "trophies": 441
+              }
+            },
+            {
+              "tag": "#TEST0048",
+              "name": "Spieler 48",
+              "brawler": {
+                "id": 16000002,
+                "name": "BULL",
+                "power": 9,
+                "trophies": 503
+              }
+            },
+            {
+              "tag": "#TEST0049",
+              "name": "Spieler 49",
+              "brawler": {
+                "id": 16000000,
+                "name": "SHELLY",
+                "power": 11,
+                "trophies": 543
+              }
+            },
+            {
+              "tag": "#TEST0050",
+              "name": "Spieler 50",
+              "brawler": {
+                "id": 16000008,
+                "name": "NITA",
+                "power": 11,
+                "trophies": 433
+              }
+            },
+            {
+              "tag": "#TEST0051",
+              "name": "Spieler 51",
+              "brawler": {
+                "id": 16000020,
+                "name": "FRANK",
+                "power": 8,
+                "trophies": 490
+              }
+            },
+            {
+              "tag": "#TEST0052",
+              "name": "Spieler 52",
+              "brawler": {
+                "id": 16000032,
+                "name": "MAX",
+                "power": 8,
+                "trophies": 579
+              }
+            },
+            {
+              "tag": "#TEST0053",
+              "name": "Spieler 53",
+              "brawler": {
+                "id": 16000017,
+                "name": "TARA",
+                "power": 9,
+                "trophies": 579
+              }
+            }
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T181234.000Z",
+        "event": {
+          "id": 15001333,
+          "mode": "knockout",
+          "modeId": 20,
+          "map": "Stroke of Luck"
+        },
+        "battle": {
+          "mode": "knockout",
+          "type": "ranked",
+          "result": "defeat",
+          "duration": 135,
+          "starPlayer": {
+            "tag": "#TEST0054",
+            "name": "Spieler 54",
+            "brawler": {
+              "id": 16000003,
+              "name": "BROCK",
+              "power": 11,
+              "trophies": 979
+            }
+          },
+          "teams": [
+            [
+              {
+                "tag": "#TEST0054",
+                "name": "Spieler 54",
+                "brawler": {
+                  "id": 16000003,
+                  "name": "BROCK",
+                  "power": 11,
+                  "trophies": 979
+                }
+              },
+              {
+                "tag": "#TEST0055",
+                "name": "Spieler 55",
+                "brawler": {
+                  "id": 16000013,
+                  "name": "POCO",
+                  "power": 11,
+                  "trophies": 766
+                }
+              },
+              {
+                "tag": "#TEST0056",
+                "name": "Spieler 56",
+                "brawler": {
+                  "id": 16000101,
+                  "name": "GLOWY",
+                  "power": 11,
+                  "trophies": 1204
+                }
+              }
+            ],
+            [
+              {
+                "tag": "#TEST0057",
+                "name": "Spieler 57",
+                "brawler": {
+                  "id": 16000109,
+                  "name": "COSMO",
+                  "power": 10,
+                  "trophies": 599
+                }
+              },
+              {
+                "tag": "#TEST0058",
+                "name": "Spieler 58",
+                "brawler": {
+                  "id": 16000004,
+                  "name": "RICO",
+                  "power": 10,
+                  "trophies": 576
+                }
+              },
+              {
+                "tag": "#TEST0001",
+                "name": "Spieler 1",
+                "brawler": {
+                  "id": 16000108,
+                  "name": "WENDY",
+                  "power": 11,
+                  "trophies": 496
+                }
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T180957.000Z",
+        "event": {
+          "id": 15001333,
+          "mode": "knockout",
+          "modeId": 20,
+          "map": "Stroke of Luck"
+        },
+        "battle": {
+          "mode": "knockout",
+          "type": "ranked",
+          "result": "defeat",
+          "duration": 131,
+          "trophyChange": -2,
+          "starPlayer": {
+            "tag": "#TEST0001",
+            "name": "Spieler 1",
+            "brawler": {
+              "id": 16000108,
+              "name": "WENDY",
+              "power": 11,
+              "trophies": 498
+            }
+          },
+          "teams": [
+            [
+              {
+                "tag": "#TEST0059",
+                "name": "Spieler 59",
+                "brawler": {
+                  "id": 16000109,
+                  "name": "COSMO",
+                  "power": 10,
+                  "trophies": 1457
+                }
+              },
+              {
+                "tag": "#TEST0060",
+                "name": "Spieler 60",
+                "brawler": {
+                  "id": 16000065,
+                  "name": "MANDY",
+                  "power": 10,
+                  "trophies": 1143
+                }
+              },
+              {
+                "tag": "#TEST0061",
+                "name": "Spieler 61",
+                "brawler": {
+                  "id": 16000015,
+                  "name": "PIPER",
+                  "power": 11,
+                  "trophies": 1939
+                }
+              }
+            ],
+            [
+              {
+                "tag": "#TEST0062",
+                "name": "Spieler 62",
+                "brawler": {
+                  "id": 16000012,
+                  "name": "CROW",
+                  "power": 7,
+                  "trophies": 573
+                }
+              },
+              {
+                "tag": "#TEST0063",
+                "name": "Spieler 63",
+                "brawler": {
+                  "id": 16000102,
+                  "name": "SIRIUS",
+                  "power": 7,
+                  "trophies": 0
+                }
+              },
+              {
+                "tag": "#TEST0001",
+                "name": "Spieler 1",
+                "brawler": {
+                  "id": 16000108,
+                  "name": "WENDY",
+                  "power": 11,
+                  "trophies": 498
+                }
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T180314.000Z",
+        "event": {
+          "id": 15001333,
+          "mode": "knockout",
+          "modeId": 20,
+          "map": "Stroke of Luck"
+        },
+        "battle": {
+          "mode": "knockout",
+          "type": "ranked",
+          "result": "victory",
+          "duration": 118,
+          "trophyChange": 13,
+          "starPlayer": {
+            "tag": "#TEST0001",
+            "name": "Spieler 1",
+            "brawler": {
+              "id": 16000108,
+              "name": "WENDY",
+              "power": 11,
+              "trophies": 485
+            }
+          },
+          "teams": [
+            [
+              {
+                "tag": "#TEST0064",
+                "name": "Spieler 64",
+                "brawler": {
+                  "id": 16000046,
+                  "name": "BELLE",
+                  "power": 6,
+                  "trophies": 251
+                }
+              },
+              {
+                "tag": "#TEST0065",
+                "name": "Spieler 65",
+                "brawler": {
+                  "id": 16000109,
+                  "name": "COSMO",
+                  "power": 11,
+                  "trophies": 310
+                }
+              },
+              {
+                "tag": "#TEST0001",
+                "name": "Spieler 1",
+                "brawler": {
+                  "id": 16000108,
+                  "name": "WENDY",
+                  "power": 11,
+                  "trophies": 485
+                }
+              }
+            ],
+            [
+              {
+                "tag": "#TEST0066",
+                "name": "Spieler 66",
+                "brawler": {
+                  "id": 16000039,
+                  "name": "COLETTE",
+                  "power": 11,
+                  "trophies": 1762
+                }
+              },
+              {
+                "tag": "#TEST0067",
+                "name": "Spieler 67",
+                "brawler": {
+                  "id": 16000054,
+                  "name": "FANG",
+                  "power": 10,
+                  "trophies": 243
+                }
+              },
+              {
+                "tag": "#TEST0068",
+                "name": "Spieler 68",
+                "brawler": {
+                  "id": 16000043,
+                  "name": "EDGAR",
+                  "power": 11,
+                  "trophies": 1488
+                }
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T180041.000Z",
+        "event": {
+          "id": 15001333,
+          "mode": "knockout",
+          "modeId": 20,
+          "map": "Stroke of Luck"
+        },
+        "battle": {
+          "mode": "knockout",
+          "type": "ranked",
+          "result": "victory",
+          "duration": 65,
+          "trophyChange": 12,
+          "starPlayer": {
+            "tag": "#TEST0073",
+            "name": "Spieler 73",
+            "brawler": {
+              "id": 16000065,
+              "name": "MANDY",
+              "power": 11,
+              "trophies": 596
+            }
+          },
+          "teams": [
+            [
+              {
+                "tag": "#TEST0069",
+                "name": "Spieler 69",
+                "brawler": {
+                  "id": 16000015,
+                  "name": "PIPER",
+                  "power": 11,
+                  "trophies": 1177
+                }
+              },
+              {
+                "tag": "#TEST0070",
+                "name": "Spieler 70",
+                "brawler": {
+                  "id": 16000061,
+                  "name": "GUS",
+                  "power": 10,
+                  "trophies": 437
+                }
+              },
+              {
+                "tag": "#TEST0071",
+                "name": "Spieler 71",
+                "brawler": {
+                  "id": 16000057,
+                  "name": "JANET",
+                  "power": 5,
+                  "trophies": 271
+                }
+              }
+            ],
+            [
+              {
+                "tag": "#TEST0072",
+                "name": "Spieler 72",
+                "brawler": {
+                  "id": 16000026,
+                  "name": "BIBI",
+                  "power": 11,
+                  "trophies": 608
+                }
+              },
+              {
+                "tag": "#TEST0073",
+                "name": "Spieler 73",
+                "brawler": {
+                  "id": 16000065,
+                  "name": "MANDY",
+                  "power": 11,
+                  "trophies": 596
+                }
+              },
+              {
+                "tag": "#TEST0001",
+                "name": "Spieler 1",
+                "brawler": {
+                  "id": 16000108,
+                  "name": "WENDY",
+                  "power": 11,
+                  "trophies": 473
+                }
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T175908.000Z",
+        "event": {
+          "id": 15001333,
+          "mode": "knockout",
+          "modeId": 20,
+          "map": "Stroke of Luck"
+        },
+        "battle": {
+          "mode": "knockout",
+          "type": "ranked",
+          "result": "victory",
+          "duration": 58,
+          "trophyChange": 11,
+          "starPlayer": {
+            "tag": "#TEST0001",
+            "name": "Spieler 1",
+            "brawler": {
+              "id": 16000108,
+              "name": "WENDY",
+              "power": 11,
+              "trophies": 462
+            }
+          },
+          "teams": [
+            [
+              {
+                "tag": "#TEST0074",
+                "name": "Spieler 74",
+                "brawler": {
+                  "id": 16000071,
+                  "name": "DOUG",
+                  "power": 9,
+                  "trophies": 323
+                }
+              },
+              {
+                "tag": "#TEST0075",
+                "name": "Spieler 75",
+                "brawler": {
+                  "id": 16000107,
+                  "name": "NORI",
+                  "power": 9,
+                  "trophies": 319
+                }
+              },
+              {
+                "tag": "#TEST0076",
+                "name": "Spieler 76",
+                "brawler": {
+                  "id": 16000029,
+                  "name": "BEA",
+                  "power": 11,
+                  "trophies": 1353
+                }
+              }
+            ],
+            [
+              {
+                "tag": "#TEST0072",
+                "name": "Spieler 72",
+                "brawler": {
+                  "id": 16000026,
+                  "name": "BIBI",
+                  "power": 11,
+                  "trophies": 597
+                }
+              },
+              {
+                "tag": "#TEST0073",
+                "name": "Spieler 73",
+                "brawler": {
+                  "id": 16000065,
+                  "name": "MANDY",
+                  "power": 11,
+                  "trophies": 584
+                }
+              },
+              {
+                "tag": "#TEST0001",
+                "name": "Spieler 1",
+                "brawler": {
+                  "id": 16000108,
+                  "name": "WENDY",
+                  "power": 11,
+                  "trophies": 462
+                }
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T175742.000Z",
+        "event": {
+          "id": 15001333,
+          "mode": "knockout",
+          "modeId": 20,
+          "map": "Stroke of Luck"
+        },
+        "battle": {
+          "mode": "knockout",
+          "type": "ranked",
+          "result": "victory",
+          "duration": 36,
+          "trophyChange": 10,
+          "starPlayer": {
+            "tag": "#TEST0072",
+            "name": "Spieler 72",
+            "brawler": {
+              "id": 16000026,
+              "name": "BIBI",
+              "power": 11,
+              "trophies": 587
+            }
+          },
+          "teams": [
+            [
+              {
+                "tag": "#TEST0001",
+                "name": "Spieler 1",
+                "brawler": {
+                  "id": 16000108,
+                  "name": "WENDY",
+                  "power": 11,
+                  "trophies": 452
+                }
+              },
+              {
+                "tag": "#TEST0072",
+                "name": "Spieler 72",
+                "brawler": {
+                  "id": 16000026,
+                  "name": "BIBI",
+                  "power": 11,
+                  "trophies": 587
+                }
+              },
+              {
+                "tag": "#TEST0073",
+                "name": "Spieler 73",
+                "brawler": {
+                  "id": 16000065,
+                  "name": "MANDY",
+                  "power": 11,
+                  "trophies": 573
+                }
+              }
+            ],
+            [
+              {
+                "tag": "#TEST0077",
+                "name": "Spieler 77",
+                "brawler": {
+                  "id": 16000020,
+                  "name": "FRANK",
+                  "power": 11,
+                  "trophies": 584
+                }
+              },
+              {
+                "tag": "#TEST0078",
+                "name": "Spieler 78",
+                "brawler": {
+                  "id": 16000066,
+                  "name": "R-T",
+                  "power": 10,
+                  "trophies": 579
+                }
+              },
+              {
+                "tag": "#TEST0079",
+                "name": "Spieler 79",
+                "brawler": {
+                  "id": 16000004,
+                  "name": "RICO",
+                  "power": 10,
+                  "trophies": 567
+                }
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T175546.000Z",
+        "event": {
+          "id": 15001054,
+          "mode": "brawlBall",
+          "modeId": 5,
+          "map": "Match 1123581321"
+        },
+        "battle": {
+          "mode": "brawlBall",
+          "type": "ranked",
+          "result": "defeat",
+          "duration": 65,
+          "trophyChange": -2,
+          "starPlayer": {
+            "tag": "#TEST0081",
+            "name": "Spieler 81",
+            "brawler": {
+              "id": 16000027,
+              "name": "8-BIT",
+              "power": 11,
+              "trophies": 566
+            }
+          },
+          "teams": [
+            [
+              {
+                "tag": "#TEST0080",
+                "name": "Spieler 80",
+                "brawler": {
+                  "id": 16000050,
+                  "name": "GRIFF",
+                  "power": 7,
+                  "trophies": 517
+                }
+              },
+              {
+                "tag": "#TEST0081",
+                "name": "Spieler 81",
+                "brawler": {
+                  "id": 16000027,
+                  "name": "8-BIT",
+                  "power": 11,
+                  "trophies": 566
+                }
+              },
+              {
+                "tag": "#TEST0082",
+                "name": "Spieler 82",
+                "brawler": {
+                  "id": 16000051,
+                  "name": "ASH",
+                  "power": 8,
+                  "trophies": 378
+                }
+              }
+            ],
+            [
+              {
+                "tag": "#TEST0001",
+                "name": "Spieler 1",
+                "brawler": {
+                  "id": 16000084,
+                  "name": "MOE",
+                  "power": 11,
+                  "trophies": 327
+                }
+              },
+              {
+                "tag": "#TEST0083",
+                "name": "Spieler 83",
+                "brawler": {
+                  "id": 16000013,
+                  "name": "POCO",
+                  "power": 9,
+                  "trophies": 868
+                }
+              },
+              {
+                "tag": "#TEST0084",
+                "name": "Spieler 84",
+                "brawler": {
+                  "id": 16000040,
+                  "name": "AMBER",
+                  "power": 11,
+                  "trophies": 939
+                }
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T164920.000Z",
+        "event": {
+          "id": 15001054,
+          "mode": "brawlBall",
+          "modeId": 5,
+          "map": "Match 1123581321"
+        },
+        "battle": {
+          "mode": "brawlBall",
+          "type": "ranked",
+          "result": "defeat",
+          "duration": 103,
+          "trophyChange": -2,
+          "starPlayer": {
+            "tag": "#TEST0086",
+            "name": "Spieler 86",
+            "brawler": {
+              "id": 16000039,
+              "name": "COLETTE",
+              "power": 11,
+              "trophies": 1411
+            }
+          },
+          "teams": [
+            [
+              {
+                "tag": "#TEST0085",
+                "name": "Spieler 85",
+                "brawler": {
+                  "id": 16000099,
+                  "name": "PIERCE",
+                  "power": 11,
+                  "trophies": 1891
+                }
+              },
+              {
+                "tag": "#TEST0001",
+                "name": "Spieler 1",
+                "brawler": {
+                  "id": 16000108,
+                  "name": "WENDY",
+                  "power": 11,
+                  "trophies": 454
+                }
+              },
+              {
+                "tag": "#TEST0086",
+                "name": "Spieler 86",
+                "brawler": {
+                  "id": 16000039,
+                  "name": "COLETTE",
+                  "power": 11,
+                  "trophies": 1411
+                }
+              }
+            ],
+            [
+              {
+                "tag": "#TEST0087",
+                "name": "Spieler 87",
+                "brawler": {
+                  "id": 16000011,
+                  "name": "MORTIS",
+                  "power": 11,
+                  "trophies": 2010
+                }
+              },
+              {
+                "tag": "#TEST0088",
+                "name": "Spieler 88",
+                "brawler": {
+                  "id": 16000010,
+                  "name": "EL PRIMO",
+                  "power": 11,
+                  "trophies": 1232
+                }
+              },
+              {
+                "tag": "#TEST0089",
+                "name": "Spieler 89",
+                "brawler": {
+                  "id": 16000039,
+                  "name": "COLETTE",
+                  "power": 11,
+                  "trophies": 1415
+                }
+              }
+            ]
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T164521.000Z",
+        "event": {
+          "id": 15000990,
+          "mode": "soloShowdown",
+          "modeId": 6,
+          "map": "Lilypond Grove"
+        },
+        "battle": {
+          "mode": "soloShowdown",
+          "type": "ranked",
+          "rank": 1,
+          "trophyChange": 20,
+          "players": [
+            {
+              "tag": "#TEST0001",
+              "name": "Spieler 1",
+              "brawler": {
+                "id": 16000086,
+                "name": "SHADE",
+                "power": 11,
+                "trophies": 998
+              }
+            },
+            {
+              "tag": "#TEST0090",
+              "name": "Spieler 90",
+              "brawler": {
+                "id": 16000104,
+                "name": "DAMIAN",
+                "power": 11,
+                "trophies": 312
+              }
+            },
+            {
+              "tag": "#TEST0091",
+              "name": "Spieler 91",
+              "brawler": {
+                "id": 16000036,
+                "name": "NANI",
+                "power": 11,
+                "trophies": 809
+              }
+            },
+            {
+              "tag": "#TEST0092",
+              "name": "Spieler 92",
+              "brawler": {
+                "id": 16000049,
+                "name": "BUZZ",
+                "power": 9,
+                "trophies": 820
+              }
+            },
+            {
+              "tag": "#TEST0093",
+              "name": "Spieler 93",
+              "brawler": {
+                "id": 16000036,
+                "name": "NANI",
+                "power": 7,
+                "trophies": 554
+              }
+            },
+            {
+              "tag": "#TEST0094",
+              "name": "Spieler 94",
+              "brawler": {
+                "id": 16000108,
+                "name": "WENDY",
+                "power": 8,
+                "trophies": 365
+              }
+            },
+            {
+              "tag": "#TEST0095",
+              "name": "Spieler 95",
+              "brawler": {
+                "id": 16000012,
+                "name": "CROW",
+                "power": 11,
+                "trophies": 2000
+              }
+            },
+            {
+              "tag": "#TEST0096",
+              "name": "Spieler 96",
+              "brawler": {
+                "id": 16000094,
+                "name": "KAZE",
+                "power": 10,
+                "trophies": 312
+              }
+            },
+            {
+              "tag": "#TEST0097",
+              "name": "Spieler 97",
+              "brawler": {
+                "id": 16000070,
+                "name": "CORDELIUS",
+                "power": 9,
+                "trophies": 656
+              }
+            },
+            {
+              "tag": "#TEST0098",
+              "name": "Spieler 98",
+              "brawler": {
+                "id": 16000005,
+                "name": "SPIKE",
+                "power": 11,
+                "trophies": 541
+              }
+            }
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T164349.000Z",
+        "event": {
+          "id": 15000990,
+          "mode": "soloShowdown",
+          "modeId": 6,
+          "map": "Lilypond Grove"
+        },
+        "battle": {
+          "mode": "soloShowdown",
+          "type": "ranked",
+          "rank": 1,
+          "trophyChange": 19,
+          "players": [
+            {
+              "tag": "#TEST0001",
+              "name": "Spieler 1",
+              "brawler": {
+                "id": 16000086,
+                "name": "SHADE",
+                "power": 11,
+                "trophies": 979
+              }
+            },
+            {
+              "tag": "#TEST0099",
+              "name": "Spieler 99",
+              "brawler": {
+                "id": 16000000,
+                "name": "SHELLY",
+                "power": 11,
+                "trophies": 622
+              }
+            },
+            {
+              "tag": "#TEST0100",
+              "name": "Spieler 100",
+              "brawler": {
+                "id": 16000002,
+                "name": "BULL",
+                "power": 8,
+                "trophies": 783
+              }
+            },
+            {
+              "tag": "#TEST0101",
+              "name": "Spieler 101",
+              "brawler": {
+                "id": 16000059,
+                "name": "OTIS",
+                "power": 11,
+                "trophies": 628
+              }
+            },
+            {
+              "tag": "#TEST0102",
+              "name": "Spieler 102",
+              "brawler": {
+                "id": 16000108,
+                "name": "WENDY",
+                "power": 11,
+                "trophies": 427
+              }
+            },
+            {
+              "tag": "#TEST0103",
+              "name": "Spieler 103",
+              "brawler": {
+                "id": 16000076,
+                "name": "KIT",
+                "power": 11,
+                "trophies": 549
+              }
+            },
+            {
+              "tag": "#TEST0104",
+              "name": "Spieler 104",
+              "brawler": {
+                "id": 16000045,
+                "name": "STU",
+                "power": 10,
+                "trophies": 285
+              }
+            },
+            {
+              "tag": "#TEST0105",
+              "name": "Spieler 105",
+              "brawler": {
+                "id": 16000044,
+                "name": "RUFFS",
+                "power": 9,
+                "trophies": 354
+              }
+            },
+            {
+              "tag": "#TEST0106",
+              "name": "Spieler 106",
+              "brawler": {
+                "id": 16000061,
+                "name": "GUS",
+                "power": 9,
+                "trophies": 570
+              }
+            },
+            {
+              "tag": "#TEST0107",
+              "name": "Spieler 107",
+              "brawler": {
+                "id": 16000020,
+                "name": "FRANK",
+                "power": 10,
+                "trophies": 804
+              }
+            }
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T164314.000Z",
+        "event": {
+          "id": 15000990,
+          "mode": "soloShowdown",
+          "modeId": 6,
+          "map": "Lilypond Grove"
+        },
+        "battle": {
+          "mode": "soloShowdown",
+          "type": "ranked",
+          "rank": 5,
+          "trophyChange": 2,
+          "players": [
+            {
+              "tag": "#TEST0108",
+              "name": "Spieler 108",
+              "brawler": {
+                "id": 16000057,
+                "name": "JANET",
+                "power": 9,
+                "trophies": 388
+              }
+            },
+            {
+              "tag": "#TEST0109",
+              "name": "Spieler 109",
+              "brawler": {
+                "id": 16000086,
+                "name": "SHADE",
+                "power": 9,
+                "trophies": 635
+              }
+            },
+            {
+              "tag": "#TEST0110",
+              "name": "Spieler 110",
+              "brawler": {
+                "id": 16000108,
+                "name": "WENDY",
+                "power": 11,
+                "trophies": 420
+              }
+            },
+            {
+              "tag": "#TEST0111",
+              "name": "Spieler 111",
+              "brawler": {
+                "id": 16000050,
+                "name": "GRIFF",
+                "power": 11,
+                "trophies": 344
+              }
+            },
+            {
+              "tag": "#TEST0001",
+              "name": "Spieler 1",
+              "brawler": {
+                "id": 16000086,
+                "name": "SHADE",
+                "power": 11,
+                "trophies": 977
+              }
+            },
+            {
+              "tag": "#TEST0112",
+              "name": "Spieler 112",
+              "brawler": {
+                "id": 16000107,
+                "name": "NORI",
+                "power": 10,
+                "trophies": 256
+              }
+            },
+            {
+              "tag": "#TEST0113",
+              "name": "Spieler 113",
+              "brawler": {
+                "id": 16000038,
+                "name": "SURGE",
+                "power": 11,
+                "trophies": 2040
+              }
+            },
+            {
+              "tag": "#TEST0114",
+              "name": "Spieler 114",
+              "brawler": {
+                "id": 16000107,
+                "name": "NORI",
+                "power": 10,
+                "trophies": 293
+              }
+            },
+            {
+              "tag": "#TEST0115",
+              "name": "Spieler 115",
+              "brawler": {
+                "id": 16000002,
+                "name": "BULL",
+                "power": 11,
+                "trophies": 1540
+              }
+            },
+            {
+              "tag": "#TEST0116",
+              "name": "Spieler 116",
+              "brawler": {
+                "id": 16000065,
+                "name": "MANDY",
+                "power": 8,
+                "trophies": 681
+              }
+            }
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T164114.000Z",
+        "event": {
+          "id": 15000990,
+          "mode": "soloShowdown",
+          "modeId": 6,
+          "map": "Lilypond Grove"
+        },
+        "battle": {
+          "mode": "soloShowdown",
+          "type": "ranked",
+          "rank": 1,
+          "trophyChange": 18,
+          "players": [
+            {
+              "tag": "#TEST0001",
+              "name": "Spieler 1",
+              "brawler": {
+                "id": 16000086,
+                "name": "SHADE",
+                "power": 11,
+                "trophies": 959
+              }
+            },
+            {
+              "tag": "#TEST0117",
+              "name": "Spieler 117",
+              "brawler": {
+                "id": 16000107,
+                "name": "NORI",
+                "power": 10,
+                "trophies": 1746
+              }
+            },
+            {
+              "tag": "#TEST0118",
+              "name": "Spieler 118",
+              "brawler": {
+                "id": 16000000,
+                "name": "SHELLY",
+                "power": 11,
+                "trophies": 1748
+              }
+            },
+            {
+              "tag": "#TEST0119",
+              "name": "Spieler 119",
+              "brawler": {
+                "id": 16000000,
+                "name": "SHELLY",
+                "power": 11,
+                "trophies": 656
+              }
+            },
+            {
+              "tag": "#TEST0120",
+              "name": "Spieler 120",
+              "brawler": {
+                "id": 16000005,
+                "name": "SPIKE",
+                "power": 11,
+                "trophies": 2071
+              }
+            },
+            {
+              "tag": "#TEST0121",
+              "name": "Spieler 121",
+              "brawler": {
+                "id": 16000063,
+                "name": "CHESTER",
+                "power": 11,
+                "trophies": 1631
+              }
+            },
+            {
+              "tag": "#TEST0122",
+              "name": "Spieler 122",
+              "brawler": {
+                "id": 16000094,
+                "name": "KAZE",
+                "power": 11,
+                "trophies": 748
+              }
+            },
+            {
+              "tag": "#TEST0123",
+              "name": "Spieler 123",
+              "brawler": {
+                "id": 16000086,
+                "name": "SHADE",
+                "power": 11,
+                "trophies": 1316
+              }
+            },
+            {
+              "tag": "#TEST0124",
+              "name": "Spieler 124",
+              "brawler": {
+                "id": 16000009,
+                "name": "DYNAMIKE",
+                "power": 11,
+                "trophies": 330
+              }
+            },
+            {
+              "tag": "#TEST0125",
+              "name": "Spieler 125",
+              "brawler": {
+                "id": 16000043,
+                "name": "EDGAR",
+                "power": 11,
+                "trophies": 1887
+              }
+            }
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T163900.000Z",
+        "event": {
+          "id": 15000990,
+          "mode": "soloShowdown",
+          "modeId": 6,
+          "map": "Lilypond Grove"
+        },
+        "battle": {
+          "mode": "soloShowdown",
+          "type": "ranked",
+          "rank": 1,
+          "trophyChange": 17,
+          "players": [
+            {
+              "tag": "#TEST0001",
+              "name": "Spieler 1",
+              "brawler": {
+                "id": 16000086,
+                "name": "SHADE",
+                "power": 11,
+                "trophies": 942
+              }
+            },
+            {
+              "tag": "#TEST0126",
+              "name": "Spieler 126",
+              "brawler": {
+                "id": 16000023,
+                "name": "LEON",
+                "power": 10,
+                "trophies": 477
+              }
+            },
+            {
+              "tag": "#TEST0127",
+              "name": "Spieler 127",
+              "brawler": {
+                "id": 16000108,
+                "name": "WENDY",
+                "power": 4,
+                "trophies": 225
+              }
+            },
+            {
+              "tag": "#TEST0128",
+              "name": "Spieler 128",
+              "brawler": {
+                "id": 16000000,
+                "name": "SHELLY",
+                "power": 10,
+                "trophies": 2072
+              }
+            },
+            {
+              "tag": "#TEST0129",
+              "name": "Spieler 129",
+              "brawler": {
+                "id": 16000089,
+                "name": "MEEPLE",
+                "power": 7,
+                "trophies": 409
+              }
+            },
+            {
+              "tag": "#TEST0130",
+              "name": "Spieler 130",
+              "brawler": {
+                "id": 16000003,
+                "name": "BROCK",
+                "power": 8,
+                "trophies": 549
+              }
+            },
+            {
+              "tag": "#TEST0131",
+              "name": "Spieler 131",
+              "brawler": {
+                "id": 16000107,
+                "name": "NORI",
+                "power": 11,
+                "trophies": 496
+              }
+            },
+            {
+              "tag": "#TEST0132",
+              "name": "Spieler 132",
+              "brawler": {
+                "id": 16000000,
+                "name": "SHELLY",
+                "power": 11,
+                "trophies": 743
+              }
+            },
+            {
+              "tag": "#TEST0133",
+              "name": "Spieler 133",
+              "brawler": {
+                "id": 16000086,
+                "name": "SHADE",
+                "power": 11,
+                "trophies": 1790
+              }
+            },
+            {
+              "tag": "#TEST0134",
+              "name": "Spieler 134",
+              "brawler": {
+                "id": 16000010,
+                "name": "EL PRIMO",
+                "power": 11,
+                "trophies": 1274
+              }
+            }
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T163520.000Z",
+        "event": {
+          "id": 15000990,
+          "mode": "soloShowdown",
+          "modeId": 6,
+          "map": "Lilypond Grove"
+        },
+        "battle": {
+          "mode": "soloShowdown",
+          "type": "ranked",
+          "rank": 4,
+          "trophyChange": 8,
+          "players": [
+            {
+              "tag": "#TEST0135",
+              "name": "Spieler 135",
+              "brawler": {
+                "id": 16000061,
+                "name": "GUS",
+                "power": 11,
+                "trophies": 1204
+              }
+            },
+            {
+              "tag": "#TEST0136",
+              "name": "Spieler 136",
+              "brawler": {
+                "id": 16000069,
+                "name": "HANK",
+                "power": 9,
+                "trophies": 543
+              }
+            },
+            {
+              "tag": "#TEST0137",
+              "name": "Spieler 137",
+              "brawler": {
+                "id": 16000038,
+                "name": "SURGE",
+                "power": 11,
+                "trophies": 809
+              }
+            },
+            {
+              "tag": "#TEST0001",
+              "name": "Spieler 1",
+              "brawler": {
+                "id": 16000086,
+                "name": "SHADE",
+                "power": 11,
+                "trophies": 934
+              }
+            },
+            {
+              "tag": "#TEST0138",
+              "name": "Spieler 138",
+              "brawler": {
+                "id": 16000065,
+                "name": "MANDY",
+                "power": 11,
+                "trophies": 2002
+              }
+            },
+            {
+              "tag": "#TEST0139",
+              "name": "Spieler 139",
+              "brawler": {
+                "id": 16000068,
+                "name": "MAISIE",
+                "power": 10,
+                "trophies": 645
+              }
+            },
+            {
+              "tag": "#TEST0140",
+              "name": "Spieler 140",
+              "brawler": {
+                "id": 16000079,
+                "name": "ANGELO",
+                "power": 11,
+                "trophies": 1802
+              }
+            },
+            {
+              "tag": "#TEST0141",
+              "name": "Spieler 141",
+              "brawler": {
+                "id": 16000102,
+                "name": "SIRIUS",
+                "power": 9,
+                "trophies": 408
+              }
+            },
+            {
+              "tag": "#TEST0142",
+              "name": "Spieler 142",
+              "brawler": {
+                "id": 16000001,
+                "name": "COLT",
+                "power": 11,
+                "trophies": 1904
+              }
+            },
+            {
+              "tag": "#TEST0143",
+              "name": "Spieler 143",
+              "brawler": {
+                "id": 16000086,
+                "name": "SHADE",
+                "power": 8,
+                "trophies": 264
+              }
+            }
+          ]
+        }
+      },
+      {
+        "battleTime": "20260914T163110.000Z",
+        "event": {
+          "id": 15000990,
+          "mode": "soloShowdown",
+          "modeId": 6,
+          "map": "Lilypond Grove"
+        },
+        "battle": {
+          "mode": "soloShowdown",
+          "type": "ranked",
+          "rank": 4,
+          "trophyChange": 7,
+          "players": [
+            {
+              "tag": "#TEST0144",
+              "name": "Spieler 144",
+              "brawler": {
+                "id": 16000107,
+                "name": "NORI",
+                "power": 11,
+                "trophies": 2188
+              }
+            },
+            {
+              "tag": "#TEST0145",
+              "name": "Spieler 145",
+              "brawler": {
+                "id": 16000075,
+                "name": "MICO",
+                "power": 9,
+                "trophies": 374
+              }
+            },
+            {
+              "tag": "#TEST0146",
+              "name": "Spieler 146",
+              "brawler": {
+                "id": 16000065,
+                "name": "MANDY",
+                "power": 11,
+                "trophies": 1485
+              }
+            },
+            {
+              "tag": "#TEST0001",
+              "name": "Spieler 1",
+              "brawler": {
+                "id": 16000086,
+                "name": "SHADE",
+                "power": 11,
+                "trophies": 927
+              }
+            },
+            {
+              "tag": "#TEST0147",
+              "name": "Spieler 147",
+              "brawler": {
+                "id": 16000035,
+                "name": "GALE",
+                "power": 5,
+                "trophies": 237
+              }
+            },
+            {
+              "tag": "#TEST0148",
+              "name": "Spieler 148",
+              "brawler": {
+                "id": 16000086,
+                "name": "SHADE",
+                "power": 9,
+                "trophies": 440
+              }
+            },
+            {
+              "tag": "#TEST0149",
+              "name": "Spieler 149",
+              "brawler": {
+                "id": 16000010,
+                "name": "EL PRIMO",
+                "power": 9,
+                "trophies": 1173
+              }
+            },
+            {
+              "tag": "#TEST0150",
+              "name": "Spieler 150",
+              "brawler": {
+                "id": 16000024,
+                "name": "ROSA",
+                "power": 7,
+                "trophies": 559
+              }
+            },
+            {
+              "tag": "#TEST0151",
+              "name": "Spieler 151",
+              "brawler": {
+                "id": 16000038,
+                "name": "SURGE",
+                "power": 11,
+                "trophies": 2000
+              }
+            },
+            {
+              "tag": "#TEST0152",
+              "name": "Spieler 152",
+              "brawler": {
+                "id": 16000040,
+                "name": "AMBER",
+                "power": 8,
+                "trophies": 661
+              }
+            }
+          ]
+        }
+      }
+    ],
+    "paging": {
+      "cursors": {}
+    }
+  },
+  "hinweis": "Echte Antwort von /players/{tag}/battlelog vom 2026-09-15, ANONYMISIERT: Spieler-Tags durch #TEST0001 ff., Namen durch 'Spieler N' ersetzt (konsistent je Spieler). Alle anderen Felder und Werte unveraendert - Grundlage des Parsers."
+}

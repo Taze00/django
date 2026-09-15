@@ -19,7 +19,8 @@ from drafter.services.providers.fixture import FixtureDataProvider
 
 
 class Command(BaseCommand):
-    help = "Liest Match-Dateien (drafter.match.v1) ein - idempotent und dedupliziert."
+    help = ("Liest Match-Dateien (drafter.match.v1, brawlstars.battlelog.raw) ein - "
+            "idempotent und dedupliziert.")
 
     def add_arguments(self, parser):
         parser.add_argument(

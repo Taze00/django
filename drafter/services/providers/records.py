@@ -241,6 +241,13 @@ class SpielerRecord:
     # ID des Brawlers in der Quelle. Wenn gesetzt, ordnet der Import
     # darueber zu und nimmt den Namen nur als Rueckfall.
     external_brawler_id: str = None
+    # Beobachtet in der offiziellen API (battle.teams[][].brawler): Level
+    # des Brawlers in dieser Partie und ein Wert namens "trophies". Dessen
+    # BEDEUTUNG haengt vom Partietyp ab - bei "soloRanked" war er in allen
+    # beobachteten Partien der Ranked-Rang, sonst die Trophaeenzahl. Er
+    # wird deshalb roh uebernommen und nicht umgedeutet.
+    power: int = None
+    trophies: int = None
 
 
 @dataclass
@@ -272,6 +279,8 @@ class MatchRecord:
     # IDs von Modus und Map in der Quelle - vorrangig vor den Namen.
     external_mode_id: str = None
     external_map_id: str = None
+    # Partietyp, wie die Quelle ihn nennt (offizielle API: battle.type).
+    battle_type: str = None
 
 
 @dataclass
@@ -298,3 +307,7 @@ class Lieferung:
     # Lieferung als Ganzes bleibt gueltig. Ob Daten synthetisch sind,
     # steht in `source`, nicht in einem zweiten Flag.
     fehler: list = field(default_factory=list)
+    # Partien, die gueltig sind, aber nicht in dieses System gehoeren - etwa
+    # Showdown ohne zwei Teams. Getrennt von `fehler`, damit ein Bericht
+    # nicht 8 "ungueltige" Partien meldet, die schlicht keine Drafts sind.
+    uebersprungen: list = field(default_factory=list)

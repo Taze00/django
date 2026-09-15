@@ -41,6 +41,7 @@ class ImportBericht:
     fehlerhaft: int = 0
     matches_gelesen: int = 0
     ungueltig: int = 0
+    uebersprungen: int = 0
     neu: int = 0
     duplikate: int = 0
     konflikte: int = 0
@@ -57,7 +58,8 @@ class ImportBericht:
             f"Lieferungen:          {self.lieferungen}"
             f" (bereits importiert {self.bereits_importiert},"
             f" nicht auswertbar {self.nicht_unterstuetzt}, fehlerhaft {self.fehlerhaft})",
-            f"Partien gelesen:      {self.matches_gelesen} (ungültig verworfen {self.ungueltig})",
+            f"Partien gelesen:      {self.matches_gelesen} (ungültig verworfen {self.ungueltig},"
+            f" übersprungen - keine Draft-Partie {self.uebersprungen})",
             f"  neu gespeichert:    {self.neu}",
             f"  Duplikate:          {self.duplikate}",
             f"  Konflikte:          {self.konflikte}",
@@ -155,13 +157,17 @@ class MatchImporter:
                     self._match(record, payload, lieferung.source, bericht)
 
                 bericht.ungueltig += len(lieferung.fehler)
+                bericht.uebersprungen += len(lieferung.uebersprungen)
                 for fehler in lieferung.fehler[:5]:
                     bericht.meldungen.append(f"{lieferung.referenz}: {fehler}")
 
                 payload.match_count = len(lieferung.matches)
                 payload.new_match_count = bericht.neu - neu_vorher
-                if lieferung.fehler:
-                    payload.parse_message = "\n".join(lieferung.fehler)
+                if lieferung.fehler or lieferung.uebersprungen:
+                    payload.parse_message = "\n".join(
+                        [f"FEHLER: {f}" for f in lieferung.fehler]
+                        + [f"ÜBERSPRUNGEN: {u}" for u in lieferung.uebersprungen]
+                    )
                 payload.save(update_fields=["match_count", "new_match_count", "parse_message"])
         except (DatabaseError, ValueError, TypeError) as fehler:
             bericht.fehlerhaft += 1
@@ -248,6 +254,7 @@ class MatchImporter:
             winner_side=sieger,
             first_pick_side=record.first_pick or "",
             duration_seconds=record.duration_seconds,
+            battle_type=(record.battle_type or "")[:40],
         )
         match.payloads.add(payload)
 
@@ -266,6 +273,7 @@ class MatchImporter:
                     match=match, side=seite, brawler=brawler,
                     brawler_name=gelieferter_name[:80], player_tag=(s.player_tag or "")[:20],
                     pick_order=s.pick_order, build=s.build,
+                    power=s.power, trophies=s.trophies,
                 ))
         MatchPlayer.objects.bulk_create(spieler)
 
