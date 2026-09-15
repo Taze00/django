@@ -205,7 +205,9 @@ class DraftEngine:
         empfehlung.zu_vermeidendes_matchup = coach.schlechtestes_matchup(
             b, gegner, self.raum
         )
-        empfehlung.build = builds.empfehlung(b, self.ctx, self.katalog)
+        # Mit Datenraum: gibt es Build-Statistiken, fliessen sie ein -
+        # ohne sie bleibt es exakt die regelbasierte Empfehlung.
+        empfehlung.build = builds.empfehlung(b, self.ctx, self.katalog, raum=self.raum)
 
     def detail(self, brawler):
         """Vollstaendige Bewertung eines einzelnen Brawlers.
@@ -300,7 +302,7 @@ class DraftEngine:
                 ),
                 "lane": lane.get("lane"),
                 "lane_grund": lane.get("grund"),
-                "build": builds.empfehlung(b, self.ctx, self.katalog),
+                "build": builds.empfehlung(b, self.ctx, self.katalog, raum=self.raum),
             })
 
         siegchance = self.siegchance()

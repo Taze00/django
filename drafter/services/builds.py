@@ -19,6 +19,7 @@ ohne Build statt mit einem erfundenen.
 
 from django.db import models
 
+from drafter import config
 from drafter.models import BrawlerItem
 from drafter.services.scoring import klemme
 
@@ -126,8 +127,15 @@ def _erfuellt(bedingung, kandidat, ctx):
     return True
 
 
-def _bewerte(gegenstaende, kandidat, ctx):
-    """Je Gegenstand: (Punktzahl, Gruende) aus Grundwert und Regeln."""
+def _bewerte(gegenstaende, kandidat, ctx, raum=None):
+    """Je Gegenstand: (Punktzahl, Gruende) aus Grundwert, Regeln und Statistik.
+
+    Die Statistik kommt obendrauf und verdraengt die Regeln nicht. Ihr
+    Einfluss ist mit ihrer Confidence gewichtet: eine Build-Statistik aus
+    zwanzig Partien verschiebt kaum etwas, eine aus zwanzigtausend deutlich.
+    Ohne Datenraum oder ohne Build-Statistik ist das Ergebnis exakt das
+    der Regeln allein.
+    """
     bewertet = []
     for gegenstand in gegenstaende:
         punkte = gegenstand.base_weight
@@ -138,9 +146,24 @@ def _bewerte(gegenstaende, kandidat, ctx):
             if _erfuellt(regel.condition, kandidat, ctx):
                 punkte += regel.weight
                 gruende.append(_text(regel, kandidat, ctx))
-        bewertet.append((punkte, gegenstand, gruende))
+
+        stat = raum.build_stat(kandidat, gegenstand.kind, gegenstand.slug) if raum else None
+        if stat is not None and stat.games:
+            punkte += config.BUILD_STAT_EINFLUSS * stat.advantage * stat.confidence
+            gruende.append(_statistik_text(stat, kandidat))
+        bewertet.append((punkte, gegenstand, gruende, stat))
     bewertet.sort(key=lambda p: -p[0])
     return bewertet
+
+
+def _statistik_text(stat, kandidat):
+    """Begruendung aus einer Build-Statistik - mit Stichprobe und Herkunft."""
+    richtung = "über" if stat.advantage >= 0 else "unter"
+    herkunft = "" if stat.ist_gemessen else " (keine Messung: Demo- oder Testdaten)"
+    return (
+        f"in {stat.games} vergleichbaren Partien {richtung} "
+        f"{kandidat.name}s Durchschnitt{herkunft}"
+    )
 
 
 def _text(regel, kandidat, ctx):
@@ -154,7 +177,7 @@ def _text(regel, kandidat, ctx):
     )
 
 
-def empfehlung(kandidat, ctx, katalog=None):
+def empfehlung(kandidat, ctx, katalog=None, raum=None):
     """Build fuer einen Brawler im aktuellen Draftkontext.
 
     Gibt None zurueck, wenn zu diesem Brawler nichts gepflegt ist.
@@ -175,7 +198,9 @@ def empfehlung(kandidat, ctx, katalog=None):
     if not eigene and not generische:
         return None
 
-    build = {"quelle": "regeln", "ist_demo": True, "gruende": []}
+    # "statistik" steht immer in der Antwort, auch als False - die
+    # Oberflaeche soll nicht zwischen "fehlt" und "nein" unterscheiden muessen.
+    build = {"quelle": "regeln", "ist_demo": True, "statistik": False, "gruende": []}
     alle_gruende = []
 
     for kind, feld in (
@@ -187,8 +212,9 @@ def empfehlung(kandidat, ctx, katalog=None):
         if not auswahl:
             build[feld] = None
             continue
-        bewertet = _bewerte(auswahl, kandidat, ctx)
-        punkte, bester, gruende = bewertet[0]
+        bewertet = _bewerte(auswahl, kandidat, ctx, raum)
+        punkte, bester, gruende, stat = bewertet[0]
+        build["statistik"] = build["statistik"] or stat is not None
         build[feld] = {
             "name": bester.name,
             "beschreibung": bester.description,
@@ -204,16 +230,19 @@ def empfehlung(kandidat, ctx, katalog=None):
 
     gears = [g for g in eigene + generische if g.kind == BrawlerItem.Kind.GEAR]
     if gears:
-        bewertet = _bewerte(gears, kandidat, ctx)
-        build["gears"] = [g.name for _, g, _ in bewertet[:GEAR_PLAETZE]]
-        for _, _, gruende in bewertet[:GEAR_PLAETZE]:
+        bewertet = _bewerte(gears, kandidat, ctx, raum)
+        build["gears"] = [g.name for _, g, _, _ in bewertet[:GEAR_PLAETZE]]
+        for _, _, gruende, stat in bewertet[:GEAR_PLAETZE]:
             alle_gruende += gruende
+            build["statistik"] = build["statistik"] or stat is not None
     else:
         build["gears"] = []
 
     # Gleiche Begruendung mehrfach (z.B. Gadget und Gear wegen derselben
     # Gegnercomp) nur einmal zeigen.
     build["gruende"] = list(dict.fromkeys(g for g in alle_gruende if g))
+    if build["statistik"]:
+        build["quelle"] = "regeln+statistik"
 
     # Ehrlich bleiben, statt eine halbe Empfehlung wie eine ganze
     # aussehen zu lassen: sind zu diesem Brawler nur die generischen
