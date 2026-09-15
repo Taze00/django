@@ -258,6 +258,20 @@ class PriorFensterTest(AggregationsTest):
 
 
 class CounterTest(AggregationsTest):
+    def _counter(self, a, b):
+        """Rohrate und Vorteil von a gegen b - aus der EINEN gespeicherten Zeile.
+
+        Berechnete Counter liegen nur in kanonischer Richtung vor (kleinere
+        ID zuerst); die Gegenrichtung wird abgeleitet, wie in der Engine.
+        """
+        brawler_a, brawler_b = self.brawler(a), self.brawler(b)
+        klein, gross = sorted((brawler_a, brawler_b), key=lambda x: x.id)
+        zeile = CounterStat.objects.get(brawler=klein, enemy=gross, game_mode__isnull=True,
+                                        rank_pool="alle", source=Datenquelle.SYNTHETIC)
+        if klein == brawler_a:
+            return zeile.raw_rate, zeile.advantage, zeile
+        return 1 - zeile.raw_rate, -zeile.advantage, zeile
+
     def _gale_kontert_buster(self):
         # Gales Team schlaegt Busters Team 8 von 10 ...
         self.importiere(*serie(10, 8))
@@ -268,31 +282,27 @@ class CounterTest(AggregationsTest):
     def test_counter_entsteht_aus_abweichung_von_der_erwartung(self):
         self._gale_kontert_buster()
         self.aggregiere()
-        hin = CounterStat.objects.get(brawler__slug="gale", enemy__slug="buster",
-                                      game_mode__isnull=True, rank_pool="alle")
-        her = CounterStat.objects.get(brawler__slug="buster", enemy__slug="gale",
-                                      game_mode__isnull=True, rank_pool="alle")
-        self.assertGreater(hin.advantage, 0)
-        self.assertLess(her.advantage, 0)
-        self.assertAlmostEqual(hin.raw_rate, 0.8)
-        self.assertEqual(hin.games, 10)
+        rate, hin, zeile = self._counter("gale", "buster")
+        _, her, _ = self._counter("buster", "gale")
+        self.assertGreater(hin, 0)
+        self.assertAlmostEqual(her, -hin)
+        self.assertAlmostEqual(rate, 0.8)
+        self.assertEqual(zeile.games, 10)
 
     def test_ein_starker_brawler_ist_nicht_automatisch_ein_counter(self):
         """Gale gewinnt gegen JEDEN 80 % - gegen Buster ist das nichts Besonderes."""
         self.importiere(*serie(10, 8))
         self.importiere(*serie(10, 8, b=("piper", "brock", "colette"), minuten=1000))
         self.aggregiere()
-        zeile = CounterStat.objects.get(brawler__slug="gale", enemy__slug="buster",
-                                        game_mode__isnull=True, rank_pool="alle")
-        self.assertAlmostEqual(zeile.raw_rate, 0.8)
-        self.assertLess(abs(zeile.advantage), 0.2)
+        rate, vorteil_wert, _ = self._counter("gale", "buster")
+        self.assertAlmostEqual(rate, 0.8)
+        self.assertLess(abs(vorteil_wert), 0.2)
 
     def test_kleine_paarstichprobe_bleibt_nahe_null(self):
         self.importiere(partie(a=("gale", "belle", "max"), b=("mortis", "stu", "surge")))
         self.aggregiere()
-        zeile = CounterStat.objects.get(brawler__slug="gale", enemy__slug="mortis",
-                                        game_mode__isnull=True, rank_pool="alle")
-        self.assertLess(abs(zeile.advantage), 0.1)
+        _, vorteil_wert, _ = self._counter("gale", "mortis")
+        self.assertLess(abs(vorteil_wert), 0.1)
 
 
 class SynergieTest(AggregationsTest):

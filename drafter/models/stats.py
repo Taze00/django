@@ -11,7 +11,7 @@ sie hat dafuer 200 Millisekunden.
 
 from django.db import models
 
-from drafter.models.base import Datenquelle, StatBasis
+from drafter.models.base import GEPFLEGT, Datenquelle, StatBasis
 
 
 class BrawlerStat(StatBasis):
@@ -71,9 +71,25 @@ class CounterStat(StatBasis):
     Mitspieler und Patch mitreden. Der Vorteil ist die bereinigte
     Groesse, `raw_rate` und `games` behalten die Rohmessung daneben.
 
-    Die Beziehung ist **nicht** automatisch symmetrisch: der
-    Gegenvorteil wird als eigene Zeile gepflegt, sonst kann man
-    "beide tun sich schwer" nicht ausdruecken.
+    Zwei Bedeutungen, getrennt nach `source` (siehe GEPFLEGT):
+
+    **Gepflegt** (demo, manual) - `advantage` ist eine gerichtete
+    Einschaetzung ("Gale stoesst Bull weg"). Die Gegenrichtung ist eine
+    eigene Zeile und darf asymmetrisch sein: "beide tun sich schwer" ist
+    eine legitime Aussage. Die Engine liest den Wert als
+    `manual_counter_score`.
+
+    **Berechnet** (fixture, api, aggregated, synthetic) - `advantage` ist
+    die Abweichung der geglaetteten Paar-Siegquote von der log5-Erwartung
+    aus den Einzelstaerken. Die Gegenrichtung ist exakt das Negativ und
+    wird deshalb NICHT gespeichert: pro Paar genau eine Zeile, kleinere
+    Brawler-ID zuerst. Die Engine liest den Wert als
+    `measured_counter_advantage` und leitet die Gegenrichtung ab.
+
+    Warum nur eine Zeile: zwei gegengleiche Zeilen luden dazu ein,
+    dasselbe Matchup zweimal in die Bewertung zu nehmen - genau das ist
+    mit der frueheren Formel "hin - 0,8 * her" passiert (effektiv 1,8-fach).
+    Der Constraint unten macht das auf Datenbankebene unmoeglich.
     """
 
     brawler = models.ForeignKey(
@@ -84,7 +100,11 @@ class CounterStat(StatBasis):
     )
 
     advantage = models.FloatField(
-        default=0.0, help_text="-1 bis +1. Positiv = brawler ist im Vorteil."
+        default=0.0,
+        help_text=(
+            "-1 bis +1. Positiv = brawler ist im Vorteil. Gepflegt: gerichtete "
+            "Einschaetzung. Berechnet: Abweichung von der erwarteten Siegquote."
+        ),
     )
     reason = models.CharField(
         max_length=200, blank=True,
@@ -103,6 +123,14 @@ class CounterStat(StatBasis):
             models.CheckConstraint(
                 condition=~models.Q(brawler=models.F("enemy")),
                 name="drafter_counter_nicht_gegen_sich_selbst",
+            ),
+            # Berechnete Counter nur in kanonischer Richtung - gepflegte in beiden.
+            models.CheckConstraint(
+                condition=(
+                    models.Q(source__in=sorted(GEPFLEGT))
+                    | models.Q(brawler__lt=models.F("enemy"))
+                ),
+                name="drafter_counter_berechnet_nur_kanonisch",
             ),
         ]
 

@@ -88,37 +88,88 @@ def heuristischer_vorteil(a, b):
     return gesamt, (staerkstes[1] if abs(staerkstes[0]) > 0.08 else None)
 
 
-def vorteil(kandidat, gegner, raum):
-    """Netto-Vorteil im Matchup: was wir gegen ihn koennen minus umgekehrt.
+def _gemessener_vorteil(hin, her):
+    """Berechneter Vorteil aus der Sicht von `hin` - oder None.
 
-    Gibt (wert, grund, quelle) zurueck. Beide Richtungen zaehlen, weil
-    "ich tue ihm weh" und "er tut mir weh" verschiedene Dinge sind - ein
-    Matchup, in dem sich beide bestrafen, ist kein Counter.
+    Gespeichert ist je Paar nur eine Richtung. Liegt sie als `her` vor,
+    ist der Vorteil ihr Negativ. Liegen (etwa aus alten Daten) beide
+    Richtungen vor, zaehlt nur `hin` - die andere ist dieselbe Messung
+    mit umgekehrtem Vorzeichen und wird nicht noch einmal verrechnet.
+    """
+    if hin is not None and hin.measured_counter_advantage is not None:
+        return hin.measured_counter_advantage, hin
+    if her is not None and her.measured_counter_advantage is not None:
+        return -her.measured_counter_advantage, her
+    return None
+
+
+def vorteil(kandidat, gegner, raum):
+    """Netto-Vorteil im Matchup, [-1, +1] - plus Begruendung und Quelle.
+
+    Drei Rechenwege, weil die drei Quellen Verschiedenes bedeuten:
+
+    1. **Gemessen** (aus Partien aggregiert, `measured_counter_advantage`):
+       Der Wert IST bereits die Netto-Aussage - die Abweichung der
+       Paar-Siegquote von der log5-Erwartung aus den Einzelstaerken. Die
+       Gegenrichtung ist exakt ihr Negativ und wird daraus abgeleitet,
+       nicht zusaetzlich abgezogen. Symmetrisch per Konstruktion:
+       vorteil(A, B) == -vorteil(B, A).
+
+    2. **Gepflegt** (Demo, manuell, `manual_counter_score`): Zwei
+       eigenstaendige, gerichtete Einschaetzungen, die asymmetrisch sein
+       duerfen. Netto = hin - Faktor * her.
+
+    3. **Heuristik** (keine Zeile): wie gepflegt, aus Attributen geschaetzt.
+
+    Gibt es fuer ein Paar Messung und Pflege zugleich, gilt die Messung.
+
+    Frueher liefen 1 und 2 durch dieselbe Formel "hin - 0,8 * her". Fuer
+    gepflegte Werte ist das richtig; fuer gemessene, gegengleiche Werte
+    wurde dasselbe Matchup damit 1,8-fach gezaehlt.
     """
     hin = raum.counter(kandidat, gegner)
     her = raum.counter(gegner, kandidat)
 
-    if hin or her:
-        wert = (hin.advantage if hin else 0.0) - (her.advantage if her else 0.0) * 0.8
+    # --- 1. Gemessen ----------------------------------------------------
+    gemessen = _gemessener_vorteil(hin, her)
+    if gemessen is not None:
+        wert, zeile = gemessen
+        quelle = "demo" if zeile.is_demo else "daten"
+        grund = None
+        # Gemessene Zeilen haben keinen gepflegten Grundtext - der Satz
+        # nennt deshalb, WORAUF die Aussage beruht, statt einen Mechanismus
+        # zu behaupten, den die Messung nicht kennt.
+        if wert > 0.15:
+            grund = f"gewinnt gegen {gegner.name} öfter als erwartet ({zeile.games} Partien)"
+        elif wert < -0.15:
+            grund = f"verliert gegen {gegner.name} öfter als erwartet ({zeile.games} Partien)"
+        return klemme(wert), grund, quelle
+
+    # --- 2. Gepflegt ----------------------------------------------------
+    hin_wert = hin.manual_counter_score if hin is not None else None
+    her_wert = her.manual_counter_score if her is not None else None
+    if hin_wert is not None or her_wert is not None:
+        wert = (hin_wert or 0.0) - (her_wert or 0.0) * config.GEPFLEGTER_COUNTER_GEGENRICHTUNG
         quelle = "demo" if (hin or her).is_demo else "daten"
         # Vier Faelle, nicht zwei: ein Vorteil kann auch daraus entstehen,
         # dass der GEGNER gegen uns schlecht dasteht. Wurde das uebersehen,
         # rechnete die Engine den Vorteil zwar richtig, konnte ihn aber
         # nicht begruenden - die Empfehlung stand oben und sagte nicht warum.
         grund = None
-        if hin and hin.advantage > 0.15:
+        if hin_wert is not None and hin_wert > 0.15:
             grund = hin.reason or f"ist stark gegen {gegner.name}"
-        elif her and her.advantage < -0.15:
+        elif her_wert is not None and her_wert < -0.15:
             grund = her.reason or f"hat gegen {gegner.name} die besseren Werkzeuge"
-        elif her and her.advantage > 0.15:
+        elif her_wert is not None and her_wert > 0.15:
             grund = her.reason or f"verliert das Matchup gegen {gegner.name}"
-        elif hin and hin.advantage < -0.15:
+        elif hin_wert is not None and hin_wert < -0.15:
             grund = hin.reason or f"kommt gegen {gegner.name} nicht durch"
         return klemme(wert), grund, quelle
 
+    # --- 3. Heuristik ---------------------------------------------------
     hin_h, grund_hin = heuristischer_vorteil(kandidat, gegner)
     her_h, grund_her = heuristischer_vorteil(gegner, kandidat)
-    wert = klemme(hin_h - her_h * 0.8)
+    wert = klemme(hin_h - her_h * config.HEURISTISCHER_COUNTER_GEGENRICHTUNG)
     grund = grund_hin if abs(hin_h) >= abs(her_h) else grund_her
     return wert, grund, "heuristik"
 

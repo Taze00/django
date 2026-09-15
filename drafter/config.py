@@ -348,16 +348,40 @@ AGGREGATIONS_EBENEN = {
     "build": ("global", "modus"),
 }
 
-# Deduplizierung: dieselbe Partie aus zwei Battlelogs kann mit leicht
-# abweichendem Zeitstempel ankommen. Innerhalb dieser Toleranz gelten
-# gleiche Teams auf gleicher Map als dasselbe Match. Ungeprueft, wie
-# genau echte Zeitstempel uebereinstimmen - offene Datenfrage.
+# Deduplizierung - NUR der Fallback.
+#
+# Vorrang hat die Partie-ID der Quelle: stimmt sie ueberein, ist es
+# dieselbe Partie, ohne jede Zeittoleranz. Erst wenn eine Quelle keine ID
+# liefert, wird die Partie aus Zeit, Map und Teams rekonstruiert - und nur
+# dort gilt diese Toleranz: gleiche Teams auf gleicher Map innerhalb
+# dieses Zeitfensters (plus Nachbarfenster) gelten als dieselbe Partie.
+#
+# Der Wert ist geschaetzt. Wie genau die Zeitstempel derselben Partie in
+# verschiedenen Battlelogs uebereinstimmen, zeigt erst eine echte Antwort.
 MATCH_ZEITTOLERANZ_SEKUNDEN = 60
 
 # Wie stark eine gemessene Build-Statistik die regelbasierte Build-Wahl
 # verschiebt, je Punkt Vorteil und gewichtet mit ihrer Confidence. Wirkt
 # nur, wenn Build-Statistiken existieren - mit Demo-Daten nie.
 BUILD_STAT_EINFLUSS = 0.35
+
+
+# =========================================================================
+# Counter: gepflegt, gemessen, geschaetzt
+# =========================================================================
+# Abzug der Gegenrichtung fuer GEPFLEGTE (Demo, manuell) und HEURISTISCHE
+# Counter. Dort sind beide Richtungen eigenstaendige Einschaetzungen -
+# "Gale stoesst Bull weg" und "Bull kommt an Gale nicht heran" ergaenzen
+# sich, ohne dasselbe zu sagen - und duerfen asymmetrisch sein.
+#
+# Unveraendert 0,8: beide Werte standen bisher als Zahl im Engine-Code
+# (services/counters.py) und sind nur hierher umgezogen. Keine Anpassung.
+#
+# Fuer GEMESSENE Counter gilt KEIN Faktor. Dort ist die Gegenrichtung
+# exakt das Negativ derselben Messung; ein Abzug wuerde dasselbe Matchup
+# 1,8-fach zaehlen (a + 0,8 * a).
+GEPFLEGTER_COUNTER_GEGENRICHTUNG = 0.8
+HEURISTISCHER_COUNTER_GEGENRICHTUNG = 0.8
 
 
 # =========================================================================

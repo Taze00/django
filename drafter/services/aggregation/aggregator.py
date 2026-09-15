@@ -257,15 +257,20 @@ class Aggregator:
                             )
 
                 if art in ebenen_fuer["counter"]:
+                    # Je Paar genau EINE Richtung zaehlen: kleinere Brawler-ID
+                    # zuerst, gezaehlt aus deren Sicht. Die Gegenrichtung ist
+                    # exakt das Negativ und wird in der Engine abgeleitet
+                    # (counters._gemessener_vorteil). Frueher entstanden zwei
+                    # gegengleiche Zeilen - und die Engine zog die zweite
+                    # noch einmal ab, dasselbe Matchup zaehlte 1,8-fach.
                     for p in teams["a"]:
                         for q in teams["b"]:
                             if p.brawler_id == q.brawler_id:
                                 continue
+                            klein, gross = sorted((p, q), key=lambda s: s.brawler_id)
                             w = zeit * pg[p.brawler_id] * pg[q.brawler_id]
-                            counter_z[(ebene, p.brawler_id, q.brawler_id)].zaehle(
-                                match.winner_side == "a", w)
-                            counter_z[(ebene, q.brawler_id, p.brawler_id)].zaehle(
-                                match.winner_side == "b", w)
+                            counter_z[(ebene, klein.brawler_id, gross.brawler_id)].zaehle(
+                                match.winner_side == klein.side, w)
 
                 if art in ebenen_fuer["synergy"]:
                     for seite, team in teams.items():
@@ -321,7 +326,9 @@ class Aggregator:
             ))
         self._schreibe(BrawlerStat, zeilen, bericht, "brawler")
 
-        # --- Counter: Abweichung von der log5-Erwartung
+        # --- Counter: Abweichung von der log5-Erwartung, eine Zeile je Paar
+        # (a < b). Der Datenbank-Constraint laesst die Gegenrichtung fuer
+        # berechnete Quellen gar nicht zu.
         zeilen = []
         for (ebene, a, b), z in counter_z.items():
             erwartet = erwartet_gegeneinander(self._rate(raten, ebene, a),

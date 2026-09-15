@@ -36,6 +36,16 @@ class Datenquelle(models.TextChoices):
 # mehr als "Niedrig".
 NICHT_GEMESSEN = frozenset({Datenquelle.DEMO, Datenquelle.MANUAL, Datenquelle.SYNTHETIC})
 
+# Quellen, deren Werte von Hand GESETZT sind statt aus Partien BERECHNET.
+#
+# Nicht dasselbe wie NICHT_GEMESSEN: synthetische Partien sind keine
+# Messung, laufen aber durch dieselbe Aggregation - ihre Werte haben also
+# dieselbe Bedeutung wie echte Messwerte. Daran haengt vor allem die
+# Counter-Logik: ein gepflegter Counter ist eine gerichtete Einschaetzung
+# und darf asymmetrisch sein; ein berechneter ist die Abweichung von der
+# erwarteten Siegquote, und seine Gegenrichtung ist exakt das Negativ.
+GEPFLEGT = frozenset({Datenquelle.DEMO, Datenquelle.MANUAL})
+
 
 class Zeitstempel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)

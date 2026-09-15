@@ -25,6 +25,15 @@ class GameMode(Zeitstempel):
 
     name = models.CharField(max_length=60, unique=True)
     slug = models.SlugField(max_length=60, unique=True)
+    # Kennung in der Datenquelle, z.B. die ID der offiziellen API. Leer,
+    # bis sie aus echten Antworten bekannt ist - nicht erfunden, nicht
+    # vorbefuellt. Der Import ordnet bevorzugt hierueber zu und faellt nur
+    # ohne ID auf den Namen zurueck: Namen aendern Schreibweise und
+    # Uebersetzung, IDs nicht.
+    external_id = models.CharField(
+        max_length=40, null=True, blank=True, unique=True,
+        help_text="ID in der Datenquelle (z.B. offizielle API). Leer lassen, bis sie aus echten Antworten bekannt ist.",
+    )
     description = models.CharField(max_length=200, blank=True)
 
     base_requirements = models.JSONField(
@@ -64,6 +73,15 @@ class BrawlMap(Zeitstempel):
 
     name = models.CharField(max_length=80)
     slug = models.SlugField(max_length=80, unique=True)
+    # Kennung in der Datenquelle, z.B. die ID der offiziellen API. Leer,
+    # bis sie aus echten Antworten bekannt ist - nicht erfunden, nicht
+    # vorbefuellt. Der Import ordnet bevorzugt hierueber zu und faellt nur
+    # ohne ID auf den Namen zurueck: Namen aendern Schreibweise und
+    # Uebersetzung, IDs nicht.
+    external_id = models.CharField(
+        max_length=40, null=True, blank=True, unique=True,
+        help_text="ID in der Datenquelle (z.B. offizielle API). Leer lassen, bis sie aus echten Antworten bekannt ist.",
+    )
     game_mode = models.ForeignKey(
         GameMode, on_delete=models.CASCADE, related_name="maps"
     )

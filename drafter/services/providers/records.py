@@ -17,7 +17,7 @@ Umstellung hat keine Komponente veraendert.
 from dataclasses import dataclass, field, replace
 from datetime import date, datetime
 
-from drafter.models.base import NICHT_GEMESSEN
+from drafter.models.base import GEPFLEGT, NICHT_GEMESSEN
 
 
 # =========================================================================
@@ -124,6 +124,39 @@ class StatRecord:
         return self.source not in NICHT_GEMESSEN
 
     @property
+    def ist_gepflegt(self):
+        """Von Hand gesetzt (demo, manual) statt aus Partien berechnet."""
+        return self.source in GEPFLEGT
+
+    # --- Counter: zwei Bedeutungen, zwei Namen -------------------------
+    # Beide lesen dasselbe Feld `advantage`. Getrennt wird ueber die
+    # Quelle, nicht ueber zwei Spalten: zwei Spalten, von denen je nach
+    # Quelle genau eine gefuellt sein duerfte, erlaubten einen
+    # ungueltigen Zustand, den `source` ohnehin ausschliesst.
+
+    @property
+    def manual_counter_score(self):
+        """Gepflegte, GERICHTETE Einschaetzung - darf asymmetrisch sein.
+
+        None, wenn der Datensatz kein gepflegter Counter ist.
+        """
+        if self.art == ART_COUNTER and self.ist_gepflegt:
+            return self.advantage
+        return None
+
+    @property
+    def measured_counter_advantage(self):
+        """Berechnete Abweichung von der log5-Erwartung - SYMMETRISCH.
+
+        Der Wert fuer den Partner gegen diesen Brawler ist exakt das
+        Negativ; er wird abgeleitet, nicht gespeichert. None, wenn der
+        Datensatz kein berechneter Counter ist.
+        """
+        if self.art == ART_COUNTER and not self.ist_gepflegt:
+            return self.advantage
+        return None
+
+    @property
     def is_demo(self):
         """Nicht gemessen. Gleiche Bedeutung wie StatBasis.is_demo."""
         return not self.ist_gemessen
@@ -201,10 +234,13 @@ class StatRecord:
 class SpielerRecord:
     """Ein Spieler in einem normalisierten Match."""
 
-    brawler: str                      # Slug aus dem eigenen Katalog - oder Rohname
+    brawler: str                      # Name wie geliefert - leer, wenn nur eine ID kam
     player_tag: str = ""
     pick_order: int = None            # nur wenn die Quelle sie kennt
     build: dict = None                # {"gadget": slug, "star_power": slug, "gears": [...], "hypercharge": slug}
+    # ID des Brawlers in der Quelle. Wenn gesetzt, ordnet der Import
+    # darueber zu und nimmt den Namen nur als Rueckfall.
+    external_brawler_id: str = None
 
 
 @dataclass
@@ -233,6 +269,9 @@ class MatchRecord:
     bans: list = field(default_factory=list)          # [{"brawler": slug, "side": "a"|None, "order": int|None}]
     duration_seconds: int = None
     external_id: str = None
+    # IDs von Modus und Map in der Quelle - vorrangig vor den Namen.
+    external_mode_id: str = None
+    external_map_id: str = None
 
 
 @dataclass

@@ -64,11 +64,21 @@ class RawPayload(Zeitstempel):
 class Match(Zeitstempel):
     """Eine gespielte Partie - genau einmal, egal wie oft gesehen.
 
-    `fingerprint` ist eindeutig und entsteht perspektivunabhaengig aus
-    Zeitpunkt, Map, Modus und den beiden Teams (services/ingest/
-    fingerprint.py). Taucht dieselbe Partie in einem zweiten Battlelog
-    auf, wird nur die Lieferung verknuepft - gezaehlt wird sie nicht
-    noch einmal.
+    Wiedererkennung in zwei Stufen (services/ingest/fingerprint.py):
+
+    1. `external_id` - die Partie-ID der Quelle, falls es eine gibt.
+       Exakt, ohne Zeittoleranz.
+    2. `reconstructed_fingerprint` - Fallback aus Zeit-Eimer, Map und
+       beiden Teams, perspektivunabhaengig. Nur hier wirkt die
+       Zeittoleranz.
+
+    `fingerprint` ist der eindeutige Schluessel: bei bekannter Partie-ID
+    deren Hash, sonst der rekonstruierte. Der rekonstruierte wird IMMER
+    zusaetzlich gespeichert - sonst faende eine Sichtung ohne ID eine
+    bereits gespeicherte Partie mit ID nicht wieder.
+
+    Taucht dieselbe Partie in einem zweiten Battlelog auf, wird nur die
+    Lieferung verknuepft - gezaehlt wird sie nicht noch einmal.
 
     Widersprechen sich zwei Sichtungen im Ergebnis, wird das Match als
     Konflikt markiert und bei der Aggregation ausgelassen. Welche Sicht
@@ -82,6 +92,7 @@ class Match(Zeitstempel):
         DRAW = "draw", "Unentschieden"
 
     fingerprint = models.CharField(max_length=64, unique=True)
+    reconstructed_fingerprint = models.CharField(max_length=64, blank=True, db_index=True)
     external_id = models.CharField(max_length=120, blank=True, db_index=True)
     source = models.CharField(max_length=20, choices=Datenquelle.choices, db_index=True)
     payloads = models.ManyToManyField(RawPayload, related_name="matches", blank=True)
