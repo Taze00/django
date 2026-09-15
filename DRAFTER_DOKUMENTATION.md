@@ -226,6 +226,37 @@ Patch mit drin. `CounterStat.advantage` ist die bereinigte Größe,
 Eintrag, greift eine Heuristik aus sechs Attributsignalen — und
 kennzeichnet ihre Gründe als „geschätzt".
 
+### Gepflegte, gemessene und geschätzte Counter
+
+Ein Counter-Wert bedeutet je nach Quelle etwas anderes — deshalb gibt es drei
+Rechenwege in `counters.vorteil`:
+
+| Quelle | Lesezugriff | Bedeutung | Gegenrichtung |
+|---|---|---|---|
+| gepflegt (`demo`, `manual`) | `manual_counter_score` | gerichtete Einschätzung („Gale stößt Bull weg") | eigene Zeile, **darf asymmetrisch sein**; Netto = hin − 0,8 · her |
+| gemessen (`fixture`, `api`, `aggregated`, `synthetic`) | `measured_counter_advantage` | Abweichung der geglätteten Paar-Siegquote von der log5-Erwartung | **exakt das Negativ** — abgeleitet, nicht abgezogen |
+| keine Zeile | Heuristik | aus Attributen geschätzt | wie gepflegt, hin − 0,8 · her |
+
+Warum die Trennung nötig war: Früher liefen alle Zeilen durch „hin − 0,8 · her".
+Für gepflegte Werte ist das richtig. Gemessene Werte sind aber gegengleich
+(her = −hin), und die Formel ergab hin + 0,8 · hin — **dasselbe Matchup zählte
+1,8-fach**. Jetzt gilt für gemessene Counter: `vorteil(A, B) == −vorteil(B, A)`.
+
+Gemessene Counter werden je Paar **nur in einer Richtung** gespeichert (kleinere
+Brawler-ID zuerst). Ein Datenbank-Constraint lässt die Gegenrichtung für
+berechnete Quellen gar nicht zu; Doppelzählung ist damit strukturell unmöglich,
+nicht nur per Konvention. Liegen für ein Paar Pflege und Messung zugleich vor,
+gilt die Messung.
+
+Die beiden 0,8 standen vorher als Zahl im Engine-Code und liegen jetzt
+unverändert in `config.py` (`GEPFLEGTER_COUNTER_GEGENRICHTUNG`,
+`HEURISTISCHER_COUNTER_GEGENRICHTUNG`). Für die Demo-Daten ist das Ergebnis
+identisch — nachgeprüft an 18 Draft-Lagen vor und nach dem Umbau.
+
+Getrennt wird über zwei benannte Zugriffe auf denselben Wert, **nicht** über zwei
+Spalten: zwei Spalten, von denen je nach Quelle genau eine gefüllt sein dürfte,
+erlaubten einen ungültigen Zustand (beide gefüllt), den `source` ohnehin ausschließt.
+
 **Synergie ist nicht gemeinsame Winrate.** Sonst gälten zwei ohnehin
 starke Brawler automatisch als gute Synergie. `SynergyStat.synergy` ist
 der *Mehrwert über die Einzelleistung hinaus*; die Heuristik misst
@@ -386,10 +417,10 @@ Aufschlüsselung.
 
 ```bash
 # Demo-Datensatz anlegen oder aktualisieren (idempotent)
-docker compose exec django-dev python manage.py seed_brawl_data
+docker compose run --rm --no-deps -T django-dev python manage.py seed_brawl_data
 
 # Demo-Daten vorher löschen - manuell gepflegte bleiben stehen
-docker compose exec django-dev python manage.py seed_brawl_data --reset
+docker compose run --rm --no-deps -T django-dev python manage.py seed_brawl_data --reset
 ```
 
 Im Admin lässt sich alles bearbeiten. **Achtung:** `seed_brawl_data`
@@ -402,7 +433,7 @@ an.
 ## 15. Tests
 
 ```bash
-docker compose exec django-dev python manage.py test drafter \
+docker compose run --rm --no-deps -T django-dev python manage.py test drafter \
     --settings=meinprojekt.settings_test
 ```
 
@@ -569,6 +600,13 @@ Eigenes, vollständig definiertes Format — kein erratenes API-Format.
   Ohne Herkunft wird nichts gespeichert — sonst läge eine Datei unbekannter
   Echtheit in den Rohdaten.
 - `played_at` braucht eine Zeitzone; `winner` ist `a`, `b`, `draw` oder `null`.
+- **IDs vor Namen.** `brawler_id`, `mode_id`, `map_id` (auch in Bans) sind
+  optional und haben Vorrang: der Import ordnet zuerst über
+  `Brawler.external_id` / `BrawlMap.external_id` / `GameMode.external_id` zu und
+  nimmt den Namen nur als Rückfall. Mit ID ist der Name optional. Die
+  `external_id`-Felder im Katalog bleiben **leer, bis echte Antworten die IDs
+  zeigen** — sie werden nicht erfunden. Der Import-Bericht zählt, wie viele
+  Brawler per ID und wie viele per Name zugeordnet wurden.
 - **Unbekannte Felder bleiben leer, nie geraten.** Pick-Reihenfolge, First Pick,
   Bans, Builds, Dauer und `external_id` sind optional.
 - Eine fehlerhafte Partie verwirft nicht die Datei — sie wird benannt und übersprungen.
@@ -577,13 +615,24 @@ Eigenes, vollständig definiertes Format — kein erratenes API-Format.
 
 1. **Idempotent je Lieferung.** Dieselbe Datei zweimal einspielen ändert nichts —
    erkannt am Inhaltshash (unabhängig von Einrückung und Schlüsselreihenfolge).
-2. **Dedupliziert je Partie.** Dieselbe Partie steht in bis zu sechs Battlelogs,
-   jeweils aus Sicht eines anderen Spielers. Der Fingerabdruck kanonisiert erst
-   die Seiten (Sieger, First Pick und Bans wandern mit) und nutzt dann einen
-   Zeit-Eimer von `MATCH_ZEITTOLERANZ_SEKUNDEN` samt Nachbar-Eimern. **Nicht** im
-   Fingerabdruck: das Ergebnis (Widersprüche sollen als Konflikt auffallen) und
-   Spieler-Tags (nicht jede Quelle liefert sie). Liefert die Quelle eine eigene
-   Partie-ID, gewinnt diese.
+2. **Dedupliziert je Partie** — in fester Rangfolge:
+   - **Partie-ID der Quelle, exakt.** Stimmt `external_id` überein, ist es
+     dieselbe Partie — ohne Zeittoleranz. Zwei Sichtungen mit *verschiedenen*
+     IDs sind zwei Partien, auch wenn Zeit, Map und Teams zusammenpassen.
+   - **Nur als Fallback: rekonstruierter Fingerabdruck.** Ohne ID wird die
+     Partie aus Ort (Map-ID aus dem Katalog, sonst Namen), Teams (Brawler-IDs
+     aus dem Katalog, sonst Namen, vorher kanonisiert — Sieger, First Pick und
+     Bans wandern mit) und einem Zeit-Eimer von `MATCH_ZEITTOLERANZ_SEKUNDEN`
+     samt Nachbar-Eimern wiedererkannt. **Die 60-Sekunden-Toleranz existiert nur
+     hier** und ist geschätzt.
+
+   Der Fingerabdruck geht über die **Katalog-Identität**, auf die ID und Name
+   beide aufgelöst werden — eine Sichtung mit IDs und eine mit Namen führen so
+   zur selben Partie. Der rekonstruierte Fingerabdruck wird auch bei bekannter
+   Partie-ID gespeichert (`reconstructed_fingerprint`), damit eine spätere
+   Sichtung *ohne* ID die Partie wiederfindet. **Nicht** im Fingerabdruck: das
+   Ergebnis (Widersprüche sollen als Konflikt auffallen) und Spieler-Tags
+   (nicht jede Quelle liefert sie).
 3. **Nichts wird geraten.** Unbekannte Brawler und Maps bleiben mit ihrem
    gelieferten Namen gespeichert (Fremdschlüssel leer) und stehen im Bericht.
    Widersprüchliche Ergebnisse markieren die Partie als **Konflikt** — sie wird
@@ -640,6 +689,8 @@ Niederlagen kippen keine lange 80-%-Historie.
   gebannt und nie gespielt wurden, bekommen eine Zeile mit Banrate und
   **ohne** Winrate — sonst ginge ausgerechnet die aussagekräftigste
   Ban-Information verloren.
+- **Counter: eine Zeile je Paar** (kleinere Brawler-ID zuerst), gezählt aus
+  deren Sicht. Die Gegenrichtung leitet die Engine ab (§7).
 - **Synthetische Partien werden nie mit echten zusammen aggregiert**; Demo-
   und gepflegte Daten werden weder gelesen noch geschrieben.
 - **Idempotent:** jeder Lauf ersetzt die Zeilen seines Kontexts vollständig.
@@ -687,7 +738,10 @@ Der Weg zu echten Daten, ohne Engine, Coach oder Frontend anzufassen:
    PARSER[FORMAT_OFFIZIELLER_BATTLELOG] = parse_offizieller_battlelog
    ```
    Der Parser übersetzt in `MatchRecord`s mit **perspektivfreien** Seiten a/b
-   und lässt alles leer, was die Antwort nicht enthält.
+   und lässt alles leer, was die Antwort nicht enthält. Enthält die
+   Antwort IDs für Brawler, Maps oder Modi, gehören sie in `brawler_id` /
+   `map_id` / `mode_id` — und die IDs selbst in die `external_id`-Felder des
+   Katalogs (Admin). Ab dann läuft die Zuordnung über IDs statt Namen.
 5. **Importieren und aggregieren** — `import_brawl_fixture`, dann
    `aggregate_brawl_stats --quelle fixture`. Ab jetzt nimmt `auto` die
    gemessenen Statistiken, und die Oberfläche hebt den Demo-Hinweis auf.
@@ -709,10 +763,9 @@ Bewusst **nicht** beantwortet, weil sie nur echte Antworten beantworten können:
 | Liefert die API Ranked-**Bans**? Die **Pick-Reihenfolge**? First Pick? | ohne sie keine Banrate, keine gelernten Draft-Positionen | Aggregation zählt nur Vorhandenes |
 | Liefert sie **Builds** historischer Partien? | sonst bleibt `BuildStat` leer | Build-Empfehlung läuft weiter auf Regeln |
 | Wie ist der **Rangbereich** einer Partie erkennbar? | Rang-Pools (Legendary+, Masters, Pro) | `Match.rank_pool` |
-| Heißen Maps/Modi/Brawler in der API wie im Katalog? | sonst unbekannt im Import-Bericht; ggf. Aliasliste nötig | `katalog_schluessel()` |
+| Welche IDs führt die API für Brawler, Maps und Modi — und sind sie stabil? | Zuordnung läuft bevorzugt über `external_id`; bis dahin über Namen, die sich in Schreibweise und Übersetzung ändern können | `external_id` im Katalog, `importer._brawler_fuer()` |
 | Wie viele Partien sind realistisch? | Paarzeilen wachsen quadratisch mit Brawlern × Ebenen × Fenstern × Pools — bei ~90 Brawlern Hunderttausende Zeilen; ggf. Mindeststichprobe für Paare | `aggregator.py` |
 | Gewichtete Kombination der Rang-Pools (`RANG_POOL_GEWICHT`)? | derzeit je Pool getrennt aggregiert, die Gewichte werden noch nicht benutzt | `config.py` |
-| Counter in beide Richtungen gemessen | `counters.vorteil` zieht die Gegenrichtung mit Faktor 0,8 ab; gemessene Counter sind symmetrisch, ein Matchup zählt dann effektiv 1,8-fach. Vor dem Umstieg prüfen — **nicht** jetzt an Demo-Daten tunen | `counters.py` |
 
 ---
 
