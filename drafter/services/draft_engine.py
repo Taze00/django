@@ -165,7 +165,9 @@ class DraftEngine:
                 rolle=coach.rolle_im_team(kandidat, self.eigene_analyse),
             ))
 
-        ergebnisse.sort(key=lambda e: -e.score)
+        # Nach dem ungeklemmten Wert - sonst waeren Kandidaten unterhalb
+        # von -1 ununterscheidbar (siehe Empfehlung.roher_score).
+        ergebnisse.sort(key=lambda e: -e.roher_score)
         spitze = ergebnisse[:anzahl]
         details_bis = len(spitze) if mit_details is None else mit_details
 

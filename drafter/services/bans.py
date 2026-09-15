@@ -126,6 +126,9 @@ def empfehlungen(ctx, raum, anzahl=None):
             "image_url": b.image_url,
             "rollen": b.rollen_label,
             "score": round(50 + 50 * max(-1.0, min(1.0, gesamt))),
+            # Sortiert wird bereits nach dem ungeklemmten Wert; er steht
+            # zusaetzlich in der Antwort, damit er nicht verloren geht.
+            "score_roh": round(gesamt, 3),
             "confidence": round(sicherheit, 2),
             "gruende": _gruende(b, teile, unsere, raum, ctx, gegner_hat_first),
         })

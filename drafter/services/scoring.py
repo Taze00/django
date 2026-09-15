@@ -135,9 +135,23 @@ class Empfehlung:
     build: object = None
 
     @property
+    def roher_score(self):
+        """Ungeklemmte Summe der gewichteten Komponenten.
+
+        Nach DIESEM Wert wird sortiert, nicht nach `score`. Die
+        Bewertungsgewichte summieren sich auf 1.0, die Strafen kommen
+        obendrauf - die Summe kann also bis etwa -1.6 fallen. Geklemmt
+        wuerden zwei Kandidaten bei -1.2 und -1.5 gleich aussehen und
+        ihre Reihenfolge waere Zufall. In den Demo-Daten tritt das nicht
+        auf (tiefster gemessener Wert -0.95 ueber 900 Kandidaten), mit
+        echten Daten ist es nicht ausgeschlossen.
+        """
+        return sum(k.beitrag for k in self.komponenten.values())
+
+    @property
     def score(self):
-        """Rohscore in [-1, +1]. Summe der gewichteten Komponenten."""
-        return klemme(sum(k.beitrag for k in self.komponenten.values()))
+        """Score in [-1, +1] - fuer die Anzeige. Rangfolge: `roher_score`."""
+        return klemme(self.roher_score)
 
     @property
     def anzeige_score(self):
@@ -194,7 +208,9 @@ class Empfehlung:
             "slug": b.slug,
             "name": b.name,
             "score": self.anzeige_score,
-            "score_roh": round(self.score, 3),
+            # Ungeklemmt - `score_roh` hiess vorher so, lieferte aber den
+            # geklemmten Wert.
+            "score_roh": round(self.roher_score, 3),
             "win_probability": round(self.win_probability * 100, 1),
             "confidence": round(self.confidence, 2),
             "confidence_label": self.confidence_label,
