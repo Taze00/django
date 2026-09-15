@@ -27,7 +27,7 @@ class ApiTest(DrafterTest):
     # --- Empfehlungen ---------------------------------------------------
     def test_empfehlung_liefert_begruendete_vorschlaege(self):
         antwort = self.post(reverse("drafter:api_recommend"), {
-            "map": "hart-rock-mine", "enemy_picks": ["buster"],
+            "map": "hard-rock-mine", "enemy_picks": ["buster"],
             "own_team_first_pick": False,
         })
         self.assertEqual(antwort.status_code, 200)
@@ -40,25 +40,25 @@ class ApiTest(DrafterTest):
         self.assertTrue(daten["datenlage"]["nur_demo"])
 
     def test_ban_empfehlungen_nur_vor_dem_ersten_pick(self):
-        vorher = self.post(reverse("drafter:api_recommend"), {"map": "hart-rock-mine"}).json()
+        vorher = self.post(reverse("drafter:api_recommend"), {"map": "hard-rock-mine"}).json()
         self.assertIn("ban_empfehlungen", vorher)
         self.assertTrue(all(b["gruende"] for b in vorher["ban_empfehlungen"]))
 
         nachher = self.post(reverse("drafter:api_recommend"), {
-            "map": "hart-rock-mine", "own_picks": ["gale"],
+            "map": "hard-rock-mine", "own_picks": ["gale"],
         }).json()
         self.assertNotIn("ban_empfehlungen", nachher)
 
     def test_endanalyse_braucht_eigene_picks(self):
         antwort = self.post(reverse("drafter:api_final_analysis"), {
-            "map": "hart-rock-mine",
+            "map": "hard-rock-mine",
         })
         self.assertEqual(antwort.status_code, 400)
         self.assertIn("fehler", antwort.json())
 
     def test_endanalyse_liefert_den_matchplan(self):
         daten = self.post(reverse("drafter:api_final_analysis"), {
-            "map": "hart-rock-mine",
+            "map": "hard-rock-mine",
             "own_picks": ["gale", "belle", "max"],
             "enemy_picks": ["buster", "gene", "tick"],
         }).json()
@@ -68,7 +68,7 @@ class ApiTest(DrafterTest):
     def test_endanalyse_enthaelt_alle_bausteine_des_coaches(self):
         """Die Liste der zugesagten Auskuenfte - Stueck fuer Stueck."""
         analyse = self.post(reverse("drafter:api_final_analysis"), {
-            "map": "hart-rock-mine",
+            "map": "hard-rock-mine",
             "own_picks": ["gale", "belle", "max"],
             "enemy_picks": ["buster", "gene", "tick"],
         }).json()["endanalyse"]
@@ -91,7 +91,7 @@ class ApiTest(DrafterTest):
     def test_jeder_spieler_bekommt_einen_eigenen_gegner_zugewiesen(self):
         """Team-Zuordnung und Spielerkarte duerfen sich nicht widersprechen."""
         analyse = self.post(reverse("drafter:api_final_analysis"), {
-            "map": "hart-rock-mine",
+            "map": "hard-rock-mine",
             "own_picks": ["gale", "belle", "max"],
             "enemy_picks": ["buster", "gene", "tick"],
         }).json()["endanalyse"]
@@ -106,7 +106,7 @@ class ApiTest(DrafterTest):
 
     def test_jede_empfehlung_liefert_die_aufschluesselung(self):
         daten = self.post(reverse("drafter:api_recommend"), {
-            "map": "hart-rock-mine", "own_picks": ["gale"], "enemy_picks": ["bull"],
+            "map": "hard-rock-mine", "own_picks": ["gale"], "enemy_picks": ["bull"],
         }).json()
         self.assertTrue(daten["empfehlungen"])
         for e in daten["empfehlungen"]:
@@ -120,7 +120,7 @@ class ApiTest(DrafterTest):
 
     def test_detail_liefert_die_aufschluesselung(self):
         daten = self.post(reverse("drafter:api_detail"), {
-            "map": "hart-rock-mine", "enemy_picks": ["bull"], "brawler": "gale",
+            "map": "hard-rock-mine", "enemy_picks": ["bull"], "brawler": "gale",
         }).json()
         self.assertEqual(daten["slug"], "gale")
         self.assertTrue(daten["komponenten"])
@@ -128,7 +128,7 @@ class ApiTest(DrafterTest):
 
     def test_detail_verweigert_gepickte_brawler(self):
         antwort = self.post(reverse("drafter:api_detail"), {
-            "map": "hart-rock-mine", "own_picks": ["gale"], "brawler": "gale",
+            "map": "hard-rock-mine", "own_picks": ["gale"], "brawler": "gale",
         })
         self.assertEqual(antwort.status_code, 400)
 
@@ -136,11 +136,11 @@ class ApiTest(DrafterTest):
     def test_ungueltige_eingaben_werden_abgewiesen(self):
         faelle = [
             {"map": "gibtsnicht"},
-            {"map": "hart-rock-mine", "own_picks": "gale"},
-            {"map": "hart-rock-mine", "own_picks": ["gale", "gale"]},
-            {"map": "hart-rock-mine", "own_picks": ["gale", "belle", "max", "tick"]},
-            {"map": "hart-rock-mine", "own_picks": ["gibtsnicht"]},
-            {"map": "hart-rock-mine", "bans": [{"boese": True}]},
+            {"map": "hard-rock-mine", "own_picks": "gale"},
+            {"map": "hard-rock-mine", "own_picks": ["gale", "gale"]},
+            {"map": "hard-rock-mine", "own_picks": ["gale", "belle", "max", "tick"]},
+            {"map": "hard-rock-mine", "own_picks": ["gibtsnicht"]},
+            {"map": "hard-rock-mine", "bans": [{"boese": True}]},
         ]
         for fall in faelle:
             antwort = self.post(reverse("drafter:api_recommend"), fall)

@@ -366,9 +366,17 @@ MODI = [
     },
 ]
 
+# Fruehere Katalogschluessel, die umbenannt wurden. Die Map heisst im Spiel
+# "Hard Rock Mine"; der Katalog fuehrte sie als "Hart Rock Mine". Solange
+# nur Demo-Daten existierten, fiel das nicht auf - echte Partien waeren nie
+# auf diese Map abgebildet worden, weil der Import ueber den Schluessel geht.
+MAP_UMBENENNUNGEN = {
+    "hart-rock-mine": "hard-rock-mine",
+}
+
 MAPS = [
     {
-        "name": "Hart Rock Mine", "slug": "hart-rock-mine", "mode": "gem-grab",
+        "name": "Hard Rock Mine", "slug": "hard-rock-mine", "mode": "gem-grab",
         "requirements": {
             "mid_control": 90, "area_control": 75, "zone_control": 70,
             "anti_tank": 60, "wallbreak": 55, "bush_control": 45,

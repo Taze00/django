@@ -107,6 +107,14 @@ class Command(BaseCommand):
         return modi
 
     def _maps(self, modi):
+        # Umbenennen statt neu anlegen: Statistiken und importierte Partien
+        # zeigen per Fremdschluessel auf die bestehende Zeile. Eine neue
+        # Zeile liesse sie auf eine verwaiste Map zeigen.
+        for alt, neu in seed_data.MAP_UMBENENNUNGEN.items():
+            if not BrawlMap.objects.filter(slug=neu).exists():
+                if BrawlMap.objects.filter(slug=alt).update(slug=neu):
+                    self._sag(f"Map umbenannt: {alt} -> {neu}")
+
         maps = {}
         for eintrag in seed_data.MAPS:
             karte, _ = BrawlMap.objects.update_or_create(

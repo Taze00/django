@@ -23,10 +23,10 @@ class DrafterTest(TestCase):
     def brawler(self, slug):
         return Brawler.objects.get(slug=slug)
 
-    def karte(self, slug="hart-rock-mine"):
+    def karte(self, slug="hard-rock-mine"):
         return BrawlMap.objects.select_related("game_mode").get(slug=slug)
 
-    def context(self, karte="hart-rock-mine", eigene=(), gegner=(), bans=(),
+    def context(self, karte="hard-rock-mine", eigene=(), gegner=(), bans=(),
                 first_pick=True, personal=None):
         k = self.karte(karte)
         return DraftContext(

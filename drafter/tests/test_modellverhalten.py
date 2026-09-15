@@ -123,17 +123,17 @@ class EigenesTeamErzeugtBedarfTest(DrafterTest):
         self.assertGreater(abstand(zwei_nahkaempfer), abstand(ausgewogen))
 
     def test_kontrolle_profitiert_ebenfalls_von_einem_nahkampflastigen_team(self):
-        ausgewogen = self.alle(karte="hart-rock-mine", eigene=["belle", "sandy"])
-        zwei_nahkaempfer = self.alle(karte="hart-rock-mine", eigene=["bull", "rosa"])
+        ausgewogen = self.alle(karte="hard-rock-mine", eigene=["belle", "sandy"])
+        zwei_nahkaempfer = self.alle(karte="hard-rock-mine", eigene=["bull", "rosa"])
         self.assertGreater(
             self.wert(zwei_nahkaempfer, "gale", config.K_TEAM_NEED),
             self.wert(ausgewogen, "gale", config.K_TEAM_NEED),
         )
 
     def test_redundanz_waechst_mit_jedem_weiteren_gleichartigen_pick(self):
-        keiner = self.alle(karte="hart-rock-mine", eigene=["belle"])
-        einer = self.alle(karte="hart-rock-mine", eigene=["belle", "bull"])
-        zwei = self.alle(karte="hart-rock-mine", eigene=["bull", "frank"])
+        keiner = self.alle(karte="hard-rock-mine", eigene=["belle"])
+        einer = self.alle(karte="hard-rock-mine", eigene=["belle", "bull"])
+        zwei = self.alle(karte="hard-rock-mine", eigene=["bull", "frank"])
 
         strafe = lambda e: self.wert(e, "rosa", config.K_REDUNDANCY)
         self.assertLessEqual(strafe(einer), strafe(keiner))
