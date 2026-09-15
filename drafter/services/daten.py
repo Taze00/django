@@ -1,20 +1,25 @@
-"""Datenraum: alle Statistiken eines Drafts in wenigen Abfragen.
+# -*- coding: utf-8 -*-
+"""Datenraum: alle Statistiken eines Drafts, einmal geladen.
 
-Das Problem, das diese Datei loest: eine Empfehlung bewertet rund
-zwanzig Kandidaten gegen bis zu drei Gegner und drei Mitspieler. Naiv
-sind das hunderte Einzelabfragen - bei jedem Klick. Der Datenraum holt
-stattdessen einmal alles Noetige und beantwortet danach jede Frage aus
-dem Speicher.
+Drei Aufgaben:
 
-Zweite Aufgabe: **Kontext-Spezifitaet**. Zu einem Paar kann es mehrere
-Zeilen geben - eine fuer diese Map, eine fuer den Modus, eine
-allgemeine. Die spezifischste gewinnt, denn "Gale gegen Buster auf
-dieser engen Map" ist eine bessere Auskunft als "Gale gegen Buster
-allgemein". Diese Aufloesung steht genau hier und nicht in fuenf
-Komponenten verteilt.
+1. **Entkopplung.** Der Datenraum fragt einen StatProvider und haelt nur
+   noch `StatRecord`s. Ob die Zahlen aus Demo-Seeds, aus Fixtures oder
+   spaeter aus der API aggregiert wurden, sieht die Engine nur am Feld
+   `source` - an keiner Tabelle, keinem Modell, keiner Abfrage.
+
+2. **Geschwindigkeit.** Eine Empfehlung bewertet rund zwanzig Kandidaten
+   gegen bis zu drei Gegner und drei Mitspieler. Der Datenraum holt alles
+   Noetige einmal und beantwortet danach jede Frage aus dem Speicher.
+
+3. **Kontext-Spezifitaet.** Zu einem Paar kann es viele Zeilen geben -
+   je Map, Modus, Rangbereich und Zeitfenster. Die passendste gewinnt,
+   und diese Auswahl steht genau hier, fuer alle Provider gleich.
 """
 
-from drafter.models import Brawler, BrawlerStat, CounterStat, SynergyStat
+from drafter import config
+from drafter.models import Brawler
+from drafter.services.providers.records import StatAnfrage
 
 
 def _spezifitaet(zeile, brawl_map, game_mode, rank_pool):
@@ -23,6 +28,9 @@ def _spezifitaet(zeile, brawl_map, game_mode, rank_pool):
     Hoeher ist besser. Eine Zeile fuer eine *andere* Map oder einen
     *anderen* Modus ist nicht schwach passend, sondern falsch - sie
     bekommt -1 und wird verworfen.
+
+    Rangfolge der Kriterien, jede Stufe schlaegt alle folgenden:
+      Map (4) > Modus (2) > Rangbereich (0.5) > Zeitfenster (<= 0.3) > Stichprobe (<= 0.1)
     """
     punkte = 0.0
 
@@ -36,87 +44,105 @@ def _spezifitaet(zeile, brawl_map, game_mode, rank_pool):
         punkte += 2.0
     if zeile.rank_pool and rank_pool and zeile.rank_pool == rank_pool:
         punkte += 0.5
+
+    # Aktuelle Meta vor langer Historie. Unbekannte Fenster bekommen
+    # nichts - sie sind nicht falsch, aber auch nicht bevorzugt.
+    vorrang = config.STAT_FENSTER_VORRANG
+    if zeile.window_label in vorrang:
+        punkte += 0.3 * (len(vorrang) - vorrang.index(zeile.window_label)) / len(vorrang)
+
     # Mehr Spiele entscheiden bei sonst gleicher Passung.
-    punkte += min(0.4, zeile.games / 100000.0)
+    punkte += min(0.1, zeile.games / 1_000_000)
     return punkte
 
 
 class Datenraum:
     """Vorgeladene Statistiken fuer genau einen Draft-Kontext."""
 
-    def __init__(self, brawl_map=None, game_mode=None, patch=None, rank_pool=None):
+    def __init__(self, brawl_map=None, game_mode=None, patch=None, rank_pool=None, provider=None):
         self.brawl_map = brawl_map
         self.game_mode = game_mode or (brawl_map.game_mode if brawl_map else None)
         self.patch = patch
         self.rank_pool = rank_pool
+        self.provider = provider
 
         self.brawler = []
         self._nach_id = {}
-        self._counter = {}    # (brawler_id, enemy_id) -> CounterStat
-        self._synergie = {}   # (kleinere_id, groessere_id) -> SynergyStat
-        self._stat = {}       # brawler_id -> BrawlerStat
+        self._counter = {}    # (brawler_id, gegner_id)   -> StatRecord
+        self._synergie = {}   # (kleinere_id, groessere_id) -> StatRecord
+        self._stat = {}       # brawler_id                -> StatRecord
+        self._build = {}      # (brawler_id, art, slug)   -> StatRecord
         self._geladen = False
 
     # --- Laden ----------------------------------------------------------
     def laden(self):
-        """Ein Aufruf, vier Abfragen. Danach faellt kein Query mehr an."""
         if self._geladen:
             return self
 
-        # Balanceaenderungen gleich mitladen: die Meta-Komponente fragt
-        # fuer JEDEN Kandidaten, ob er seit der Messung veraendert wurde
-        # (services/patch_weighting.py). Ohne prefetch ist das eine
-        # Abfrage je Brawler - genau die Art N+1, gegen die es diese
-        # Klasse gibt. Faellt nur auf, wenn ein Patch gesetzt ist, also
-        # ueber die API und nicht im schnellen Direkttest.
+        if self.provider is None:
+            # Spaet importiert: die Registry kennt alle Provider, der
+            # Datenraum soll keinen davon kennen muessen.
+            from drafter.services.providers.registry import hole_stat_provider
+            self.provider = hole_stat_provider()
+
+        # Der Brawler-Katalog ist keine Statistik, sondern gepflegte
+        # Domaene (Attribute, Rollen) - er kommt deshalb weiter direkt aus
+        # der Datenbank. Balanceaenderungen gleich mitladen: die
+        # Patchgewichtung fragt sie fuer jeden Kandidaten ab.
         self.brawler = list(
-            Brawler.objects.filter(is_active=True)
-            .prefetch_related("balance_changes__patch")
+            Brawler.objects.filter(is_active=True).prefetch_related("balance_changes__patch")
         )
         self._nach_id = {b.id: b for b in self.brawler}
-        ids = set(self._nach_id)
+        ids = frozenset(self._nach_id)
 
-        # select_related("patch") ist kein Feinschliff, sondern
-        # notwendig: die Patchgewichtung liest `stat.patch` fuer JEDEN
-        # Kandidaten, und ohne das Mitladen holt Django den Patch je
-        # Zeile einzeln nach - zwanzig Abfragen fuer einen einzigen
-        # Datensatz, den alle teilen.
-        self._counter = self._bestes_je_schluessel(
-            CounterStat.objects.filter(
-                brawler_id__in=ids, enemy_id__in=ids
-            ).select_related("patch"),
-            lambda z: (z.brawler_id, z.enemy_id),
-        )
-        self._synergie = self._bestes_je_schluessel(
-            SynergyStat.objects.filter(
-                brawler_a_id__in=ids, brawler_b_id__in=ids
-            ).select_related("patch"),
-            lambda z: (z.brawler_a_id, z.brawler_b_id),
+        anfrage = StatAnfrage(
+            brawler_ids=ids,
+            game_mode_id=self.game_mode.id if self.game_mode else None,
+            brawl_map_id=self.brawl_map.id if self.brawl_map else None,
+            rank_pool=self.rank_pool or "",
         )
         self._stat = self._bestes_je_schluessel(
-            BrawlerStat.objects.filter(brawler_id__in=ids).select_related("patch"),
-            lambda z: z.brawler_id,
+            self.provider.brawler_stats(anfrage), lambda r: r.brawler_id, ids,
+        )
+        self._counter = self._bestes_je_schluessel(
+            self.provider.counter_stats(anfrage), lambda r: (r.brawler_id, r.partner_id), ids,
+        )
+        self._synergie = self._bestes_je_schluessel(
+            self.provider.synergy_stats(anfrage),
+            lambda r: tuple(sorted((r.brawler_id, r.partner_id))), ids,
+        )
+        self._build = self._bestes_je_schluessel(
+            self.provider.build_stats(anfrage),
+            lambda r: (r.brawler_id, r.item_kind, r.item_slug), ids,
         )
         self._geladen = True
         return self
 
-    def _bestes_je_schluessel(self, queryset, schluessel):
-        """Je Schluessel die passendste Zeile behalten."""
+    def _bestes_je_schluessel(self, records, schluessel, ids):
+        """Je Schluessel die passendste Zeile behalten.
+
+        Datensaetze zu Brawlern ausserhalb des aktiven Katalogs werden
+        verworfen - ein Provider muss nicht wissen, wer gerade aktiv ist.
+        """
         gewaehlt = {}
         bewertung = {}
-        for zeile in queryset:
-            punkte = _spezifitaet(zeile, self.brawl_map, self.game_mode, self.rank_pool)
+        for record in records:
+            if record.brawler_id not in ids:
+                continue
+            if record.partner_id is not None and record.partner_id not in ids:
+                continue
+            punkte = _spezifitaet(record, self.brawl_map, self.game_mode, self.rank_pool)
             if punkte < 0:
                 continue
-            k = schluessel(zeile)
+            k = schluessel(record)
             if punkte > bewertung.get(k, -1):
-                gewaehlt[k] = zeile
+                gewaehlt[k] = record
                 bewertung[k] = punkte
         return gewaehlt
 
     # --- Abfragen -------------------------------------------------------
     def counter(self, brawler, gegner):
-        """Gepflegter Vorteil von `brawler` gegen `gegner`, sonst None.
+        """Vorteil von `brawler` gegen `gegner` laut Statistik, sonst None.
 
         None heisst ausdruecklich "keine Auskunft" und nicht "kein
         Vorteil" - die Counter-Komponente faellt dann auf ihre
@@ -131,16 +157,29 @@ class Datenraum:
     def stat(self, brawler):
         return self._stat.get(brawler.id)
 
+    def build_stat(self, brawler, art, slug):
+        return self._build.get((brawler.id, art, slug))
+
     def hat_statistik(self):
-        """Gibt es ueberhaupt gemessene Daten - oder laeuft alles auf Demo?"""
         return bool(self._stat or self._counter)
 
     @property
+    def quelle(self):
+        """Name des Providers - fuer die Datenlage in der Oberflaeche."""
+        return self.provider.name if self.provider is not None else None
+
+    @property
     def nur_demo(self):
-        alle = list(self._stat.values()) + list(self._counter.values()) + list(
-            self._synergie.values()
+        """Beruht alles auf nicht gemessenen Werten?
+
+        Ohne jede Statistik: ja. Das ist die ehrliche Antwort - dann
+        rechnet die Engine ausschliesslich mit Heuristiken.
+        """
+        alle = (
+            list(self._stat.values()) + list(self._counter.values())
+            + list(self._synergie.values()) + list(self._build.values())
         )
-        return all(z.is_demo for z in alle) if alle else True
+        return all(r.is_demo for r in alle) if alle else True
 
     def verfuegbare(self, gesperrte_ids):
         return [b for b in self.brawler if b.id not in gesperrte_ids]

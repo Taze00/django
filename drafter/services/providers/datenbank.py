@@ -1,0 +1,89 @@
+# -*- coding: utf-8 -*-
+"""Statistiken aus den Stat-Tabellen - gefiltert nach Quelle.
+
+Die Stat-Tabellen enthalten Zeilen verschiedener Herkunft nebeneinander:
+gepflegte Demo-Werte, aus Fixtures aggregierte, spaeter aus der API
+aggregierte. Dieser Provider liest genau die Quellen, fuer die er
+angelegt wurde - und NIE eine Mischung, die niemand bestellt hat.
+
+Das ist wichtiger, als es aussieht: mischt man stillschweigend gemessene
+Counter mit geschaetzten Demo-Countern, steht neben einer Zahl aus
+40 000 Matches eine ausgedachte, und beide sehen in der Aufschluesselung
+gleich aus.
+"""
+
+from django.db.models import Q
+
+from drafter.models import BrawlerStat, BuildStat, CounterStat, Datenquelle, SynergyStat
+from drafter.services.providers.basis import StatProvider
+from drafter.services.providers.records import ProviderStatus, StatRecord
+
+
+class DatenbankStatProvider(StatProvider):
+    """Liest voraggregierte Zeilen der angegebenen Quellen."""
+
+    name = "datenbank"
+
+    def __init__(self, quellen, name=None):
+        self.quellen = tuple(str(q) for q in quellen)
+        if name:
+            self.name = name
+
+    def status(self):
+        vorhanden = (
+            BrawlerStat.objects.filter(source__in=self.quellen).exists()
+            or CounterStat.objects.filter(source__in=self.quellen).exists()
+        )
+        if vorhanden:
+            return ProviderStatus.bereit()
+        labels = ", ".join(self.quellen)
+        return ProviderStatus.nicht_verfuegbar(
+            f"Keine Statistiken der Quelle(n) {labels} vorhanden"
+        )
+
+    # --- Abfragen -------------------------------------------------------
+    def _zeilen(self, modell, anfrage, brawler_feld, partner_feld=None):
+        """Grundabfrage mit Vorfilter auf Kontext und Quelle.
+
+        Vorgefiltert wird nur, was sicher nicht passt: eine andere Map,
+        ein anderer Modus. Die Feinauswahl (Map vor Modus vor allgemein,
+        Zeitfenster, Rangbereich) bleibt beim Datenraum, damit sie fuer
+        alle Provider identisch ist.
+        """
+        zeilen = modell.objects.filter(source__in=self.quellen).select_related("patch")
+        if anfrage.brawler_ids:
+            zeilen = zeilen.filter(**{f"{brawler_feld}__in": anfrage.brawler_ids})
+            if partner_feld:
+                zeilen = zeilen.filter(**{f"{partner_feld}__in": anfrage.brawler_ids})
+        zeilen = zeilen.filter(
+            Q(game_mode_id__isnull=True) | Q(game_mode_id=anfrage.game_mode_id)
+        ).filter(
+            Q(brawl_map_id__isnull=True) | Q(brawl_map_id=anfrage.brawl_map_id)
+        )
+        return [StatRecord.aus_model(z) for z in zeilen]
+
+    def brawler_stats(self, anfrage):
+        return self._zeilen(BrawlerStat, anfrage, "brawler_id")
+
+    def counter_stats(self, anfrage):
+        return self._zeilen(CounterStat, anfrage, "brawler_id", "enemy_id")
+
+    def synergy_stats(self, anfrage):
+        return self._zeilen(SynergyStat, anfrage, "brawler_a_id", "brawler_b_id")
+
+    def build_stats(self, anfrage):
+        return self._zeilen(BuildStat, anfrage, "brawler_id")
+
+
+# Quellen, deren Zeilen aus echten Matches aggregiert wurden. SYNTHETIC
+# fehlt hier mit Absicht: synthetische Fixtures testen die Pipeline und
+# duerfen nie automatisch als Messung auf der Seite landen.
+GEMESSENE_QUELLEN = (Datenquelle.FIXTURE, Datenquelle.API, Datenquelle.AGGREGATED)
+
+
+def gemessener_provider():
+    return DatenbankStatProvider(GEMESSENE_QUELLEN, name="gemessen")
+
+
+def synthetischer_provider():
+    return DatenbankStatProvider((Datenquelle.SYNTHETIC,), name="synthetisch")

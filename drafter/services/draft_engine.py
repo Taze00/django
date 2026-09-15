@@ -35,7 +35,14 @@ from drafter.services.team_coverage import Teamanalyse, anforderungen_mit_gegner
 class DraftEngine:
     """Bewertet einen Draftzustand."""
 
-    def __init__(self, ctx, raum=None):
+    def __init__(self, ctx, raum=None, provider=None):
+        """`provider` ist ein StatProvider - ohne Angabe entscheidet die Registry.
+
+        Die Engine kennt keine Datenquelle. Sie bekommt voraggregierte
+        Statistiken ueber den Datenraum und rechnet damit; ob die aus
+        Demo-Seeds, Fixtures oder der API stammen, aendert am Rechenweg
+        nichts. Rohmatches erreichen sie nie.
+        """
         self.ctx = ctx
         self.hinweise = ctx.pruefe()
         self.raum = (raum or Datenraum(
@@ -43,6 +50,7 @@ class DraftEngine:
             game_mode=ctx.game_mode,
             patch=ctx.patch,
             rank_pool=ctx.rank_pool,
+            provider=provider,
         )).laden()
 
         # Zwei Anforderungsprofile, bewusst getrennt:
@@ -300,6 +308,7 @@ class DraftEngine:
             "siegchance": siegchance,
             "datenlage": {
                 "nur_demo": self.raum.nur_demo,
+                "quelle": self.raum.quelle,
                 "confidence": siegchance["confidence"],
                 "confidence_label": siegchance["confidence_label"],
                 "hinweis": confidence.erklaerung(
@@ -335,6 +344,7 @@ class DraftEngine:
             "siegchance": self.siegchance(),
             "datenlage": {
                 "nur_demo": self.raum.nur_demo,
+                "quelle": self.raum.quelle,
                 "hinweis": confidence.erklaerung(
                     empfehlungen[0].confidence if empfehlungen else 0.0,
                     self.raum, self.ctx,

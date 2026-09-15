@@ -298,6 +298,69 @@ ZEITFENSTER = {
 
 
 # =========================================================================
+# Datenquellen, Import und Aggregation
+# =========================================================================
+# Keine dieser Zahlen ist ein Scoring-Gewicht. Sie bestimmen, wie aus
+# Rohmatches Statistiken werden - nicht, wie die Engine sie gewichtet.
+
+# Welcher StatProvider die Engine versorgt (services/providers/registry.py).
+#   "auto"        - gemessene Statistiken, wenn vorhanden, sonst Demo
+#   "demo"        - immer die gepflegten Demo-Daten
+#   "gemessen"    - nur aus echten Matches aggregierte Statistiken
+#   "synthetisch" - nur aus synthetischen Fixtures (Pipeline-Tests)
+STAT_PROVIDER = getattr(settings, "DRAFTER_STAT_PROVIDER", "auto")
+
+# Wo mitgeschnittene Rohantworten und Fixture-Dateien liegen. Das
+# Verzeichnis ist gitignored: echte Antworten enthalten Spieler-Tags.
+FIXTURE_VERZEICHNIS = getattr(
+    settings, "DRAFTER_FIXTURE_VERZEICHNIS", settings.BASE_DIR / "data" / "brawl_fixtures"
+)
+
+# Aggregationsfenster in Tagen. None = seit dem aktuellen Patch.
+AGGREGATIONS_FENSTER = {**ZEITFENSTER, "seit_patch": None}
+
+# Aus welchem Fenster der Prior fuer die kuerzeren Fenster stammt.
+#
+# Das ist die Umsetzung von "nach einem Patch alte Daten als Prior
+# nutzen": eine 7-Tage-Statistik mit 80 Spielen wird nicht zu 50 %
+# gezogen, sondern zur langfristigen Rate desselben Brawlers. Je mehr
+# neue Spiele vorliegen, desto weniger zaehlt der Prior.
+PRIOR_FENSTER = "90d"
+
+# Welches Fenster der Datenraum nimmt, wenn fuer denselben Kontext
+# mehrere vorliegen: aktuelle Meta vor langer Historie, gepflegte Werte
+# ohne Fenster ("") zuletzt.
+STAT_FENSTER_VORRANG = ("seit_patch", "7d", "30d", "90d", "")
+
+# Bayes-Prior fuer Paare (Counter, Synergie). Paare haben um
+# Groessenordnungen weniger Spiele als Einzelbrawler. Der Prior ist hier
+# nicht 50 %, sondern die ERWARTETE Rate aus den Einzelstaerken - kleine
+# Paar-Stichproben landen dadurch bei "kein besonderer Vorteil" statt bei
+# einem Zufallswert.
+PAAR_PRIOR_STAERKE = 60
+
+# Auf welchen Kontexten gezaehlt wird. Counter und Synergien je Map waeren
+# auf absehbare Zeit zu duenn besetzt, um mehr als Rauschen zu liefern.
+AGGREGATIONS_EBENEN = {
+    "brawler": ("global", "modus", "map"),
+    "counter": ("global", "modus"),
+    "synergy": ("global", "modus"),
+    "build": ("global", "modus"),
+}
+
+# Deduplizierung: dieselbe Partie aus zwei Battlelogs kann mit leicht
+# abweichendem Zeitstempel ankommen. Innerhalb dieser Toleranz gelten
+# gleiche Teams auf gleicher Map als dasselbe Match. Ungeprueft, wie
+# genau echte Zeitstempel uebereinstimmen - offene Datenfrage.
+MATCH_ZEITTOLERANZ_SEKUNDEN = 60
+
+# Wie stark eine gemessene Build-Statistik die regelbasierte Build-Wahl
+# verschiebt, je Punkt Vorteil und gewichtet mit ihrer Confidence. Wirkt
+# nur, wenn Build-Statistiken existieren - mit Demo-Daten nie.
+BUILD_STAT_EINFLUSS = 0.35
+
+
+# =========================================================================
 # Win-Wahrscheinlichkeit (Heuristik)
 # =========================================================================
 # Die MVP-Schaetzung ist eine Heuristik, keine kalibrierte
