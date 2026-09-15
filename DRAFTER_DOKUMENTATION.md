@@ -349,7 +349,7 @@ Drafter schlichte Django-Views mit Session und CSRF.
 React-App mit, die Portfolio-Seiten sind Vanilla; eine dritte
 Werkzeugkette wäre unnötig.
 
-**Geschwindigkeit:** rund 40 ms und 14 Abfragen je Empfehlungsanfrage,
+**Geschwindigkeit:** rund 45 ms und 17 Abfragen je Empfehlungsanfrage (gemessen nach der Provider-Umstellung; die drei zusätzlichen gegenüber vorher sind die `auto`-Prüfung auf gemessene Daten und das Laden der Build-Statistiken),
 Antwort ~33 KB — inklusive Aufschlüsselung, Coach-Texten und Build für
 alle acht angezeigten Empfehlungen.
 
