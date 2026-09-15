@@ -313,7 +313,7 @@ STAT_PROVIDER = getattr(settings, "DRAFTER_STAT_PROVIDER", "auto")
 # Wo mitgeschnittene Rohantworten und Fixture-Dateien liegen. Das
 # Verzeichnis ist gitignored: echte Antworten enthalten Spieler-Tags.
 FIXTURE_VERZEICHNIS = getattr(
-    settings, "DRAFTER_FIXTURE_VERZEICHNIS", settings.BASE_DIR / "data" / "brawl_fixtures"
+    settings, "DRAFTER_FIXTURE_VERZEICHNIS", settings.BASE_DIR / "data" / "brawl_api_raw"
 )
 
 # Aggregationsfenster in Tagen. None = seit dem aktuellen Patch.

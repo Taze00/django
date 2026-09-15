@@ -241,6 +241,16 @@ class _FakeClient:
         self.aufrufe.append(tag)
         return {"hinweis": "Platzhalter - keine echte API-Antwort"}
 
+    def abrufen(self, pfad, **parameter):
+        from drafter.services.brawl_api_client import ApiAntwort
+        if not self.einsatzbereit:
+            raise AssertionError("Ohne Key darf nichts abgerufen werden")
+        self.aufrufe.append(pfad)
+        return ApiAntwort(
+            pfad=f"/{pfad}", status=200, header={"content-type": "application/json"},
+            daten={"hinweis": "Platzhalter - keine echte API-Antwort"},
+        )
+
 
 class OffiziellerApiProviderTest(FixtureMixin, DrafterTest):
     @override_settings(BRAWL_STARS_API_KEY="")
@@ -276,7 +286,12 @@ class OffiziellerApiProviderTest(FixtureMixin, DrafterTest):
         provider = OfficialBrawlAPIProvider(client=_FakeClient(mit_key=True))
         pfad = provider.rohantwort_sichern("#SYNTH01", self.verzeichnis)
         inhalt = json.loads(pfad.read_text(encoding="utf-8"))
-        self.assertEqual(set(inhalt), {"format", "herkunft", "referenz", "abgerufen_am", "antwort"})
+        self.assertEqual(set(inhalt), {
+            "format", "herkunft", "referenz", "endpoint", "http_status",
+            "antwort_header", "abgerufen_am", "antwort",
+        })
+        self.assertEqual(inhalt["http_status"], 200)
+        self.assertNotIn("authorization", pfad.read_text(encoding="utf-8").lower())
 
         bericht = MatchImporter(FixtureDataProvider(pfad)).ausfuehren()
         self.assertEqual(bericht.nicht_unterstuetzt, 1)

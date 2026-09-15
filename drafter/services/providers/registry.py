@@ -46,7 +46,7 @@ def hole_stat_provider(name=None):
 def hole_match_provider(name, **optionen):
     """Ein MatchProvider fuer den Import.
 
-        hole_match_provider("fixture", pfade=["data/brawl_fixtures"])
+        hole_match_provider("fixture", pfade=["data/brawl_api_raw"])
         hole_match_provider("api", spieler_tags=["#2ABC"])
     """
     name = (name or "").lower()

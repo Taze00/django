@@ -28,7 +28,9 @@ from datetime import datetime, timezone as dt_timezone
 from pathlib import Path
 
 from drafter.models.base import Datenquelle
-from drafter.services.brawl_api_client import ApiFehler, BrawlApiClient, KeinKeyFehler
+from drafter.services.brawl_api_client import (
+    ApiFehler, BrawlApiClient, KeinKeyFehler, tag_normalisieren,
+)
 from drafter.services.ingest.parser import FORMAT_OFFIZIELLER_BATTLELOG, ParserFehler, parser_fuer
 from drafter.services.providers.basis import MatchProvider
 from drafter.services.providers.records import Lieferung, ProviderStatus
@@ -40,20 +42,52 @@ MELDUNG_KEIN_PARSER = (
 )
 
 
-def verpacke(antwort, referenz):
-    """Rohantwort in die eigene Huelle legen.
+def verpacke(antwort, referenz, format_name=FORMAT_OFFIZIELLER_BATTLELOG):
+    """Rohantwort in die eigene Huelle legen - ohne HTTP-Angaben.
 
-    Die Huelle enthaelt nur EIGENE Schluessel (format, herkunft,
-    referenz, abgerufen_am). Die Antwort selbst steht unveraendert unter
-    "antwort" - an ihr wird nichts umbenannt, gefiltert oder gelesen.
+    Die Huelle enthaelt nur EIGENE Schluessel. Die Antwort steht
+    unveraendert unter "antwort" - nichts umbenannt, gefiltert, gelesen.
     """
     return {
-        "format": FORMAT_OFFIZIELLER_BATTLELOG,
+        "format": format_name,
         "herkunft": "api-mitschnitt",
         "referenz": referenz,
         "abgerufen_am": datetime.now(dt_timezone.utc).isoformat(),
         "antwort": antwort,
     }
+
+
+def verpacke_mitschnitt(api_antwort, referenz, format_name):
+    """Vollstaendiger Mitschnitt einer ApiAntwort: Endpoint, Status, Header, JSON.
+
+    Gespeichert werden ausschliesslich ANTWORT-Header - die Anfrage mit
+    ihrem Authorization-Header kommt in dieser Funktion gar nicht vor.
+    """
+    return {
+        "format": format_name,
+        "herkunft": "api-mitschnitt",
+        "referenz": referenz,
+        "endpoint": api_antwort.pfad,
+        "http_status": api_antwort.status,
+        "antwort_header": dict(api_antwort.header),
+        "abgerufen_am": api_antwort.abgerufen_am.isoformat(),
+        "antwort": api_antwort.daten,
+    }
+
+
+def dateiname(art, referenz, zeitpunkt):
+    """player_2ABC_20260916T101500Z.json - Tag ohne Sonderzeichen."""
+    sauber = "".join(z for z in str(referenz or "").upper() if z.isalnum()) or "ohne"
+    return f"{art}_{sauber}_{zeitpunkt.strftime('%Y%m%dT%H%M%SZ')}.json"
+
+
+def speichere_mitschnitt(huelle, verzeichnis, name):
+    """Hülle als JSON-Datei ablegen. Gibt den Pfad zurueck."""
+    verzeichnis = Path(verzeichnis)
+    verzeichnis.mkdir(parents=True, exist_ok=True)
+    ziel = verzeichnis / name
+    ziel.write_text(json.dumps(huelle, ensure_ascii=False, indent=2), encoding="utf-8")
+    return ziel
 
 
 class OfficialBrawlAPIProvider(MatchProvider):
@@ -116,22 +150,17 @@ class OfficialBrawlAPIProvider(MatchProvider):
             )
 
     def rohantwort_sichern(self, tag, verzeichnis):
-        """Einen Battlelog abrufen und unveraendert als Fixture-Datei ablegen.
+        """Einen Battlelog abrufen und unveraendert als Datei ablegen.
 
-        Der erste Schritt zu echten Daten - und der einzige, der das Netz
-        braucht. Danach laeuft alles ueber den FixtureDataProvider.
-        Ohne Key: KeinKeyFehler mit klarer Meldung (ein ausdruecklicher
-        Aufruf soll laut scheitern, nicht still nichts tun).
+        Mit Endpoint, HTTP-Status und Antwort-Headern - so ist spaeter
+        nachvollziehbar, woher die Datei stammt und was die API dazu
+        meldete. Ohne Key: KeinKeyFehler (ein ausdruecklicher Aufruf soll
+        laut scheitern, nicht still nichts tun).
         """
         if not self.client.einsatzbereit:
             raise KeinKeyFehler("BRAWL_STARS_API_KEY ist nicht gesetzt")
-        antwort = self.client.battlelog(tag)
-        verzeichnis = Path(verzeichnis)
-        verzeichnis.mkdir(parents=True, exist_ok=True)
-        stempel = datetime.now(dt_timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-        sauberer_tag = "".join(z for z in str(tag).upper() if z.isalnum())
-        ziel = verzeichnis / f"battlelog_{sauberer_tag}_{stempel}.json"
-        ziel.write_text(
-            json.dumps(verpacke(antwort, tag), ensure_ascii=False, indent=2), encoding="utf-8"
+        antwort = self.client.abrufen(f"players/{tag_normalisieren(tag)}/battlelog")
+        huelle = verpacke_mitschnitt(antwort, tag, FORMAT_OFFIZIELLER_BATTLELOG)
+        return speichere_mitschnitt(
+            huelle, verzeichnis, dateiname("battlelog", tag, antwort.abgerufen_am)
         )
-        return ziel

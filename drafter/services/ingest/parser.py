@@ -25,6 +25,12 @@ from drafter.services.providers.records import MatchRecord, SpielerRecord
 
 FORMAT_NORMALISIERT = "drafter.match.v1"
 FORMAT_OFFIZIELLER_BATTLELOG = "brawlstars.battlelog.raw"
+# Weitere Mitschnitte der offiziellen API. Sie enthalten keine Partien und
+# bekommen deshalb nie einen Match-Parser - sie werden gespeichert, damit
+# ihre Struktur (etwa stabile Brawler-IDs) angesehen werden kann.
+FORMAT_OFFIZIELLER_SPIELER = "brawlstars.player.raw"
+FORMAT_OFFIZIELLE_BRAWLER = "brawlstars.brawlers.raw"
+FORMAT_OFFIZIELLE_RANGLISTE = "brawlstars.rankings.raw"
 
 # Pflichtangabe jeder Datei: woher die Partien stammen. Ohne sie koennte
 # eine ausgedachte Testdatei als Messung in die Statistik gelangen.
