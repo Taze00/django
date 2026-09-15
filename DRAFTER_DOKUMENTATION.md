@@ -76,7 +76,7 @@ drafter/
 ```
 
 Dazu außerhalb der App, der Projektkonvention folgend:
-`templates/drafter/`, `static/drafter/` und `data/brawl_fixtures/`
+`templates/drafter/`, `static/drafter/` und `data/brawl_api_raw/`
 (gitignored — mitgeschnittene API-Antworten enthalten Spieler-Tags).
 
 ---
@@ -710,6 +710,76 @@ die Empfehlung **exakt** die regelbasierte.
 ---
 
 ## 19. Die offizielle API anschließen
+
+### Offizielle Brawl Stars API
+
+**Umgebungsvariable:** `BRAWL_STARS_API_KEY` in der gitignorten `.env`. Sie wird
+über `docker-compose.yml` durchgereicht, in `settings.py` gelesen und nur über
+`drafter.config.api_key()` abgefragt. Sie ist bewusst **kein** Argument eines
+Commands (Argumente landen in Shell-History und Prozesslisten).
+
+- `docker compose run --rm …` liest die `.env` bei jedem Start neu.
+- Ein **laufender** Container übernimmt eine geänderte `.env` erst nach
+  `docker compose up -d --force-recreate django-dev`. Die Webseite selbst ruft
+  die API nicht auf — für Tests und Mitschnitte ist das nicht nötig.
+
+**Key anlegen:** im Developer-Portal (developer.brawlstars.com) einen Key anlegen
+und dabei die **öffentliche IP des Servers** als erlaubte Adresse eintragen.
+
+**IP-Freigabe:** Supercell bindet jeden Key an die eingetragenen IP-Adressen.
+Anfragen von einer anderen IP werden abgelehnt (403). Der Server hängt an einer
+DynDNS-Adresse — **ändert sich seine öffentliche IP, muss der Key angepasst
+oder neu angelegt werden.** Der Client meldet 403 mit genau diesem Hinweis und
+gibt Supercells eigene Begründung mit aus.
+
+**Geheimhaltung, technisch durchgesetzt:**
+- Der Key steht nur im `Authorization`-Header der ausgehenden Anfrage.
+- Gespeichert werden ausschließlich **Antwort**-Header.
+- Der Key liegt privat am Client, `repr()` zeigt ihn nicht, Fehlermeldungen
+  werden bereinigt, und Fehler werden ohne Ausnahme-Kette geworfen.
+- Tests prüfen, dass er in keiner Meldung, keinem Log und keiner Datei auftaucht.
+
+**Testbefehle** (importieren und aggregieren nichts):
+
+```bash
+docker compose run --rm --no-deps -T django-dev python manage.py test_brawl_api --brawlers
+docker compose run --rm --no-deps -T django-dev python manage.py test_brawl_api --player "#SPIELERTAG"
+docker compose run --rm --no-deps -T django-dev python manage.py test_brawl_api --analysiere data/brawl_api_raw/DATEI.json
+```
+
+`--analysiere` gibt die Feldstruktur einer gespeicherten Antwort aus — Pfade,
+Typen, Häufigkeit, **keine Werte**. So lässt sich die Struktur zeigen, ohne
+Spielernamen oder Tags auszugeben.
+
+**Speicherort:** `data/brawl_api_raw/` (gitignored — echte Antworten enthalten
+Spieler-Tags), eine Datei je Abruf, z. B. `battlelog_<TAG>_<Zeitstempel>.json`.
+Jede Datei ist eine Hülle aus eigenen Schlüsseln um die **unveränderte** Antwort:
+
+| Schlüssel | Inhalt |
+|---|---|
+| `format` | `brawlstars.player.raw`, `brawlstars.battlelog.raw`, `brawlstars.brawlers.raw` |
+| `herkunft` | `api-mitschnitt` |
+| `referenz` | Spieler-Tag bzw. `alle` |
+| `endpoint` | abgefragter Pfad, z. B. `/players/%23TAG/battlelog` |
+| `http_status` | Status der Antwort |
+| `antwort_header` | Antwort-Header (ohne `set-cookie`) — für Rate-Limit-Hinweise |
+| `abgerufen_am` | Zeitpunkt (UTC) |
+| `antwort` | die JSON-Antwort, unverändert |
+
+**Fehlerbehandlung** im Client (`services/brawl_api_client.py`): 401 → Key
+fehlt/ungültig · 403 → Zugriff verweigert, meist IP-Freigabe · 404 → nicht
+gefunden, meist falscher Tag · 429 → Ratenlimit · 5xx → Fehler/Wartung bei der
+API · Zeitüberschreitung (12 s) und Netzwerkfehler. Jede Meldung nennt den
+Endpoint und Supercells `reason`/`message`, sofern die Fehlerantwort sie enthält.
+
+**Lage der Dokumentation:** Die öffentliche Swagger-Oberfläche des Portals
+(`/api-docs/index.html`) enthält **keine** Spezifikation. Die Adresse wird erst
+nach dem Anmelden mit einem temporären Token übergeben. Ohne Login ließ sich
+deshalb kein einziger Endpoint belegen. Eingebaut und abgerufen werden nur die
+ausdrücklich gewünschten Pfade `/players/{playerTag}`,
+`/players/{playerTag}/battlelog` und `/brawlers`. **Ranking-Endpoints sind nicht
+eingebaut**, bis ihre Pfade aus der Spezifikation vorliegen.
+
 
 Heute: ohne `BRAWL_STARS_API_KEY` meldet sich `OfficialBrawlAPIProvider` als
 **nicht verfügbar**, ruft nichts ab und stürzt nicht ab. Mit Key speichert er

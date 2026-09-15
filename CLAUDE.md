@@ -145,7 +145,7 @@ python manage.py import_brawl_fixture PFAD            # Rohdaten: idempotent, de
 python manage.py aggregate_brawl_stats --quelle …     # Statistiken: gemessen | fixture | api | synthetisch
 python manage.py rebuild_draft_stats --quelle …       # Patches neu zuordnen + alles neu aggregieren
 ```
-Synthetische Testpartien (`drafter/testdaten/`) landen als `source="synthetic"` und werden nie mit echten gemischt. Mitgeschnittene API-Antworten gehören nach `data/brawl_fixtures/` (gitignored, enthalten Spieler-Tags).
+Synthetische Testpartien (`drafter/testdaten/`) landen als `source="synthetic"` und werden nie mit echten gemischt. Mitgeschnittene API-Antworten gehören nach `data/brawl_api_raw/` (gitignored, enthalten Spieler-Tags). Test gegen die echte API: `python manage.py test_brawl_api --brawlers | --player "#TAG" | --analysiere DATEI` — ruft ab und speichert, importiert nichts. Der Key kommt nur aus `BRAWL_STARS_API_KEY` in der `.env`, nie als Argument.
 
 Volle Erklärung: `DRAFTER_DOKUMENTATION.md`.
 
@@ -179,7 +179,7 @@ docker compose run --rm --no-deps -T django-dev python manage.py test fitness --
 ```
 docker compose run --rm --no-deps -T django-dev python manage.py test drafter --settings=meinprojekt.settings_test
 ```
-242 Tests, ~2 min. **Vor jedem Dependency- oder Django-Upgrade beide laufen lassen** (zusammen 495). Nie zwei Testläufe gleichzeitig — beide legen `test_postgres` an.
+256 Tests, ~2 min. **Vor jedem Dependency- oder Django-Upgrade beide laufen lassen** (zusammen 509). Nie zwei Testläufe gleichzeitig — beide legen `test_postgres` an.
 
 > Frühere Fassungen dieser Datei nannten 134 Tests und „SQLite im Speicher". Beides stimmt nicht mehr bzw. stimmte nie: `settings_test` unterscheidet sich von `settings` **nur** im Passwort-Hasher, die Testdatenbank ist dieselbe Postgres-Instanz.
 

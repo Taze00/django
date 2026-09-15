@@ -71,7 +71,7 @@ Diese Seiten und Dateien gibt es **nicht mehr** — falls dir irgendwo noch ein 
 ```
 alex-django/
 ├── data/              → Postgres-Datenbank — NICHT anfassen
-│   └── brawl_fixtures/ → Draft Coach: mitgeschnittene API-Antworten (gitignored)
+│   └── brawl_api_raw/  → Draft Coach: mitgeschnittene API-Antworten (gitignored)
 ├── docker/            → Dockerfile + requirements.txt
 ├── drafter/           → DRAFT COACH (Brawl Stars, /draft/) - eigene Welt
 ├── films/             → FILME-App (Models, Views, Daten für /filme/)
