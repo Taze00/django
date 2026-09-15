@@ -84,6 +84,18 @@ def _text(wert, pfad, pflicht=True):
     return wert.strip()
 
 
+def _kennung(wert, pfad):
+    """Eine ID der Quelle - Text oder Ganzzahl, als Text gespeichert.
+
+    Welchen Typ echte IDs haben, ist ungeprueft; beide sind erlaubt.
+    """
+    if wert is None:
+        return None
+    if isinstance(wert, bool) or not isinstance(wert, (str, int)) or str(wert).strip() == "":
+        raise ValueError(f"{pfad} muss Text oder eine Ganzzahl sein")
+    return str(wert).strip()
+
+
 def _ganzzahl(wert, pfad):
     if wert is None:
         return None
@@ -111,11 +123,14 @@ def _build(wert, pfad):
 def _spieler(eintrag, pfad):
     if not isinstance(eintrag, dict):
         raise ValueError(f"{pfad} muss ein Objekt sein")
+    # ID bevorzugt; der Name ist dann optional. Ohne ID ist er Pflicht.
+    brawler_id = _kennung(eintrag.get("brawler_id"), f"{pfad}.brawler_id")
     return SpielerRecord(
-        brawler=_text(eintrag.get("brawler"), f"{pfad}.brawler"),
+        brawler=_text(eintrag.get("brawler"), f"{pfad}.brawler", pflicht=brawler_id is None) or "",
         player_tag=_text(eintrag.get("player_tag"), f"{pfad}.player_tag", pflicht=False) or "",
         pick_order=_ganzzahl(eintrag.get("pick_order"), f"{pfad}.pick_order"),
         build=_build(eintrag.get("build"), f"{pfad}.build"),
+        external_brawler_id=brawler_id,
     )
 
 
@@ -151,8 +166,10 @@ def _match(eintrag, pfad):
             raise ValueError(f"{bpfad} muss ein Objekt sein")
         if ban.get("side") not in SEITEN:
             raise ValueError(f"{bpfad}.side muss a, b oder null sein")
+        ban_id = _kennung(ban.get("brawler_id"), f"{bpfad}.brawler_id")
         bans.append({
-            "brawler": _text(ban.get("brawler"), f"{bpfad}.brawler"),
+            "brawler": _text(ban.get("brawler"), f"{bpfad}.brawler", pflicht=ban_id is None) or "",
+            "external_brawler_id": ban_id,
             "side": ban.get("side"),
             "order": _ganzzahl(ban.get("order"), f"{bpfad}.order"),
         })
@@ -161,10 +178,14 @@ def _match(eintrag, pfad):
     if not isinstance(ranked, bool):
         raise ValueError(f"{pfad}.ranked muss true oder false sein")
 
+    mode_id = _kennung(eintrag.get("mode_id"), f"{pfad}.mode_id")
+    map_id = _kennung(eintrag.get("map_id"), f"{pfad}.map_id")
     return MatchRecord(
         played_at=_zeitpunkt(eintrag.get("played_at"), pfad),
-        mode=_text(eintrag.get("mode"), f"{pfad}.mode"),
-        map=_text(eintrag.get("map"), f"{pfad}.map"),
+        mode=_text(eintrag.get("mode"), f"{pfad}.mode", pflicht=mode_id is None and map_id is None) or "",
+        map=_text(eintrag.get("map"), f"{pfad}.map", pflicht=map_id is None) or "",
+        external_mode_id=mode_id,
+        external_map_id=map_id,
         teams=spieler,
         winner=winner,
         rank_pool=rank_pool,

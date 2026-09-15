@@ -28,7 +28,8 @@ from django.db import DatabaseError, transaction
 from drafter.models import Brawler, BrawlMap, GameMode, Patch
 from drafter.models.matches import Match, MatchBan, MatchPlayer, RawPayload
 from drafter.services.ingest.fingerprint import (
-    fingerprint, ist_spiegel, kandidaten, kanonisiere, katalog_schluessel,
+    eindeutiger_fingerprint, ist_spiegel, kandidaten, kanonisiere, katalog_schluessel,
+    rekonstruierter_fingerprint, standard_identitaet, standard_ort,
 )
 
 
@@ -43,6 +44,10 @@ class ImportBericht:
     neu: int = 0
     duplikate: int = 0
     konflikte: int = 0
+    # Wie Brawler zugeordnet wurden. Solange "per Name" dominiert, haengt
+    # die Zuordnung an Schreibweisen - ein Grund, externe IDs zu pflegen.
+    zuordnung_per_id: int = 0
+    zuordnung_per_name: int = 0
     unbekannte_brawler: set = field(default_factory=set)
     unbekannte_maps: set = field(default_factory=set)
     meldungen: list = field(default_factory=list)
@@ -56,6 +61,8 @@ class ImportBericht:
             f"  neu gespeichert:    {self.neu}",
             f"  Duplikate:          {self.duplikate}",
             f"  Konflikte:          {self.konflikte}",
+            f"Brawler zugeordnet:   per ID {self.zuordnung_per_id},"
+            f" per Name {self.zuordnung_per_name}",
         ]
         if self.unbekannte_brawler:
             zeilen.append(f"Unbekannte Brawler:   {', '.join(sorted(self.unbekannte_brawler))}")
@@ -76,9 +83,16 @@ class MatchImporter:
         self.trockenlauf = trockenlauf
         # Kataloge einmal laden - eine Abfrage je Partie waere bei
         # grossen Importen der teuerste Teil.
-        self._brawler = {b.slug: b for b in Brawler.objects.all()}
-        self._modi = {m.slug: m for m in GameMode.objects.all()}
-        self._maps = {k.slug: k for k in BrawlMap.objects.select_related("game_mode")}
+        brawler = list(Brawler.objects.all())
+        modi = list(GameMode.objects.all())
+        karten = list(BrawlMap.objects.select_related("game_mode"))
+        self._brawler = {b.slug: b for b in brawler}
+        self._modi = {m.slug: m for m in modi}
+        self._maps = {k.slug: k for k in karten}
+        # Externe IDs zuerst - Namen sind nur der Rueckfall.
+        self._brawler_ext = {b.external_id: b for b in brawler if b.external_id}
+        self._modi_ext = {m.external_id: m for m in modi if m.external_id}
+        self._maps_ext = {k.external_id: k for k in karten if k.external_id}
         self._patches = list(Patch.objects.order_by("released_on"))
         self._patch_daten = [p.released_on for p in self._patches]
 
@@ -153,27 +167,74 @@ class MatchImporter:
             bericht.fehlerhaft += 1
             bericht.meldungen.append(f"{lieferung.referenz}: Import abgebrochen - {fehler}")
 
+    # --- Aufloesung gegen den Katalog -----------------------------------
+    def _brawler_fuer(self, name, externe_id):
+        """(Brawler, Weg) - Weg ist "id", "name" oder None."""
+        if externe_id and externe_id in self._brawler_ext:
+            return self._brawler_ext[externe_id], "id"
+        brawler = self._brawler.get(katalog_schluessel(name)) if name else None
+        return (brawler, "name") if brawler else (None, None)
+
+    def _identitaet(self, spieler):
+        """Katalog-Identitaet fuer den Fingerabdruck.
+
+        Loest ID oder Name auf DENSELBEN Katalogeintrag auf - so fuehrt
+        eine Sichtung mit IDs und eine mit Namen zum selben Fingerabdruck.
+        Nur was der Katalog nicht kennt, behaelt seine gelieferte Form.
+        """
+        brawler, _ = self._brawler_fuer(spieler.brawler, spieler.external_brawler_id)
+        return f"brawler:{brawler.id}" if brawler else standard_identitaet(spieler)
+
+    def _ort_fuer(self, record):
+        """(Modus, Map, Identitaet des Orts) - IDs vor Namen."""
+        karte = (self._maps_ext.get(record.external_map_id) if record.external_map_id else None) \
+            or self._maps.get(katalog_schluessel(record.map))
+        modus = (self._modi_ext.get(record.external_mode_id) if record.external_mode_id else None) \
+            or self._modi.get(katalog_schluessel(record.mode))
+        if karte is not None and modus is None:
+            modus = karte.game_mode
+        ort = f"karte:{karte.id}" if karte else standard_ort(record)
+        return modus, karte, ort
+
+    def _finde(self, record, ort):
+        """Bereits gespeicherte Partie - in fester Rangfolge.
+
+        1. Partie-ID der Quelle: exakt, ohne Zeittoleranz.
+        2. Fallback: rekonstruierter Fingerabdruck innerhalb der Toleranz.
+           Eine Partie mit ANDERER Partie-ID ist dabei nie ein Treffer.
+        """
+        if record.external_id:
+            treffer = Match.objects.filter(external_id=record.external_id).first()
+            if treffer is not None:
+                return treffer
+        for kandidat in Match.objects.filter(
+            reconstructed_fingerprint__in=kandidaten(record, self._identitaet, ort)
+        ):
+            if record.external_id and kandidat.external_id \
+                    and kandidat.external_id != record.external_id:
+                continue
+            return kandidat
+        return None
+
     # --- Eine Partie ----------------------------------------------------
     def _match(self, record, payload, quelle, bericht):
-        record, _ = kanonisiere(record)
+        record, _ = kanonisiere(record, self._identitaet)
         # Bei spiegelgleichen Teams ist nicht feststellbar, welche Seite
         # gewonnen hat - das Ergebnis bleibt dann unbekannt.
-        sieger = "" if ist_spiegel(record) else (record.winner or "")
+        sieger = "" if ist_spiegel(record, self._identitaet) else (record.winner or "")
+        modus, karte, ort = self._ort_fuer(record)
 
-        vorhanden = Match.objects.filter(fingerprint__in=kandidaten(record)).first()
+        vorhanden = self._finde(record, ort)
         if vorhanden is not None:
             self._zusammenfuehren(vorhanden, record, sieger, payload, bericht)
             return
 
-        modus = self._modi.get(katalog_schluessel(record.mode))
-        karte = self._maps.get(katalog_schluessel(record.map))
         if karte is None:
-            bericht.unbekannte_maps.add(record.map)
-        elif modus is None:
-            modus = karte.game_mode
+            bericht.unbekannte_maps.add(record.map or f"id:{record.external_map_id}")
 
         match = Match.objects.create(
-            fingerprint=fingerprint(record),
+            fingerprint=eindeutiger_fingerprint(record, self._identitaet, ort),
+            reconstructed_fingerprint=rekonstruierter_fingerprint(record, self._identitaet, ort),
             external_id=record.external_id or "",
             source=quelle,
             played_at=record.played_at,
@@ -193,24 +254,30 @@ class MatchImporter:
         spieler = []
         for seite in ("a", "b"):
             for s in record.teams[seite]:
-                brawler = self._brawler.get(katalog_schluessel(s.brawler))
-                if brawler is None:
-                    bericht.unbekannte_brawler.add(s.brawler)
+                brawler, weg = self._brawler_fuer(s.brawler, s.external_brawler_id)
+                gelieferter_name = s.brawler or f"id:{s.external_brawler_id}"
+                if weg == "id":
+                    bericht.zuordnung_per_id += 1
+                elif weg == "name":
+                    bericht.zuordnung_per_name += 1
+                else:
+                    bericht.unbekannte_brawler.add(gelieferter_name)
                 spieler.append(MatchPlayer(
                     match=match, side=seite, brawler=brawler,
-                    brawler_name=s.brawler[:80], player_tag=(s.player_tag or "")[:20],
+                    brawler_name=gelieferter_name[:80], player_tag=(s.player_tag or "")[:20],
                     pick_order=s.pick_order, build=s.build,
                 ))
         MatchPlayer.objects.bulk_create(spieler)
 
-        MatchBan.objects.bulk_create([
-            MatchBan(
-                match=match, side=ban.get("side") or "",
-                brawler=self._brawler.get(katalog_schluessel(ban["brawler"])),
-                brawler_name=ban["brawler"][:80], order=ban.get("order"),
-            )
-            for ban in record.bans
-        ])
+        bans = []
+        for ban in record.bans:
+            brawler, _ = self._brawler_fuer(ban.get("brawler"), ban.get("external_brawler_id"))
+            bans.append(MatchBan(
+                match=match, side=ban.get("side") or "", brawler=brawler,
+                brawler_name=(ban.get("brawler") or f"id:{ban.get('external_brawler_id')}")[:80],
+                order=ban.get("order"),
+            ))
+        MatchBan.objects.bulk_create(bans)
         bericht.neu += 1
 
     def _zusammenfuehren(self, vorhanden, record, sieger, payload, bericht):
