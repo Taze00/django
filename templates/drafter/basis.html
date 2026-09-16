@@ -11,7 +11,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'drafter/draft.css' %}?v=20260916-1">
+<link rel="stylesheet" href="{% static 'drafter/draft.css' %}?v=20260916-3">
 </head>
 <body class="drafter{% block koerperklasse %}{% endblock %}">
 
@@ -35,6 +35,12 @@
 </header>
 
 {% block inhalt %}{% endblock %}
+
+{# Pflichttext der Supercell Fan Content Policy - woertlich, nicht uebersetzen. #}
+<footer class="fuss" lang="en">
+  This material is unofficial and is not endorsed by Supercell. For more information see
+  Supercell's Fan Content Policy: <a href="https://www.supercell.com/fan-content-policy" rel="noopener">www.supercell.com/fan-content-policy</a>.
+</footer>
 
 {% block skripte %}{% endblock %}
 </body>

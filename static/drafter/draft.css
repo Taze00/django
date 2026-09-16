@@ -75,6 +75,21 @@ a { color: inherit; text-decoration: none; }
 
 :focus-visible { outline: 2px solid var(--akzent); outline-offset: 1px; }
 
+/* Portrait bzw. Map-Bild: eingefaerbter Platzhalter mit Kuerzel, das
+   echte Bild als <img> darueber. Der Platzhalter steht ab dem ersten
+   Frame und bleibt, wenn die Datei fehlt. `contain` statt `cover`: das
+   Fan Kit erlaubt kein Beschneiden der Bilder. */
+.bild { position: relative; overflow: hidden; }
+.bild > img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: contain; display: block;
+}
+/* Erst nach dem Laden den Platzhalter wegnehmen - sonst stuende bis
+   dahin eine leere Flaeche da. `!important`, weil die Platzhalterfarbe
+   inline am Knoten steht. */
+.bild.ist-geladen { background: var(--bg-3) !important; }
+.bild.ist-geladen > .bild-kuerzel { visibility: hidden; }
+
 .visuell-versteckt {
   position: absolute; width: 1px; height: 1px;
   overflow: hidden; clip-path: inset(50%); white-space: nowrap;
@@ -114,6 +129,15 @@ kbd {
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .hinweis-demo strong { color: var(--warn); font-weight: 500; }
+
+/* Pflichthinweis der Supercell Fan Content Policy. Klein, aber auf jeder
+   Seite - auch dort, wo gerade kein Bild zu sehen ist. */
+.fuss {
+  flex-shrink: 0; padding: 4px 20px;
+  font-size: 10px; line-height: 1.4; color: var(--text-sehr-leise);
+  border-top: 1px solid var(--rand);
+}
+.fuss a { text-decoration: underline; }
 
 /* ─── 3. Aktionsleiste ────────────────────────────────────── */
 /* Map, First Pick, Ban/Pick und "wer ist dran" auf einer Zeile. Alles
@@ -170,6 +194,11 @@ kbd {
 }
 .mapknopf-modus { font-size: 11px; color: var(--akzent); white-space: nowrap; }
 .mapknopf.ist-leer { border-color: var(--akzent); }
+.mapknopf.hat-bild { position: relative; padding-left: 52px; }
+.mapknopf-bild {
+  position: absolute; left: 8px; top: 50%; transform: translateY(-50%);
+  width: 34px; height: 34px; border-radius: 4px;
+}
 
 /* Der wichtigste Text der Seite. */
 .jetzt {
@@ -237,7 +266,7 @@ kbd {
   padding: 7px 8px; border-radius: 5px; text-align: left;
 }
 .mapzeile-bild {
-  width: 34px; height: 34px; border-radius: 4px; flex-shrink: 0;
+  width: 40px; height: 40px; border-radius: 4px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
   background: var(--bg-3); background-size: cover; background-position: center;
   font-family: var(--display); font-size: 13px; color: var(--text-sehr-leise);
@@ -255,7 +284,10 @@ kbd {
    sich beim Tippen aendert, macht das Wiederfinden unmoeglich. */
 .drafter-raster {
   display: grid;
-  grid-template-columns: 216px minmax(0, 1fr) 340px;
+  /* 256px Brett: sechs Ban-Slots zu je ~37px (vorher 216px -> 29px,
+     zu klein, um ein Portrait zu erkennen). Das Gitter verliert dafuer
+     rund eine halbe Kachelspalte. */
+  grid-template-columns: 256px minmax(0, 1fr) 340px;
   gap: 12px; padding: 12px 20px;
   max-width: 1900px; margin: 0 auto; width: 100%;
 }
@@ -291,13 +323,14 @@ kbd {
 .brett-block--wir h2 { color: var(--wir); }
 .brett-block--gegner h2 { color: var(--gegner); }
 .brett-block--ban h2 { color: var(--ban-hell); }
+.brett-block--ban { padding-left: 8px; padding-right: 8px; }
 .brett-hinweis {
   font-family: var(--mono); font-size: 10.5px;
   color: var(--text-sehr-leise); letter-spacing: 0;
 }
 
 .slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-.slots--ban { grid-template-columns: repeat(6, 1fr); gap: 4px; }
+.slots--ban { grid-template-columns: repeat(6, 1fr); gap: 3px; }
 
 .slot {
   aspect-ratio: 1; display: flex; flex-direction: column;
@@ -314,7 +347,7 @@ kbd {
 .slot.ist-belegt { border-style: solid; }
 .slot.ist-belegt:hover { border-color: var(--gegner) !important; }
 .slot-bild {
-  width: 40px; height: 40px; border-radius: 4px;
+  width: 48px; height: 48px; border-radius: 4px;
   display: flex; align-items: center; justify-content: center;
   font-family: var(--display); font-size: 19px; letter-spacing: .04em; color: #0d0e10;
   background-size: cover; background-position: center;
@@ -323,7 +356,7 @@ kbd {
   font-size: 10px; color: var(--text); line-height: 1.15;
   max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.slots--ban .slot-bild { width: 26px; height: 26px; font-size: 13px; }
+.slots--ban .slot-bild { width: 30px; height: 30px; font-size: 13px; }
 .slots--ban .slot-name { display: none; }
 .slot--ban.ist-belegt .slot-bild { filter: grayscale(1) brightness(.6); }
 
@@ -702,7 +735,7 @@ kbd {
 /* Unter 1280px faellt die Empfehlungsspalte unter die Auswahl, statt
    sie zu erdruecken. */
 @media (max-width: 1280px) and (min-width: 1101px) {
-  .drafter-raster { grid-template-columns: 200px minmax(0, 1fr) 300px; }
+  .drafter-raster { grid-template-columns: 250px minmax(0, 1fr) 300px; }
 }
 
 /* Unter 1100px steht alles untereinander und die Seite scrollt wieder.
@@ -787,6 +820,11 @@ kbd {
   .mapknopf-zeile { flex-direction: column; gap: 0; }
   .mapknopf-name { font-size: 12.5px; max-width: 100%; }
   .mapknopf-modus { font-size: 10px; }
+  /* Im schmalen Knopf kostete das Vorschaubild den halben Mapnamen -
+     der Name ist hier die schnellere Bestaetigung. Im Waehler bleiben
+     die Vorschauen. */
+  .mapknopf-bild { display: none; }
+  .mapknopf.hat-bild { padding-left: 10px; }
   .schalter button { padding: 6px 9px; font-size: 12px; min-height: 40px; }
   .leiste-rechts { margin-left: 0; }
   .knopf-zuruecksetzen { padding: 6px 9px; min-height: 40px; }

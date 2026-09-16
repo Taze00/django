@@ -15,10 +15,14 @@
   <div class="confidence-liste">
     {% for eintrag in eintraege %}
       <div class="confidence-zeile" data-slug="{{ eintrag.brawler.slug }}">
-        <div class="confidence-bild"
-             {% if eintrag.brawler.image_url %}style="background-image: url('{{ eintrag.brawler.image_url }}')"
-             {% else %}style="background: {{ eintrag.brawler.color }}"{% endif %}>
-          {% if not eintrag.brawler.image_url %}{{ eintrag.brawler.initialen }}{% endif %}
+        {# Gleicher Aufbau wie im Drafter: Kuerzel als Platzhalter, Bild lazy darueber. #}
+        <div class="confidence-bild bild" style="background: {{ eintrag.brawler.color }}">
+          <span class="bild-kuerzel">{{ eintrag.brawler.initialen }}</span>
+          {% if eintrag.brawler.image_url %}
+            <img src="{{ eintrag.brawler.image_url }}" alt="" width="40" height="40"
+                 loading="lazy" decoding="async"
+                 onload="this.parentNode.classList.add('ist-geladen')" onerror="this.remove()">
+          {% endif %}
         </div>
         <span class="confidence-name">{{ eintrag.brawler.name }}</span>
         <input type="range" class="confidence-regler" min="0" max="100" step="5"

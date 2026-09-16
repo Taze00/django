@@ -28,17 +28,63 @@ function el(tag, klassen, text) {
   return knoten;
 }
 
-/** Portrait oder eingefaerbter Platzhalter mit Kuerzel. */
-function bild(brawler, klasse) {
-  const knoten = el('span', klasse);
-  if (brawler.image_url) {
-    knoten.style.backgroundImage = `url("${brawler.image_url.replace(/["\\]/g, '')}")`;
-    knoten.classList.add('hat-bild');
+/**
+ * Bereits geladene Bild-URLs.
+ *
+ * Gitter und Panel werden bei jedem Pick neu gebaut. Ein neues <img>
+ * mit `decoding="async"` bekaeme dabei einen Frame ohne Bild - das
+ * Kuerzel darunter blitzte bei jedem Klick einmal auf. Was schon
+ * einmal geladen war, kommt deshalb sofort und synchron aus dem Cache.
+ */
+const geladen = new Set();
+// Und umgekehrt: was einmal nicht geladen hat, wird nicht bei jedem
+// Neuzeichnen erneut angefragt - der Platzhalter bleibt einfach stehen.
+const fehlend = new Set();
+
+/**
+ * Portrait bzw. Map-Bild mit Kuerzel-Platzhalter.
+ *
+ * Immer zuerst der eingefaerbte Platzhalter mit Kuerzel - er steht ab
+ * dem ersten Frame da, die Kachel springt nicht, und er bleibt, falls
+ * die Datei fehlt oder nicht laedt. Das Bild liegt als echtes <img>
+ * darueber (lazy, mit fester Groesse), nicht als CSS-Hintergrund:
+ * so laedt der Browser nur, was in Sichtweite kommt, und ein Fehler
+ * ist ein Ereignis, auf das man reagieren kann.
+ */
+function bildKnoten(url, kuerzel, farbe, klasse, groesse) {
+  const knoten = el('span', `${klasse} bild`);
+  knoten.style.background = farbe || '#3a3f4b';
+  knoten.appendChild(el('span', 'bild-kuerzel', kuerzel));
+  if (!url || fehlend.has(url)) return knoten;
+
+  const img = document.createElement('img');
+  img.alt = '';                   // Name steht daneben bzw. im title
+  img.width = groesse;
+  img.height = groesse;
+  if (geladen.has(url)) {
+    knoten.classList.add('ist-geladen');
+    img.decoding = 'sync';
   } else {
-    knoten.style.background = brawler.farbe || '#3a3f4b';
-    knoten.appendChild(t(brawler.initialen || brawler.name.slice(0, 2).toUpperCase()));
+    img.loading = 'lazy';
+    img.decoding = 'async';
+    img.addEventListener('load', () => {
+      geladen.add(url);
+      knoten.classList.add('ist-geladen');
+    }, { once: true });
+    // Fehlt die Datei, bleibt der Platzhalter - kein kaputtes Bildsymbol.
+    img.addEventListener('error', () => { fehlend.add(url); img.remove(); }, { once: true });
   }
+  img.src = url;
+  knoten.appendChild(img);
   return knoten;
+}
+
+function bild(brawler, klasse, groesse) {
+  return bildKnoten(
+    brawler.image_url,
+    brawler.initialen || brawler.name.slice(0, 2).toUpperCase(),
+    brawler.farbe, klasse, groesse,
+  );
 }
 
 // ─── Aktionsleiste ──────────────────────────────────────────
@@ -78,9 +124,18 @@ export function zeichneJetzt(stand, zusatz, hatMap) {
 }
 
 export function zeichneMapKnopf(modus, karte) {
+  const knopf = $('mapknopf');
   $('mapknopf-modus').textContent = modus ? modus.name : '—';
   $('mapknopf-name').textContent = karte ? karte.name : 'wählen';
-  $('mapknopf').classList.toggle('ist-leer', !karte);
+  knopf.classList.toggle('ist-leer', !karte);
+
+  // Vorschaubild der gesetzten Map - zur Bestaetigung auf einen Blick,
+  // nur wenn es eines gibt. Ohne Bild bleibt der Knopf reiner Text.
+  knopf.querySelector('.mapknopf-bild')?.remove();
+  knopf.classList.toggle('hat-bild', !!(karte && karte.image_url));
+  if (karte && karte.image_url) {
+    knopf.prepend(bildKnoten(karte.image_url, '', 'var(--bg)', 'mapknopf-bild', 34));
+  }
 }
 
 // ─── Brett ──────────────────────────────────────────────────
@@ -96,9 +151,10 @@ export function zeichneSlots(containerId, slugs, anzahl, katalog, ziel, aktiv, k
       const b = katalog.get(slug);
       slot.classList.add('ist-belegt');
       slot.style.borderColor = b.farbe;
-      slot.appendChild(bild(b, 'slot-bild'));
+      slot.appendChild(bild(b, 'slot-bild', 48));
       slot.appendChild(el('span', 'slot-name', b.name));
       slot.title = `${b.name} entfernen`;
+      slot.setAttribute('aria-label', `${b.name} entfernen`);
       slot.dataset.entfernen = slug;
     } else {
       const istZiel = aktiv && i === slugs.length;
@@ -172,7 +228,7 @@ export function zeichneGitter(brawler, gesperrt, bewertungen, persoenlich, filte
       kachel.disabled = true;
     }
 
-    kachel.appendChild(bild(b, 'kachel-bild'));
+    kachel.appendChild(bild(b, 'kachel-bild', 54));
     kachel.appendChild(el('span', 'kachel-name', b.name));
 
     const bewertung = bewertungen.get(b.slug);
@@ -331,7 +387,7 @@ function vorschlagsKarte(e, rang, zielText) {
   waehlen.title = `${e.name} als ${zielText} setzen`;
 
   waehlen.appendChild(el('span', 'vorschlag-rang', rang + 1));
-  waehlen.appendChild(bild(e, 'vorschlag-bild'));
+  waehlen.appendChild(bild(e, 'vorschlag-bild', 40));
 
   const kern = el('span', 'vorschlag-kern');
   kern.appendChild(el('span', 'vorschlag-name', e.name));
@@ -366,7 +422,7 @@ function banKarte(ban, rang) {
   waehlen.title = `${ban.name} bannen`;
 
   waehlen.appendChild(el('span', 'vorschlag-rang', rang + 1));
-  waehlen.appendChild(bild(ban, 'vorschlag-bild'));
+  waehlen.appendChild(bild(ban, 'vorschlag-bild', 40));
 
   const kern = el('span', 'vorschlag-kern');
   kern.appendChild(el('span', 'vorschlag-name', ban.name));
@@ -484,13 +540,8 @@ export function zeichneMapListe(modi, suchtext, letzte, aktuellerSlug) {
     knopf.dataset.map = karte.slug;
     if (karte.slug === aktuellerSlug) knopf.classList.add('ist-aktuell');
 
-    const vorschau = el('span', 'mapzeile-bild');
-    if (karte.image_url) {
-      vorschau.style.backgroundImage = `url("${karte.image_url.replace(/["\\]/g, '')}")`;
-    } else {
-      vorschau.appendChild(t(modus.name.slice(0, 2).toUpperCase()));
-    }
-    knopf.appendChild(vorschau);
+    knopf.appendChild(bildKnoten(karte.image_url, modus.name.slice(0, 2).toUpperCase(),
+      'var(--bg-3)', 'mapzeile-bild', 40));
 
     const text = el('span', 'mapzeile-text');
     text.appendChild(el('span', 'mapzeile-name', karte.name));
