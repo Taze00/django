@@ -35,6 +35,9 @@ def rolle_im_team(brawler, analyse=None):
     Controller ist neben einem Tank etwas anderes als neben zwei
     Snipern. Deshalb fliesst ein, welche Luecke er hier schliesst.
     """
+    if not brawler.hat_profil:
+        # Kein Profil, keine Rolle - nichts behaupten, was die Daten nicht hergeben.
+        return "Ohne Profil"
     haupt = attr.ROLLEN_LABEL.get(brawler.role, brawler.role)
     staerken = brawler.staerken(grenze=65, anzahl=2)
 
@@ -228,9 +231,15 @@ def matchup_zuordnung(eigene, gegner, raum):
         return []
 
     # Vorteile einmal rechnen statt je Permutation erneut.
-    matrix = {
-        (a.id, b.id): vorteil(a, b, raum)[0] for a in eigene for b in gegner
-    }
+    # Unbekannte Paare (kein Profil, keine Messung) gehen mit 0 in die
+    # Summe ein und werden als "bekannt: False" ausgewiesen - eine Zuordnung
+    # braucht jeder Spieler, eine Vorteilsbehauptung nicht.
+    matrix, bekannt = {}, {}
+    for a in eigene:
+        for b in gegner:
+            wert, _, quelle = vorteil(a, b, raum)
+            matrix[(a.id, b.id)] = wert
+            bekannt[(a.id, b.id)] = quelle is not None
 
     if len(eigene) <= len(gegner):
         varianten = ((eigene, auswahl) for auswahl in permutations(gegner, len(eigene)))
@@ -256,6 +265,7 @@ def matchup_zuordnung(eigene, gegner, raum):
             "unser": a.name, "unser_slug": a.slug,
             "gegner": b.name, "gegner_slug": b.slug,
             "vorteil": round(w, 2),
+            "bekannt": bekannt[(a.id, b.id)],
         }
         for a, b, w in beste
     ]
@@ -268,6 +278,9 @@ def lane_vorschlag(eigene, ctx):
     *anfaengt*: wer Mid halten kann, geht nach Mitte, der Rest verteilt
     sich. Wer daraus eine feste Regel macht, spielt schlechter.
     """
+    # Nur wer ein Profil hat, bekommt eine Lane - fuer die anderen ist
+    # nicht bekannt, ob sie Mid halten oder allein zurechtkommen.
+    eigene = [b for b in eigene if b.hat_profil]
     if not eigene:
         return []
 
@@ -300,9 +313,10 @@ def win_condition(ctx, analyse, raum):
         analyse.staerken(anzahl=5),
         key=lambda paar: -(paar[1] * analyse.anforderungen.get(paar[0].key, 0.0)),
     )
-    if staerken:
+    bekannte = [b for b in ctx.own_picks if b.hat_profil]
+    if staerken and bekannte:
         eigenschaft = staerken[0][0]
-        traeger = max(ctx.own_picks, key=lambda b: b.wert(eigenschaft.key))
+        traeger = max(bekannte, key=lambda b: b.wert(eigenschaft.key))
         teile.append(f"{traeger.name} setzt {eigenschaft.label} durch")
 
     zuordnung = matchup_zuordnung(list(ctx.own_picks), list(ctx.enemy_picks), raum)
@@ -361,8 +375,9 @@ def team_schwaechen(ctx, analyse, raum):
         pruefung = ausnutzer.get(eigenschaft.key)
         bedrohung = None
         staerke = 0.0
-        if pruefung is not None and ctx.enemy_picks:
-            bewertet = [(pruefung(g), g) for g in ctx.enemy_picks]
+        bekannte_gegner = [g for g in ctx.enemy_picks if g.hat_profil]
+        if pruefung is not None and bekannte_gegner:
+            bewertet = [(pruefung(g), g) for g in bekannte_gegner]
             staerke, kandidat = max(bewertet, key=lambda paar: paar[0])
             if staerke >= 0.5:
                 bedrohung = kandidat

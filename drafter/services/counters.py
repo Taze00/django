@@ -167,6 +167,11 @@ def vorteil(kandidat, gegner, raum):
         return klemme(wert), grund, quelle
 
     # --- 3. Heuristik ---------------------------------------------------
+    # Nur, wenn BEIDE ein Profil haben. Sonst rechnete sie mit Nullen
+    # ("schießt weiter als SHELLY", weil Shellys Reichweite als 0 galt).
+    # Quelle None = keine Auskunft; Aufrufer lassen das Paar aus.
+    if not (kandidat.hat_profil and gegner.hat_profil):
+        return 0.0, None, None
     hin_h, grund_hin = heuristischer_vorteil(kandidat, gegner)
     her_h, grund_her = heuristischer_vorteil(gegner, kandidat)
     wert = klemme(hin_h - her_h * config.HEURISTISCHER_COUNTER_GEGENRICHTUNG)
@@ -189,12 +194,20 @@ def komponente(kandidat, ctx, raum):
     werte = []
     for gegner in ctx.enemy_picks:
         wert, grund, quelle = vorteil(kandidat, gegner, raum)
+        if quelle is None:
+            continue   # unbekanntes Matchup - weder Vorteil noch Nachteil
         werte.append(wert)
         if grund and abs(wert) > 0.12:
             komp.gruende.append(Grund(
                 text=grund, positiv=wert > 0, staerke=min(1.0, abs(wert) + 0.3), quelle=quelle
             ))
 
+    if not werte:
+        # Gegner stehen fest, aber zu keinem ist etwas bekannt: nicht
+        # "neutral", sondern nicht berechenbar.
+        komp.verfuegbar = False
+        komp.confidence = 0.0
+        return komp
     mittel = sum(werte) / len(werte)
     schlechtester = min(werte)
     komp.wert = klemme(mittel * 0.7 + schlechtester * 0.3)
@@ -203,18 +216,27 @@ def komponente(kandidat, ctx, raum):
     return komp
 
 
+def _bekannte_matchups(kandidat, gegner_liste, raum):
+    ergebnis = []
+    for g in gegner_liste or ():
+        wert, _, quelle = vorteil(kandidat, g, raum)
+        if quelle is not None:
+            ergebnis.append((wert, g))
+    return ergebnis
+
+
 def bestes_matchup(kandidat, gegner_liste, raum):
     """Gegen wen soll dieser Brawler bevorzugt spielen?"""
-    if not gegner_liste:
+    bewertet = _bekannte_matchups(kandidat, gegner_liste, raum)
+    if not bewertet:
         return None
-    bewertet = [(vorteil(kandidat, g, raum)[0], g) for g in gegner_liste]
     wert, gegner = max(bewertet, key=lambda p: p[0])
     return {"gegner": gegner.name, "vorteil": round(wert, 2)} if wert > 0.05 else None
 
 
 def schlechtestes_matchup(kandidat, gegner_liste, raum):
-    if not gegner_liste:
+    bewertet = _bekannte_matchups(kandidat, gegner_liste, raum)
+    if not bewertet:
         return None
-    bewertet = [(vorteil(kandidat, g, raum)[0], g) for g in gegner_liste]
     wert, gegner = min(bewertet, key=lambda p: p[0])
     return {"gegner": gegner.name, "vorteil": round(wert, 2)} if wert < -0.05 else None

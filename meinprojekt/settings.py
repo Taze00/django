@@ -195,6 +195,15 @@ STORAGES = {
 # Andere statische Dateien sind davon nicht betroffen.
 WHITENOISE_IMMUTABLE_FILE_TEST = r"^/static/drafter/fonts/[^/]+\.[0-9a-f]{12}\.woff2$"
 
+# Drafter: aus echten soloRanked-Partien aggregierte Statistiken produktiv
+# nutzen (statt der gepflegten Demo-Statistiken). Freigegeben am 2026-09-16:
+# Brawler ohne Eigenschaftsprofil sollen ueber Messwerte bewertbar sein.
+# Umgeschaltet wird ganz, nicht zeilenweise - siehe
+# drafter/services/providers/registry.py. Die Eigenschaftsprofile der 20
+# gepflegten Brawler sind davon unberuehrt; ihre Demo-Meta, -Counter und
+# -Synergien werden dadurch durch die (duennen) Messungen ersetzt.
+DRAFTER_GEMESSENE_STATS_FREIGEGEBEN = True
+
 # Media files (User uploads)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

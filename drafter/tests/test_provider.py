@@ -152,10 +152,11 @@ class RegistryTest(DrafterTest):
         BrawlerStat.objects.create(
             brawler=self.brawler("gale"), adjusted_rate=0.55, source=Datenquelle.FIXTURE,
         )
-        self.assertEqual(
-            hole_stat_provider("auto").name, "demo",
-            "Ohne Freigabe bleibt die Seite bei Demo, auch wenn Messwerte vorliegen",
-        )
+        with mock.patch.object(config, "GEMESSENE_STATS_FREIGEGEBEN", False):
+            self.assertEqual(
+                hole_stat_provider("auto").name, "demo",
+                "Ohne Freigabe bleibt die Seite bei Demo, auch wenn Messwerte vorliegen",
+            )
         with mock.patch.object(config, "GEMESSENE_STATS_FREIGEGEBEN", True):
             self.assertEqual(hole_stat_provider("auto").name, "gemessen")
 

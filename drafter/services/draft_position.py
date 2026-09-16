@@ -28,6 +28,11 @@ _PROFILE = {
 def komponente(kandidat, ctx):
     phase = ctx.phase
     komp = Komponente(key=config.K_DRAFT_POSITION)
+    if not kandidat.hat_draftwerte:
+        # Ohne gepflegte Draft-Werte waere jeder Wert der Default 0.5 -
+        # eine Annahme, keine Auskunft.
+        komp.verfuegbar = False
+        return komp
 
     anteile = _PROFILE.get(phase, _PROFILE[config.PHASE_MID])
     roh = sum(kandidat.draftwert(key) * anteil for key, anteil in anteile.items())
@@ -70,6 +75,9 @@ def komponente(kandidat, ctx):
 def flexibilitaet(kandidat, ctx):
     """Eigene kleine Komponente: wie sehr haelt er uns Optionen offen."""
     komp = Komponente(key=config.K_FLEXIBILITY)
+    if not kandidat.hat_draftwerte:
+        komp.verfuegbar = False
+        return komp
     komp.wert = zentriere(kandidat.draftwert("flexibility_value"))
     if komp.wert > 0.35 and ctx.unsere_restpicks > 1:
         komp.gruende.append(Grund(

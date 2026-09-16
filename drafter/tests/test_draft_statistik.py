@@ -9,6 +9,7 @@ Seite wandern.
 
 import io
 from datetime import date
+from unittest import mock
 
 from django.core.management import call_command
 from django.test import SimpleTestCase
@@ -82,6 +83,9 @@ class EchteStatistikTest(FixtureMixin, DrafterTest):
         self.assertTrue(gezaehlt)
         self.assertEqual(gezaehlt - solo_ids, set())
 
+    # Die Seite hat die Freigabe seit 2026-09-16 gesetzt (settings.py).
+    # Geprueft wird hier der MECHANISMUS - deshalb ausdruecklich ohne sie.
+    @mock.patch.object(config, "GEMESSENE_STATS_FREIGEGEBEN", False)
     def test_aggregation_macht_die_seite_nicht_produktiv(self):
         self.aggregiere()
         self.assertTrue(self.global_zeilen().exists())
@@ -90,6 +94,7 @@ class EchteStatistikTest(FixtureMixin, DrafterTest):
             "Ohne Freigabe bleibt die Oberfläche bei den Demo-Daten",
         )
 
+    @mock.patch.object(config, "GEMESSENE_STATS_FREIGEGEBEN", False)
     def test_vergleichsbericht_beschreibt_und_aktiviert_nichts(self):
         self.aggregiere()
         ziel = self.verzeichnis / "vergleich.md"

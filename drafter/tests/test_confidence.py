@@ -61,8 +61,11 @@ class EmpfehlungsConfidenceTest(DrafterTest):
         # nimmt "auto" weiterhin die Demo-Daten.
         from unittest import mock
 
-        from drafter.models import BrawlerStat, Datenquelle
+        from drafter.models import Brawler, BrawlerStat, Datenquelle
         BrawlerStat.objects.update(source=Datenquelle.AGGREGATED, confidence=0.8)
+        # Seit 2026-09-16 deckelt auch ein Demo-PROFIL die Confidence, nicht
+        # nur ein reiner Demo-Datenraum. Manuell gepflegte Profile nicht.
+        Brawler.objects.update(source=Datenquelle.MANUAL)
 
         with mock.patch.object(config, "GEMESSENE_STATS_FREIGEGEBEN", True):
             wenig = self.engine().empfehlungen()[0].confidence

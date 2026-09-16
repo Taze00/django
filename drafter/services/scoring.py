@@ -81,10 +81,17 @@ class Komponente:
     gewicht: float = 0.0
     gruende: list = field(default_factory=list)
     confidence: float = 1.0
+    # False = fuer diesen Brawler NICHT berechenbar (Eigenschaften oder
+    # Messwerte fehlen). Das ist etwas anderes als Wert 0: eine
+    # nicht verfuegbare Komponente faellt aus dem Score heraus, statt ihn
+    # Richtung "durchschnittlich" oder "schlecht" zu ziehen. "Nicht
+    # anwendbar" (Counter ohne bekannte Gegner) bleibt dagegen verfuegbar
+    # mit Wert 0 - das gilt fuer alle Kandidaten gleich.
+    verfuegbar: bool = True
 
     @property
     def beitrag(self):
-        return self.wert * self.gewicht
+        return self.wert * self.gewicht if self.verfuegbar else 0.0
 
     @property
     def label(self):
@@ -94,19 +101,27 @@ class Komponente:
     def ist_strafe(self):
         return self.key in config.STRAF_KOMPONENTEN
 
-    def als_dict(self):
+    def als_dict(self, skalierung=1.0):
+        """`skalierung` rechnet die Bewertungsgewichte hoch, wenn andere
+        Komponenten nicht verfuegbar sind - so summieren sich die
+        angezeigten Beitraege weiter genau zum Score."""
+        faktor = (
+            1.0 if self.ist_strafe or not self.verfuegbar or self.key == config.K_PERSONAL
+            else skalierung
+        )
         return {
             "key": self.key,
             "label": self.label,
+            "verfuegbar": self.verfuegbar,
             # Der Rohwert der Komponente in [-1, +1]. Steht mit dabei,
             # weil Beitrag = Wert x Gewicht ist: ohne den Wert kann man
             # "schwache Komponente" nicht von "kleines Gewicht"
             # unterscheiden. Genau das will die Aufschluesselung zeigen.
             "wert": round(self.wert, 3),
-            "gewicht": round(self.gewicht, 3),
+            "gewicht": round(self.gewicht * faktor, 3),
             # Beitrag in Anzeigepunkten - das ist die Zahl, die in der
             # Aufschluesselung steht ("Map Fit +18").
-            "beitrag": round(self.beitrag * 50, 1),
+            "beitrag": round(self.beitrag * faktor * 50, 1),
             "ist_strafe": self.ist_strafe,
             # Begruendungen der Komponente, damit jede Zeile der Tabelle
             # aufklappbar ist und nicht nur eine Zahl bleibt.
@@ -133,6 +148,55 @@ class Empfehlung:
     vermeiden: list = field(default_factory=list)
     warnungen: list = field(default_factory=list)
     build: object = None
+    # profil | gemessen - Kandidaten der Stufe "katalog" werden nicht bewertet.
+    stufe: str = "profil"
+
+    # --- Datenabdeckung -------------------------------------------------
+    def _bewertungsgewichte(self, ohne_persoenlich=False):
+        komps = [
+            k for k in self.komponenten.values()
+            if not k.ist_strafe and not (ohne_persoenlich and k.key == config.K_PERSONAL)
+        ]
+        gesamt = sum(k.gewicht for k in komps)
+        verfuegbar = sum(k.gewicht for k in komps if k.verfuegbar)
+        return gesamt, verfuegbar
+
+    @property
+    def skalierung(self):
+        """Faktor, mit dem die verfuegbaren Bewertungsbeitraege hochgerechnet
+        werden. 1.0, wenn alles berechenbar ist - dann ist der Score exakt
+        die alte Summe.
+
+        Ohne die persoenliche Sicherheit gerechnet und nicht auf sie
+        angewandt: sie hat einen harten Deckel (PERSOENLICH_MAX_AUSSCHLAG),
+        und hochgerechnet koennte sie bei einem nur gemessenen Brawler ein
+        Vielfaches davon ausmachen.
+        """
+        gesamt, verfuegbar = self._bewertungsgewichte(ohne_persoenlich=True)
+        if verfuegbar <= 0 or verfuegbar >= gesamt:
+            return 1.0
+        return gesamt / verfuegbar
+
+    @property
+    def datenabdeckung(self):
+        """0-1: auf welchem Anteil der Bewertungsgewichte der Score beruht.
+
+        Die persoenliche Sicherheit zaehlt nicht mit - sie ist immer
+        bekannt und wuerde jede Abdeckung um ihren Anteil schoenen.
+        """
+        gesamt, verfuegbar = self._bewertungsgewichte(ohne_persoenlich=True)
+        return verfuegbar / gesamt if gesamt > 0 else 0.0
+
+    @property
+    def datenabdeckung_label(self):
+        for grenze, text in config.DATENABDECKUNG_STUFEN:
+            if self.datenabdeckung >= grenze:
+                return text
+        return config.DATENABDECKUNG_STUFEN[-1][1]
+
+    @property
+    def ausgelassen(self):
+        return [k for k in self.aufschluesselung() if k.key in self.komponenten and not k.verfuegbar]
 
     @property
     def roher_score(self):
@@ -146,7 +210,17 @@ class Empfehlung:
         auf (tiefster gemessener Wert -0.95 ueber 900 Kandidaten), mit
         echten Daten ist es nicht ausgeschlossen.
         """
-        return sum(k.beitrag for k in self.komponenten.values())
+        komps = self.komponenten.values()
+        bewertung = sum(
+            k.beitrag for k in komps if not k.ist_strafe and k.key != config.K_PERSONAL
+        )
+        persoenlich = sum(k.beitrag for k in komps if k.key == config.K_PERSONAL)
+        strafen = sum(k.beitrag for k in komps if k.ist_strafe)
+        # Fehlende Bewertungskomponenten fallen heraus, die vorhandenen
+        # werden auf die volle Gewichtssumme hochgerechnet. Nicht die
+        # persoenliche Sicherheit (Deckel) und nicht die Strafen: eine
+        # Strafe, die nicht berechenbar ist, faellt einfach weg.
+        return bewertung * self.skalierung + persoenlich + strafen
 
     @property
     def score(self):
@@ -225,7 +299,11 @@ class Empfehlung:
             # zur Spitze: sie ist der Grund, warum das Werkzeug kein
             # Orakel ist. Sie kostet nichts extra - die Komponenten sind
             # ohnehin gerechnet, sonst gaebe es keinen Score.
-            "komponenten": [k.als_dict() for k in self.aufschluesselung()],
+            "komponenten": [k.als_dict(self.skalierung) for k in self.aufschluesselung()],
+            "datenstufe": self.stufe,
+            "datenabdeckung": round(self.datenabdeckung * 100),
+            "datenabdeckung_label": self.datenabdeckung_label,
+            "ausgelassen": [k.label for k in self.ausgelassen],
             "groesster_treiber": (
                 self.groesster_treiber.label if self.groesster_treiber else None
             ),

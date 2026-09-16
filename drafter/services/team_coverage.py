@@ -26,10 +26,16 @@ from drafter import config
 
 
 def teamprofil(brawler_liste):
-    """Was das Team in jeder Eigenschaft leistet, je 0-1."""
+    """Was das Team in jeder Eigenschaft leistet, je 0-1.
+
+    Nur ueber Mitglieder MIT Profil. Ein Brawler ohne Profil ist
+    unbekannt - als 0 mitgerechnet, erzeugte er Luecken, die es vielleicht
+    gar nicht gibt. `Teamanalyse.unbekannt` haelt fest, wer fehlt.
+    """
+    bekannt = [b for b in brawler_liste if b.hat_profil]
     profil = {}
     for key in attr.ATTRIBUT_KEYS:
-        werte = sorted((b.wert(key) for b in brawler_liste), reverse=True)
+        werte = sorted((b.wert(key) for b in bekannt), reverse=True)
         gesamt = 0.0
         for rang, wert in enumerate(werte[:3]):
             anteil = (
@@ -58,6 +64,8 @@ def anforderungen_mit_gegner(basis, gegner_picks):
     verwaessern, indem es nebenbei andere Bedarfe erzeugt.
     """
     erweitert = dict(basis)
+    # Gegner ohne Profil erzwingen nichts - was er kann, ist unbekannt.
+    gegner_picks = [g for g in gegner_picks if g.hat_profil]
     if not gegner_picks:
         return erweitert
 
@@ -177,11 +185,15 @@ class Teamanalyse:
     ueberschuss: dict = field(default_factory=dict)
     rollen: dict = field(default_factory=dict)
     rollen_ueberhang: dict = field(default_factory=dict)
+    # Mitglieder ohne Profil: gehen nicht ins Teamprofil ein. Luecken und
+    # Deckung beschreiben dann nur die bekannten Mitglieder.
+    unbekannt: list = field(default_factory=list)
 
     @classmethod
     def bauen(cls, brawler_liste, anforderungen):
         profil = teamprofil(brawler_liste)
         return cls(
+            unbekannt=[b for b in brawler_liste if not b.hat_profil],
             brawler=list(brawler_liste),
             anforderungen=anforderungen,
             profil=profil,
@@ -259,4 +271,5 @@ class Teamanalyse:
             ],
             "rollen": self.rollen,
             "rollen_ueberhang": self.rollen_ueberhang,
+            "unbekannt": [b.name for b in self.unbekannt],
         }

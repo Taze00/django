@@ -17,6 +17,8 @@ Drei Aufgaben:
    und diese Auswahl steht genau hier, fuer alle Provider gleich.
 """
 
+from django.db.models import Q
+
 from drafter import config
 from drafter.models import Brawler
 from drafter.services.providers.records import StatAnfrage
@@ -72,6 +74,12 @@ class Datenraum:
         self._synergie = {}   # (kleinere_id, groessere_id) -> StatRecord
         self._stat = {}       # brawler_id                -> StatRecord
         self._build = {}      # (brawler_id, art, slug)   -> StatRecord
+        # Groesste GEMESSENE Stichprobe je Brawler ueber alle Zeilen, die
+        # auf diesen Draft anwendbar sind (Map, Modus, gesamt) - Grundlage
+        # der Datenstufe. Bewusst nicht nur die Zeile, die `stat()` liefert:
+        # die spezifischste Zeile (Map mit 3 Spielen) sagt nichts darueber,
+        # ob es fuer den Brawler insgesamt genug Messungen gibt.
+        self._spiele = {}     # brawler_id                -> int
         self._geladen = False
 
     # --- Laden ----------------------------------------------------------
@@ -89,8 +97,15 @@ class Datenraum:
         # Domaene (Attribute, Rollen) - er kommt deshalb weiter direkt aus
         # der Datenbank. Balanceaenderungen gleich mitladen: die
         # Patchgewichtung fragt sie fuer jeden Kandidaten ab.
+        #
+        # Der volle Katalog: aktive Brawler UND alle, die die offizielle
+        # API kennt. Letztere haben meist kein Profil; ob und wie sie
+        # bewertet werden, entscheidet `stufe()` - nicht der Ausschluss
+        # aus dem Pool. Frueher standen hier nur aktive, und alles andere
+        # war fuer die Engine unsichtbar, auch mit Messdaten.
         self.brawler = list(
-            Brawler.objects.filter(is_active=True).prefetch_related("balance_changes__patch")
+            Brawler.objects.filter(Q(is_active=True) | Q(external_id__isnull=False))
+            .prefetch_related("balance_changes__patch")
         )
         self._nach_id = {b.id: b for b in self.brawler}
         ids = frozenset(self._nach_id)
@@ -101,9 +116,16 @@ class Datenraum:
             brawl_map_id=self.brawl_map.id if self.brawl_map else None,
             rank_pool=self.rank_pool or "",
         )
+        brawler_zeilen = self.provider.brawler_stats(anfrage)
         self._stat = self._bestes_je_schluessel(
-            self.provider.brawler_stats(anfrage), lambda r: r.brawler_id, ids,
+            brawler_zeilen, lambda r: r.brawler_id, ids,
         )
+        for zeile in brawler_zeilen:
+            if (zeile.brawler_id in ids and zeile.ist_gemessen
+                    and _spezifitaet(zeile, self.brawl_map, self.game_mode, self.rank_pool) >= 0):
+                self._spiele[zeile.brawler_id] = max(
+                    self._spiele.get(zeile.brawler_id, 0), zeile.games or 0
+                )
         self._counter = self._bestes_je_schluessel(
             self.provider.counter_stats(anfrage), lambda r: (r.brawler_id, r.partner_id), ids,
         )
@@ -159,6 +181,20 @@ class Datenraum:
 
     def build_stat(self, brawler, art, slug):
         return self._build.get((brawler.id, art, slug))
+
+    def gemessene_spiele(self, brawler):
+        return self._spiele.get(brawler.id, 0)
+
+    def stufe(self, brawler):
+        """profil | gemessen | katalog - siehe config.PROFIL_MESS_MINDESTSPIELE."""
+        if brawler.hat_profil:
+            return "profil"
+        if self.gemessene_spiele(brawler) >= config.PROFIL_MESS_MINDESTSPIELE:
+            return "gemessen"
+        return "katalog"
+
+    def bewertbar(self, brawler):
+        return self.stufe(brawler) != "katalog"
 
     def hat_statistik(self):
         return bool(self._stat or self._counter)

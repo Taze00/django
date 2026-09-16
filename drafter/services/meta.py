@@ -4,9 +4,9 @@ Bezieht sich auf gemessene bzw. gepflegte Statistiken (`BrawlerStat`) -
 nicht auf Attribute. Die Attribute sagen, was ein Brawler *kann*; die
 Meta sagt, was davon im aktuellen Patch *funktioniert*.
 
-Fehlt jede Statistik, liefert die Komponente 0 und eine niedrige
-Confidence. Das ist der ehrliche Zustand "wir wissen es nicht" - und
-nicht etwa "durchschnittlich gut".
+Fehlt jede Statistik, ist die Komponente nicht verfuegbar und faellt
+aus dem Score heraus. Frueher lieferte sie 0 ("durchschnittlich") mit
+niedriger Confidence - das zog einen unbekannten Brawler still zur Mitte.
 """
 
 from drafter import config
@@ -22,7 +22,8 @@ def komponenten_fuer_pool(kandidaten, raum, patch=None):
         # Eine Zeile ohne geglaettete Rate ist keine Auskunft - dann gilt
         # dasselbe wie ohne Zeile: Wert 0, niedrige Confidence.
         if not stat or stat.adjusted_rate is None:
-            komp.confidence = 0.1
+            komp.verfuegbar = False
+            komp.confidence = 0.0
             ergebnis[b.id] = komp
             continue
 

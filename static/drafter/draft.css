@@ -515,6 +515,9 @@ kbd {
   color: var(--warn); background: rgba(0, 0, 0, .72);
   border: 1px solid rgba(232, 176, 74, .35); font-size: 9px; letter-spacing: .04em;
 }
+.kachel-score--teil { border: 1px dashed rgba(232, 176, 74, .55); }
+.vorschlag-wp--teil { color: var(--warn); }
+.komponente-unbekannt { font-size: 11px; color: var(--text-sehr-leise); font-style: italic; }
 .slot.ist-limited { position: relative; }
 .slot-limited {
   position: absolute; top: 2px; right: 2px; padding: 0 3px; border-radius: 2px;

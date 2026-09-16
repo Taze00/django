@@ -32,31 +32,15 @@ let letzteMaps = [];          // [{mode, map}] - zuletzt benutzt, aus localStora
 let letzteAntwort = null;     // fuer die Ban-Begruendung hinter dem Fragezeichen
 
 /**
- * Der Draftzustand fuer den Server - OHNE Picks von Brawlern ohne Profil.
- *
- * Die Engine kennt fuer sie keine Eigenschaften und rechnet fehlende als 0:
- * ein gegnerischer Shelly ergab so Gruende wie "schießt weiter als SHELLY",
- * ein eigener zaehlte als "kann nichts". Solche Picks stehen deshalb im
- * Brett und sind fuer Empfehlungen gesperrt, fliessen aber nicht in die
- * Bewertung ein - das Panel sagt es ausdruecklich. Bans bleiben drin: ein
- * Ban nimmt nur aus dem Pool und behauptet nichts.
+ * Picks ohne Profil laut Server (Teamanalysen). Die Engine rechnet sie
+ * als unbekannt - nicht als 0 -, das Panel nennt sie trotzdem, damit
+ * klar ist, dass fuer sie nur Messwerte zaehlen.
  */
-function fuerBewertung() {
-  const daten = zustand.fuerServer();
-  const bewertbar = (slug) => !(katalog.get(slug) || {}).limited;
-  return {
-    ...daten,
-    own_picks: daten.own_picks.filter(bewertbar),
-    enemy_picks: daten.enemy_picks.filter(bewertbar),
-  };
-}
-
-function ohneDatenGepickt() {
-  const z = zustand.hole();
-  return [...z.own_picks, ...z.enemy_picks]
-    .map((slug) => katalog.get(slug))
-    .filter((b) => b && b.limited)
-    .map((b) => b.name);
+function ohneProfil(antwort) {
+  return [
+    ...((antwort.team_analyse || {}).unbekannt || []),
+    ...((antwort.gegner_analyse || {}).unbekannt || []),
+  ];
 }
 
 // ─── Gedaechtnis des Browsers ───────────────────────────────
@@ -258,7 +242,7 @@ function verdrahte() {
     const info = e.target.closest('[data-detail]');
     if (info) {
       try {
-        ui.zeigeDetail(await api.detail(fuerBewertung(), info.dataset.detail));
+        ui.zeigeDetail(await api.detail(zustand.fuerServer(), info.dataset.detail));
       } catch (fehler) {
         ui.panelFehler(fehler.message);
       }
@@ -440,13 +424,7 @@ async function hole() {
   ui.panelLaedt(true);
   try {
     const fertig = z.own_picks.length === 3 && z.enemy_picks.length === 3;
-    const daten = fuerBewertung();
-    const ohneDaten = ohneDatenGepickt();
-    if (fertig && !daten.own_picks.length) {
-      // Matchplan braucht mindestens einen eigenen Brawler mit Profil.
-      ui.panelFehler('Kein Matchplan: keiner unserer Brawler hat ein Profil (Limited Data).');
-      return;
-    }
+    const daten = zustand.fuerServer();
     const antwort = fertig
       ? await api.endanalyse(daten)
       : await api.empfehlen(daten);
@@ -461,13 +439,11 @@ async function hole() {
       ui.zeichneMatchplan(antwort.endanalyse);
       ui.zeichneSiegchance(antwort.endanalyse.siegchance);
     } else {
-      ui.zeichnePanel(antwort, ziel, ohneDaten);
+      ui.zeichnePanel(antwort, ziel, ohneProfil(antwort));
       ui.zeichneSiegchance(antwort.siegchance);
     }
 
-    // Die Phase des Servers stimmt nicht, wenn Picks ohne Profil
-    // herausgefiltert wurden - dann lieber keine als eine falsche.
-    const zusatz = ohneDaten.length ? 'Limited Data im Draft' : (antwort.draft_state || {}).phase_label;
+    const zusatz = (antwort.draft_state || {}).phase_label;
     ui.zeichneJetzt(zustand.zielStand(), zusatz, true);
     datenlageZeigen(antwort);
   } catch (fehler) {
@@ -493,15 +469,17 @@ async function hole() {
  */
 function bewertungenBauen(antwort, ziel) {
   const werte = new Map();
+  const stufen = antwort.datenstufen || {};
   Object.entries(antwort.scores || {}).forEach(([slug, score]) => {
-    werte.set(slug, { score, rang: null });
+    const stufe = stufen[slug] || {};
+    werte.set(slug, { score, rang: null, stufe: stufe.stufe, abdeckung: stufe.abdeckung });
   });
   const spitze = ziel === 'ban'
     ? (antwort.ban_empfehlungen || [])
     : (antwort.empfehlungen || []);
   spitze.forEach((e, i) => {
     const vorhanden = werte.get(e.slug);
-    werte.set(e.slug, { score: vorhanden ? vorhanden.score : e.score, rang: i });
+    werte.set(e.slug, { ...(vorhanden || { score: e.score }), rang: i });
   });
   return werte;
 }

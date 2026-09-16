@@ -99,6 +99,23 @@ class Brawler(Zeitstempel):
         if fehler:
             raise ValidationError(fehler)
 
+    # --- Datenstand ----------------------------------------------------
+    @property
+    def hat_profil(self):
+        """Gibt es ein gepflegtes Eigenschaftsprofil?
+
+        Ohne Profil liefert `wert()` fuer alles 0 - das heisst dann
+        "unbekannt", nicht "kann nichts". Jede Rechnung, die Eigenschaften
+        liest, muss vorher hier fragen, statt die 0 zu verrechnen.
+        """
+        return bool(self.attributes)
+
+    @property
+    def hat_draftwerte(self):
+        """Gepflegte Draft-Werte? Ohne sie liefert `draftwert()` 0.5 -
+        ein Durchschnitt, der nicht gemessen, sondern angenommen waere."""
+        return bool(self.draft_values)
+
     # --- Zugriff --------------------------------------------------------
     def wert(self, key):
         """Eigenschaft als 0-1. Unbekannt oder fehlend = 0."""

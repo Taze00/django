@@ -35,16 +35,25 @@ def _unsere_wahrscheinliche_strategie(kandidaten, anforderungen, ctx, anzahl=5):
     """
     if ctx.own_picks:
         return list(ctx.own_picks)
+    # Nur Brawler mit Profil - die Passung der anderen ist unbekannt.
     nach_passung = sorted(
-        kandidaten, key=lambda b: -roh_passung(b, anforderungen)
+        (b for b in kandidaten if b.hat_profil), key=lambda b: -roh_passung(b, anforderungen)
     )
     return nach_passung[:anzahl]
 
 
 def empfehlungen(ctx, raum, anzahl=None):
-    """Ban-Kandidaten, gefaehrlichster zuerst."""
+    """Ban-Kandidaten, gefaehrlichster zuerst.
+
+    Nur bewertbare Brawler (Stufe profil oder gemessen). Jeder Teilaspekt
+    wird nur fuer die Brawler gerechnet, bei denen er bekannt ist, und
+    feldrelativ ueber genau diese normalisiert. Fehlt einem Brawler ein
+    Aspekt, faellt er aus seiner Summe heraus und die uebrigen werden
+    hochgerechnet - wie beim Pick-Score. Frueher galt ein fehlender
+    Draft-Wert als 0.5 und eine fehlende Meta als 50 %.
+    """
     anzahl = anzahl or config.BAN_VORSCHLAEGE
-    kandidaten = raum.verfuegbare(ctx.gesperrte_ids)
+    kandidaten = [b for b in raum.verfuegbare(ctx.gesperrte_ids) if raum.bewertbar(b)]
     if not kandidaten:
         return []
 
@@ -53,43 +62,38 @@ def empfehlungen(ctx, raum, anzahl=None):
     )
     unsere = _unsere_wahrscheinliche_strategie(kandidaten, anforderungen, ctx)
 
-    # Rohwerte je Teilaspekt, danach feldrelativ normalisiert - dieselbe
-    # Begruendung wie beim Map-Fit: absolute Schwellen waeren geraten.
-    roh = {
-        "map_strength": {},
-        "meta_strength": {},
-        "pick_order_threat": {},
-        "counter_threat": {},
-        "flexibility": {},
-        "uncounterability": {},
-    }
-
+    # Rohwerte je Teilaspekt - nur wo bekannt.
+    roh = {aspekt: {} for aspekt in config.BAN_GEWICHTE}
     gegner_hat_first = not ctx.own_team_first_pick
 
     for b in kandidaten:
-        roh["map_strength"][b.id] = roh_passung(b, anforderungen)
+        if b.hat_profil:
+            roh["map_strength"][b.id] = roh_passung(b, anforderungen)
 
         stat = raum.stat(b)
-        roh["meta_strength"][b.id] = (
-            stat.adjusted_rate if stat and stat.adjusted_rate is not None else 0.5
-        )
+        if stat and stat.adjusted_rate is not None:
+            roh["meta_strength"][b.id] = stat.adjusted_rate
 
-        # Was ihn in der gegnerischen Pickposition gefaehrlich macht.
-        if gegner_hat_first:
-            roh["pick_order_threat"][b.id] = b.draftwert("blind_pick_value")
-        else:
-            roh["pick_order_threat"][b.id] = max(
-                b.draftwert("last_pick_value"), b.draftwert("counter_pick_value")
-            )
+        if b.hat_draftwerte:
+            # Was ihn in der gegnerischen Pickposition gefaehrlich macht.
+            if gegner_hat_first:
+                roh["pick_order_threat"][b.id] = b.draftwert("blind_pick_value")
+            else:
+                roh["pick_order_threat"][b.id] = max(
+                    b.draftwert("last_pick_value"), b.draftwert("counter_pick_value")
+                )
+            roh["flexibility"][b.id] = b.draftwert("flexibility_value")
+            roh["uncounterability"][b.id] = 1.0 - b.draftwert("counterability")
 
-        # Wie hart bestraft er das, was wir spielen wollen?
-        bedrohung = [vorteil(b, unser, raum)[0] for unser in unsere]
-        roh["counter_threat"][b.id] = (
-            sum(bedrohung) / len(bedrohung) if bedrohung else 0.0
-        )
-
-        roh["flexibility"][b.id] = b.draftwert("flexibility_value")
-        roh["uncounterability"][b.id] = 1.0 - b.draftwert("counterability")
+        # Wie hart bestraft er das, was wir spielen wollen? Unbekannte
+        # Matchups zaehlen nicht mit.
+        bedrohung = []
+        for unser in unsere:
+            wert, _, quelle = vorteil(b, unser, raum)
+            if quelle is not None:
+                bedrohung.append(wert)
+        if bedrohung:
+            roh["counter_threat"][b.id] = sum(bedrohung) / len(bedrohung)
 
     normiert = {aspekt: z_werte(werte) for aspekt, werte in roh.items()}
 
@@ -101,12 +105,20 @@ def empfehlungen(ctx, raum, anzahl=None):
     bewertet = []
     for b in kandidaten:
         teile = {}
-        gesamt = 0.0
+        summe = 0.0
+        gewicht_gesamt = 0.0
+        gewicht_bekannt = 0.0
         for aspekt, gewicht in config.BAN_GEWICHTE.items():
-            wert = normiert[aspekt].get(b.id, 0.0)
             g = gewicht * fokus.get(aspekt, 1.0)
+            gewicht_gesamt += g
+            if b.id not in normiert[aspekt]:
+                continue
+            gewicht_bekannt += g
+            wert = normiert[aspekt][b.id]
             teile[aspekt] = wert * g
-            gesamt += wert * g
+            summe += wert * g
+        abdeckung = gewicht_bekannt / gewicht_gesamt if gewicht_gesamt else 0.0
+        gesamt = summe * (gewicht_gesamt / gewicht_bekannt) if gewicht_bekannt else 0.0
 
         # Duenne Datenlage senkt die Dringlichkeit eines Bans: einen Ban
         # auf Verdacht auszugeben, kostet einen von drei.
@@ -114,12 +126,12 @@ def empfehlungen(ctx, raum, anzahl=None):
         sicherheit = stat.confidence if stat else 0.15
         gesamt -= (1.0 - sicherheit) * 0.10
 
-        bewertet.append((gesamt, b, teile, sicherheit))
+        bewertet.append((gesamt, b, teile, sicherheit, abdeckung))
 
     bewertet.sort(key=lambda p: -p[0])
 
     ergebnis = []
-    for gesamt, b, teile, sicherheit in bewertet[:anzahl]:
+    for gesamt, b, teile, sicherheit, abdeckung in bewertet[:anzahl]:
         ergebnis.append({
             "slug": b.slug,
             "name": b.name,
@@ -132,6 +144,8 @@ def empfehlungen(ctx, raum, anzahl=None):
             # zusaetzlich in der Antwort, damit er nicht verloren geht.
             "score_roh": round(gesamt, 3),
             "confidence": round(sicherheit, 2),
+            "datenstufe": raum.stufe(b),
+            "datenabdeckung": round(abdeckung * 100),
             "gruende": _gruende(b, teile, unsere, raum, ctx, gegner_hat_first),
         })
     return ergebnis
@@ -157,8 +171,9 @@ def _gruende(brawler, teile, unsere, raum, ctx, gegner_hat_first):
                 "gefährlicher Last Pick - er sieht unser Team und bestraft es gezielt"
             )
         elif aspekt == "counter_threat":
+            bekannt = [u for u in unsere if vorteil(brawler, u, raum)[2] is not None]
             bedroht = max(
-                unsere, key=lambda u: vorteil(brawler, u, raum)[0], default=None
+                bekannt, key=lambda u: vorteil(brawler, u, raum)[0], default=None
             )
             if bedroht is not None:
                 gruende.append(f"bestraft {bedroht.name}, den wir hier gern spielen würden")

@@ -165,6 +165,38 @@ PHASEN_GEWICHTE = {
 
 
 # =========================================================================
+# Datenstufen: was ueber einen Brawler bekannt ist
+# =========================================================================
+# Drei Stufen, von der Engine je Anfrage bestimmt (Datenraum.stufe):
+#
+#   profil   - gepflegtes Eigenschaftsprofil (32 Attribute, Rolle,
+#              Draft-Werte). Alle Komponenten berechenbar.
+#   gemessen - kein Profil, aber gemessene soloRanked-Statistik mit
+#              mindestens PROFIL_MESS_MINDESTSPIELE Spielen in einem auf
+#              diesen Draft anwendbaren Kontext (Map, Modus oder gesamt).
+#              Bewertet wird nur, was die Messung hergibt: Meta, gemessene
+#              Counter und Synergien, persoenliche Sicherheit.
+#   katalog  - weder noch. Waehl- und bannbar, bekommt aber KEINEN Score.
+#
+# Die Grenze ist eine Festlegung, keine Statistik: darunter traegt die
+# geglaettete Siegquote (PRIOR_STAERKE 120) praktisch nur noch den Prior,
+# und ein Score wuerde Wissen vortaeuschen. Hoeher gesetzt, faellt stand
+# 16.09.2026 fast jeder Brawler aus der Bewertung (max. 35 Spiele).
+PROFIL_MESS_MINDESTSPIELE = 20
+
+# Datenabdeckung = Anteil der Bewertungsgewichte (ohne persoenliche
+# Sicherheit), dessen Komponenten fuer diesen Brawler berechenbar sind.
+# Fehlende Komponenten zaehlen nicht als 0 - sie fallen heraus, und die
+# vorhandenen werden auf die volle Gewichtssumme hochgerechnet. Die
+# Abdeckung sagt, auf wie viel davon der Score tatsaechlich beruht.
+DATENABDECKUNG_STUFEN = (
+    (0.80, "Hoch"),
+    (0.50, "Mittel"),
+    (0.00, "Niedrig"),
+)
+
+
+# =========================================================================
 # Ban-Bewertung
 # =========================================================================
 # Ein Ban bewertet nicht "wie gut ist der Brawler fuer uns", sondern

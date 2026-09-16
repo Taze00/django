@@ -37,7 +37,7 @@ def label(wert):
     return config.CONFIDENCE_STUFEN[-1][1]
 
 
-def fuer_empfehlung(komponenten, ctx, raum):
+def fuer_empfehlung(komponenten, ctx, raum, kandidat=None):
     """Gesamtconfidence einer Empfehlung, 0-1.
 
     Gewichtet die Confidence jeder Komponente mit deren Gewicht - eine
@@ -48,7 +48,10 @@ def fuer_empfehlung(komponenten, ctx, raum):
     gewichtet = 0.0
     for komp in komponenten.values():
         g = abs(komp.gewicht)
-        if g <= 0:
+        # Nicht berechenbare Komponenten gehen nicht ein: ihre Unsicherheit
+        # steckt schon in der Datenabdeckung, doppelt gezaehlt waere sie
+        # eine zweite Strafe fuer dieselbe Luecke.
+        if g <= 0 or not komp.verfuegbar:
             continue
         gewicht_summe += g
         gewichtet += g * komp.confidence
@@ -58,7 +61,11 @@ def fuer_empfehlung(komponenten, ctx, raum):
     bekannt = (ctx.picks_gesamt + len(ctx.bans) * 0.3) / 7.8
     basis = basis * (0.75 + 0.25 * min(1.0, bekannt))
 
-    if raum.nur_demo:
+    # Deckel auch dann, wenn der Datenraum gemessene Zeilen hat, die
+    # Bewertung DIESES Kandidaten aber auf einem gepflegten Demo-Profil
+    # beruht (Map-Fit, Teambedarf, Heuristik-Counter). Sonst hiess ein
+    # geschaetztes Profil "Hoch", sobald irgendwo gemessen wurde.
+    if raum.nur_demo or (kandidat is not None and kandidat.hat_profil and kandidat.is_demo):
         basis = min(basis, DEMO_DECKEL)
     return max(0.0, min(1.0, basis))
 

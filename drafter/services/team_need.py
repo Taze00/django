@@ -44,6 +44,8 @@ def komponenten_fuer_pool(kandidaten, analyse, ctx):
     roh = {}
     zuwaechse = {}
     for b in kandidaten:
+        if not b.hat_profil:
+            continue
         wert, zuwachs = _nutzen(analyse, b)
         roh[b.id] = wert
         zuwaechse[b.id] = zuwachs
@@ -54,6 +56,11 @@ def komponenten_fuer_pool(kandidaten, analyse, ctx):
     ergebnis = {}
     for b in kandidaten:
         komp = Komponente(key=config.K_TEAM_NEED)
+        if not b.hat_profil:
+            # Was er dem Team hinzufuegt, ist ohne Eigenschaften unbekannt.
+            komp.verfuegbar = False
+            ergebnis[b.id] = komp
+            continue
         absolut = klemme(roh[b.id] * 2.5)
         komp.wert = klemme(0.6 * z.get(b.id, 0.0) + 0.4 * absolut)
 
@@ -87,6 +94,9 @@ def komponenten_fuer_pool(kandidaten, analyse, ctx):
 def redundanz(kandidat, analyse, ctx):
     """Strafkomponente: wovon wir schon genug haben. Immer <= 0."""
     komp = Komponente(key=config.K_REDUNDANCY)
+    if not kandidat.hat_profil:
+        komp.verfuegbar = False
+        return komp
     strafe = 0.0
 
     # 1. Eigenschaften, die das Team bereits ueberdeckt.
@@ -141,6 +151,11 @@ def angreifbarkeit(kandidat, analyse, ctx):
     entscheiden. Eine vollstaendige Matrix waere Scheingenauigkeit.
     """
     komp = Komponente(key=config.K_WEAKNESS)
+    if not kandidat.hat_profil:
+        # Welche Luecke nach ihm offen bleibt, haengt an seinen
+        # Eigenschaften - unbekannt, also keine Strafe, die behauptet wird.
+        komp.verfuegbar = False
+        return komp
     if not ctx.enemy_picks:
         # Ohne bekannte Gegner gibt es keine belegbare Angreifbarkeit.
         # Die Gefahr steckt dann in der Konterbarkeit (draft_position).
@@ -164,7 +179,11 @@ def angreifbarkeit(kandidat, analyse, ctx):
         offen = max(0.0, config.COVERAGE_ZIEL - nach_pick.profil.get(key, 0.0))
         if offen <= 0.05:
             continue
-        gegner_staerke = max((bedrohung(g) for g in ctx.enemy_picks), default=0.0)
+        # Nur Gegner mit Profil: eine unbekannte Bedrohung ist keine 0,
+        # aber auch keine belegbare Gefahr.
+        gegner_staerke = max(
+            (bedrohung(g) for g in ctx.enemy_picks if g.hat_profil), default=0.0
+        )
         if gegner_staerke < 0.5:
             continue
         wichtig = analyse.anforderungen.get(key, 0.3)

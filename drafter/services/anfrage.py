@@ -11,6 +11,8 @@ ignoriert - sonst rechnet die Engine mit einem anderen Draft als dem,
 den der Nutzer sieht.
 """
 
+from django.db.models import Q
+
 from drafter import config
 from drafter.models import BrawlMap, Brawler, GameMode, Patch
 from drafter.services.context import BANS_JE_TEAM, PICKS_JE_TEAM, DraftContext, DraftFehler
@@ -77,7 +79,9 @@ def context_aus_daten(daten, request=None):
     if rang_pool not in dict(config.RANG_POOLS):
         rang_pool = config.RANG_POOL_STANDARD
 
-    alle_brawler = list(Brawler.objects.filter(is_active=True))
+    # Voller Katalog: persoenliche Sicherheit gilt auch fuer Brawler ohne
+    # Profil, die ueber Messwerte bewertet werden.
+    alle_brawler = list(Brawler.objects.filter(Q(is_active=True) | Q(external_id__isnull=False)))
     ctx = DraftContext(
         game_mode=modus,
         brawl_map=karte,

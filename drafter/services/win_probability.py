@@ -53,7 +53,11 @@ class HeuristicWinProbabilityProvider(WinProbabilityProvider):
     def vorhersage(self, ctx, raum, eigene_analyse=None, gegner_analyse=None):
         vorteile = []
 
-        if eigene_analyse is not None and gegner_analyse is not None:
+        # Deckung nur vergleichen, wenn beide Teams vollstaendig bekannt
+        # sind: ein Mitglied ohne Profil fehlt im Teamprofil, und die
+        # Deckung dieses Teams waere systematisch zu niedrig.
+        if (eigene_analyse is not None and gegner_analyse is not None
+                and not eigene_analyse.unbekannt and not gegner_analyse.unbekannt):
             vorteile.append(
                 self.GEWICHT_DECKUNG
                 * (eigene_analyse.deckungsgrad() - gegner_analyse.deckungsgrad())
@@ -61,11 +65,14 @@ class HeuristicWinProbabilityProvider(WinProbabilityProvider):
             )
 
         if ctx.own_picks and ctx.enemy_picks:
-            paare = [
-                vorteil(a, b, raum)[0]
-                for a in ctx.own_picks for b in ctx.enemy_picks
-            ]
-            vorteile.append(self.GEWICHT_MATCHUP * (sum(paare) / len(paare)))
+            paare = []
+            for a in ctx.own_picks:
+                for b in ctx.enemy_picks:
+                    wert, _, quelle = vorteil(a, b, raum)
+                    if quelle is not None:   # unbekannte Paare zaehlen nicht mit
+                        paare.append(wert)
+            if paare:
+                vorteile.append(self.GEWICHT_MATCHUP * (sum(paare) / len(paare)))
 
         meta_diff = self._meta_diff(ctx, raum)
         if meta_diff is not None:

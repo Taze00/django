@@ -87,6 +87,9 @@ def paar(a, b, raum):
             else f"{a.name} und {b.name} beißen sich"
         )
         return klemme(eintrag.synergy), grund, quelle
+    if not (a.hat_profil and b.hat_profil):
+        # Ergaenzung laesst sich ohne Eigenschaften nicht schaetzen.
+        return 0.0, None, None
     wert, grund = heuristische_synergie(a, b)
     return wert, grund, "heuristik"
 
@@ -100,12 +103,18 @@ def komponente(kandidat, ctx, raum):
     werte = []
     for mitspieler in ctx.own_picks:
         wert, grund, quelle = paar(kandidat, mitspieler, raum)
+        if quelle is None:
+            continue
         werte.append(wert)
         if grund and abs(wert) > 0.15:
             komp.gruende.append(Grund(
                 text=grund, positiv=wert > 0, staerke=min(1.0, abs(wert) + 0.25), quelle=quelle
             ))
 
+    if not werte:
+        komp.verfuegbar = False
+        komp.confidence = 0.0
+        return komp
     komp.wert = klemme(sum(werte) / len(werte))
     komp.confidence = min(1.0, 0.5 + 0.25 * len(werte))
     return komp

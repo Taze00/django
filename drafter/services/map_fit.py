@@ -32,7 +32,10 @@ def komponenten_fuer_pool(kandidaten, anforderungen, brawl_map=None):
     Einmal fuer das ganze Feld, weil die Normalisierung das ganze Feld
     braucht - einzeln waere sie nicht berechenbar.
     """
-    roh = {b.id: roh_passung(b, anforderungen) for b in kandidaten}
+    # Nur ueber Brawler mit Profil: ohne Eigenschaften ist die Passung
+    # unbekannt, nicht 0 - und ein Feld voller Nullen wuerde ausserdem
+    # die z-Werte aller anderen verschieben.
+    roh = {b.id: roh_passung(b, anforderungen) for b in kandidaten if b.hat_profil}
     z = z_werte(roh)
 
     # Welche Eigenschaften praegen diese Map? Nur darueber wird begruendet -
@@ -41,6 +44,9 @@ def komponenten_fuer_pool(kandidaten, anforderungen, brawl_map=None):
 
     ergebnis = {}
     for b in kandidaten:
+        if not b.hat_profil:
+            ergebnis[b.id] = Komponente(key=config.K_MAP_MODE, verfuegbar=False)
+            continue
         komp = Komponente(key=config.K_MAP_MODE, wert=z.get(b.id, 0.0))
         if komp.wert > 0.15:
             treffer = [

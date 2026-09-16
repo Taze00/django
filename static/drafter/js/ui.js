@@ -242,11 +242,10 @@ export function zeichneGitter(brawler, gesperrt, bewertungen, persoenlich, filte
     kachel.appendChild(el('span', 'kachel-name', b.name));
 
     const bewertung = bewertungen.get(b.slug);
-    if (b.limited) {
-      // Kein gepflegtes Profil: die Engine bewertet ihn nicht, also
-      // steht hier auch keine Zahl - sondern sichtbar "LD".
+    if (!bewertung && b.limited) {
+      // Weder Profil noch genug Messwerte: kein Score, sichtbar "LD".
       kachel.classList.add('ist-limited');
-      kachel.title = `${b.name} · Limited Data: kein Profil, wird nicht bewertet`;
+      kachel.title = `${b.name} · Limited Data: zu wenig Daten für eine Bewertung`;
       kachel.appendChild(el('span', 'kachel-score kachel-score--limited', 'LD'));
     } else if (bewertung) {
       // Rang nur fuer die Spitze - sonst traegt jede Kachel eine Zahl,
@@ -263,6 +262,11 @@ export function zeichneGitter(brawler, gesperrt, bewertungen, persoenlich, filte
       const score = el('span', 'kachel-score', bewertung.score);
       if (bewertung.score >= 60) score.classList.add('ist-gut');
       else if (bewertung.score < 45) score.classList.add('ist-schwach');
+      if (bewertung.stufe === 'gemessen') {
+        // Score nur aus Messwerten: sichtbar anders als ein voll bewerteter.
+        score.classList.add('kachel-score--teil');
+        kachel.title = `${b.name} · nur Messdaten, Datenabdeckung ${bewertung.abdeckung} %`;
+      }
       kachel.appendChild(score);
     }
 
@@ -353,6 +357,13 @@ function aufschluesselung(komponenten) {
 
   komponenten.forEach((k) => {
     const zeile = el('div', 'komponente');
+    if (k.verfuegbar === false) {
+      zeile.classList.add('ist-ohne-wirkung', 'ist-unbekannt');
+      zeile.appendChild(el('span', 'komponente-label', k.label));
+      zeile.appendChild(el('span', 'komponente-unbekannt', 'keine Daten - ausgelassen'));
+      kasten.appendChild(zeile);
+      return;
+    }
     if (Math.abs(k.beitrag) < 0.05) zeile.classList.add('ist-ohne-wirkung');
 
     const label = el('span', 'komponente-label', k.label);
@@ -424,7 +435,10 @@ function vorschlagsKarte(e, rang, zielText) {
   waehlen.appendChild(kern);
 
   const score = el('span', 'vorschlag-score', e.score);
-  if (e.win_probability != null) {
+  if (e.datenstufe && e.datenstufe !== 'profil') {
+    // Teildaten: statt der Siegchance steht, worauf der Score beruht.
+    score.appendChild(el('span', 'vorschlag-wp vorschlag-wp--teil', `Daten ${e.datenabdeckung}%`));
+  } else if (e.win_probability != null) {
     score.appendChild(el('span', 'vorschlag-wp', `${Math.round(e.win_probability)}%`));
   }
   waehlen.appendChild(score);
@@ -508,7 +522,7 @@ export function zeichnePanel(antwort, ziel, ohneDaten) {
   if (ohneDaten && ohneDaten.length) {
     const zeile = el('div', 'panel-limited');
     zeile.appendChild(el('span', 'chip chip--limited', 'LD'));
-    zeile.appendChild(el('span', null, `Nicht bewertet: ${ohneDaten.join(', ')}`));
+    zeile.appendChild(el('span', null, `Ohne Profil, nur Messwerte: ${ohneDaten.join(', ')}`));
     panel.appendChild(zeile);
   }
 
@@ -855,7 +869,8 @@ export function zeigeDetail(e) {
 
   inhalt.appendChild(detailKopf(e,
     `${e.rolle} · Score ${e.score}/100 · ~${e.win_probability}% Siegchance · `
-    + `Confidence: ${e.confidence_label}`));
+    + `Confidence: ${e.confidence_label} · `
+    + `Datenabdeckung ${e.datenabdeckung} % · ${e.datenabdeckung_label}`));
 
   if (e.pro.length || e.contra.length) {
     inhalt.appendChild(el('h3', null, 'Warum dieser Pick'));

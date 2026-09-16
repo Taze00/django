@@ -84,6 +84,7 @@ class DraftEngine:
         # gaebe es weder Badge noch Sortierung nach Empfehlung. Die Werte
         # sind ohnehin gerechnet - nur die Spitze wird zurueckgeschnitten.
         self.alle_scores = {}
+        self.alle_stufen = {}
 
     @property
     def katalog(self):
@@ -116,7 +117,13 @@ class DraftEngine:
         die bekommt jede Empfehlung, weil sie ohnehin gerechnet ist.
         """
         anzahl = anzahl or config.EMPFEHLUNGEN_ANZAHL
-        kandidaten = self.raum.verfuegbare(self.ctx.gesperrte_ids)
+        # Nur bewertbare Kandidaten (Stufe profil oder gemessen). Brawler
+        # der Stufe "katalog" bekommen keinen Score - einer aus nichts als
+        # dem Prior saehe genauso aus wie ein begruendeter.
+        kandidaten = [
+            b for b in self.raum.verfuegbare(self.ctx.gesperrte_ids)
+            if self.raum.bewertbar(b)
+        ]
         if not kandidaten:
             return []
 
@@ -157,7 +164,7 @@ class DraftEngine:
             personal.deckel_anwenden(komponenten[config.K_PERSONAL])
 
             # Datenlage zum Schluss - sie bewertet die anderen Komponenten.
-            conf = confidence.fuer_empfehlung(komponenten, self.ctx, self.raum)
+            conf = confidence.fuer_empfehlung(komponenten, self.ctx, self.raum, kandidat)
             unsicherheit = Komponente(
                 key=config.K_UNCERTAINTY,
                 wert=-(1.0 - conf),
@@ -177,12 +184,17 @@ class DraftEngine:
                 komponenten=komponenten,
                 confidence=conf,
                 rolle=coach.rolle_im_team(kandidat, self.eigene_analyse),
+                stufe=self.raum.stufe(kandidat),
             ))
 
         # Nach dem ungeklemmten Wert - sonst waeren Kandidaten unterhalb
         # von -1 ununterscheidbar (siehe Empfehlung.roher_score).
         ergebnisse.sort(key=lambda e: -e.roher_score)
         self.alle_scores = {e.brawler.slug: e.anzeige_score for e in ergebnisse}
+        self.alle_stufen = {
+            e.brawler.slug: {"stufe": e.stufe, "abdeckung": round(e.datenabdeckung * 100)}
+            for e in ergebnisse
+        }
         spitze = ergebnisse[:anzahl]
         details_bis = len(spitze) if mit_details is None else mit_details
 
@@ -204,6 +216,16 @@ class DraftEngine:
     def _details_ergaenzen(self, empfehlung):
         b = empfehlung.brawler
         gegner = list(self.ctx.enemy_picks)
+        if not b.hat_profil:
+            # Aufgaben, Warnungen und Build entstehen aus Eigenschaften.
+            # Ohne Profil bleiben nur Matchups, und die nur, wo gemessen.
+            empfehlung.bevorzugte_matchups = [
+                m for m in [coach.bestes_matchup(b, gegner, self.raum)] if m
+            ]
+            empfehlung.zu_vermeidendes_matchup = coach.schlechtestes_matchup(
+                b, gegner, self.raum
+            )
+            return
         empfehlung.aufgaben = coach.aufgaben(b, self.ctx, self.eigene_analyse, self.raum)
         empfehlung.vermeiden = coach.vermeiden(b, self.ctx, self.raum)
         empfehlung.warnungen = coach.warnungen(b, self.ctx, self.raum, self.katalog)
@@ -284,6 +306,9 @@ class DraftEngine:
 
         spieler = []
         for b in eigene:
+            if not b.hat_profil:
+                spieler.append(self._spieler_ohne_profil(b, gegner, matchups))
+                continue
             zugewiesen = zuweisung.get(b.slug)
             aufgaben = coach.aufgaben(
                 b, self.ctx, self.eigene_analyse, self.raum, zugewiesen
@@ -335,6 +360,34 @@ class DraftEngine:
             "gegner_analyse": self.gegner_analyse.als_dict(),
         }
 
+    def _spieler_ohne_profil(self, b, gegner, matchups):
+        """Spielerkarte im Matchplan fuer einen Brawler ohne Profil.
+
+        Alles, was aus Eigenschaften entsteht (Rolle, Aufgaben, Lane,
+        Warnungen, Build), bleibt leer statt aus Nullen formuliert zu
+        werden. Matchups nur, soweit gemessen.
+        """
+        return {
+            "name": b.name,
+            "slug": b.slug,
+            "farbe": b.color,
+            "initialen": b.initialen,
+            "image_url": b.image_url,
+            "rolle": coach.rolle_im_team(b, self.eigene_analyse),
+            "ohne_profil": True,
+            "hauptaufgabe": None,
+            "aufgaben": [],
+            "vermeiden": [],
+            "warnungen": [],
+            "bevorzugtes_matchup": next(
+                (m for m in matchups if m["unser_slug"] == b.slug and m["bekannt"]), None
+            ),
+            "zu_vermeidendes_matchup": coach.schlechtestes_matchup(b, gegner, self.raum),
+            "lane": None,
+            "lane_grund": None,
+            "build": None,
+        }
+
     def als_dict(self, mit_bans=True):
         """Vollstaendige Antwort fuer die Oberflaeche."""
         from drafter.services import bans
@@ -351,6 +404,9 @@ class DraftEngine:
             # Score aller Kandidaten, nicht nur der angezeigten: das
             # Gitter zeigt den gesamten Pool und faerbt jede Kachel.
             "scores": self.alle_scores,
+            # Datenstufe und -abdeckung je bewertetem Kandidaten. Wer hier
+            # fehlt, ist Stufe "katalog" und hat keinen Score.
+            "datenstufen": self.alle_stufen,
             "team_analyse": self.eigene_analyse.als_dict(),
             "gegner_analyse": self.gegner_analyse.als_dict(),
             "siegchance": self.siegchance(),
