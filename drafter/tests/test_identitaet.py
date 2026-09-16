@@ -34,7 +34,7 @@ class IdentitaetTest(FixtureMixin, DrafterTest):
     def test_namen_und_ids_fuehren_zur_selben_partie(self):
         mit_namen = partie(a=TEAM_A, b=TEAM_B)
         self.importiere(mit_namen)
-        bericht = self.importiere(self._nur_ids(partie(a=TEAM_A, b=TEAM_B, sekunden=10)))
+        bericht = self.importiere(self._nur_ids(partie(a=TEAM_A, b=TEAM_B)))
         self.assertEqual(bericht.duplikate, 1)
         self.assertEqual(Match.objects.count(), 1)
 
@@ -68,7 +68,7 @@ class IdentitaetTest(FixtureMixin, DrafterTest):
 
 
 class PartieIdVorToleranzTest(FixtureMixin, DrafterTest):
-    """Die 60-Sekunden-Toleranz ist nur der Fallback."""
+    """Die Partie-ID der Quelle schlaegt die Rekonstruktion aus Zeit und Teams."""
 
     def test_gleiche_partie_id_ist_dieselbe_partie_ohne_zeittoleranz(self):
         self.importiere(partie(external_id="SYNTH-7"))
@@ -77,18 +77,18 @@ class PartieIdVorToleranzTest(FixtureMixin, DrafterTest):
 
     def test_verschiedene_partie_ids_sind_zwei_partien_trotz_gleicher_rekonstruktion(self):
         self.importiere(partie(external_id="SYNTH-1"))
-        self.importiere(partie(sekunden=5, external_id="SYNTH-2"))
+        self.importiere(partie(external_id="SYNTH-2"))
         self.assertEqual(Match.objects.count(), 2)
 
     def test_sichtung_ohne_id_findet_partie_mit_id(self):
         self.importiere(partie(external_id="SYNTH-3"))
-        bericht = self.importiere(partie(sekunden=20))
+        bericht = self.importiere(partie())
         self.assertEqual(bericht.duplikate, 1)
         self.assertEqual(Match.objects.get().external_id, "SYNTH-3")
 
     def test_sichtung_mit_id_ergaenzt_partie_ohne_id(self):
         self.importiere(partie())
-        bericht = self.importiere(partie(sekunden=20, external_id="SYNTH-4"))
+        bericht = self.importiere(partie(external_id="SYNTH-4"))
         self.assertEqual(bericht.duplikate, 1)
         match = Match.objects.get()
         self.assertEqual(match.external_id, "SYNTH-4")
@@ -97,11 +97,16 @@ class PartieIdVorToleranzTest(FixtureMixin, DrafterTest):
 
 class MigrationsRechnungTest(FixtureMixin, DrafterTest):
     def test_migration_rechnet_denselben_fingerprint_wie_der_importer(self):
-        """Sonst wuerden Partien von vor 0006 nie wiedererkannt."""
+        """Sonst wuerden bereits gespeicherte Partien nie wiedererkannt.
+
+        Geprueft wird die JUENGSTE Rechnung (0009, sekundengenau). Aeltere
+        Migrationen frieren die Regel ein, die zu ihrer Zeit galt - sie
+        duerfen nicht mit dem heutigen Importer uebereinstimmen muessen.
+        """
         import importlib
         from django.apps import apps
 
-        modul = importlib.import_module("drafter.migrations.0006_counter_identitaet")
+        modul = importlib.import_module("drafter.migrations.0009_fingerprint_sekundengenau")
         self.importiere(
             partie(a=TEAM_A, b=TEAM_B),
             partie(a=("Kit", "belle", "max"), karte="Unbekannte Testmap", minuten=30),
@@ -111,5 +116,5 @@ class MigrationsRechnungTest(FixtureMixin, DrafterTest):
         self.assertTrue(all(erwartet.values()))
 
         Match.objects.update(reconstructed_fingerprint="")
-        modul.rekonstruierte_fingerprints(apps, None)
+        modul.neu_berechnen(apps, None)
         self.assertEqual(dict(Match.objects.values_list("id", "reconstructed_fingerprint")), erwartet)

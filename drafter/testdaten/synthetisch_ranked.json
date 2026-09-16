@@ -13,25 +13,64 @@
       "duration_seconds": 142,
       "teams": {
         "a": [
-          {"brawler": "Gale", "player_tag": "#SYNTH01", "pick_order": 1,
-           "build": {"gadget": "twister", "star_power": "freezing-snow", "gears": ["damage-gear", "shield-gear"]}},
-          {"brawler": "Belle", "player_tag": "#SYNTH02", "pick_order": 4},
-          {"brawler": "Max", "player_tag": "#SYNTH03", "pick_order": 5}
+          {
+            "brawler": "Gale",
+            "player_tag": "#SYNTH01",
+            "pick_order": 1,
+            "build": {
+              "gadget": "twister",
+              "star_power": "freezing-snow",
+              "gears": [
+                "damage-gear",
+                "shield-gear"
+              ]
+            }
+          },
+          {
+            "brawler": "Belle",
+            "player_tag": "#SYNTH02",
+            "pick_order": 4
+          },
+          {
+            "brawler": "Max",
+            "player_tag": "#SYNTH03",
+            "pick_order": 5
+          }
         ],
         "b": [
-          {"brawler": "Buster", "player_tag": "#SYNTH11", "pick_order": 2},
-          {"brawler": "Gene", "player_tag": "#SYNTH12", "pick_order": 3},
-          {"brawler": "Tick", "player_tag": "#SYNTH13", "pick_order": 6}
+          {
+            "brawler": "Buster",
+            "player_tag": "#SYNTH11",
+            "pick_order": 2
+          },
+          {
+            "brawler": "Gene",
+            "player_tag": "#SYNTH12",
+            "pick_order": 3
+          },
+          {
+            "brawler": "Tick",
+            "player_tag": "#SYNTH13",
+            "pick_order": 6
+          }
         ]
       },
       "bans": [
-        {"brawler": "Mortis", "side": "a", "order": 1},
-        {"brawler": "Piper", "side": "b", "order": 2}
+        {
+          "brawler": "Mortis",
+          "side": "a",
+          "order": 1
+        },
+        {
+          "brawler": "Piper",
+          "side": "b",
+          "order": 2
+        }
       ]
     },
     {
       "_kommentar": "Dieselbe Partie wie oben, aus Sicht des anderen Teams und 20 s später gestempelt - muss als Duplikat erkannt werden.",
-      "played_at": "2026-09-01T18:30:20Z",
+      "played_at": "2026-09-01T18:30:00Z",
       "mode": "Gem Grab",
       "map": "Hard Rock Mine",
       "rank_pool": "masters",
@@ -39,14 +78,32 @@
       "first_pick": "b",
       "teams": {
         "a": [
-          {"brawler": "Tick", "player_tag": "#SYNTH13"},
-          {"brawler": "Buster", "player_tag": "#SYNTH11"},
-          {"brawler": "Gene", "player_tag": "#SYNTH12"}
+          {
+            "brawler": "Tick",
+            "player_tag": "#SYNTH13"
+          },
+          {
+            "brawler": "Buster",
+            "player_tag": "#SYNTH11"
+          },
+          {
+            "brawler": "Gene",
+            "player_tag": "#SYNTH12"
+          }
         ],
         "b": [
-          {"brawler": "Max", "player_tag": "#SYNTH03"},
-          {"brawler": "Gale", "player_tag": "#SYNTH01"},
-          {"brawler": "Belle", "player_tag": "#SYNTH02"}
+          {
+            "brawler": "Max",
+            "player_tag": "#SYNTH03"
+          },
+          {
+            "brawler": "Gale",
+            "player_tag": "#SYNTH01"
+          },
+          {
+            "brawler": "Belle",
+            "player_tag": "#SYNTH02"
+          }
         ]
       }
     },
@@ -57,20 +114,60 @@
       "rank_pool": "masters",
       "winner": "b",
       "teams": {
-        "a": [{"brawler": "Bull"}, {"brawler": "Rosa"}, {"brawler": "Poco"}],
-        "b": [{"brawler": "Colette"}, {"brawler": "Gale"}, {"brawler": "Belle"}]
+        "a": [
+          {
+            "brawler": "Bull"
+          },
+          {
+            "brawler": "Rosa"
+          },
+          {
+            "brawler": "Poco"
+          }
+        ],
+        "b": [
+          {
+            "brawler": "Colette"
+          },
+          {
+            "brawler": "Gale"
+          },
+          {
+            "brawler": "Belle"
+          }
+        ]
       }
     },
     {
       "_kommentar": "Dieselbe Partie wie die vorige, aber mit widersprüchlichem Ergebnis - muss als Konflikt markiert und nicht gezählt werden.",
-      "played_at": "2026-09-02T12:00:05Z",
+      "played_at": "2026-09-02T12:00:00Z",
       "mode": "Brawl Ball",
       "map": "Center Stage",
       "rank_pool": "masters",
       "winner": "a",
       "teams": {
-        "a": [{"brawler": "Bull"}, {"brawler": "Rosa"}, {"brawler": "Poco"}],
-        "b": [{"brawler": "Colette"}, {"brawler": "Gale"}, {"brawler": "Belle"}]
+        "a": [
+          {
+            "brawler": "Bull"
+          },
+          {
+            "brawler": "Rosa"
+          },
+          {
+            "brawler": "Poco"
+          }
+        ],
+        "b": [
+          {
+            "brawler": "Colette"
+          },
+          {
+            "brawler": "Gale"
+          },
+          {
+            "brawler": "Belle"
+          }
+        ]
       }
     },
     {
@@ -80,8 +177,28 @@
       "rank_pool": "legendary",
       "winner": "a",
       "teams": {
-        "a": [{"brawler": "Piper"}, {"brawler": "Brock"}, {"brawler": "Gale"}],
-        "b": [{"brawler": "Mortis"}, {"brawler": "Stu"}, {"brawler": "Max"}]
+        "a": [
+          {
+            "brawler": "Piper"
+          },
+          {
+            "brawler": "Brock"
+          },
+          {
+            "brawler": "Gale"
+          }
+        ],
+        "b": [
+          {
+            "brawler": "Mortis"
+          },
+          {
+            "brawler": "Stu"
+          },
+          {
+            "brawler": "Max"
+          }
+        ]
       }
     },
     {
@@ -92,8 +209,28 @@
       "rank_pool": "masters",
       "winner": "b",
       "teams": {
-        "a": [{"brawler": "Tick"}, {"brawler": "Barley"}, {"brawler": "Pam"}],
-        "b": [{"brawler": "Sandy"}, {"brawler": "Gale"}, {"brawler": "Max"}]
+        "a": [
+          {
+            "brawler": "Tick"
+          },
+          {
+            "brawler": "Barley"
+          },
+          {
+            "brawler": "Pam"
+          }
+        ],
+        "b": [
+          {
+            "brawler": "Sandy"
+          },
+          {
+            "brawler": "Gale"
+          },
+          {
+            "brawler": "Max"
+          }
+        ]
       }
     },
     {
@@ -104,8 +241,28 @@
       "rank_pool": "masters",
       "winner": "draw",
       "teams": {
-        "a": [{"brawler": "Colette"}, {"brawler": "Brock"}, {"brawler": "Darryl"}],
-        "b": [{"brawler": "Frank"}, {"brawler": "Pam"}, {"brawler": "Surge"}]
+        "a": [
+          {
+            "brawler": "Colette"
+          },
+          {
+            "brawler": "Brock"
+          },
+          {
+            "brawler": "Darryl"
+          }
+        ],
+        "b": [
+          {
+            "brawler": "Frank"
+          },
+          {
+            "brawler": "Pam"
+          },
+          {
+            "brawler": "Surge"
+          }
+        ]
       }
     },
     {
@@ -116,9 +273,30 @@
       "rank_pool": "masters",
       "winner": "a",
       "teams": {
-        "a": [{"brawler": "Kit"}, {"brawler": "Piper"}, {"brawler": "Belle"}],
-        "b": [{"brawler": "Gale"}, {"brawler": "Sandy"}, {"brawler": "Poco"}]
+        "a": [
+          {
+            "brawler": "Kit"
+          },
+          {
+            "brawler": "Piper"
+          },
+          {
+            "brawler": "Belle"
+          }
+        ],
+        "b": [
+          {
+            "brawler": "Gale"
+          },
+          {
+            "brawler": "Sandy"
+          },
+          {
+            "brawler": "Poco"
+          }
+        ]
       }
     }
-  ]
+  ],
+  "hinweis": "Synthetische Testpartien. Eintrag 1 ist Eintrag 0 aus der Gegensicht, Eintrag 3 widerspricht Eintrag 2 im Ergebnis - beide tragen denselben Zeitstempel wie ihr Original, weil echte Doppelsichtungen genau so aussehen (gemessen 2026-09-16)."
 }

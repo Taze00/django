@@ -132,7 +132,10 @@ def kanonisiere(record, identitaet=standard_identitaet):
 # --- Fingerabdruecke --------------------------------------------------------
 
 def zeit_eimer(played_at, toleranz=None):
-    toleranz = toleranz or config.MATCH_ZEITTOLERANZ_SEKUNDEN
+    """Zeitschluessel der Partie. Toleranz 0 heisst sekundengenau."""
+    toleranz = config.MATCH_ZEITTOLERANZ_SEKUNDEN if toleranz is None else toleranz
+    if toleranz <= 0:
+        return int(played_at.timestamp())
     return int(played_at.timestamp() // toleranz)
 
 
@@ -161,8 +164,15 @@ def eindeutiger_fingerprint(record, identitaet=standard_identitaet, ort=None):
 
 
 def kandidaten(record, identitaet=standard_identitaet, ort=None):
-    """Stufe 2: alle rekonstruierten Fingerabdruecke innerhalb der Toleranz."""
+    """Stufe 2: alle rekonstruierten Fingerabdruecke innerhalb der Toleranz.
+
+    Ohne Toleranz bleibt genau EIN Kandidat. Das ist der Normalfall:
+    Nachbarfenster wuerden Serien derselben Aufstellung zusammenwerfen -
+    gemessen am 2026-09-16 der einzige Effekt, den sie hatten.
+    """
     eimer = zeit_eimer(record.played_at)
+    if config.MATCH_ZEITTOLERANZ_SEKUNDEN <= 0:
+        return [rekonstruierter_fingerprint(record, identitaet, ort, eimer)]
     return [
         rekonstruierter_fingerprint(record, identitaet, ort, e)
         for e in (eimer, eimer - 1, eimer + 1)

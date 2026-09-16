@@ -59,10 +59,14 @@ class IdempotenzTest(FixtureMixin, DrafterTest):
 
 class DeduplizierungTest(FixtureMixin, DrafterTest):
     def test_dieselbe_partie_aus_zwei_battlelogs_zaehlt_einmal(self):
-        """Zweite Sichtung: andere Datei, andere Perspektive, 20 s spaeter."""
+        """Zweite Sichtung: andere Datei, andere Perspektive, gleicher Zeitpunkt.
+
+        So sieht es in echten Daten aus - gemessen am 2026-09-16 tragen
+        beide Battlelogs derselben Partie exakt denselben Zeitstempel.
+        """
         self.importiere(partie(a=("gale", "belle", "max"), b=("buster", "gene", "tick"), sieger="a"))
         bericht = self.importiere(partie(
-            a=("tick", "buster", "gene"), b=("max", "gale", "belle"), sieger="b", sekunden=20,
+            a=("tick", "buster", "gene"), b=("max", "gale", "belle"), sieger="b",
         ))
 
         self.assertEqual(bericht.neu, 0)
@@ -76,13 +80,21 @@ class DeduplizierungTest(FixtureMixin, DrafterTest):
         sieger = {s.brawler_name for s in match.players.filter(side=match.winner_side)}
         self.assertEqual(sieger, {"gale", "belle", "max"})
 
-    def test_toleranz_greift_ueber_eine_minutengrenze(self):
-        self.importiere(partie(sekunden=55))
-        bericht = self.importiere(partie(minuten=1, sekunden=40))   # 45 s spaeter, anderer Eimer
-        self.assertEqual(bericht.duplikate, 1)
-        self.assertEqual(Match.objects.count(), 1)
+    def test_serie_derselben_aufstellung_bleibt_getrennt(self):
+        """Dieselben sechs Spieler, dieselbe Map, dreimal hintereinander.
 
-    def test_ausserhalb_der_toleranz_sind_es_zwei_partien(self):
+        Der haeufigste Fall in echten Daten und frueher der teuerste Fehler:
+        mit 60 s Toleranz wurden solche Serien zu EINER Partie verschmolzen
+        (gemessen: 8 von 298 Partien verloren, dazu zwei falsche
+        "Ergebniskonflikte"). Unterschiedliche Sekunde heisst andere Partie.
+        """
+        self.importiere(partie(sekunden=0, sieger="a"))
+        self.importiere(partie(sekunden=45, sieger="b"))
+        self.importiere(partie(minuten=1, sekunden=40, sieger="a"))
+        self.assertEqual(Match.objects.count(), 3)
+        self.assertEqual(Match.objects.filter(has_conflict=True).count(), 0)
+
+    def test_andere_zeit_ist_eine_andere_partie(self):
         self.importiere(partie())
         self.importiere(partie(minuten=5))
         self.assertEqual(Match.objects.count(), 2)
@@ -113,7 +125,7 @@ class DeduplizierungTest(FixtureMixin, DrafterTest):
 class KonfliktTest(FixtureMixin, DrafterTest):
     def test_widerspruechliches_ergebnis_wird_markiert_und_nicht_gezaehlt(self):
         self.importiere(partie(sieger="a"))
-        bericht = self.importiere(partie(sieger="b", sekunden=5))
+        bericht = self.importiere(partie(sieger="b"))
         match = Match.objects.get()
         self.assertEqual(bericht.konflikte, 1)
         self.assertTrue(match.has_conflict)
@@ -126,7 +138,7 @@ class KonfliktTest(FixtureMixin, DrafterTest):
 
     def test_nachgeliefertes_ergebnis_wird_uebernommen(self):
         self.importiere(partie(sieger=None))
-        self.importiere(partie(sieger="a", sekunden=5))
+        self.importiere(partie(sieger="a"))
         match = Match.objects.get()
         self.assertEqual(match.winner_side, "a")
         self.assertFalse(match.has_conflict)

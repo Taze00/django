@@ -158,7 +158,7 @@ class BrawlerRateTest(AggregationsTest):
     def test_unentschieden_und_konflikte_zaehlen_nicht(self):
         self.importiere(partie(sieger="draw"))
         self.importiere(partie(minuten=10, sieger="a"))
-        self.importiere(partie(minuten=10, sekunden=5, sieger="b"))   # Konflikt zur vorigen
+        self.importiere(partie(minuten=10, sieger="b"))   # gleiche Partie, anderes Ergebnis
         self.importiere(partie(minuten=20, sieger="a"))
         self.aggregiere()
         self.assertEqual(self.stat("gale").games, 1)
