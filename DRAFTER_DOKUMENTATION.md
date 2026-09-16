@@ -870,17 +870,115 @@ ohne Konflikt. Der Test hält es fest. Wie genau `battleTime` bei zwei Spielern
 derselben Partie übereinstimmt, ist mit einem einzigen Battlelog **nicht messbar**.
 Die 60 s Toleranz bleibt deshalb geschätzt.
 
-### Weiter zu echten Statistiken
+### Geprüfte Endpoints (2026-09-15)
 
-1. **Mitschneiden**: `test_brawl_api --player "#TAG"` (einzelne Spieler, kein Crawler).
-2. **Importieren**: `import_brawl_fixture data/brawl_api_raw/battlelog_….json` —
-   idempotent, dieselbe Datei zweimal ergibt keine neuen Partien.
-3. **Aggregieren** (`aggregate_brawl_stats --quelle fixture`) erst, wenn genug
-   Partien vorliegen. Aus 17 Partien eines Spielers entsteht keine Statistik.
-4. Später: Crawler als weiterer `MatchProvider`, mit Ratenlimit — ohne dass
-   sich Import oder Aggregation ändern.
+Alle Kandidaten wurden mit einer echten Anfrage geprüft. Eingebaut ist nur,
+was mit HTTP 200 geantwortet hat.
 
----
+| Pfad | Antwort | Inhalt |
+|---|---|---|
+| `/brawlers` | 200 | 108 Brawler mit `id`, `name`, Gadgets, Star Powers, Gears, Hypercharges |
+| `/players/{tag}` | 200 | Profil samt `rankedRank`, `rankedElo`, besessene Ausrüstung |
+| `/players/{tag}/battlelog` | 200 | letzte 25 Partien |
+| `/rankings/global/players` | 200 | Top 200 **nach Trophäen**: `tag`, `name`, `trophies`, `rank` |
+| `/rankings/global/brawlers/{id}` | 200 | Top 200 je Brawler, ebenfalls nach Trophäen |
+| `/rankings/global/clubs` | 200 | Top 200 Clubs |
+| `/events/rotation` | 200 | 16 laufende Events mit `id`, `mode`, `modeId`, `map` |
+| `/rankings/global/powerplay/seasons` | **404** | gibt es nicht (mehr) |
+
+**Es gibt keine Ranked-Rangliste nach Elo.** Alle Ranglisten sind
+Trophäenlisten. Wer Ranked-Spieler sucht, findet sie nur über den Umweg:
+Top-Trophäenspieler abrufen und aus deren `soloRanked`-Partien die Mitspieler
+entdecken.
+
+**`/events/rotation` zeigt außerdem**, dass `event.id` Map UND Modus zusammen
+bezeichnet: „Doom Shroom" hat drei IDs, je eine für Solo-, Duo- und
+Trio-Showdown. Ranked-Maps stehen nicht in der Rotation.
+
+### Der Collector
+
+`services/collector.py`, Befehl `collect_brawl_matches`. Vier Schritte je Lauf:
+
+1. **Katalog** `/brawlers` → IDs eintragen, unbekannte Brawler inaktiv anlegen.
+2. **Saat** `/rankings/global/players` → bis zu 200 Spieler, Tiefe 0.
+3. **Battlelogs** `/players/{tag}/battlelog` → höchstens `--max-spieler` Abrufe.
+4. **Entdecken** Mitspieler aus **soloRanked**-Partien → Tiefe + 1.
+
+**Drei Bremsen gegen unkontrollierte Rekursion**, gleichzeitig wirksam:
+
+- **Budget** — `--max-spieler` (Standard 25) begrenzt die Battlelogs je Lauf.
+- **Tiefe** — `--max-tiefe` (Standard 1). Jenseits davon werden Spieler nicht
+  einmal gespeichert, nicht nur nicht abgerufen.
+- **Abrufabstand** — derselbe Spieler frühestens nach
+  `COLLECTOR_ABRUF_ABSTAND_STUNDEN` (Standard 6) erneut. Dafür trägt jeder
+  `TrackedPlayer` sein `last_fetched_at`.
+
+**Fehlerverhalten:**
+
+| Fall | Reaktion |
+|---|---|
+| 401 / 403 | Lauf sofort beenden — Key oder IP-Freigabe betreffen jede weitere Anfrage |
+| 429 | nach den Wiederholungen des Clients: Lauf beenden, der Spieler bleibt offen |
+| 404 | Spieler markieren, 7 Tage Pause, weiter zum nächsten |
+| 5xx, Netz | nach den Wiederholungen: Pause je Spieler 1 h, 2 h, 4 h … bis 48 h; nach 3 solchen Fehlern in Folge endet der Lauf |
+| Parserfehler | Rohantwort trotzdem speichern, Spieler markieren, weiter |
+
+Der Client wiederholt 429, 5xx und Zeitüberschreitungen bis zu `API_VERSUCHE`-mal
+(Standard 4) mit exponentieller Pause; bei 429 gilt `Retry-After`, falls die
+Antwort ihn nennt. 401, 403 und 404 werden **nie** wiederholt — ein zweiter
+Versuch ändert daran nichts.
+
+Jeder Lauf wird als `CollectorRun` protokolliert (Parameter und vollständiger
+Bericht als JSON). `python manage.py brawl_datenlage` zeigt jederzeit ohne Netz,
+was vorliegt.
+
+### Katalog: IDs vor Namen
+
+`services/katalog.py` trägt IDs ein und legt Fehlendes an — **aber nie
+Eigenschaften**:
+
+- Ein gepflegter Eintrag bekommt nur seine bis dahin **leere** `external_id`.
+  Trägt er schon eine andere, ist das ein gemeldeter Konflikt.
+- Ein **neuer** Brawler bekommt Name und ID, sonst nichts: keine Rolle, keine
+  Eigenschaften, keine Draft-Werte — und `is_active=False`. Grund: eine fehlende
+  Eigenschaft zählt im Modell als 0, also „kann das nicht". Ein Profil voller
+  Nullen wäre eine erfundene Aussage. Engine und Oberfläche sehen solche
+  Einträge deshalb nicht; Import und Aggregation zählen sie.
+- **Modi und Maps** entstehen beim Import aus `event.modeId` und `event.id` —
+  schon bei der ersten Sichtung. Das ist kein Übereifer, sondern
+  Deduplizierung: Der Fingerabdruck einer Partie hängt daran, ob der Katalog
+  die Map kennt. Käme sie erst nach mehreren Sichtungen dazu, bekäme dieselbe
+  Partie aus einem später abgerufenen Battlelog einen anderen Fingerabdruck und
+  würde doppelt gezählt. Jede weitere Sichtung wird stattdessen gegen den
+  Katalog geprüft; Widersprüche (bekannte ID, anderer Name) stehen im Bericht.
+
+### Trophäen und Ranked bleiben getrennt
+
+`battle.type` wird roh gespeichert. In Draft-Statistiken geht nur ein, was in
+`config.DRAFT_STATISTIK_BATTLE_TYPEN` steht — derzeit `soloRanked`. Die
+Aggregation filtert doppelt: über `is_ranked` **und** über den Partietyp. Eine
+Trophäen-Partie würde also auch dann nicht gezählt, wenn `is_ranked` falsch
+gesetzt wäre. Entdeckt werden Mitspieler ebenfalls nur aus `soloRanked`.
+
+### Gemessene Statistiken werden nicht automatisch produktiv
+
+`config.GEMESSENE_STATS_FREIGEGEBEN` (aus
+`settings.DRAFTER_GEMESSENE_STATS_FREIGEGEBEN`, Standard **False**) entscheidet,
+ob `auto` gemessene Werte überhaupt in Betracht zieht. Solange der Schalter aus
+ist, bleibt die Seite bei den Demo-Daten, auch wenn längst aggregiert wurde.
+
+Der Weg zur Freigabe:
+
+```bash
+python manage.py collect_brawl_matches --max-spieler 25
+python manage.py aggregate_brawl_stats --quelle api
+python manage.py vergleiche_brawl_stats --quelle api      # Bericht, ändert nichts
+```
+
+Der Vergleichsbericht stellt Messwerte und Demo-Werte nebeneinander: Stichprobe,
+Pick- und Winrate, Confidence, Counter, Synergien — und für jede Map die Top 5
+der Engine einmal mit Demo- und einmal mit gemessenen Daten. Erst wenn die
+Stichproben tragen, lohnt die Freigabe.
 
 ## 20. Offene Datenfragen
 
@@ -892,6 +990,7 @@ Bewusst **nicht** beantwortet, weil sie nur echte Antworten beantworten können:
 | Gibt es eine eindeutige Partie-ID? | **Nein** (beobachtet) — Rekonstruktion per Fingerabdruck | `fingerprint.py` |
 | Wie genau stimmen Zeitstempel derselben Partie überein? | Toleranz `MATCH_ZEITTOLERANZ_SEKUNDEN` (60 s) ist geschätzt; messbar erst mit Battlelogs zweier Spieler derselben Partie | `config.py` |
 | Ranked-**Bans**, **Pick-Reihenfolge**, First Pick? | **Nicht im Battlelog** (beobachtet) — keine Banrate, keine gelernten Draft-Positionen; Quelle offen | Aggregation zählt nur Vorhandenes |
+| Wie erreicht man gezielt Ranked-Spieler? | Es gibt **keine Elo-Rangliste** (geprüft) — die Saat sind Trophäenspieler, Ranked-Spieler kommen erst über deren soloRanked-Mitspieler | `services/collector.py` |
 | **Builds** historischer Partien? | **Nicht im Battlelog** (beobachtet); das Profil nennt nur Besessenes — `BuildStat` bleibt leer | Build-Empfehlung läuft weiter auf Regeln |
 | Wie ist der **Rangbereich** einer Partie erkennbar? | kein Feld dafür; bei `soloRanked` evtl. über `brawler.trophies` (s. o.) | `Match.rank_pool` |
 | Sind Brawler-ID, `event.id` und `modeId` über Zeit stabil? In einem Log 1:1 — über Wochen unbelegt | Zuordnung läuft bevorzugt über `external_id`; bis dahin über Namen, die sich in Schreibweise und Übersetzung ändern können | `external_id` im Katalog, `importer._brawler_fuer()` |
@@ -902,7 +1001,7 @@ Bewusst **nicht** beantwortet, weil sie nur echte Antworten beantworten können:
 
 ## 21. Nächste Schritte
 
-1. **Mehr Battlelogs mitschneiden** (einzelne Spieler, §19) — genug für eine erste Aggregation und um die offenen Fragen in §20 zu klären.
+1. **Mehr Läufe des Collectors** (§19), bis die Stichproben je Map und Paar tragen — und um die offenen Fragen in §20 zu klären.
 2. **Crawler** als weiterer `MatchProvider`, mit Ratenlimit und Deduplizierung
    über den bestehenden Import.
 3. **Aggregation planen** (Cron, später Celery Beat) — nie live aggregieren.

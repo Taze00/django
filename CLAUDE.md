@@ -124,16 +124,17 @@ docker compose run --rm --no-deps -T django-dev python manage.py collectstatic -
 docker compose restart django-dev
 ```
 
-**Acht Dinge, die man wissen muss, bevor man dort etwas ändert:**
+**Neun Dinge, die man wissen muss, bevor man dort etwas ändert:**
 
 1. **`drafter/config.py` hält ALLE Zahlen.** Gewichte, Schwellen, Grenzen. Eine Zahl im Engine-Code ist unauffindbar — deshalb steht dort keine.
 2. **Jede Score-Komponente liefert [-1, +1].** Roh-Winrates (0–1) und Attribute (0–100) werden nie direkt addiert. Die Umrechnung auf 0–100 passiert genau einmal, in `Empfehlung.anzeige_score`.
 3. **Strafgewichte sind Beträge, nicht negative Zahlen.** Das Vorzeichen steckt im *Wert* der Komponente. Wären beide negativ, würde aus jeder Strafe ein Bonus — und das fällt beim Lesen nicht auf, weil die Zahlen einzeln richtig aussehen. Ein Test hält es fest.
 4. **Verhaltenstests statt Platzierungstests.** `tests/test_modellverhalten.py` prüft Richtungen an den Score-Komponenten („gegen zwei Tanks muss der Anti-Tank-Beitrag *stärker* steigen als bei einem Kandidaten ohne Anti-Tank"), nie Ränge. Ein Platz hängt von allen Kandidaten ab — Tests darauf verleiten dazu, Gewichte zu drehen, bis ein Lieblingsbeispiel wieder oben steht.
-5. **Die Engine liest nie Rohmatches.** Statistiken kommen ausschließlich über einen `StatProvider` (`services/providers/registry.py`, Standard `auto`: gemessen wenn vorhanden, sonst Demo, synthetisch nie). Eine neue Datenquelle ist ein neuer Provider bzw. Parser — keine Änderung an Engine, Coach oder Frontend. Rohdaten (`models/matches.py`) und Statistiken (`models/stats.py`) sind getrennte Tabellen; dazwischen liegt die Aggregation.
+5. **Die Engine liest nie Rohmatches.** Statistiken kommen ausschließlich über einen `StatProvider` (`services/providers/registry.py`, Standard `auto`: gemessen nur wenn vorhanden **und freigegeben**, sonst Demo, synthetisch nie). Die Freigabe ist `DRAFTER_GEMESSENE_STATS_FREIGEGEBEN` und steht auf False — aggregieren macht die Seite also nicht produktiv. Eine neue Datenquelle ist ein neuer Provider bzw. Parser — keine Änderung an Engine, Coach oder Frontend. Rohdaten (`models/matches.py`) und Statistiken (`models/stats.py`) sind getrennte Tabellen; dazwischen liegt die Aggregation.
 6. **Keine API-Felder erfinden.** `parse_offizieller_battlelog` liest nur Felder, die in echten Antworten beobachtet wurden (anonymisiert: `drafter/testdaten/offizieller_battlelog_anonymisiert.json`). Neues Feld? Erst in einer echten Antwort nachweisen, dann parsen. Fallen: `battle.type == "ranked"` ist die **Trophäen**-Rangliste, Ranked heißt `soloRanked`; `result` gilt aus Sicht des abgefragten Spielers, der auch in `teams[1]` stehen kann; es gibt keine Partie-ID, keine Bans, keine Picks, keine Builds. Details in `DRAFTER_DOKUMENTATION.md` §19–§20.
 7. **Gemessene Counter zählen genau einmal.** Aus Partien berechnete Counter (`measured_counter_advantage`) sind die Abweichung von der log5-Erwartung, liegen je Paar nur in einer Richtung vor (kleinere Brawler-ID zuerst, per DB-Constraint erzwungen) und die Gegenrichtung ist ihr Negativ. Der 0,8-Abzug der Gegenrichtung gilt **nur** für gepflegte (`manual_counter_score`) und heuristische Counter — auf gemessene angewandt, zählte dasselbe Matchup 1,8-fach. Zuordnung beim Import: Katalog-`external_id` vor Namen, Partie-ID vor Zeittoleranz.
-8. **`drafter/attributes.py` ist das einzige Vokabular.** Dieselben 32 Schlüssel beschreiben Brawler („was ich kann"), Maps („was hier zählt") und Teams („was uns fehlt"). Neue Eigenschaft nur dort eintragen — die Modelle validieren dagegen.
+8. **Trophäen und Ranked sind getrennt, Katalogeinträge ohne Profil inaktiv.** In Draft-Statistiken zählt nur `battle.type` aus `config.DRAFT_STATISTIK_BATTLE_TYPEN` (`soloRanked`); die Aggregation filtert über `is_ranked` **und** den Typ. Der Collector (`collect_brawl_matches`) entdeckt Mitspieler nur aus soloRanked, mit Budget, Tiefengrenze und `last_fetched_at`. Neue Brawler, Modi und Maps kommen per ID in den Katalog — ohne Eigenschaften und `is_active=False`, weil eine fehlende Eigenschaft als 0 zählt und ein Nullprofil eine erfundene Aussage wäre.
+9. **`drafter/attributes.py` ist das einzige Vokabular.** Dieselben 32 Schlüssel beschreiben Brawler („was ich kann"), Maps („was hier zählt") und Teams („was uns fehlt"). Neue Eigenschaft nur dort eintragen — die Modelle validieren dagegen.
 
 **Anzeigetexte mit echten Umlauten, Kommentare in ASCII-Umschrift.** Die Engine erzeugt ihre Sätze aus Attributen; sie landen unverändert auf der Seite. „Flaechenkontrolle zaehlt" sieht dort falsch aus.
 
@@ -144,6 +145,12 @@ docker compose restart django-dev
 python manage.py import_brawl_fixture PFAD            # Rohdaten: idempotent, dedupliziert
 python manage.py aggregate_brawl_stats --quelle …     # Statistiken: gemessen | fixture | api | synthetisch
 python manage.py rebuild_draft_stats --quelle …       # Patches neu zuordnen + alles neu aggregieren
+```
+```
+python manage.py sync_brawler_katalog --abrufen | --datei DATEI   # IDs eintragen, Fehlende inaktiv anlegen
+python manage.py collect_brawl_matches --max-spieler 25           # Rangliste -> Battlelogs -> soloRanked-Mitspieler
+python manage.py brawl_datenlage                                  # was liegt vor? (ohne Netz)
+python manage.py vergleiche_brawl_stats --quelle api              # Bericht gemessen vs. Demo, aktiviert nichts
 ```
 Synthetische Testpartien (`drafter/testdaten/`) landen als `source="synthetic"` und werden nie mit echten gemischt. Mitgeschnittene API-Antworten gehören nach `data/brawl_api_raw/` (gitignored, enthalten Spieler-Tags). Test gegen die echte API: `python manage.py test_brawl_api --brawlers | --player "#TAG" | --analysiere DATEI` — ruft ab und speichert, importiert nichts. Der Key kommt nur aus `BRAWL_STARS_API_KEY` in der `.env`, nie als Argument.
 
