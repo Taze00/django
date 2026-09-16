@@ -53,9 +53,21 @@ BILDENDUNGEN = {".png", ".webp", ".jpg", ".jpeg"}
 MAX_KANTE = {"brawler": 160, "maps": 240}
 
 # Woerter, die in Fan-Kit-Dateinamen neben dem eigentlichen Namen stehen.
+# "end" und "new" stehen im Fan Kit an Portraits, die nur in dieser Variante
+# vorliegen (crow_end_portrait, jessie_new_portrait). Liegt zusaetzlich die
+# Grundform vor, meldet der Import beide als mehrdeutig statt zu raten.
 FUELLWOERTER = {
     "portrait", "portraits", "brawler", "brawlers", "icon", "icons", "avatar",
-    "map", "maps", "default", "hd", "and", "bs", "brawlstars",
+    "map", "maps", "default", "hd", "and", "bs", "brawlstars", "end", "new",
+}
+
+# Dateinamen im Fan Kit, die weder Slug noch Anzeigename treffen: interne
+# Spielnamen und ein Tippfehler. Nur belegte Faelle - alles andere wird
+# gemeldet, nicht geraten.
+ALIASE = {
+    "mike": "dynamike",            # mike_portrait.png
+    "primo": "el-primo",           # primo_portrait.png
+    "larrielawrie": "larry-lawrie",  # larrie&lawrie_portrait.png
 }
 
 STANDARD_ZIEL = Path(settings.BASE_DIR) / "static" / "drafter" / "fankit"
@@ -148,7 +160,11 @@ class Command(BaseCommand):
                     continue
                 treffer.setdefault(obj, []).insert(0, datei)   # Zuordnung gewinnt
                 continue
-            kandidaten = nach_schluessel.get(schluessel(datei.stem), set())
+            k = schluessel(datei.stem)
+            if k in ALIASE and ALIASE[k] in nach_slug:
+                treffer.setdefault(nach_slug[ALIASE[k]], []).append(datei)
+                continue
+            kandidaten = nach_schluessel.get(k, set())
             if len(kandidaten) == 1:
                 treffer.setdefault(next(iter(kandidaten)), []).append(datei)
             else:
@@ -184,12 +200,14 @@ class Command(BaseCommand):
             self.stdout.write(self.style.WARNING(
                 "  Ohne Treffer:\n    " + "\n    ".join(ohne_treffer)))
 
-        aktiv_ohne = sorted(
-            o.slug for o in modell.objects.filter(is_active=True, image_url="")
-        )
-        if aktiv_ohne and not trocken:
-            self.stdout.write(self.style.WARNING(
-                f"  Aktiv, aber weiter ohne Bild ({len(aktiv_ohne)}): {', '.join(aktiv_ohne)}"))
+        if not trocken:
+            gesamt = modell.objects.count()
+            ohne = sorted(o.slug for o in modell.objects.filter(image_url=""))
+            self.stdout.write(self.style.SUCCESS(
+                f"  Ergebnis: {gesamt - len(ohne)} von {gesamt} mit Bild, "
+                f"{len(ohne)} weiter mit Kürzel"))
+            if ohne:
+                self.stdout.write(f"  Ohne Bild: {', '.join(ohne)}")
         return geschrieben
 
     def _schreiben(self, quelle, art, slug, ziel, static_wurzel):
