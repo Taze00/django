@@ -449,12 +449,17 @@ kbd {
 .rollenfilter button:hover { color: var(--text-leise); border-color: var(--rand-hell); }
 .rollenfilter button.ist-aktiv { color: var(--akzent); border-color: var(--akzent); }
 .rollenfilter-meine.ist-aktiv { color: var(--wir); border-color: var(--wir); }
+.rollenfilter-limited { border-style: dashed !important; }
 
 /* Portraits so gross wie moeglich, ohne dass die Zahl der gleichzeitig
    sichtbaren Kacheln faellt. 74px Spaltenbreite sind auf 1440px rund
    zehn Kacheln je Zeile und zugleich ein sicheres Touch-Ziel. */
 .gitter {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  /* max-content: die Kacheln haben overflow: hidden und damit keine
+     Mindesthoehe - in der scrollenden Desktopspalte quetschte der Browser
+     bei 108 Kacheln alle Zeilen auf die Spaltenhoehe zusammen. */
+  grid-auto-rows: max-content;
   gap: 6px; overflow-y: auto; padding-right: 4px; align-content: start;
   flex: 1; min-height: 0;
 }
@@ -467,7 +472,7 @@ kbd {
 .kachel:hover:not(.ist-gesperrt) { border-color: var(--rand-hell); }
 .kachel.ist-gesperrt { opacity: .22; cursor: not-allowed; filter: grayscale(1); }
 .kachel-bild {
-  width: 54px; height: 54px; border-radius: 5px;
+  width: 60px; height: 60px; border-radius: 5px;
   display: flex; align-items: center; justify-content: center;
   font-family: var(--display); font-size: 24px; color: #0d0e10;
   background-size: cover; background-position: center;
@@ -502,6 +507,19 @@ kbd {
 .gitter.ist-banmodus .kachel.ist-empfohlen { border-color: rgba(154, 163, 176, .55); }
 .gitter.ist-banmodus .kachel.ist-bester { border-color: var(--ban-hell); }
 .gitter.ist-banmodus .kachel-rang { background: var(--ban-hell); color: #14161a; }
+
+/* Limited Data: kein gepflegtes Profil, keine Bewertung. Das Portrait
+   bleibt voll sichtbar - erkennen und waehlen muss man sie genauso
+   schnell -, nur der Badge sagt "LD" statt einer Zahl. */
+.kachel-score--limited {
+  color: var(--warn); background: rgba(0, 0, 0, .72);
+  border: 1px solid rgba(232, 176, 74, .35); font-size: 9px; letter-spacing: .04em;
+}
+.slot.ist-limited { position: relative; }
+.slot-limited {
+  position: absolute; top: 2px; right: 2px; padding: 0 3px; border-radius: 2px;
+  font-size: 8px; line-height: 1.4; color: var(--warn); background: rgba(0, 0, 0, .72);
+}
 
 /* ─── 8. Empfehlungspanel ─────────────────────────────────── */
 .panel {
@@ -601,6 +619,11 @@ kbd {
   color: var(--text-leise); cursor: help;
 }
 .chip-wert { font-size: 9px; }
+.chip--limited { color: var(--warn); border-color: rgba(232, 176, 74, .4); cursor: default; }
+.panel-limited {
+  display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
+  font-size: 11px; color: var(--text-leise);
+}
 .chip.ist-plus .chip-wert { color: var(--gut); }
 .chip.ist-minus .chip-wert { color: var(--gegner); }
 
@@ -737,6 +760,12 @@ kbd {
   color: var(--text-sehr-leise); font-weight: 400; margin: 16px 0 7px;
 }
 .modal-unterzeile { font-size: 12px; color: var(--text-sehr-leise); }
+.modal-kopf { display: flex; align-items: center; gap: 14px; padding-right: 30px; }
+.modal-bild {
+  width: 64px; height: 64px; border-radius: 6px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--display); font-size: 28px; color: #0d0e10;
+}
 
 /* ─── 11. Nebenseiten ─────────────────────────────────────── */
 .seite { max-width: 1100px; margin: 0 auto; padding: 28px 24px 60px; }

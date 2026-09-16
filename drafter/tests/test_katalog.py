@@ -86,11 +86,16 @@ class BrawlerAbgleichTest(DrafterTest):
         self.assertEqual(ergebnis.uebersprungen, 3)
         self.assertEqual(ergebnis.neu, [])
 
-    def test_neue_brawler_erreichen_weder_engine_noch_oberflaeche(self):
+    def test_neue_brawler_werden_nicht_bewertet_aber_als_limited_data_angezeigt(self):
+        # Die Engine sieht Brawler ohne Profil nie (keine erfundenen Werte).
+        # Die Oberflaeche zeigt sie seit September 2026 trotzdem - sie sind
+        # im Spiel und muessen im echten Draft waehl- und bannbar sein.
         brawler_abgleichen([SHELLY])
         self.assertNotIn("shelly", {e.brawler.slug for e in self.alle()})
         katalog = self.client.get(reverse("drafter:api_katalog")).json()
-        self.assertNotIn("shelly", {b["slug"] for b in katalog["brawler"]})
+        shelly = next(b for b in katalog["brawler"] if b["slug"] == "shelly")
+        self.assertTrue(shelly["limited"])
+        self.assertTrue(all(not b["limited"] for b in katalog["brawler"] if b["slug"] != "shelly"))
 
 
 class KatalogErgaenzenTest(FixtureMixin, DrafterTest):

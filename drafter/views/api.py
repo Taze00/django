@@ -14,6 +14,7 @@ laufen.
 
 import json
 
+from django.db.models import Q
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
@@ -44,10 +45,16 @@ def katalog(request):
     Pick loest deshalb genau eine Anfrage aus (die Empfehlung) und nicht
     zusaetzlich Nachschlagen von Namen und Bildern.
     """
+    # Der VOLLE Katalog: alle aktiven Brawler plus alle, die die offizielle
+    # API kennt (external_id gesetzt). Letztere haben oft kein gepflegtes
+    # Profil und sind deshalb inaktiv - die Engine bewertet und empfiehlt
+    # sie nicht, und die Oberflaeche markiert sie als "Limited Data".
+    # Waehlen, bannen und suchen muss man sie trotzdem koennen: sie sind
+    # im Spiel, also auch im echten Draft.
     brawler = [
         {
             "slug": b.slug,
-            "name": b.name,
+            "name": _anzeigename(b.name),
             "rolle": b.role,
             "rollen": b.rollen_label,
             "tags": b.alle_rollen,
@@ -55,8 +62,11 @@ def katalog(request):
             "initialen": b.initialen,
             "image_url": b.image_url,
             "ist_demo": b.is_demo,
+            "limited": not b.is_active,
         }
-        for b in Brawler.objects.filter(is_active=True)
+        for b in Brawler.objects.filter(
+            Q(is_active=True) | Q(external_id__isnull=False)
+        ).order_by("name")
     ]
     modi = [
         {
@@ -87,6 +97,18 @@ def katalog(request):
         },
         "angemeldet": request.user.is_authenticated,
     })
+
+
+# Namen, die .title() falsch schreibt (Abkuerzungen).
+_NAMEN_SONDERFAELLE = {"EMZ": "EMZ", "R-T": "R-T"}
+
+
+def _anzeigename(name):
+    """Namen aus der API kommen in Grossbuchstaben ("EL PRIMO") - fuer die
+    Kachel lesbar schreiben. Gepflegte Namen bleiben, wie sie sind."""
+    if name != name.upper():
+        return name
+    return _NAMEN_SONDERFAELLE.get(name, name.title())
 
 
 def _persoenliche_paare(request):

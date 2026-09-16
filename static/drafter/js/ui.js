@@ -158,6 +158,10 @@ export function zeichneSlots(containerId, slugs, anzahl, katalog, ziel, aktiv, k
       slot.style.borderColor = b.farbe;
       slot.appendChild(bild(b, 'slot-bild', 48));
       slot.appendChild(el('span', 'slot-name', b.name));
+      if (b.limited) {
+        slot.classList.add('ist-limited');
+        slot.appendChild(el('span', 'slot-limited', 'LD'));
+      }
       slot.title = `${b.name} entfernen`;
       slot.setAttribute('aria-label', `${b.name} entfernen`);
       slot.dataset.entfernen = slug;
@@ -201,7 +205,8 @@ export function zeichneGitter(brawler, gesperrt, bewertungen, persoenlich, filte
   const nurMeine = filter.nurMeine;
 
   const passend = brawler.filter((b) => {
-    if (rolle && !b.tags.includes(rolle)) return false;
+    if (rolle === '__limited') { if (!b.limited) return false; }
+    else if (rolle && !b.tags.includes(rolle)) return false;
     if (nurMeine && (persoenlich[b.slug] || 50) <= 50) return false;
     if (suche && !b.name.toLowerCase().includes(suche)) return false;
     return true;
@@ -233,11 +238,17 @@ export function zeichneGitter(brawler, gesperrt, bewertungen, persoenlich, filte
       kachel.disabled = true;
     }
 
-    kachel.appendChild(bild(b, 'kachel-bild', 54));
+    kachel.appendChild(bild(b, 'kachel-bild', 60));
     kachel.appendChild(el('span', 'kachel-name', b.name));
 
     const bewertung = bewertungen.get(b.slug);
-    if (bewertung) {
+    if (b.limited) {
+      // Kein gepflegtes Profil: die Engine bewertet ihn nicht, also
+      // steht hier auch keine Zahl - sondern sichtbar "LD".
+      kachel.classList.add('ist-limited');
+      kachel.title = `${b.name} · Limited Data: kein Profil, wird nicht bewertet`;
+      kachel.appendChild(el('span', 'kachel-score kachel-score--limited', 'LD'));
+    } else if (bewertung) {
       // Rang nur fuer die Spitze - sonst traegt jede Kachel eine Zahl,
       // die niemanden interessiert, und die Spitze faellt nicht mehr auf.
       if (bewertung.rang != null && bewertung.rang < 6) {
@@ -293,6 +304,17 @@ function gruendeListe(pro, contra) {
  * mit dem Betrag zusaetzlich die Groessenordnung. Der ganze Satz steht
  * im Detailfenster - und im `title`, fuer alle, die hinsehen wollen.
  */
+/**
+ * Kurzform der Komponenten fuer die Chips. Die langen Namen ("Map &
+ * Modus", "Teambedarf") stehen weiter im Detailfenster; auf der Karte
+ * zaehlt, dass drei Chips in eine Zeile passen.
+ */
+const CHIP_KURZ = {
+  map_mode: 'Map', meta: 'Meta', counter: 'Counter', synergy: 'Synergie',
+  team_need: 'Team', draft_position: 'Position', personal: 'Du',
+  flexibility: 'Flex', redundancy: 'Doppelt', weakness: 'Angreifbar',
+};
+
 function grundChips(komponenten) {
   const kasten = el('span', 'chips');
   const stark = (komponenten || [])
@@ -305,7 +327,7 @@ function grundChips(komponenten) {
 
   stark.forEach((k) => {
     const chip = el('span', `chip ${k.beitrag >= 0 ? 'ist-plus' : 'ist-minus'}`);
-    chip.appendChild(el('span', 'chip-label', k.label));
+    chip.appendChild(el('span', 'chip-label', CHIP_KURZ[k.key] || k.label));
     chip.appendChild(el('span', 'chip-wert',
       `${k.beitrag > 0 ? '+' : ''}${Math.round(k.beitrag)}`));
     if (k.gruende && k.gruende.length) {
@@ -396,7 +418,9 @@ function vorschlagsKarte(e, rang, zielText) {
 
   const kern = el('span', 'vorschlag-kern');
   kern.appendChild(el('span', 'vorschlag-name', e.name));
-  kern.appendChild(el('span', 'vorschlag-rolle', e.rolle || (e.rollen || []).join(' · ')));
+  // Hauptrolle aus dem Katalog ("Controller"), nicht die Coach-Zeile
+  // ("Controller / Peel für Mitspieler") - die steht im Detailfenster.
+  kern.appendChild(el('span', 'vorschlag-rolle', (e.rollen || [])[0] || e.rolle || ''));
   waehlen.appendChild(kern);
 
   const score = el('span', 'vorschlag-score', e.score);
@@ -431,23 +455,62 @@ function banKarte(ban, rang) {
 
   const kern = el('span', 'vorschlag-kern');
   kern.appendChild(el('span', 'vorschlag-name', ban.name));
-  kern.appendChild(el('span', 'vorschlag-rolle', (ban.rollen || []).slice(0, 2).join(' · ')));
+  kern.appendChild(el('span', 'vorschlag-rolle', (ban.rollen || [])[0] || ''));
   waehlen.appendChild(kern);
 
   waehlen.appendChild(el('span', 'vorschlag-score', ban.score));
-  const gruende = el('span', 'vorschlag-bangrund');
-  (ban.gruende || []).slice(0, 2).forEach((g) => gruende.appendChild(el('span', 'bangrund', g)));
-  waehlen.appendChild(gruende);
-  // Die Gruende sind hier Saetze des Servers und werden gekuerzt - im
-  // title stehen sie vollstaendig.
-  waehlen.title = [`${ban.name} bannen`, ...(ban.gruende || [])].join('\n');
   karte.appendChild(waehlen);
+
+  // Die Ban-Gruende sind ganze Saetze des Servers - sie stehen nicht auf
+  // der Karte, sondern hinter dem Fragezeichen.
+  if ((ban.gruende || []).length) {
+    const info = el('button', 'vorschlag-info', '?');
+    info.type = 'button';
+    info.dataset.bangruende = ban.slug;
+    info.setAttribute('aria-label', `Warum ${ban.name} bannen?`);
+    karte.appendChild(info);
+  }
   return karte;
 }
 
-export function zeichnePanel(antwort, ziel) {
+/** Ban-Begruendung im Detailfenster - die Daten liegen schon in der Antwort. */
+export function zeigeBanGruende(ban) {
+  const inhalt = $('modal-inhalt');
+  inhalt.replaceChildren();
+  inhalt.appendChild(detailKopf(ban, `${(ban.rollen || [])[0] || ''} · Ban-Score ${ban.score}/100`));
+  inhalt.appendChild(el('h3', null, 'Warum bannen'));
+  const liste = el('ul', 'liste');
+  ban.gruende.forEach((g) => liste.appendChild(el('li', null, g)));
+  inhalt.appendChild(liste);
+  $('modal').hidden = false;
+  $('modal-schliessen').focus();
+}
+
+/** Kopf des Detailfensters: Portrait, Name, Unterzeile. */
+function detailKopf(e, unterzeile) {
+  const kopf = el('div', 'modal-kopf');
+  kopf.appendChild(bild(e, 'modal-bild', 64));
+  const text = el('div');
+  const titel = el('h2', null, e.name);
+  titel.id = 'modal-titel';
+  text.appendChild(titel);
+  text.appendChild(el('p', 'modal-unterzeile', unterzeile));
+  kopf.appendChild(text);
+  return kopf;
+}
+
+export function zeichnePanel(antwort, ziel, ohneDaten) {
   const panel = $('panel');
   panel.replaceChildren();
+
+  // Gepickte Brawler ohne Profil gehen nicht in die Bewertung ein - das
+  // muss man sehen, sonst wirkt die Empfehlung, als kenne sie sie.
+  if (ohneDaten && ohneDaten.length) {
+    const zeile = el('div', 'panel-limited');
+    zeile.appendChild(el('span', 'chip chip--limited', 'LD'));
+    zeile.appendChild(el('span', null, `Nicht bewertet: ${ohneDaten.join(', ')}`));
+    panel.appendChild(zeile);
+  }
 
   const banModus = ziel === 'ban';
   const zielText = ZIEL_TEXT[ziel] || 'Pick';
@@ -790,10 +853,7 @@ export function zeigeDetail(e) {
   const inhalt = $('modal-inhalt');
   inhalt.replaceChildren();
 
-  const titel = el('h2', null, e.name);
-  titel.id = 'modal-titel';
-  inhalt.appendChild(titel);
-  inhalt.appendChild(el('p', 'modal-unterzeile',
+  inhalt.appendChild(detailKopf(e,
     `${e.rolle} · Score ${e.score}/100 · ~${e.win_probability}% Siegchance · `
     + `Confidence: ${e.confidence_label}`));
 

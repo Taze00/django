@@ -7,7 +7,8 @@
 
 Gepflegte Eintraege werden nie ueberschrieben: gesetzt wird nur eine leere
 `external_id`. Neue Brawler kommen ohne Profil und inaktiv in den Katalog -
-Engine und Oberflaeche sehen sie nicht, Import und Aggregation schon.
+die Engine bewertet sie nicht; die Oberflaeche zeigt sie als "Limited Data"
+(waehlbar, bannbar, ohne Score). Import und Aggregation sehen sie.
 """
 
 import json
