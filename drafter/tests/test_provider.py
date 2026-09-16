@@ -144,11 +144,20 @@ class RegistryTest(DrafterTest):
     def test_auto_nimmt_demo_ohne_messdaten(self):
         self.assertEqual(hole_stat_provider("auto").name, "demo")
 
-    def test_auto_nimmt_messdaten_sobald_vorhanden(self):
+    def test_auto_nimmt_messdaten_erst_nach_freigabe(self):
+        from unittest import mock
+
+        from drafter import config
+
         BrawlerStat.objects.create(
             brawler=self.brawler("gale"), adjusted_rate=0.55, source=Datenquelle.FIXTURE,
         )
-        self.assertEqual(hole_stat_provider("auto").name, "gemessen")
+        self.assertEqual(
+            hole_stat_provider("auto").name, "demo",
+            "Ohne Freigabe bleibt die Seite bei Demo, auch wenn Messwerte vorliegen",
+        )
+        with mock.patch.object(config, "GEMESSENE_STATS_FREIGEGEBEN", True):
+            self.assertEqual(hole_stat_provider("auto").name, "gemessen")
 
     def test_auto_nimmt_synthetische_daten_nie(self):
         BrawlerStat.objects.create(

@@ -23,6 +23,7 @@ from datetime import timedelta
 from itertools import combinations
 
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -173,7 +174,15 @@ class Aggregator:
             played_at__date__lte=ende,
         )
         if self.nur_ranked:
-            partien = partien.filter(is_ranked=True)
+            # Trophaeen- und Ranked-Partien bleiben streng getrennt: eine
+            # Partie mit Partietyp der Quelle zaehlt nur, wenn der Typ ein
+            # Draft-Modus ist. So wuerde eine Trophaeen-Partie selbst dann
+            # nicht mitgezaehlt, wenn `is_ranked` falsch gesetzt waere.
+            # Partien ohne Typ (eigenes Austauschformat) haengen weiter
+            # allein an `is_ranked`.
+            partien = partien.filter(is_ranked=True).filter(
+                Q(battle_type="") | Q(battle_type__in=config.DRAFT_STATISTIK_BATTLE_TYPEN)
+            )
         if pool != "alle":
             partien = partien.filter(rank_pool=pool)
         return partien.prefetch_related("players", "bans")

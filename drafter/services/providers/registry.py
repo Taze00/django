@@ -18,8 +18,9 @@ MATCH_PROVIDER_NAMEN = ("fixture", "api")
 def hole_stat_provider(name=None):
     """Der StatProvider fuer die Engine.
 
-    "auto" nimmt gemessene Statistiken, sobald es welche gibt, und sonst
-    die Demo-Daten. Synthetische Daten waehlt "auto" NIE - sie existieren,
+    "auto" nimmt gemessene Statistiken, sobald es welche gibt UND sie
+    freigegeben sind (config.GEMESSENE_STATS_FREIGEGEBEN), sonst die
+    Demo-Daten. Synthetische Daten waehlt "auto" NIE - sie existieren,
     um die Pipeline zu testen, und duerfen nicht unbemerkt als Messung
     auf der Seite erscheinen.
 
@@ -36,6 +37,13 @@ def hole_stat_provider(name=None):
     if name == "synthetisch":
         return synthetischer_provider()
     if name == "auto":
+        # Die Freigabe ist der Schalter zwischen "aggregiert" und
+        # "produktiv". Ohne sie bleibt die Seite bei Demo, auch wenn
+        # bereits gemessene Zeilen in der Datenbank stehen: erste echte
+        # Aggregationen sind klein und gehoeren zuerst in den
+        # Vergleichsbericht, nicht auf die Seite.
+        if not config.GEMESSENE_STATS_FREIGEGEBEN:
+            return DemoDataProvider()
         gemessen = gemessener_provider()
         return gemessen if gemessen.status().verfuegbar else DemoDataProvider()
     raise ValueError(

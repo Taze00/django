@@ -56,14 +56,19 @@ class EmpfehlungsConfidenceTest(DrafterTest):
     def test_mehr_bekannter_draft_erhoeht_die_confidence(self):
         # Mit reinen Demo-Daten liegen beide Werte am Deckel - der
         # Zusammenhang waere dann nicht messbar. Also eine Statistik auf
-        # "gemessen" stellen, damit der Deckel nicht greift.
+        # "gemessen" stellen, damit der Deckel nicht greift. Seit es die
+        # Freigabe gibt, reicht die Quelle dafuer nicht mehr: ohne sie
+        # nimmt "auto" weiterhin die Demo-Daten.
+        from unittest import mock
+
         from drafter.models import BrawlerStat, Datenquelle
         BrawlerStat.objects.update(source=Datenquelle.AGGREGATED, confidence=0.8)
 
-        wenig = self.engine().empfehlungen()[0].confidence
-        viel = self.engine(
-            eigene=["gale"], gegner=["bull", "tick"]
-        ).empfehlungen()[0].confidence
+        with mock.patch.object(config, "GEMESSENE_STATS_FREIGEGEBEN", True):
+            wenig = self.engine().empfehlungen()[0].confidence
+            viel = self.engine(
+                eigene=["gale"], gegner=["bull", "tick"]
+            ).empfehlungen()[0].confidence
         self.assertGreater(viel, wenig)
 
     def test_erklaerung_nennt_die_demo_lage(self):
