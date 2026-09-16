@@ -78,6 +78,12 @@ class DraftEngine:
         # Ausruestung wird erst geladen, wenn jemand nach Builds oder
         # Warnungen fragt - eine reine Score-Abfrage braucht sie nicht.
         self._katalog = None
+        # Score JEDES bewerteten Kandidaten, gefuellt von empfehlungen().
+        # Die Oberflaeche braucht das fuer das Brawler-Gitter: dort steht
+        # der ganze Pool, nicht nur die Spitze, und ohne Score je Kachel
+        # gaebe es weder Badge noch Sortierung nach Empfehlung. Die Werte
+        # sind ohnehin gerechnet - nur die Spitze wird zurueckgeschnitten.
+        self.alle_scores = {}
 
     @property
     def katalog(self):
@@ -176,6 +182,7 @@ class DraftEngine:
         # Nach dem ungeklemmten Wert - sonst waeren Kandidaten unterhalb
         # von -1 ununterscheidbar (siehe Empfehlung.roher_score).
         ergebnisse.sort(key=lambda e: -e.roher_score)
+        self.alle_scores = {e.brawler.slug: e.anzeige_score for e in ergebnisse}
         spitze = ergebnisse[:anzahl]
         details_bis = len(spitze) if mit_details is None else mit_details
 
@@ -341,6 +348,9 @@ class DraftEngine:
             # ohnehin berechnet (siehe empfehlungen()), und eine
             # Empfehlung ohne Begruendung ist in diesem Werkzeug keine.
             "empfehlungen": [e.als_dict(ausfuehrlich=True) for e in empfehlungen],
+            # Score aller Kandidaten, nicht nur der angezeigten: das
+            # Gitter zeigt den gesamten Pool und faerbt jede Kachel.
+            "scores": self.alle_scores,
             "team_analyse": self.eigene_analyse.als_dict(),
             "gegner_analyse": self.gegner_analyse.als_dict(),
             "siegchance": self.siegchance(),

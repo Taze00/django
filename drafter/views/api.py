@@ -17,6 +17,7 @@ import json
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 
+from drafter import attributes as attr
 from drafter import config
 from drafter.models import Brawler, BrawlMap, GameMode
 from drafter.services.anfrage import context_aus_daten
@@ -63,7 +64,8 @@ def katalog(request):
             "name": m.name,
             "beschreibung": m.description,
             "maps": [
-                {"slug": k.slug, "name": k.name, "notiz": k.notes}
+                {"slug": k.slug, "name": k.name, "notiz": k.notes,
+                 "image_url": k.image_url}
                 for k in m.maps.filter(is_active=True)
             ],
         }
@@ -73,6 +75,12 @@ def katalog(request):
         "brawler": brawler,
         "modi": modi,
         "rang_pools": [{"key": k, "label": v} for k, v in config.RANG_POOLS],
+        # Das Rollen-Vokabular in seiner kanonischen Reihenfolge. Die
+        # Oberflaeche baute den Rollenfilter vorher aus den Tags der
+        # geladenen Brawler und sortierte alphabetisch - damit hiessen
+        # die Knoepfe "damage" statt "Damage Dealer", und ihre Reihenfolge
+        # hing davon ab, welche Brawler gerade gepflegt sind.
+        "rollen": [{"key": k, "label": v} for k, v in attr.ROLLEN],
         "persoenlich": {
             b.slug: eintrag["confidence"]
             for b, eintrag in _persoenliche_paare(request)

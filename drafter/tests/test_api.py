@@ -24,6 +24,12 @@ class ApiTest(DrafterTest):
         self.assertFalse(daten["angemeldet"])
         self.assertTrue(all("initialen" in b for b in daten["brawler"]))
 
+    def test_katalog_liefert_rollen_in_kanonischer_reihenfolge(self):
+        from drafter import attributes as attr
+        daten = self.client.get(reverse("drafter:api_katalog")).json()
+        self.assertEqual([r["key"] for r in daten["rollen"]], list(attr.ROLLEN_KEYS))
+        self.assertTrue(all("image_url" in k for m in daten["modi"] for k in m["maps"]))
+
     # --- Empfehlungen ---------------------------------------------------
     def test_empfehlung_liefert_begruendete_vorschlaege(self):
         antwort = self.post(reverse("drafter:api_recommend"), {
@@ -38,6 +44,24 @@ class ApiTest(DrafterTest):
         self.assertIn("score", erster)
         self.assertIn("komponenten", erster)
         self.assertTrue(daten["datenlage"]["nur_demo"])
+
+    def test_scores_decken_den_ganzen_pool_ab(self):
+        # Das Gitter zeigt alle verfuegbaren Brawler mit Score und sortiert
+        # danach - die Spitze allein (acht Empfehlungen) reicht dafuer nicht.
+        daten = self.post(reverse("drafter:api_recommend"), {
+            "map": "hard-rock-mine", "bans": ["gale"], "enemy_picks": ["buster"],
+        }).json()
+        scores = daten["scores"]
+        self.assertEqual(len(scores), 20 - 2, "gebannt und gepickt fehlen, sonst alle")
+        self.assertNotIn("gale", scores)
+        self.assertNotIn("buster", scores)
+        # Die angezeigte Spitze ist dieselbe Rechnung, nicht eine zweite.
+        for e in daten["empfehlungen"]:
+            self.assertEqual(scores[e["slug"]], e["score"])
+        spitze = [e["score"] for e in daten["empfehlungen"]]
+        rest = [v for k, v in scores.items()
+                if k not in {e["slug"] for e in daten["empfehlungen"]}]
+        self.assertLessEqual(max(rest), min(spitze))
 
     def test_ban_empfehlungen_nur_vor_dem_ersten_pick(self):
         vorher = self.post(reverse("drafter:api_recommend"), {"map": "hard-rock-mine"}).json()
