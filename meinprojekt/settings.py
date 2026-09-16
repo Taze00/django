@@ -186,6 +186,15 @@ STORAGES = {
     },
 }
 
+# Unveraenderlich cachen ("immutable", ein Jahr) - nur die Schriften des
+# Drafters, deren Dateiname einen Inhalts-Hash traegt. WhiteNoise erkennt
+# Hash-Namen von sich aus nur zusammen mit Manifest-Storage, den das Projekt
+# nicht benutzt; ohne diese Zeile bekamen sie max-age=60. Fuer
+# font-display: optional zaehlt das: eine Nachfrage beim Server dauert
+# auf dem Telefon laenger als die ~100 ms, die der Browser wartet.
+# Andere statische Dateien sind davon nicht betroffen.
+WHITENOISE_IMMUTABLE_FILE_TEST = r"^/static/drafter/fonts/[^/]+\.[0-9a-f]{12}\.woff2$"
+
 # Media files (User uploads)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

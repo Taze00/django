@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
 from drafter import attributes as attr
-from drafter.models import Brawler, GameMode, UserBrawlerPreference
+from drafter.models import Brawler, BrawlMap, GameMode, UserBrawlerPreference
 from drafter.services import personal
 
 
@@ -17,6 +17,10 @@ def draft(request):
     """Die Draft-Oberflaeche unter /draft/."""
     return render(request, "drafter/draft.html", {
         "modi": GameMode.objects.filter(is_active=True).prefetch_related("maps"),
+        # Ob der Map-Knopf Platz fuer ein Vorschaubild reservieren muss.
+        # Steht schon im HTML, damit der Knopftext nicht nach dem Laden
+        # des Katalogs um die Bildbreite nach rechts springt.
+        "karten_mit_bild": BrawlMap.objects.filter(is_active=True).exclude(image_url="").exists(),
     })
 
 

@@ -9,9 +9,16 @@
 <meta name="robots" content="noindex">
 <link rel="icon" href="{% static 'css/images/favicon.ico' %}" type="image/x-icon">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'drafter/draft.css' %}?v=20260916-3">
+{% comment %}
+Schriften liegen selbst gehostet unter static/drafter/fonts (SIL OFL, Lizenztexte daneben).
+Vorgeladen werden die beiden, die im ersten Bild stehen - DM Mono 500 kommt nur in zwei
+<strong> vor. Der Hash im Dateinamen macht sie fuer WhiteNoise unveraenderlich (Cache
+"immutable", siehe WHITENOISE_IMMUTABLE_FILE_TEST); warum das fuer font-display: optional
+zaehlt, steht in draft.css. Mehrzeilig nur mit comment-Tag - {# #} gilt fuer eine Zeile.
+{% endcomment %}
+<link rel="preload" href="{% static 'drafter/fonts/dm-mono-400-latin.e1896b13b2b1.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="{% static 'drafter/fonts/bebas-neue-400-latin.a7c90c89240c.woff2' %}" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{% static 'drafter/draft.css' %}?v=20260916-4">
 </head>
 <body class="drafter{% block koerperklasse %}{% endblock %}">
 

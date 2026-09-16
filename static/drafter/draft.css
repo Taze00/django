@@ -31,6 +31,39 @@
     12. Schmale Fenster
    ═══════════════════════════════════════════════════════════════ */
 
+/* ─── 0. Schriften ────────────────────────────────────────── */
+/* Selbst gehostet (SIL OFL, Lizenztexte in static/drafter/fonts/) statt
+   von Google Fonts - dort kamen sie mit `display=swap`, und der Wechsel
+   von der Ersatz- zur Webschrift verschob auf dem Telefon die ganze
+   Aktionsleiste (CLS ~0,11): andere Zeichenbreiten, andere Umbrueche.
+
+   `font-display: optional` statt `swap`: der Browser wartet sehr kurz
+   (~100 ms) auf die Schrift; ist sie bis dahin nicht da, bleibt die
+   Ersatzschrift fuer diesen Seitenaufruf stehen. Es gibt also nie einen
+   Wechsel mitten im Bild. Vorgeladen (basis.html) und mit Hash im
+   Dateinamen - WhiteNoise liefert sie damit als "immutable" aus, ab dem
+   zweiten Besuch kommen sie ohne Netzanfrage aus dem Cache und schaffen
+   die 100 ms sicher. Nur der allererste Aufruf ueber langsames Netz
+   zeigt die Ersatzschrift.
+
+   Nur der Latin-Ausschnitt (wie bei Google Fonts); Zeichen ausserhalb
+   des Bereichs kommen aus der Ersatzschrift. */
+@font-face {
+  font-family: 'DM Mono'; font-style: normal; font-weight: 400; font-display: optional;
+  src: url('fonts/dm-mono-400-latin.e1896b13b2b1.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'DM Mono'; font-style: normal; font-weight: 500; font-display: optional;
+  src: url('fonts/dm-mono-500-latin.9964608a8493.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Bebas Neue'; font-style: normal; font-weight: 400; font-display: optional;
+  src: url('fonts/bebas-neue-400-latin.a7c90c89240c.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 /* ─── 1. Tokens ───────────────────────────────────────────── */
 :root {
   --bg:        #0b0c0f;
@@ -175,9 +208,12 @@ kbd {
 
 /* Map als Knopf, nicht als <select>: der Waehler dahinter kann suchen,
    gruppieren und zuletzt Benutztes zeigen. Ein Dropdown kann das nicht. */
+/* Feste Breite: vorher wuchs der Knopf, sobald "wählen" durch den
+   Mapnamen ersetzt wurde, und schob First-Pick- und Modusschalter nach
+   rechts. Lange Namen kuerzt die Ellipse. */
 .mapknopf {
   display: flex; flex-direction: column; gap: 3px; align-items: flex-start;
-  padding: 6px 14px; min-width: 190px;
+  padding: 6px 14px; flex: 0 0 230px; min-width: 0;
   background: var(--bg-3); border: 1px solid var(--rand-hell); border-radius: 5px;
   transition: border-color .12s;
 }
@@ -187,7 +223,7 @@ kbd {
   font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase;
   color: var(--text-sehr-leise);
 }
-.mapknopf-zeile { display: flex; align-items: baseline; gap: 8px; min-width: 0; max-width: 100%; }
+.mapknopf-zeile { display: flex; align-items: baseline; gap: 8px; min-width: 0; max-width: 100%; overflow: hidden; }
 .mapknopf-name {
   font-size: 14px; color: var(--text);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
@@ -213,7 +249,13 @@ kbd {
   letter-spacing: .05em; text-transform: uppercase;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
-.jetzt-zusatz { font-size: 10.5px; color: var(--text-sehr-leise); }
+/* Die Zusatzzeile ist beim Laden leer und bekommt erst mit der ersten
+   Antwort die Phase - ohne Mindesthoehe rutschte die grosse Zeile
+   darueber dabei nach oben. */
+.jetzt-zusatz {
+  font-size: 10.5px; line-height: 15px; min-height: 15px; color: var(--text-sehr-leise);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
 .jetzt--wir    { border-left-color: var(--wir); }
 .jetzt--wir    .jetzt-text { color: var(--wir); }
 .jetzt--gegner { border-left-color: var(--gegner); }
@@ -224,6 +266,7 @@ kbd {
 
 .leiste-rechts { display: flex; align-items: center; gap: 10px; }
 .datenlage {
+  min-width: 122px; text-align: center;
   font-size: 11px; color: var(--text-leise); white-space: nowrap;
   padding: 4px 8px; border-radius: 4px; background: var(--bg-3);
   border: 1px solid var(--rand); cursor: help;
@@ -393,7 +436,11 @@ kbd {
   padding: 9px 8px; font-size: 12.5px;
   background: var(--bg-3); border: 1px solid var(--rand-hell); border-radius: 5px;
 }
-.rollenfilter { display: flex; flex-wrap: wrap; gap: 4px; }
+/* Die Rollenknoepfe baut JavaScript aus dem Katalog. Vorher stand der
+   leere Container 0px hoch neben dem Suchfeld und sprang nach dem Laden
+   in eine eigene Zeile - also gleich von Anfang an eigene Zeile und eine
+   Knopfhoehe. */
+.rollenfilter { display: flex; flex-wrap: wrap; gap: 4px; flex-basis: 100%; min-height: 29px; }
 .rollenfilter button {
   padding: 5px 10px; font-size: 11px; color: var(--text-sehr-leise);
   border: 1px solid var(--rand); border-radius: 20px;
@@ -748,7 +795,7 @@ kbd {
     position: sticky; top: 0; z-index: 30;
     flex-wrap: wrap; gap: 8px; padding: 8px 12px;
   }
-  .mapknopf { min-width: 150px; flex: 1; }
+  .mapknopf { flex: 1 1 150px; min-width: 150px; }
   .jetzt { order: -1; flex-basis: 100%; padding: 6px 12px; }
   .jetzt-text { font-size: 24px; }
   .leiste-rechts { margin-left: auto; }
@@ -785,6 +832,15 @@ kbd {
   /* Empfehlungen als waagerechter Streifen. */
   .panel { order: 1; }
   .auswahl { order: 2; }
+
+  /* Hoehen reservieren, die erst nach der ersten Antwort feststehen.
+     Beide Werte sind die gemessene Hoehe im geladenen Zustand - nicht
+     mehr, sonst stuende ein leerer Kasten da:
+       - Panel: Kopfzeile + eine Reihe Karten.
+       - Gitter: zwei Kachelreihen. Das reicht, damit der Fuss beim
+         Laden nicht erst im Bild steht und dann nach unten springt. */
+  .panel { min-height: 120px; }
+  .gitter { min-height: 170px; }
   .vorschlaege { flex-direction: row; overflow-x: auto; padding-bottom: 4px; }
   .vorschlag { flex: 0 0 200px; }
   .chips, .vorschlag-bangrund { display: none; }
@@ -839,7 +895,8 @@ kbd {
   .siegchance { padding: 3px 10px; }
   .siegchance-wert { font-size: 20px; }
 
-  .panel { padding: 7px; }
+  .panel { padding: 7px; min-height: 104px; }
+  .gitter { min-height: 250px; }
   .panel-kopf { margin-bottom: 4px; }
   .vorschlag { flex-basis: 172px; }
   .vorschlag-waehlen { padding: 6px 26px 6px 6px; gap: 6px; }
@@ -847,7 +904,7 @@ kbd {
   .auswahl { padding: 7px; }
   .auswahl-kopf { gap: 6px; margin-bottom: 7px; }
   /* Rollen als eine wischbare Zeile statt drei umgebrochener. */
-  .rollenfilter { flex-wrap: nowrap; overflow-x: auto; width: 100%; padding-bottom: 2px; }
+  .rollenfilter { flex-wrap: nowrap; overflow-x: auto; width: 100%; padding-bottom: 2px; min-height: 33px; }
   .rollenfilter button { flex-shrink: 0; padding: 6px 10px; }
   .gitter { grid-template-columns: repeat(auto-fill, minmax(68px, 1fr)); gap: 5px; }
 }

@@ -159,6 +159,8 @@ docker compose restart django-dev      # WhiteNoise liest neue Dateien nur beim 
 ```
 Ordnet über Dateinamen zu (nicht eindeutig → gemeldet, nie geraten), verkleinert nur proportional (Fan Kit erlaubt keine andere Änderung), schreibt nach `static/drafter/fankit/` (gitignored). `image_url` ist ein `BildUrlFeld`: absolute URL **oder** Pfad mit `/`. Der Pflichthinweis der Fan Content Policy steht im Fuß von `basis.html` — nicht entfernen, nicht übersetzen.
 
+**Schriften und Layout-Stabilität:** Bebas Neue und DM Mono liegen selbst gehostet unter `static/drafter/fonts/` (SIL OFL, Lizenztexte daneben) mit `font-display: optional` und Hash im Dateinamen; `WHITENOISE_IMMUTABLE_FILE_TEST` in `settings.py` cacht **nur diese** Dateien dauerhaft. Neue Schriftdatei → neuer Hash im Namen, sonst hängt der alte Cache ein Jahr. Brett-Slots stehen schon im HTML, Panel/Gitter/Rollenfilter haben Mindesthöhen — beim Umbau CLS nachmessen (Ziel < 0,1, aktuell ≈ 0).
+
 Synthetische Testpartien (`drafter/testdaten/`) landen als `source="synthetic"` und werden nie mit echten gemischt. Mitgeschnittene API-Antworten gehören nach `data/brawl_api_raw/` (gitignored, enthalten Spieler-Tags). Test gegen die echte API: `python manage.py test_brawl_api --brawlers | --player "#TAG" | --analysiere DATEI` — ruft ab und speichert, importiert nichts. Der Key kommt nur aus `BRAWL_STARS_API_KEY` in der `.env`, nie als Argument.
 
 Volle Erklärung: `DRAFTER_DOKUMENTATION.md`.

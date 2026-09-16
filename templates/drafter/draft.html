@@ -30,8 +30,10 @@ Aufbau von oben nach unten, nach Benutzungshaeufigkeit sortiert:
   <!-- Map: ein Knopf, der einen Waehler mit Suchfeld oeffnet. Kein
        <select>, weil ein Dropdown mit hundert Maps nicht durchsuchbar
        ist und "zuletzt benutzt" nicht kennt. -->
-  <button type="button" class="mapknopf" id="mapknopf"
+  <button type="button" class="mapknopf{% if karten_mit_bild %} hat-bild{% endif %}" id="mapknopf"
+          {% if karten_mit_bild %}data-bildplatz="1"{% endif %}
           aria-haspopup="dialog" aria-expanded="false" aria-controls="mapwaehler">
+    {% if karten_mit_bild %}<span class="mapknopf-bild bild"></span>{% endif %}
     <span class="mapknopf-etikett">Map <kbd>M</kbd></span>
     <span class="mapknopf-zeile">
       <span class="mapknopf-modus" id="mapknopf-modus">—</span>
@@ -57,12 +59,12 @@ Aufbau von oben nach unten, nach Benutzungshaeufigkeit sortiert:
 
   <!-- Der wichtigste Text der Seite: was jetzt zu tun ist. -->
   <div class="jetzt" id="jetzt" aria-live="polite">
-    <span class="jetzt-text" id="jetzt-text">Map wählen</span>
+    <span class="jetzt-text" id="jetzt-text">Lädt…</span>
     <span class="jetzt-zusatz" id="jetzt-zusatz"></span>
   </div>
 
   <div class="leiste-rechts">
-    <span class="datenlage" id="datenlage" tabindex="0">—</span>
+    <span class="datenlage" id="datenlage" tabindex="0">Daten: —</span>
     <button type="button" class="knopf-zuruecksetzen" id="zuruecksetzen"
             title="Draft zurücksetzen">Reset</button>
   </div>
@@ -81,23 +83,39 @@ Aufbau von oben nach unten, nach Benutzungshaeufigkeit sortiert:
 <main class="drafter-raster" id="app">
 
   <!-- ─── Brett ───────────────────────────────────────────── -->
+  {% comment %}
+  Die leeren Slots stehen schon im HTML, nicht erst nach dem Laden des
+  Katalogs. Vorher waren die Slot-Container leer und damit 0px hoch; das
+  Einsetzen durch JavaScript schob Panel und Gitter auf dem Telefon um
+  ~250px nach unten - der groesste Einzelposten im CLS von 0,54.
+  JavaScript ersetzt sie spaeter durch Knoten mit identischer Groesse.
+  Die Schleifen ueber "xxx" sind nur Zaehler.
+  {% endcomment %}
   <section class="brett" aria-label="Draftzustand">
     <div class="brett-block brett-block--gegner">
-      <h2>Gegner <span class="brett-hinweis" id="gegner-hinweis"></span></h2>
-      <div class="slots" id="slots-gegner"></div>
+      <h2>Gegner <span class="brett-hinweis" id="gegner-hinweis">0/3</span></h2>
+      <div class="slots" id="slots-gegner">
+        {% for _ in "xxx" %}<button type="button" class="slot" data-ziel="gegner" title="Hierhin zielen"><span class="slot-leer"></span></button>{% endfor %}
+      </div>
     </div>
 
     <div class="brett-block brett-block--ban">
-      <h2>Bans <span class="brett-hinweis" id="ban-hinweis"></span></h2>
-      <div class="slots slots--ban" id="slots-ban"></div>
+      <h2>Bans <span class="brett-hinweis" id="ban-hinweis">0/6</span></h2>
+      <div class="slots slots--ban" id="slots-ban">
+        {% for _ in "xxxxxx" %}<button type="button" class="slot slot--ban" data-ziel="ban" title="Hierhin zielen"><span class="slot-leer"></span></button>{% endfor %}
+      </div>
     </div>
 
     <div class="brett-block brett-block--wir">
-      <h2>Wir <span class="brett-hinweis" id="wir-hinweis"></span></h2>
-      <div class="slots" id="slots-wir"></div>
+      <h2>Wir <span class="brett-hinweis" id="wir-hinweis">0/3</span></h2>
+      <div class="slots" id="slots-wir">
+        {% for _ in "xxx" %}<button type="button" class="slot" data-ziel="wir" title="Hierhin zielen"><span class="slot-leer"></span></button>{% endfor %}
+      </div>
     </div>
 
-    <div class="siegchance" id="siegchance"></div>
+    <div class="siegchance" id="siegchance">
+      <span class="siegchance-label">Draft-Stärke</span><span class="siegchance-wert">—</span>
+    </div>
   </section>
 
   <!-- ─── Brawler-Auswahl ─────────────────────────────────── -->
@@ -124,7 +142,7 @@ Aufbau von oben nach unten, nach Benutzungshaeufigkeit sortiert:
   <!-- ─── Empfehlungen ────────────────────────────────────── -->
   <aside class="panel" id="panel-rahmen" aria-label="Empfehlungen">
     <div class="panel-inhalt" id="panel" aria-live="polite">
-      <p class="panel-leer">Map wählen — dann beginnt die Ban-Phase.</p>
+      <p class="panel-leer">Empfehlungen werden geladen…</p>
     </div>
   </aside>
 
@@ -146,5 +164,5 @@ Aufbau von oben nach unten, nach Benutzungshaeufigkeit sortiert:
   // Django das Token ohnehin ins Template rendert.
   window.DRAFTER = { csrf: "{{ csrf_token }}" };
 </script>
-<script type="module" src="{% static 'drafter/js/main.js' %}?v=20260916-3"></script>
+<script type="module" src="{% static 'drafter/js/main.js' %}?v=20260916-4"></script>
 {% endblock %}

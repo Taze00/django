@@ -129,12 +129,17 @@ export function zeichneMapKnopf(modus, karte) {
   $('mapknopf-name').textContent = karte ? karte.name : 'wählen';
   knopf.classList.toggle('ist-leer', !karte);
 
-  // Vorschaubild der gesetzten Map - zur Bestaetigung auf einen Blick,
-  // nur wenn es eines gibt. Ohne Bild bleibt der Knopf reiner Text.
+  // Vorschaubild der gesetzten Map - zur Bestaetigung auf einen Blick.
+  // Der Platz dafuer wird vom Server reserviert (data-bildplatz), sobald
+  // irgendeine Map ein Bild hat - und bleibt dann auch fuer Maps ohne
+  // Bild stehen, mit Kuerzel. Sonst sprang der Text bei jedem Mapwechsel
+  // zwischen "mit" und "ohne" Bild um die Bildbreite hin und her.
+  const platz = knopf.dataset.bildplatz === '1' || !!(karte && karte.image_url);
   knopf.querySelector('.mapknopf-bild')?.remove();
-  knopf.classList.toggle('hat-bild', !!(karte && karte.image_url));
-  if (karte && karte.image_url) {
-    knopf.prepend(bildKnoten(karte.image_url, '', 'var(--bg)', 'mapknopf-bild', 34));
+  knopf.classList.toggle('hat-bild', platz);
+  if (platz) {
+    knopf.prepend(bildKnoten(karte && karte.image_url,
+      modus ? modus.name.slice(0, 2).toUpperCase() : '', 'var(--bg-3)', 'mapknopf-bild', 34));
   }
 }
 
