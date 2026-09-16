@@ -64,3 +64,4 @@ backups/
 # stattdessen versioniert unter drafter/testdaten/.
 data/brawl_api_raw/
 data/brawl_fixtures/
+data/brawl_reports/

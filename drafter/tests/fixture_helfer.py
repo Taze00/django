@@ -71,6 +71,24 @@ def datei(matches, herkunft="synthetisch", **extra):
     return inhalt
 
 
+def katalog_aus_battlelog(daten):
+    """Katalogeintraege {id, name} aller Brawler eines Battlelog-Mitschnitts.
+
+    Ersetzt in Tests die echte /brawlers-Antwort: dieselben IDs und Namen,
+    nur eben genau die, die im Fixture vorkommen.
+    """
+    gefunden = {}
+    for eintrag in daten["antwort"]["items"]:
+        battle = eintrag.get("battle", {})
+        spieler = [s for team in battle.get("teams", []) for s in team]
+        spieler += battle.get("players", [])
+        for s in spieler:
+            brawler = s.get("brawler") or {}
+            if brawler.get("id") is not None:
+                gefunden[brawler["id"]] = brawler.get("name", "")
+    return [{"id": kennung, "name": name} for kennung, name in sorted(gefunden.items())]
+
+
 class FixtureMixin:
     """Temporaeres Verzeichnis und Import in einem Schritt."""
 

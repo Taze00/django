@@ -124,6 +124,11 @@ class Match(Zeitstempel):
     # trophyChange), "soloRanked" = Ranked-Modus. `is_ranked` wird daraus
     # abgeleitet; der Rohwert bleibt, falls sich die Deutung als falsch erweist.
     battle_type = models.CharField(max_length=40, blank=True, db_index=True)
+    # Kennungen der Quelle, roh. Offizielle API: event.modeId und event.id.
+    # `event.id` bezeichnet Map UND Modus zusammen - dieselbe Map hat je
+    # Modus eine eigene ID (beobachtet in /events/rotation).
+    external_mode_id = models.CharField(max_length=40, blank=True, db_index=True)
+    external_map_id = models.CharField(max_length=40, blank=True, db_index=True)
 
     has_conflict = models.BooleanField(default=False, db_index=True)
     conflict_note = models.CharField(max_length=300, blank=True)
@@ -151,8 +156,8 @@ class MatchPlayer(models.Model):
     """Ein Spieler in einer Partie.
 
     `pick_order` und `build` bleiben leer, wenn die Quelle sie nicht
-    kennt. Ob die offizielle API sie liefert, ist ungeprueft - die
-    Aggregation beruecksichtigt nur, was tatsaechlich da ist.
+    kennt. Der offizielle Battlelog liefert beides nicht (geprueft am
+    2026-09-15) - die Aggregation beruecksichtigt nur, was da ist.
     """
 
     match = models.ForeignKey(Match, on_delete=models.CASCADE, related_name="players")
@@ -169,6 +174,8 @@ class MatchPlayer(models.Model):
     # der Ranked-Rang (bei allen sechs Spielern gleich), sonst Trophaeen.
     power = models.IntegerField(null=True, blank=True)
     trophies = models.IntegerField(null=True, blank=True)
+    # Brawler-ID der Quelle, roh - unabhaengig davon, ob der Katalog sie kennt.
+    external_brawler_id = models.CharField(max_length=40, blank=True, db_index=True)
 
     class Meta:
         indexes = [models.Index(fields=["brawler", "side"])]

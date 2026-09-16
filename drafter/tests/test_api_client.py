@@ -11,6 +11,7 @@ import logging
 import socket
 import urllib.error
 from email.message import Message
+from unittest import mock
 
 from django.test import SimpleTestCase, override_settings
 
@@ -22,6 +23,19 @@ from drafter.services.brawl_api_client import (
 # Ein ausgedachter Wert. Er muss nur eindeutig genug sein, um in Texten
 # gefunden zu werden, wenn er dort faelschlich auftaucht.
 TEST_KEY = "TEST-KEY-nicht-echt-7f3a9c"
+
+# 429, 5xx und Zeitueberschreitungen werden wiederholt - hier soll dabei
+# niemand wirklich warten. Dass ueberhaupt und wie lange gewartet wird,
+# prueft test_api_wiederholung.py mit einem eigenen Ersatz.
+_ohne_pausen = mock.patch("drafter.services.brawl_api_client.time.sleep")
+
+
+def setUpModule():
+    _ohne_pausen.start()
+
+
+def tearDownModule():
+    _ohne_pausen.stop()
 
 
 class _Antwort:
@@ -114,8 +128,11 @@ class FehlercodeTest(SimpleTestCase):
     def test_jeder_status_hat_seinen_fehlertyp_und_eine_hilfreiche_meldung(self):
         for status, typ, stichwort in self.FAELLE:
             with self.subTest(status=status):
+                # versuche=1: hier geht es um Fehlertyp und Meldung, nicht
+                # ums Wiederholen - und _Oeffner liefert den Fehlerkoerper
+                # nur beim ersten Versuch.
                 client = BrawlApiClient(
-                    api_key=TEST_KEY,
+                    api_key=TEST_KEY, versuche=1,
                     oeffner=_Oeffner(_http_fehler(status, {"reason": "beispielGrund"})),
                 )
                 with self.assertRaises(typ) as fehler:

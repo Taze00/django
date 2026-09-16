@@ -21,12 +21,14 @@ neu zu aggregieren, ohne neu zu importieren.
 import bisect
 import hashlib
 import json
+from collections import Counter
 from dataclasses import dataclass, field
 
 from django.db import DatabaseError, transaction
 
 from drafter.models import Brawler, BrawlMap, GameMode, Patch
 from drafter.models.matches import Match, MatchBan, MatchPlayer, RawPayload
+from drafter.services.katalog import KatalogErgaenzer
 from drafter.services.ingest.fingerprint import (
     eindeutiger_fingerprint, ist_spiegel, kandidaten, kanonisiere, katalog_schluessel,
     rekonstruierter_fingerprint, standard_identitaet, standard_ort,
@@ -51,6 +53,15 @@ class ImportBericht:
     zuordnung_per_name: int = 0
     unbekannte_brawler: set = field(default_factory=set)
     unbekannte_maps: set = field(default_factory=set)
+    # Nach Partietyp der Quelle. Trophaeen- und Ranked-Partien sollen schon
+    # im Importbericht getrennt sichtbar sein, nicht erst in der Aggregation.
+    neu_nach_typ: Counter = field(default_factory=Counter)
+    duplikate_nach_typ: Counter = field(default_factory=Counter)
+    # Nur mit katalog_ergaenzen: angelegte bzw. per Name verknuepfte Eintraege.
+    katalog_neu: list = field(default_factory=list)
+    katalog_verknuepft: list = field(default_factory=list)
+    # Bekannte Quellen-ID, die einen anderen Namen traegt als der Katalog.
+    id_widersprueche: list = field(default_factory=list)
     meldungen: list = field(default_factory=list)
 
     def zeilen(self):
@@ -70,6 +81,19 @@ class ImportBericht:
             zeilen.append(f"Unbekannte Brawler:   {', '.join(sorted(self.unbekannte_brawler))}")
         if self.unbekannte_maps:
             zeilen.append(f"Unbekannte Maps:      {', '.join(sorted(self.unbekannte_maps))}")
+        if self.neu_nach_typ or self.duplikate_nach_typ:
+            typen = sorted(set(self.neu_nach_typ) | set(self.duplikate_nach_typ))
+            zeilen.append("Nach Partietyp:       " + ", ".join(
+                f"{typ}: neu {self.neu_nach_typ[typ]}, Dublette {self.duplikate_nach_typ[typ]}"
+                for typ in typen
+            ))
+        if self.katalog_neu:
+            zeilen.append(f"Katalog neu (inaktiv): {', '.join(self.katalog_neu)}")
+        if self.katalog_verknuepft:
+            zeilen.append(f"Katalog verknüpft:    {', '.join(self.katalog_verknuepft)}")
+        if self.id_widersprueche:
+            zeilen.append(f"ID-Widersprüche:      {len(self.id_widersprueche)}")
+            zeilen += [f"  ! {w}" for w in self.id_widersprueche[:10]]
         return zeilen + [f"  - {m}" for m in self.meldungen]
 
 
@@ -80,7 +104,7 @@ def inhalts_hash(rohdaten):
 
 
 class MatchImporter:
-    def __init__(self, provider, trockenlauf=False):
+    def __init__(self, provider, trockenlauf=False, katalog_ergaenzen=False):
         self.provider = provider
         self.trockenlauf = trockenlauf
         # Kataloge einmal laden - eine Abfrage je Partie waere bei
@@ -95,6 +119,13 @@ class MatchImporter:
         self._brawler_ext = {b.external_id: b for b in brawler if b.external_id}
         self._modi_ext = {m.external_id: m for m in modi if m.external_id}
         self._maps_ext = {k.external_id: k for k in karten if k.external_id}
+        # Mit `katalog_ergaenzen` legt der Ergaenzer fehlende Modi und Maps
+        # an, sobald eine Partie ihre Quellen-ID nennt - auf denselben
+        # Woerterbuechern, sodass die Zuordnung sie sofort findet.
+        self._ergaenzer = (
+            KatalogErgaenzer(self._modi, self._modi_ext, self._maps, self._maps_ext)
+            if katalog_ergaenzen else None
+        )
         self._patches = list(Patch.objects.order_by("released_on"))
         self._patch_daten = [p.released_on for p in self._patches]
 
@@ -228,7 +259,10 @@ class MatchImporter:
         # Bei spiegelgleichen Teams ist nicht feststellbar, welche Seite
         # gewonnen hat - das Ergebnis bleibt dann unbekannt.
         sieger = "" if ist_spiegel(record, self._identitaet) else (record.winner or "")
+        if self._ergaenzer is not None:
+            self._ergaenzer.ergaenze(record, bericht)
         modus, karte, ort = self._ort_fuer(record)
+        self._widersprueche_pruefen(record, modus, karte, bericht)
 
         vorhanden = self._finde(record, ort)
         if vorhanden is not None:
@@ -255,6 +289,8 @@ class MatchImporter:
             first_pick_side=record.first_pick or "",
             duration_seconds=record.duration_seconds,
             battle_type=(record.battle_type or "")[:40],
+            external_mode_id=(record.external_mode_id or "")[:40],
+            external_map_id=(record.external_map_id or "")[:40],
         )
         match.payloads.add(payload)
 
@@ -265,6 +301,11 @@ class MatchImporter:
                 gelieferter_name = s.brawler or f"id:{s.external_brawler_id}"
                 if weg == "id":
                     bericht.zuordnung_per_id += 1
+                    if s.brawler and katalog_schluessel(s.brawler) != katalog_schluessel(brawler.name):
+                        bericht.id_widersprueche.append(
+                            f"Brawler-ID {s.external_brawler_id}: Katalog '{brawler.name}', "
+                            f"geliefert '{s.brawler}'"
+                        )
                 elif weg == "name":
                     bericht.zuordnung_per_name += 1
                 else:
@@ -274,6 +315,7 @@ class MatchImporter:
                     brawler_name=gelieferter_name[:80], player_tag=(s.player_tag or "")[:20],
                     pick_order=s.pick_order, build=s.build,
                     power=s.power, trophies=s.trophies,
+                    external_brawler_id=(s.external_brawler_id or "")[:40],
                 ))
         MatchPlayer.objects.bulk_create(spieler)
 
@@ -287,10 +329,12 @@ class MatchImporter:
             ))
         MatchBan.objects.bulk_create(bans)
         bericht.neu += 1
+        bericht.neu_nach_typ[record.battle_type or "-"] += 1
 
     def _zusammenfuehren(self, vorhanden, record, sieger, payload, bericht):
         """Eine erneute Sichtung einer bekannten Partie."""
         bericht.duplikate += 1
+        bericht.duplikate_nach_typ[record.battle_type or "-"] += 1
         vorhanden.payloads.add(payload)
 
         felder = []
@@ -314,6 +358,32 @@ class MatchImporter:
 
         if felder:
             vorhanden.save(update_fields=felder + ["updated_at"])
+
+    def _widersprueche_pruefen(self, record, modus, karte, bericht):
+        """Bekannte Quellen-ID, aber anderer Name? Melden, nicht korrigieren.
+
+        IDs haben Vorrang - zugeordnet wird weiterhin ueber sie. Ein
+        Widerspruch heisst: die ID wurde neu vergeben oder der Name hat sich
+        geaendert. Beides soll jemand ansehen, bevor daraus Statistik wird.
+        """
+        if karte is not None and record.external_map_id \
+                and karte.external_id == record.external_map_id:
+            if record.map and katalog_schluessel(karte.name) != katalog_schluessel(record.map):
+                bericht.id_widersprueche.append(
+                    f"Map-ID {record.external_map_id}: Katalog '{karte.name}', "
+                    f"geliefert '{record.map}'"
+                )
+            if modus is not None and modus.external_id == record.external_mode_id \
+                    and karte.game_mode_id != modus.id:
+                bericht.id_widersprueche.append(
+                    f"Map-ID {record.external_map_id}: Katalog-Modus "
+                    f"'{karte.game_mode.name}', geliefert '{record.mode}'"
+                )
+        # Der Modusname wird NICHT geprueft. Gemessen am 2026-09-16: dieselbe
+        # modeId heisst je nach Endpoint anders (45 = "airHockey" in
+        # /events/rotation, "brawlBall" im Battlelog), und derselbe Name steht
+        # fuer mehrere IDs. Eine Namensabweichung bei bekannter ID ist damit
+        # der Normalfall, keine Warnung - die ID entscheidet.
 
     def _patch_fuer(self, zeitpunkt):
         """Der Patch, der zum Spielzeitpunkt galt - der letzte davor."""

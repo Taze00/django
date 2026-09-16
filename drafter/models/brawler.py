@@ -37,8 +37,11 @@ class Brawler(Zeitstempel):
     )
 
     role = models.CharField(
-        max_length=20, choices=attr.ROLLEN, default="damage",
-        help_text="Hauptarchetyp - für Filter, Anzeige und Rollenredundanz",
+        max_length=20, choices=attr.ROLLEN, default="damage", blank=True,
+        help_text=(
+            "Hauptarchetyp - für Filter, Anzeige und Rollenredundanz. "
+            "Leer bei Einträgen ohne gepflegtes Profil (aus der API übernommen)."
+        ),
     )
     tags = models.JSONField(
         default=list, blank=True,
@@ -112,7 +115,7 @@ class Brawler(Zeitstempel):
     @property
     def alle_rollen(self):
         """Hauptrolle plus Tags, ohne Doppelung."""
-        return list(dict.fromkeys([self.role] + list(self.tags or [])))
+        return list(dict.fromkeys(r for r in [self.role] + list(self.tags or []) if r))
 
     @property
     def rollen_label(self):

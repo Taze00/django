@@ -7,6 +7,7 @@ findet die Modelle trotzdem, weil sie hier alle importiert werden.
 from drafter.models.base import NICHT_GEMESSEN, Datenquelle, StatBasis, Zeitstempel
 from drafter.models.brawler import Brawler
 from drafter.models.builds import BrawlerItem, BuildRule
+from drafter.models.collector import CollectorRun, TrackedPlayer
 from drafter.models.maps import BrawlMap, GameMode
 from drafter.models.matches import Match, MatchBan, MatchPlayer, RawPayload
 from drafter.models.patches import BrawlerBalanceChange, Patch
@@ -22,4 +23,5 @@ __all__ = [
     "BrawlerItem", "BuildRule",
     "UserBrawlerPreference",
     "RawPayload", "Match", "MatchPlayer", "MatchBan",
+    "TrackedPlayer", "CollectorRun",
 ]

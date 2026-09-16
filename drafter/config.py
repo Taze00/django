@@ -304,7 +304,8 @@ ZEITFENSTER = {
 # Rohmatches Statistiken werden - nicht, wie die Engine sie gewichtet.
 
 # Welcher StatProvider die Engine versorgt (services/providers/registry.py).
-#   "auto"        - gemessene Statistiken, wenn vorhanden, sonst Demo
+#   "auto"        - gemessene Statistiken, wenn vorhanden UND freigegeben,
+#                   sonst Demo (siehe GEMESSENE_STATS_FREIGEGEBEN)
 #   "demo"        - immer die gepflegten Demo-Daten
 #   "gemessen"    - nur aus echten Matches aggregierte Statistiken
 #   "synthetisch" - nur aus synthetischen Fixtures (Pipeline-Tests)
@@ -350,20 +351,80 @@ AGGREGATIONS_EBENEN = {
 
 # Deduplizierung - NUR der Fallback.
 #
-# Vorrang hat die Partie-ID der Quelle: stimmt sie ueberein, ist es
-# dieselbe Partie, ohne jede Zeittoleranz. Erst wenn eine Quelle keine ID
-# liefert, wird die Partie aus Zeit, Map und Teams rekonstruiert - und nur
-# dort gilt diese Toleranz: gleiche Teams auf gleicher Map innerhalb
-# dieses Zeitfensters (plus Nachbarfenster) gelten als dieselbe Partie.
+# Vorrang hat die Partie-ID der Quelle. Liefert eine Quelle keine ID, wird
+# die Partie aus Zeit, Map und Teams rekonstruiert.
 #
-# Der Wert ist geschaetzt. Wie genau die Zeitstempel derselben Partie in
-# verschiedenen Battlelogs uebereinstimmen, zeigt erst eine echte Antwort.
-MATCH_ZEITTOLERANZ_SEKUNDEN = 60
+# 0 = sekundengenau, keine Toleranz. GEMESSEN am 2026-09-16: steht dieselbe
+# Partie in den Battlelogs zweier Spieler, ist `battleTime` exakt gleich -
+# es gibt kein Zittern, fuer das man eine Toleranz braeuchte.
+#
+# Die frueheren 60 Sekunden waren eine Schaetzung und haben aktiv geschadet:
+# dieselben sechs Spieler spielen mit denselben Brawlern Serien auf
+# derselben Map, oft nur 100-160 s auseinander. Von 298 echten Partien
+# wurden dadurch 8 zusammengefasst (also verloren) und 2 als
+# "widerspruechliches Ergebnis" markiert, obwohl beide Ergebnisse stimmten.
+# Wer den Wert wieder anhebt, muss zuerst zeigen, dass Zeitstempel
+# tatsaechlich auseinanderlaufen.
+MATCH_ZEITTOLERANZ_SEKUNDEN = 0
 
 # Wie stark eine gemessene Build-Statistik die regelbasierte Build-Wahl
 # verschiebt, je Punkt Vorteil und gewichtet mit ihrer Confidence. Wirkt
 # nur, wenn Build-Statistiken existieren - mit Demo-Daten nie.
 BUILD_STAT_EINFLUSS = 0.35
+
+# Gemessene Statistiken produktiv nutzen? Solange False, nimmt "auto" die
+# Demo-Daten, auch wenn aggregierte Messwerte vorliegen. Erste echte
+# Aggregationen beruhen auf kleinen Stichproben; sie gehoeren zuerst in
+# einen Vergleichsbericht (python manage.py vergleiche_brawl_stats) und
+# erst dann - bewusst - auf die Seite.
+GEMESSENE_STATS_FREIGEGEBEN = getattr(settings, "DRAFTER_GEMESSENE_STATS_FREIGEGEBEN", False)
+
+# Welche Partietypen (battle.type der offiziellen API) in Draft-Statistiken
+# eingehen. Beobachtet am 2026-09-15: "soloRanked" ist der Ranked-Modus mit
+# Draft, "ranked" die Trophaeen-Rangliste ohne Draft. Trophaeen-Partien
+# werden gespeichert, aber nie mitgezaehlt.
+DRAFT_STATISTIK_BATTLE_TYPEN = ("soloRanked",)
+
+# Wo Vergleichsberichte landen (gitignored).
+BERICHT_VERZEICHNIS = getattr(
+    settings, "DRAFTER_BERICHT_VERZEICHNIS", settings.BASE_DIR / "data" / "brawl_reports"
+)
+
+
+# =========================================================================
+# Offizielle API: Wiederholen, Pausen, Collector
+# =========================================================================
+# Die Dokumentation nennt kein Ratenlimit, und die Antworten tragen keine
+# Rate-Limit-Header (geprueft am 2026-09-15). Diese Werte sind deshalb
+# vorsichtige Annahmen - keine bekannten Grenzen der API.
+
+# Abstand zwischen zwei Anfragen desselben Clients.
+API_MINDESTABSTAND_SEKUNDEN = 0.25
+# Versuche je Anfrage bei 429, 5xx und Zeitueberschreitung (1 = nie wiederholen).
+API_VERSUCHE = 4
+# Exponentielle Pause: 1 s, 2 s, 4 s ... hoechstens bis zur Obergrenze.
+API_BACKOFF_BASIS_SEKUNDEN = 1.0
+API_BACKOFF_MAX_SEKUNDEN = 30.0
+# Nennt eine 429-Antwort Retry-After, gilt dieser Wert - hoechstens so lange.
+API_RETRY_AFTER_MAX_SEKUNDEN = 120.0
+
+# Battlelogs je Collector-Lauf. Klein halten: ein Lauf soll ueberschaubar
+# bleiben und jederzeit abbrechbar sein.
+COLLECTOR_MAX_SPIELER = 25
+# Wie weit von der Saat (Rangliste/manuell = Tiefe 0) entdeckt wird. 1 heisst:
+# deren Mitspieler werden abgerufen, deren Mitspieler nicht einmal gespeichert.
+COLLECTOR_MAX_TIEFE = 1
+COLLECTOR_TIEFE_OBERGRENZE = 2
+# Denselben Spieler fruehestens nach so vielen Stunden erneut abrufen.
+COLLECTOR_ABRUF_ABSTAND_STUNDEN = 6
+# Aus welchen Partietypen Mitspieler entdeckt werden - nur aus Draft-Partien.
+COLLECTOR_ENTDECKEN_AUS_TYPEN = DRAFT_STATISTIK_BATTLE_TYPEN
+# 404: den Tag gibt es (nicht mehr) - so lange nicht erneut versuchen.
+COLLECTOR_404_PAUSE_TAGE = 7
+# 5xx/Netz nach allen Wiederholungen: Pause je Spieler 1 h, 2 h, 4 h ... bis hierhin.
+COLLECTOR_FEHLER_PAUSE_STUNDEN_MAX = 48
+# So viele solcher Fehler in Folge beenden den Lauf.
+COLLECTOR_ABBRUCH_NACH_FEHLERN = 3
 
 
 # =========================================================================

@@ -13,6 +13,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 
 from drafter.models import (
+    CollectorRun, TrackedPlayer,
     Brawler, BrawlerBalanceChange, BrawlerItem, BrawlerStat, BrawlMap, BuildStat,
     BuildRule, CounterStat, Datenquelle, GameMode, Patch, SynergyStat,
     UserBrawlerPreference,
@@ -290,3 +291,24 @@ class RawPayloadAdmin(admin.ModelAdmin):
 
 
 admin.site.site_header = "alex.volkmann.com"
+
+
+@admin.register(TrackedPlayer)
+class TrackedPlayerAdmin(admin.ModelAdmin):
+    list_display = (
+        "tag", "origin", "depth", "ranking_position", "last_fetched_at",
+        "last_status", "fetch_count", "error_streak", "last_solo_ranked_count",
+    )
+    list_filter = ("origin", "depth", "last_status", "is_active")
+    search_fields = ("tag", "discovered_from")
+    readonly_fields = ("created_at", "updated_at")
+
+
+@admin.register(CollectorRun)
+class CollectorRunAdmin(admin.ModelAdmin):
+    list_display = ("started_at", "finished_at", "status", "abort_reason")
+    list_filter = ("status",)
+    # Ein Lauf ist ein Protokoll - nichts davon wird von Hand geaendert.
+    readonly_fields = (
+        "started_at", "finished_at", "status", "abort_reason", "parameters", "report",
+    )
