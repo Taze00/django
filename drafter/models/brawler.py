@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from drafter import attributes as attr
-from drafter.models.base import Datenquelle, Zeitstempel
+from drafter.models.base import BildUrlFeld, Datenquelle, Zeitstempel
 
 
 class Brawler(Zeitstempel):
@@ -58,10 +58,11 @@ class Brawler(Zeitstempel):
     )
 
     # Bilder liegen NICHT im Repository: die Brawler-Artworks gehoeren
-    # Supercell. Das Feld nimmt eine URL auf, wenn der Betreiber eine
-    # lizenzkonforme Quelle hat; ohne URL zeigt die Oberflaeche eine
+    # Supercell. Quelle ist das offizielle Fan Kit, von Hand geladen und
+    # mit `import_fankit_bilder` eingespielt (liegt dann gitignored unter
+    # static/drafter/fankit/). Ohne Bild zeigt die Oberflaeche eine
     # eingefaerbte Kachel mit Kuerzel.
-    image_url = models.URLField(blank=True)
+    image_url = BildUrlFeld()
     color = models.CharField(
         max_length=7, default="#3a3f4b",
         help_text="Hex-Farbe der Platzhalterkachel, z.B. #7d5fff",

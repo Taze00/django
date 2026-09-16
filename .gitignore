@@ -65,3 +65,7 @@ backups/
 data/brawl_api_raw/
 data/brawl_fixtures/
 data/brawl_reports/
+
+# Drafter: Portraits und Map-Bilder aus dem Supercell Fan Kit. Gehoeren
+# Supercell, werden mit import_fankit_bilder eingespielt, nicht versioniert.
+static/drafter/fankit/

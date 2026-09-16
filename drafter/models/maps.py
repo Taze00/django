@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 
 from drafter import attributes as attr
-from drafter.models.base import Datenquelle, Zeitstempel
+from drafter.models.base import BildUrlFeld, Datenquelle, Zeitstempel
 
 
 class GameMode(Zeitstempel):
@@ -101,7 +101,7 @@ class BrawlMap(Zeitstempel):
         ),
     )
 
-    image_url = models.URLField(blank=True)
+    image_url = BildUrlFeld()
     notes = models.TextField(blank=True)
     source = models.CharField(
         max_length=20, choices=Datenquelle.choices, default=Datenquelle.DEMO

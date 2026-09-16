@@ -6,7 +6,41 @@ Star Power, anti_tank), deutsche Feldnamen neben englischen JSON-Keys
 waeren ein Mischmasch. Dieselbe Linie faehrt `fitness/`.
 """
 
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
 from django.db import models
+
+
+def pruefe_bild_url(wert):
+    """Absolute http(s)-URL ODER ein Pfad auf dem eigenen Server.
+
+    `URLField` akzeptiert nur absolute URLs. Die Fan-Kit-Bilder liegen
+    aber auf demselben Server (`/static/drafter/fankit/...`), und eine
+    absolute URL mit Domain wuerde lokal und in Produktion verschieden
+    heissen - dieselbe Datenbank zeigte dann auf einer der beiden Seiten
+    ins Leere.
+    """
+    if not wert:
+        return
+    if wert.startswith("/") and not wert.startswith("//"):
+        return
+    try:
+        URLValidator(schemes=["http", "https"])(wert)
+    except ValidationError:
+        raise ValidationError(
+            "Erwartet eine http(s)-URL oder einen Pfad, der mit / beginnt."
+        )
+
+
+class BildUrlFeld(models.CharField):
+    """Feld fuer Portraits und Map-Bilder, siehe `pruefe_bild_url`."""
+
+    default_validators = [pruefe_bild_url]
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("max_length", 300)
+        kwargs.setdefault("blank", True)
+        super().__init__(*args, **kwargs)
 
 
 class Datenquelle(models.TextChoices):

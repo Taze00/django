@@ -152,6 +152,13 @@ python manage.py collect_brawl_matches --max-spieler 25           # Rangliste ->
 python manage.py brawl_datenlage                                  # was liegt vor? (ohne Netz)
 python manage.py vergleiche_brawl_stats --quelle api              # Bericht gemessen vs. Demo, aktiviert nichts
 ```
+**Portraits und Map-Bilder** kommen ausschließlich aus dem offiziellen Supercell Fan Kit (fankit.supercell.com), **von Hand im Browser** geladen — das Portal hat Login und Nutzungsbedingungen, automatisches Abholen wäre Scrapen. Fremde Spiegel (Wikis, Brawlify, GitHub-Kopien) sind keine Quelle. Einspielen:
+```
+python manage.py import_fankit_bilder --brawler ORDNER --maps ORDNER [--trocken] [--zuordnung datei.json]
+docker compose restart django-dev      # WhiteNoise liest neue Dateien nur beim Start
+```
+Ordnet über Dateinamen zu (nicht eindeutig → gemeldet, nie geraten), verkleinert nur proportional (Fan Kit erlaubt keine andere Änderung), schreibt nach `static/drafter/fankit/` (gitignored). `image_url` ist ein `BildUrlFeld`: absolute URL **oder** Pfad mit `/`. Der Pflichthinweis der Fan Content Policy steht im Fuß von `basis.html` — nicht entfernen, nicht übersetzen.
+
 Synthetische Testpartien (`drafter/testdaten/`) landen als `source="synthetic"` und werden nie mit echten gemischt. Mitgeschnittene API-Antworten gehören nach `data/brawl_api_raw/` (gitignored, enthalten Spieler-Tags). Test gegen die echte API: `python manage.py test_brawl_api --brawlers | --player "#TAG" | --analysiere DATEI` — ruft ab und speichert, importiert nichts. Der Key kommt nur aus `BRAWL_STARS_API_KEY` in der `.env`, nie als Argument.
 
 Volle Erklärung: `DRAFTER_DOKUMENTATION.md`.
@@ -186,7 +193,7 @@ docker compose run --rm --no-deps -T django-dev python manage.py test fitness --
 ```
 docker compose run --rm --no-deps -T django-dev python manage.py test drafter --settings=meinprojekt.settings_test
 ```
-277 Tests, ~2,5 min. **Vor jedem Dependency- oder Django-Upgrade beide laufen lassen** (zusammen 530). Nie zwei Testläufe gleichzeitig — beide legen `test_postgres` an.
+339 Tests, ~3,5 min. **Vor jedem Dependency- oder Django-Upgrade beide laufen lassen** (zusammen 530). Nie zwei Testläufe gleichzeitig — beide legen `test_postgres` an.
 
 > Frühere Fassungen dieser Datei nannten 134 Tests und „SQLite im Speicher". Beides stimmt nicht mehr bzw. stimmte nie: `settings_test` unterscheidet sich von `settings` **nur** im Passwort-Hasher, die Testdatenbank ist dieselbe Postgres-Instanz.
 
