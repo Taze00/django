@@ -1,11 +1,17 @@
 /**
- * Zeichnen: Slots, Gitter, Panel, Modal.
+ * Zeichnen: Aktionsleiste, Brett, Gitter, Panel, Map-Waehler, Modal.
  *
  * Alles hier ist reine Darstellung - kein Zustand, keine Netzanfragen.
  * Jede Funktion bekommt Daten und schreibt DOM. Dadurch bleibt
  * nachvollziehbar, wo etwas herkommt, wenn die Anzeige falsch aussieht:
  * entweder liefert der Server es falsch, oder hier wird es falsch
  * hingeschrieben - nie beides vermischt.
+ *
+ * Leitlinie fuer die Live-Ansicht (Leiste, Brett, Gitter, Panel):
+ * **so wenig Text wie moeglich**. Ein Draft laeuft in Sekunden; was
+ * gelesen werden muss, statt erkannt zu werden, kostet einen Pick.
+ * Ganze Saetze stehen deshalb nur im Detailfenster und im Matchplan -
+ * beides Ansichten, die man ausdruecklich oeffnet.
  */
 
 const $ = (id) => document.getElementById(id);
@@ -24,9 +30,10 @@ function el(tag, klassen, text) {
 
 /** Portrait oder eingefaerbter Platzhalter mit Kuerzel. */
 function bild(brawler, klasse) {
-  const knoten = el('div', klasse);
+  const knoten = el('span', klasse);
   if (brawler.image_url) {
     knoten.style.backgroundImage = `url("${brawler.image_url.replace(/["\\]/g, '')}")`;
+    knoten.classList.add('hat-bild');
   } else {
     knoten.style.background = brawler.farbe || '#3a3f4b';
     knoten.appendChild(t(brawler.initialen || brawler.name.slice(0, 2).toUpperCase()));
@@ -34,28 +41,70 @@ function bild(brawler, klasse) {
   return knoten;
 }
 
-// ─── Slots ──────────────────────────────────────────────────
+// ─── Aktionsleiste ──────────────────────────────────────────
+const ZIEL_TEXT = {
+  ban: 'Ban',
+  wir: 'Unser Pick',
+  gegner: 'Gegner-Pick',
+};
+
+/**
+ * Der wichtigste Text der Seite: was jetzt zu tun ist.
+ *
+ * Gross, farbig nach Seite und mit laufender Nummer ("UNSER PICK 2/3").
+ * Vorher stand hier nur die Phase des Servers ("Mittlerer Pick") - die
+ * sagt, wie bewertet wird, aber nicht, wohin der naechste Klick geht.
+ */
+export function zeichneJetzt(stand, zusatz, hatMap) {
+  const kasten = $('jetzt');
+  const text = $('jetzt-text');
+  kasten.classList.remove('jetzt--ban', 'jetzt--wir', 'jetzt--gegner', 'jetzt--fertig');
+
+  if (!hatMap) {
+    kasten.classList.add('jetzt--fertig');
+    text.textContent = 'Map wählen';
+    $('jetzt-zusatz').textContent = 'ohne Map keine Bewertung';
+    return;
+  }
+  if (!stand.ziel) {
+    kasten.classList.add('jetzt--fertig');
+    text.textContent = 'Draft komplett';
+    $('jetzt-zusatz').textContent = zusatz || 'Matchplan rechts';
+    return;
+  }
+  kasten.classList.add(`jetzt--${stand.ziel}`);
+  text.textContent = `${ZIEL_TEXT[stand.ziel]} ${stand.nummer}/${stand.von}`;
+  $('jetzt-zusatz').textContent = zusatz || '';
+}
+
+export function zeichneMapKnopf(modus, karte) {
+  $('mapknopf-modus').textContent = modus ? modus.name : '—';
+  $('mapknopf-name').textContent = karte ? karte.name : 'wählen';
+  $('mapknopf').classList.toggle('ist-leer', !karte);
+}
+
+// ─── Brett ──────────────────────────────────────────────────
 export function zeichneSlots(containerId, slugs, anzahl, katalog, ziel, aktiv, klasse) {
   const container = $(containerId);
   container.replaceChildren();
 
   for (let i = 0; i < anzahl; i += 1) {
     const slug = slugs[i];
-    const slot = el('div', `slot ${klasse || ''}`);
+    const slot = el('button', `slot ${klasse || ''}`);
+    slot.type = 'button';
     if (slug) {
       const b = katalog.get(slug);
       slot.classList.add('ist-belegt');
       slot.style.borderColor = b.farbe;
       slot.appendChild(bild(b, 'slot-bild'));
-      const kuerzel = slot.querySelector('.slot-bild');
-      if (!b.image_url) kuerzel.classList.add('slot-kuerzel');
       slot.appendChild(el('span', 'slot-name', b.name));
       slot.title = `${b.name} entfernen`;
       slot.dataset.entfernen = slug;
     } else {
       const istZiel = aktiv && i === slugs.length;
       if (istZiel) slot.classList.add('ist-ziel');
-      slot.appendChild(el('span', null, istZiel ? 'wählen' : '—'));
+      slot.appendChild(el('span', 'slot-leer', istZiel ? '▸' : ''));
+      slot.title = istZiel ? 'Hier landet die nächste Auswahl' : 'Hierhin zielen';
       slot.dataset.ziel = ziel;
     }
     container.appendChild(slot);
@@ -63,51 +112,103 @@ export function zeichneSlots(containerId, slugs, anzahl, katalog, ziel, aktiv, k
 }
 
 // ─── Brawler-Gitter ─────────────────────────────────────────
-export function zeichneGitter(brawler, gesperrt, bewertungen, persoenlich, filter) {
+/**
+ * Sortierungen des Gitters.
+ *
+ * Voreinstellung ist A-Z und nicht Score: die Kachelposition bleibt
+ * damit ueber den ganzen Draft stabil, und ein bekannter Brawler wird
+ * gefunden, ohne zu lesen. Wer nach Score sortiert, bekommt nach jedem
+ * Pick ein neu gemischtes Gitter - gut zum Stoebern, schlecht zum
+ * Wiederfinden. Die Empfehlungen stehen ohnehin im rechten Panel, und
+ * die besten Kacheln tragen im Gitter Rang und Score.
+ */
+const SORTIERER = {
+  name: (a, b) => a.name.localeCompare(b.name, 'de'),
+  rolle: (a, b) => (a._rollenrang - b._rollenrang) || a.name.localeCompare(b.name, 'de'),
+  score: (a, b) => (b._score - a._score) || a.name.localeCompare(b.name, 'de'),
+};
+
+export function zeichneGitter(brawler, gesperrt, bewertungen, persoenlich, filter, rollenrang) {
   const gitter = $('gitter');
   gitter.replaceChildren();
+  // Im Ban-Modus markiert der Rang die Ban-Empfehlungen, nicht die
+  // Pickvorschlaege - die Kachel faerbt sich dann grau statt orange.
+  gitter.classList.toggle('ist-banmodus', !!filter.banRang);
 
   const suche = (filter.suche || '').trim().toLowerCase();
   const rolle = filter.rolle;
+  const nurMeine = filter.nurMeine;
 
-  brawler
-    .filter((b) => !suche || b.name.toLowerCase().includes(suche))
-    .filter((b) => !rolle || b.tags.includes(rolle))
-    .forEach((b) => {
-      const karte = el('button', 'karte');
-      karte.type = 'button';
-      karte.dataset.slug = b.slug;
+  const passend = brawler.filter((b) => {
+    if (rolle && !b.tags.includes(rolle)) return false;
+    if (nurMeine && (persoenlich[b.slug] || 50) <= 50) return false;
+    if (suche && !b.name.toLowerCase().includes(suche)) return false;
+    return true;
+  });
 
-      if (gesperrt.has(b.slug)) {
-        karte.classList.add('ist-gesperrt');
-        karte.disabled = true;
+  // Sortierschluessel einmal anhaengen statt in jedem Vergleich neu
+  // nachzuschlagen - der Vergleicher laeuft O(n log n) mal.
+  passend.forEach((b) => {
+    const bewertung = bewertungen.get(b.slug);
+    b._score = bewertung ? bewertung.score : -1;
+    b._rollenrang = rollenrang[b.rolle] ?? 99;
+    // Wer "ga" tippt, meint Gale und nicht Belle mit "Marksman".
+    // Treffer am Wortanfang kommen deshalb vor Treffer in der Mitte -
+    // innerhalb der Gruppe gilt weiter die gewaehlte Sortierung.
+    b._praefix = suche && b.name.toLowerCase().startsWith(suche) ? 0 : 1;
+  });
+
+  const sortierer = SORTIERER[filter.sortierung] || SORTIERER.name;
+  passend.sort((a, b) => (a._praefix - b._praefix) || sortierer(a, b));
+
+  passend.forEach((b) => {
+    const kachel = el('button', 'kachel');
+    kachel.type = 'button';
+    kachel.dataset.slug = b.slug;
+    kachel.title = `${b.name} · ${b.rollen.join(' · ')}`;
+
+    if (gesperrt.has(b.slug)) {
+      kachel.classList.add('ist-gesperrt');
+      kachel.disabled = true;
+    }
+
+    kachel.appendChild(bild(b, 'kachel-bild'));
+    kachel.appendChild(el('span', 'kachel-name', b.name));
+
+    const bewertung = bewertungen.get(b.slug);
+    if (bewertung) {
+      // Rang nur fuer die Spitze - sonst traegt jede Kachel eine Zahl,
+      // die niemanden interessiert, und die Spitze faellt nicht mehr auf.
+      if (bewertung.rang != null && bewertung.rang < 6) {
+        kachel.classList.add('ist-empfohlen');
+        if (bewertung.rang === 0) kachel.classList.add('ist-bester');
+        const rang = el('span', 'kachel-rang', bewertung.rang + 1);
+        rang.title = filter.banRang
+          ? `Ban-Empfehlung #${bewertung.rang + 1}`
+          : `Empfehlung #${bewertung.rang + 1}`;
+        kachel.appendChild(rang);
       }
+      const score = el('span', 'kachel-score', bewertung.score);
+      if (bewertung.score >= 60) score.classList.add('ist-gut');
+      else if (bewertung.score < 45) score.classList.add('ist-schwach');
+      kachel.appendChild(score);
+    }
 
-      const bewertung = bewertungen.get(b.slug);
-      if (bewertung) {
-        if (bewertung.rang < 3) karte.classList.add('ist-empfohlen');
-        const score = el('span', 'karte-score', bewertung.score);
-        if (bewertung.score >= 60) score.classList.add('ist-gut');
-        else if (bewertung.score < 45) score.classList.add('ist-schwach');
-        karte.appendChild(score);
-      }
+    const sicher = persoenlich[b.slug];
+    if (sicher != null && sicher !== 50) {
+      const balken = el('span', 'kachel-sicher');
+      balken.style.width = `${Math.max(6, sicher)}%`;
+      balken.classList.add(sicher > 50 ? 'ist-hoch' : 'ist-niedrig');
+      kachel.appendChild(balken);
+    }
 
-      if (persoenlich[b.slug] != null) {
-        const punkt = el('span', 'karte-confidence');
-        punkt.title = `Deine Sicherheit: ${persoenlich[b.slug]}/100`;
-        punkt.style.opacity = String(0.25 + (persoenlich[b.slug] / 100) * 0.75);
-        karte.appendChild(punkt);
-      }
+    gitter.appendChild(kachel);
+  });
 
-      karte.appendChild(bild(b, 'karte-bild'));
-      karte.appendChild(el('span', 'karte-name', b.name));
-      karte.appendChild(el('span', 'karte-rollen', b.rollen.slice(0, 2).join(' · ')));
-      gitter.appendChild(karte);
-    });
-
-  if (!gitter.children.length) {
+  if (!passend.length) {
     gitter.appendChild(el('p', 'panel-leer', 'Kein Brawler passt zu diesem Filter.'));
   }
+  return passend;
 }
 
 // ─── Gruende ────────────────────────────────────────────────
@@ -122,23 +223,53 @@ function gruendeListe(pro, contra) {
   return liste;
 }
 
+/**
+ * Die drei staerksten Komponenten als Chips.
+ *
+ * Im Live-Draft steht bewusst NICHT der ausformulierte Grund
+ * ("gehoert auf Hard Rock Mine zu den staerksten Picks"), sondern
+ * "Map & Modus +18": gleiche Aussage, ein Blick statt einer Zeile, und
+ * mit dem Betrag zusaetzlich die Groessenordnung. Der ganze Satz steht
+ * im Detailfenster - und im `title`, fuer alle, die hinsehen wollen.
+ */
+function grundChips(komponenten) {
+  const kasten = el('span', 'chips');
+  const stark = (komponenten || [])
+    // Die Datenlage ist kein Grund fuer oder gegen einen Pick, sondern
+    // ein Vorbehalt gegenueber allen anderen - sie steht oben in der
+    // Leiste und im Detailfenster, hier verdraengte sie einen echten Grund.
+    .filter((k) => k.key !== 'uncertainty' && Math.abs(k.beitrag) >= 1)
+    .sort((a, b) => Math.abs(b.beitrag) - Math.abs(a.beitrag))
+    .slice(0, 3);
+
+  stark.forEach((k) => {
+    const chip = el('span', `chip ${k.beitrag >= 0 ? 'ist-plus' : 'ist-minus'}`);
+    chip.appendChild(el('span', 'chip-label', k.label));
+    chip.appendChild(el('span', 'chip-wert',
+      `${k.beitrag > 0 ? '+' : ''}${Math.round(k.beitrag)}`));
+    if (k.gruende && k.gruende.length) {
+      chip.title = k.gruende.map((g) => g.text).join('\n');
+    }
+    kasten.appendChild(chip);
+  });
+  return kasten;
+}
+
 // ─── Score-Aufschlüsselung ──────────────────────────────────
 /**
- * Die Komponententabelle. Kommt bei jeder Empfehlung zum Einsatz und im
- * Detailfenster - deshalb eine Funktion und nicht zweimal gebaut.
+ * Die Komponententabelle - nur noch im Detailfenster.
  *
- * `kompakt` steuert nur die Größe: im Panel ohne Rohwert-Spalte, im
- * Modal mit. Die Zeilen sind in beiden Fällen dieselben und in
- * derselben Reihenfolge - der Server liefert sie vollständig, auch die
- * mit Beitrag 0. Genau daran sieht man, dass eine Komponente nichts
- * beigetragen hat, statt sie nur zu vermissen.
+ * Sie stand frueher aufklappbar in jeder Empfehlungskarte. Das war im
+ * Live-Draft totes Gewicht: elf Zeilen je Karte, acht Karten. Die
+ * Karten tragen jetzt die drei staerksten Komponenten als Chips, die
+ * vollstaendige Tabelle oeffnet das Fragezeichen.
  */
-function aufschluesselung(komponenten, kompakt) {
+function aufschluesselung(komponenten) {
   const kasten = el('div', 'komponenten');
   const groesster = Math.max(...komponenten.map((k) => Math.abs(k.beitrag)), 1);
 
   komponenten.forEach((k) => {
-    const zeile = el('div', `komponente${kompakt ? ' komponente--kompakt' : ''}`);
+    const zeile = el('div', 'komponente');
     if (Math.abs(k.beitrag) < 0.05) zeile.classList.add('ist-ohne-wirkung');
 
     const label = el('span', 'komponente-label', k.label);
@@ -153,10 +284,8 @@ function aufschluesselung(komponenten, kompakt) {
     balken.appendChild(fuellung);
     zeile.appendChild(balken);
 
-    if (!kompakt) {
-      zeile.appendChild(el('span', 'komponente-roh',
-        `${k.wert >= 0 ? '+' : ''}${k.wert.toFixed(2)} × ${k.gewicht.toFixed(2)}`));
-    }
+    zeile.appendChild(el('span', 'komponente-roh',
+      `${k.wert >= 0 ? '+' : ''}${k.wert.toFixed(2)} × ${k.gewicht.toFixed(2)}`));
     zeile.appendChild(el('span', 'komponente-wert',
       `${k.beitrag > 0 ? '+' : ''}${k.beitrag.toFixed(1)}`));
     kasten.appendChild(zeile);
@@ -165,75 +294,134 @@ function aufschluesselung(komponenten, kompakt) {
 }
 
 // ─── Empfehlungspanel ───────────────────────────────────────
-export function zeichnePanel(antwort) {
+/**
+ * Zeigt an, dass eine Antwort unterwegs ist - **ohne** die alte zu
+ * loeschen. Ein leeres Panel nach jedem Klick ist der Unterschied
+ * zwischen "reagiert sofort" und "haengt": die vorige Empfehlung ist
+ * eine Sekunde lang eine bessere Auskunft als nichts.
+ */
+export function panelLaedt(an) {
+  $('panel-rahmen').classList.toggle('ist-laedt', !!an);
+}
+
+function kopfzeile(text, zusatz) {
+  const zeile = el('div', 'panel-kopf');
+  zeile.appendChild(el('h2', null, text));
+  if (zusatz) zeile.appendChild(el('span', 'panel-kopf-zusatz', zusatz));
+  return zeile;
+}
+
+/**
+ * Eine anklickbare Empfehlungskarte.
+ *
+ * Der ganze Kasten setzt den Pick bzw. den Ban - genau ein Klick vom
+ * Lesen zum Setzen. Frueher oeffnete ein Klick nur die Begruendung, und
+ * den Brawler musste man danach im Gitter wiederfinden.
+ *
+ * Deshalb ZWEI Knoepfe nebeneinander statt ineinander (ein Button im
+ * Button ist ungueltiges HTML und fuer Tastatur und Screenreader kaputt):
+ * der grosse waehlt, das Fragezeichen erklaert.
+ */
+function vorschlagsKarte(e, rang, zielText) {
+  const karte = el('div', `vorschlag${rang === 0 ? ' vorschlag--top' : ''}`);
+
+  const waehlen = el('button', 'vorschlag-waehlen');
+  waehlen.type = 'button';
+  waehlen.dataset.waehlen = e.slug;
+  waehlen.title = `${e.name} als ${zielText} setzen`;
+
+  waehlen.appendChild(el('span', 'vorschlag-rang', rang + 1));
+  waehlen.appendChild(bild(e, 'vorschlag-bild'));
+
+  const kern = el('span', 'vorschlag-kern');
+  kern.appendChild(el('span', 'vorschlag-name', e.name));
+  kern.appendChild(el('span', 'vorschlag-rolle', e.rolle || (e.rollen || []).join(' · ')));
+  waehlen.appendChild(kern);
+
+  const score = el('span', 'vorschlag-score', e.score);
+  if (e.win_probability != null) {
+    score.appendChild(el('span', 'vorschlag-wp', `${Math.round(e.win_probability)}%`));
+  }
+  waehlen.appendChild(score);
+  // Eigene Zeile ueber die volle Kartenbreite - neben Portrait und Score
+  // passten nur zwei Chips, der dritte brach um und machte jede Karte
+  // doppelt so hoch.
+  waehlen.appendChild(grundChips(e.komponenten));
+  karte.appendChild(waehlen);
+
+  const info = el('button', 'vorschlag-info', '?');
+  info.type = 'button';
+  info.dataset.detail = e.slug;
+  info.setAttribute('aria-label', `Warum ${e.name}? Vollständige Begründung`);
+  karte.appendChild(info);
+  return karte;
+}
+
+/** Eine Ban-Karte. Gleiche Bedienung, andere Farbe. */
+function banKarte(ban, rang) {
+  const karte = el('div', `vorschlag vorschlag--ban${rang === 0 ? ' vorschlag--top' : ''}`);
+  const waehlen = el('button', 'vorschlag-waehlen');
+  waehlen.type = 'button';
+  waehlen.dataset.waehlen = ban.slug;
+  waehlen.title = `${ban.name} bannen`;
+
+  waehlen.appendChild(el('span', 'vorschlag-rang', rang + 1));
+  waehlen.appendChild(bild(ban, 'vorschlag-bild'));
+
+  const kern = el('span', 'vorschlag-kern');
+  kern.appendChild(el('span', 'vorschlag-name', ban.name));
+  kern.appendChild(el('span', 'vorschlag-rolle', (ban.rollen || []).slice(0, 2).join(' · ')));
+  waehlen.appendChild(kern);
+
+  waehlen.appendChild(el('span', 'vorschlag-score', ban.score));
+  const gruende = el('span', 'vorschlag-bangrund');
+  (ban.gruende || []).slice(0, 2).forEach((g) => gruende.appendChild(el('span', 'bangrund', g)));
+  waehlen.appendChild(gruende);
+  // Die Gruende sind hier Saetze des Servers und werden gekuerzt - im
+  // title stehen sie vollstaendig.
+  waehlen.title = [`${ban.name} bannen`, ...(ban.gruende || [])].join('\n');
+  karte.appendChild(waehlen);
+  return karte;
+}
+
+export function zeichnePanel(antwort, ziel) {
   const panel = $('panel');
   panel.replaceChildren();
 
-  if (antwort.ban_empfehlungen && antwort.ban_empfehlungen.length) {
-    panel.appendChild(el('h2', null, 'Ban-Empfehlungen'));
-    const kasten = el('div', 'bankarten');
-    antwort.ban_empfehlungen.forEach((ban) => {
-      const karte = el('button', 'bankarte');
-      karte.type = 'button';
-      karte.dataset.slug = ban.slug;
-      karte.appendChild(bild(ban, 'vorschlag-bild'));
-      const text = el('div', 'bankarte-text');
-      text.appendChild(el('div', 'bankarte-name', `${ban.name} · ${ban.score}`));
-      ban.gruende.forEach((g) => text.appendChild(el('div', 'bankarte-grund', g)));
-      karte.appendChild(text);
-      kasten.appendChild(karte);
-    });
-    panel.appendChild(kasten);
-  }
+  const banModus = ziel === 'ban';
+  const zielText = ZIEL_TEXT[ziel] || 'Pick';
 
-  if (antwort.empfehlungen && antwort.empfehlungen.length) {
-    panel.appendChild(el('h2', null, 'Empfehlungen'));
+  if (banModus) {
+    const bans = antwort.ban_empfehlungen || [];
+    panel.appendChild(kopfzeile('Bannen', 'Klick = Ban'));
+    if (bans.length) {
+      const liste = el('div', 'vorschlaege');
+      bans.forEach((ban, i) => liste.appendChild(banKarte(ban, i)));
+      panel.appendChild(liste);
+    } else {
+      panel.appendChild(el('p', 'panel-leer',
+        'Ban-Empfehlungen gibt es nur vor dem ersten Pick. Bannen geht weiter über das Gitter.'));
+    }
+  } else if (antwort.empfehlungen && antwort.empfehlungen.length) {
+    panel.appendChild(kopfzeile(
+      ziel === 'gegner' ? 'Stärkste Kandidaten' : 'Empfehlung',
+      ziel === 'gegner' ? 'Klick = eintragen' : 'Klick = Pick',
+    ));
+    const liste = el('div', 'vorschlaege');
     antwort.empfehlungen.forEach((e, i) => {
-      // Ein div statt eines button: die Karte enthält jetzt selbst
-      // Bedienelemente (das Aufklappen der Aufschlüsselung), und ein
-      // Button im Button wäre ungültiges HTML und für Tastatur und
-      // Screenreader kaputt. Klickbar ist stattdessen der Kopf.
-      const karte = el('div', `vorschlag${i === 0 ? ' vorschlag--top' : ''}`);
-
-      const kopf = el('button', 'vorschlag-kopf');
-      kopf.type = 'button';
-      kopf.dataset.detail = e.slug;
-      kopf.title = `${e.name}: vollständige Begründung öffnen`;
-      kopf.appendChild(bild(e, 'vorschlag-bild'));
-      const namen = el('div');
-      namen.appendChild(el('div', 'vorschlag-name', e.name));
-      namen.appendChild(el('div', 'vorschlag-rolle', e.rolle));
-      kopf.appendChild(namen);
-      const score = el('div', 'vorschlag-score', e.score);
-      score.appendChild(el('div', 'vorschlag-wp', `~${e.win_probability}% Sieg`));
-      kopf.appendChild(score);
-      karte.appendChild(kopf);
-      karte.appendChild(gruendeListe(e.pro, e.contra));
-
-      if (e.komponenten && e.komponenten.length) {
-        const klappe = document.createElement('details');
-        klappe.className = 'klappe';
-        const titel = document.createElement('summary');
-        titel.textContent = e.groesster_treiber
-          ? `Aufschlüsselung · stärkster Faktor: ${e.groesster_treiber}`
-          : 'Aufschlüsselung';
-        klappe.appendChild(titel);
-        klappe.appendChild(aufschluesselung(e.komponenten, true));
-        klappe.appendChild(el('p', 'komponenten-fuss',
-          `Summe = Score ${e.score} (50 = durchschnittlicher Pick)`));
-        karte.appendChild(klappe);
-      }
-      panel.appendChild(karte);
+      liste.appendChild(vorschlagsKarte(e, i, zielText));
     });
+    panel.appendChild(liste);
+  } else {
+    panel.appendChild(el('p', 'panel-leer', 'Keine Kandidaten übrig.'));
   }
 
-  if (antwort.team_analyse) {
+  if (antwort.team_analyse && !banModus) {
     const analyse = antwort.team_analyse;
     const abschnitt = el('div', 'abschnitt');
-    abschnitt.appendChild(el('h3', null,
-      `Was unserem Team fehlt · Deckung ${analyse.deckungsgrad}%`));
+    abschnitt.appendChild(el('h3', null, `Uns fehlt · Deckung ${analyse.deckungsgrad}%`));
     const luecken = el('div', 'luecken');
-    (analyse.luecken || []).forEach((l) => {
+    (analyse.luecken || []).slice(0, 4).forEach((l) => {
       const zeile = el('div', `luecke${l.kritisch ? ' ist-kritisch' : ''}`);
       zeile.appendChild(el('span', null, l.label));
       const balken = el('div', 'luecke-balken');
@@ -253,27 +441,135 @@ export function zeichnePanel(antwort) {
 
   if (antwort.hinweise && antwort.hinweise.length) {
     const abschnitt = el('div', 'abschnitt');
-    abschnitt.appendChild(el('h3', null, 'Hinweis'));
     antwort.hinweise.forEach((h) => abschnitt.appendChild(el('p', 'panel-leer', h)));
     panel.appendChild(abschnitt);
   }
+}
+
+export function panelFehler(nachricht) {
+  const panel = $('panel');
+  panel.replaceChildren();
+  panel.appendChild(el('p', 'panel-fehler', nachricht));
 }
 
 export function zeichneSiegchance(siegchance) {
   const kasten = $('siegchance');
   kasten.replaceChildren();
   if (!siegchance) return;
-  kasten.appendChild(el('div', 'siegchance-label', 'Geschätzte Draft-Stärke'));
-  kasten.appendChild(el('div', 'siegchance-wert', `${Math.round(siegchance.prozent)}%`));
-  kasten.appendChild(el('div', 'siegchance-fuss',
-    `Confidence: ${siegchance.confidence_label}${siegchance.ist_heuristik ? ' · heuristisch' : ''}`));
+  kasten.appendChild(el('span', 'siegchance-label', 'Draft-Stärke'));
+  kasten.appendChild(el('span', 'siegchance-wert', `${Math.round(siegchance.prozent)}%`));
+  kasten.title = `Confidence: ${siegchance.confidence_label}`
+    + (siegchance.ist_heuristik ? ' · heuristisch' : '');
+}
+
+// ─── Map-Waehler ────────────────────────────────────────────
+/**
+ * Maps als durchsuchbare Liste statt als Dropdown.
+ *
+ * Ein <select> mit allen Maps des Spiels ist im Draft unbenutzbar: man
+ * kann nicht tippen, nicht filtern, und "die von letzter Woche" steht
+ * irgendwo in der Mitte. Hier steht zuletzt Benutztes oben, darunter
+ * alles nach Modus gruppiert, und das Suchfeld filtert ueber Map- UND
+ * Modusname.
+ */
+export function zeichneMapListe(modi, suchtext, letzte, aktuellerSlug) {
+  const liste = $('mapwaehler-liste');
+  liste.replaceChildren();
+  const suche = (suchtext || '').trim().toLowerCase();
+
+  const zeile = (modus, karte) => {
+    const knopf = el('button', 'mapzeile');
+    knopf.type = 'button';
+    knopf.dataset.mode = modus.slug;
+    knopf.dataset.map = karte.slug;
+    if (karte.slug === aktuellerSlug) knopf.classList.add('ist-aktuell');
+
+    const vorschau = el('span', 'mapzeile-bild');
+    if (karte.image_url) {
+      vorschau.style.backgroundImage = `url("${karte.image_url.replace(/["\\]/g, '')}")`;
+    } else {
+      vorschau.appendChild(t(modus.name.slice(0, 2).toUpperCase()));
+    }
+    knopf.appendChild(vorschau);
+
+    const text = el('span', 'mapzeile-text');
+    text.appendChild(el('span', 'mapzeile-name', karte.name));
+    text.appendChild(el('span', 'mapzeile-modus', modus.name));
+    knopf.appendChild(text);
+    if (karte.notiz) knopf.title = karte.notiz;
+    return knopf;
+  };
+
+  const passt = (modus, karte) => !suche
+    || karte.name.toLowerCase().includes(suche)
+    || modus.name.toLowerCase().includes(suche);
+
+  let treffer = 0;
+
+  // 1. Zuletzt benutzt - nur ohne Suchtext. Wer tippt, sucht gezielt.
+  if (!suche && letzte.length) {
+    const gruppe = el('div', 'mapwaehler-gruppe');
+    gruppe.appendChild(el('h3', null, 'Zuletzt benutzt'));
+    letzte.forEach((eintrag) => {
+      const modus = modi.find((m) => m.slug === eintrag.mode);
+      const karte = modus && modus.maps.find((k) => k.slug === eintrag.map);
+      if (!karte) return;
+      gruppe.appendChild(zeile(modus, karte));
+      treffer += 1;
+    });
+    if (treffer) liste.appendChild(gruppe);
+  }
+
+  // 2. Alles, nach Modus gruppiert.
+  modi.forEach((modus) => {
+    const karten = modus.maps.filter((k) => passt(modus, k));
+    if (!karten.length) return;
+    const gruppe = el('div', 'mapwaehler-gruppe');
+    gruppe.appendChild(el('h3', null, modus.name));
+    karten.forEach((k) => { gruppe.appendChild(zeile(modus, k)); treffer += 1; });
+    liste.appendChild(gruppe);
+  });
+
+  if (!treffer) liste.appendChild(el('p', 'panel-leer', 'Keine Map passt.'));
+  markiereMapzeile(0);
+}
+
+/**
+ * Den Waehlerkasten unter seinen Knopf haengen.
+ *
+ * Die Position kommt aus dem Rechteck des Knopfes und nicht aus einer
+ * festen Zahl im CSS: darueber liegen Kopfzeile, Demo-Hinweis und
+ * Aktionsleiste, und jede davon aendert ihre Hoehe, sobald ihr Text
+ * umbricht. Auf schmalen Fenstern steht der Kasten mittig - dort setzt
+ * das Stylesheet `position: static` und diese Werte laufen ins Leere.
+ */
+export function mapWaehlerAusrichten(knopf) {
+  const kasten = $('mapwaehler').querySelector('.mapwaehler-kasten');
+  const r = knopf.getBoundingClientRect();
+  kasten.style.top = `${Math.round(r.bottom + 6)}px`;
+  kasten.style.left = `${Math.round(Math.min(r.left, window.innerWidth - kasten.offsetWidth - 12))}px`;
+}
+
+/** Tastaturmarkierung im Map-Waehler. Gibt die markierte Zeile zurueck. */
+export function markiereMapzeile(schritt, relativ) {
+  const zeilen = [...$('mapwaehler-liste').querySelectorAll('.mapzeile')];
+  if (!zeilen.length) return null;
+  let index = zeilen.findIndex((z) => z.classList.contains('ist-markiert'));
+  if (index < 0) index = 0;
+  const neu = relativ
+    ? Math.max(0, Math.min(zeilen.length - 1, index + schritt))
+    : Math.max(0, Math.min(zeilen.length - 1, schritt));
+  zeilen.forEach((z) => z.classList.remove('ist-markiert'));
+  zeilen[neu].classList.add('ist-markiert');
+  zeilen[neu].scrollIntoView({ block: 'nearest' });
+  return zeilen[neu];
 }
 
 // ─── Matchplan ──────────────────────────────────────────────
 export function zeichneMatchplan(analyse) {
   const panel = $('panel');
   panel.replaceChildren();
-  panel.appendChild(el('h2', null, 'Matchplan'));
+  panel.appendChild(kopfzeile('Matchplan', 'Draft steht'));
 
   // 1. Datenlage zuerst. Wer die Einschätzung liest, soll vorher
   //    wissen, worauf sie sich stützt - nicht hinterher.
@@ -441,7 +737,7 @@ export function zeigeDetail(e) {
   const titel = el('h2', null, e.name);
   titel.id = 'modal-titel';
   inhalt.appendChild(titel);
-  inhalt.appendChild(el('p', 'vorschlag-rolle',
+  inhalt.appendChild(el('p', 'modal-unterzeile',
     `${e.rolle} · Score ${e.score}/100 · ~${e.win_probability}% Siegchance · `
     + `Confidence: ${e.confidence_label}`));
 
@@ -452,7 +748,7 @@ export function zeigeDetail(e) {
 
   if (e.komponenten) {
     inhalt.appendChild(el('h3', null, 'Woraus der Score entsteht'));
-    inhalt.appendChild(aufschluesselung(e.komponenten, false));
+    inhalt.appendChild(aufschluesselung(e.komponenten));
     inhalt.appendChild(el('p', 'komponenten-fuss',
       `Beitrag = Wert × Gewicht. Summe ${(e.score - 50) > 0 ? '+' : ''}`
       + `${e.score - 50} auf den Anker 50 ergibt Score ${e.score}.`));
@@ -524,8 +820,13 @@ export function zeigeDetail(e) {
   }
 
   $('modal').hidden = false;
+  $('modal-schliessen').focus();
 }
 
 export function schliesseModal() {
   $('modal').hidden = true;
+}
+
+export function modalOffen() {
+  return !$('modal').hidden;
 }

@@ -11,9 +11,9 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'drafter/draft.css' %}?v=20260914-1">
+<link rel="stylesheet" href="{% static 'drafter/draft.css' %}?v=20260916-1">
 </head>
-<body class="drafter">
+<body class="drafter{% block koerperklasse %}{% endblock %}">
 
 <header class="kopf">
   <a class="kopf-marke" href="{% url 'drafter:draft' %}">

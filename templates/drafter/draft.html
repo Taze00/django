@@ -1,92 +1,136 @@
 {% extends "drafter/basis.html" %}
 {% load static %}
 {% block titel %}Ranked Draft Coach{% endblock %}
+{% block koerperklasse %} ist-draftseite{% endblock %}
 
 {% comment %}
 Die Seite wird EINMAL gerendert. Danach laeuft alles ueber
 static/drafter/js - ein Klick auf einen Pick laedt nichts neu, sondern
 schickt den Draftzustand an /draft/api/recommend/. Genau deshalb steht
 hier fast kein Inhalt, sondern nur das Geruest, das JavaScript fuellt.
+
+Aufbau von oben nach unten, nach Benutzungshaeufigkeit sortiert:
+
+  1. Aktionsleiste - Map, First Pick, Ban/Pick, "wer ist dran".
+     Klebt oben, weil sie waehrend des ganzen Drafts gebraucht wird.
+  2. Drei Spalten - Brett | Brawler-Gitter | Empfehlungen.
+     Jede Spalte scrollt fuer sich; die Seite selbst scrollt auf dem
+     Desktop gar nicht. Ein Draft dauert Sekunden, Scrollen kostet sie.
 {% endcomment %}
 
 {% block inhalt %}
-<div class="hinweis-demo" role="status">
-  <strong>Demo-Daten.</strong> Alle Werte sind gepflegte Einschätzungen, keine
-  gemessenen Statistiken. Die Empfehlungslogik ist echt — die Zahlenbasis noch nicht.
+<p class="hinweis-demo" role="status">
+  <strong>Demo-Daten</strong> — gepflegte Einschätzungen, keine gemessenen
+  Statistiken. Die Empfehlungslogik ist echt, die Zahlenbasis noch nicht.
+</p>
+
+<!-- ─── Aktionsleiste ──────────────────────────────────────── -->
+<div class="aktionsleiste">
+
+  <!-- Map: ein Knopf, der einen Waehler mit Suchfeld oeffnet. Kein
+       <select>, weil ein Dropdown mit hundert Maps nicht durchsuchbar
+       ist und "zuletzt benutzt" nicht kennt. -->
+  <button type="button" class="mapknopf" id="mapknopf"
+          aria-haspopup="dialog" aria-expanded="false" aria-controls="mapwaehler">
+    <span class="mapknopf-etikett">Map <kbd>M</kbd></span>
+    <span class="mapknopf-zeile">
+      <span class="mapknopf-modus" id="mapknopf-modus">—</span>
+      <span class="mapknopf-name" id="mapknopf-name">wählen</span>
+    </span>
+  </button>
+
+  <div class="steuerpaar">
+    <span class="steuer-etikett" id="firstpick-etikett">First Pick</span>
+    <div class="schalter" role="group" aria-labelledby="firstpick-etikett">
+      <button type="button" data-firstpick="wir" class="ist-aktiv">Wir first</button>
+      <button type="button" data-firstpick="gegner">Gegner first</button>
+    </div>
+  </div>
+
+  <div class="steuerpaar steuerpaar--modus">
+    <span class="steuer-etikett" id="modus-etikett">Was setze ich?</span>
+    <div class="schalter schalter--modus" role="group" aria-labelledby="modus-etikett">
+      <button type="button" data-modus="ban" class="ist-aktiv">Ban <kbd>B</kbd></button>
+      <button type="button" data-modus="pick">Pick <kbd>P</kbd></button>
+    </div>
+  </div>
+
+  <!-- Der wichtigste Text der Seite: was jetzt zu tun ist. -->
+  <div class="jetzt" id="jetzt" aria-live="polite">
+    <span class="jetzt-text" id="jetzt-text">Map wählen</span>
+    <span class="jetzt-zusatz" id="jetzt-zusatz"></span>
+  </div>
+
+  <div class="leiste-rechts">
+    <span class="datenlage" id="datenlage" tabindex="0">—</span>
+    <button type="button" class="knopf-zuruecksetzen" id="zuruecksetzen"
+            title="Draft zurücksetzen">Reset</button>
+  </div>
+</div>
+
+<!-- ─── Map-Waehler ────────────────────────────────────────── -->
+<div class="mapwaehler" id="mapwaehler" hidden role="dialog"
+     aria-modal="true" aria-label="Map wählen">
+  <div class="mapwaehler-kasten">
+    <input type="search" id="mapsuche" class="mapwaehler-suche" autocomplete="off"
+           placeholder="Map oder Modus tippen…" aria-label="Map suchen">
+    <div class="mapwaehler-liste" id="mapwaehler-liste"></div>
+  </div>
 </div>
 
 <main class="drafter-raster" id="app">
 
-  <!-- ─── Steuerleiste ─────────────────────────────────────── -->
-  <section class="leiste" aria-label="Draft-Einstellungen">
-    <div class="feld">
-      <label for="modus">Modus</label>
-      <select id="modus"></select>
-    </div>
-    <div class="feld">
-      <label for="karte">Map</label>
-      <select id="karte"></select>
-    </div>
-    <div class="feld">
-      <label id="pickorder-label">First Pick</label>
-      <div class="schalter" role="group" aria-labelledby="pickorder-label">
-        <button type="button" data-firstpick="wir" class="ist-aktiv">Wir</button>
-        <button type="button" data-firstpick="gegner">Gegner</button>
-      </div>
-    </div>
-    <div class="feld feld--weit">
-      <label>Phase</label>
-      <div class="phase" id="phase">Ban-Phase</div>
-    </div>
-    <div class="feld">
-      <label>Datenlage</label>
-      <div class="datenlage" id="datenlage">—</div>
-    </div>
-    <button type="button" class="knopf-zuruecksetzen" id="zuruecksetzen">Draft zurücksetzen</button>
-  </section>
-
-  <!-- ─── Draft-Bereich ────────────────────────────────────── -->
-  <section class="draftbereich" aria-label="Draftzustand">
-    <div class="team team--gegner">
-      <h2>Gegner <span class="team-hinweis" id="gegner-hinweis"></span></h2>
+  <!-- ─── Brett ───────────────────────────────────────────── -->
+  <section class="brett" aria-label="Draftzustand">
+    <div class="brett-block brett-block--gegner">
+      <h2>Gegner <span class="brett-hinweis" id="gegner-hinweis"></span></h2>
       <div class="slots" id="slots-gegner"></div>
     </div>
 
-    <div class="bans">
-      <h2>Bans</h2>
+    <div class="brett-block brett-block--ban">
+      <h2>Bans <span class="brett-hinweis" id="ban-hinweis"></span></h2>
       <div class="slots slots--ban" id="slots-ban"></div>
-      <button type="button" class="knopf-klein" id="ban-fertig">Ban-Phase beenden</button>
     </div>
 
-    <div class="team team--wir">
-      <h2>Unser Team <span class="team-hinweis" id="wir-hinweis"></span></h2>
+    <div class="brett-block brett-block--wir">
+      <h2>Wir <span class="brett-hinweis" id="wir-hinweis"></span></h2>
       <div class="slots" id="slots-wir"></div>
     </div>
 
     <div class="siegchance" id="siegchance"></div>
   </section>
 
-  <!-- ─── Brawler-Auswahl ──────────────────────────────────── -->
+  <!-- ─── Brawler-Auswahl ─────────────────────────────────── -->
   <section class="auswahl" aria-label="Brawler auswählen">
     <div class="auswahl-kopf">
-      <input type="search" id="suche" placeholder="Brawler suchen…" autocomplete="off"
-             aria-label="Brawler suchen">
+      <div class="suchfeld">
+        <input type="search" id="suche" placeholder="Brawler suchen…" autocomplete="off"
+               aria-label="Brawler suchen">
+        <kbd class="suchfeld-taste">/</kbd>
+      </div>
+      <label class="sortierung">
+        <span class="visuell-versteckt">Sortierung</span>
+        <select id="sortierung">
+          <option value="name">A–Z</option>
+          <option value="score">Score</option>
+          <option value="rolle">Rolle</option>
+        </select>
+      </label>
       <div class="rollenfilter" id="rollenfilter" role="group" aria-label="Nach Rolle filtern"></div>
-      <div class="ziel" id="ziel" aria-live="polite"></div>
     </div>
     <div class="gitter" id="gitter"></div>
   </section>
 
-  <!-- ─── Empfehlungen ─────────────────────────────────────── -->
-  <aside class="panel" aria-label="Empfehlungen" aria-live="polite">
-    <div class="panel-inhalt" id="panel">
-      <p class="panel-leer">Modus und Map wählen — dann beginnt die Ban-Phase.</p>
+  <!-- ─── Empfehlungen ────────────────────────────────────── -->
+  <aside class="panel" id="panel-rahmen" aria-label="Empfehlungen">
+    <div class="panel-inhalt" id="panel" aria-live="polite">
+      <p class="panel-leer">Map wählen — dann beginnt die Ban-Phase.</p>
     </div>
   </aside>
 
 </main>
 
-<!-- Detailfenster fuer den Klick auf eine Empfehlung -->
+<!-- Detailfenster fuer den Klick auf das Fragezeichen einer Empfehlung -->
 <div class="modal" id="modal" hidden>
   <div class="modal-kasten" role="dialog" aria-modal="true" aria-labelledby="modal-titel">
     <button type="button" class="modal-schliessen" id="modal-schliessen" aria-label="Schließen">×</button>
@@ -102,5 +146,5 @@ hier fast kein Inhalt, sondern nur das Geruest, das JavaScript fuellt.
   // Django das Token ohnehin ins Template rendert.
   window.DRAFTER = { csrf: "{{ csrf_token }}" };
 </script>
-<script type="module" src="{% static 'drafter/js/main.js' %}?v=20260914-1"></script>
+<script type="module" src="{% static 'drafter/js/main.js' %}?v=20260916-1"></script>
 {% endblock %}

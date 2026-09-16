@@ -5,17 +5,30 @@
    Trennung wie bei CORVIS: eine dichte App-Oberflaeche hat andere
    Beduerfnisse als eine Portfolioseite aus Fliesstext.
 
+   Leitlinie: das hier ist ein WERKZEUG, das waehrend eines laufenden
+   Ranked-Drafts bedient wird. Ein Draft gibt einem Sekunden. Deshalb:
+
+     - Auf dem Desktop scrollt die SEITE nicht. Die drei Spalten
+       scrollen fuer sich, alles Wichtige steht gleichzeitig da.
+     - Bilder vor Text. Im Gitter steht Portrait und Name, sonst nichts.
+     - Was jetzt zu tun ist, steht gross in der Leiste - nicht als
+       Nebensatz irgendwo.
+     - Nichts Dekoratives, das Platz oder Zeit kostet. Uebergaenge nur
+       dort, wo sie eine Zustandsaenderung verstaendlich machen.
+
    Aufbau:
      1. Tokens
      2. Grundgeruest und Kopf
-     3. Raster der Draft-Seite
-     4. Steuerleiste
-     5. Draftbereich (Slots)
-     6. Brawler-Gitter
-     7. Empfehlungspanel
-     8. Modal
-     9. Nebenseiten (Meine Brawler, Login)
-    10. Schmale Fenster
+     3. Aktionsleiste
+     4. Map-Waehler
+     5. Raster der Draft-Seite
+     6. Brett (Slots)
+     7. Brawler-Gitter
+     8. Empfehlungspanel
+     9. Matchplan und Aufschluesselung
+    10. Modal
+    11. Nebenseiten (Meine Brawler, Login)
+    12. Schmale Fenster
    ═══════════════════════════════════════════════════════════════ */
 
 /* ─── 1. Tokens ───────────────────────────────────────────── */
@@ -32,6 +45,7 @@
   --wir:       #45b7d1;
   --gegner:    #d1455f;
   --ban:       #6b7280;
+  --ban-hell:  #9aa3b0;
   --gut:       #5fc27e;
   --warn:      #e8b04a;
   --akzent:    #ff6a2a;
@@ -59,19 +73,32 @@ button, input, select, textarea { font: inherit; color: inherit; }
 button { cursor: pointer; background: none; border: none; }
 a { color: inherit; text-decoration: none; }
 
+:focus-visible { outline: 2px solid var(--akzent); outline-offset: 1px; }
+
+.visuell-versteckt {
+  position: absolute; width: 1px; height: 1px;
+  overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+
+kbd {
+  font-family: var(--mono); font-size: 9.5px; line-height: 1;
+  padding: 2px 4px; border-radius: 3px;
+  background: rgba(255, 255, 255, .08); color: var(--text-sehr-leise);
+  border: 1px solid var(--rand-hell);
+}
+
 .kopf {
   display: flex; align-items: center; justify-content: space-between;
-  gap: 24px; padding: 12px 24px;
+  gap: 24px; padding: 8px 20px; flex-shrink: 0;
   border-bottom: 1px solid var(--rand);
   background: var(--bg-2);
-  position: sticky; top: 0; z-index: 40;
 }
-.kopf-marke { font-family: var(--display); font-size: 26px; letter-spacing: .06em; }
+.kopf-marke { font-family: var(--display); font-size: 22px; letter-spacing: .06em; }
 .kopf-marke-stark { color: var(--akzent); }
 .kopf-marke-leicht { color: var(--text-leise); }
-.kopf-nav { display: flex; align-items: center; gap: 20px; font-size: 13px; }
+.kopf-nav { display: flex; align-items: center; gap: 18px; font-size: 12.5px; }
 .kopf-nav a, .kopf-abmelden button {
-  color: var(--text-leise); padding: 4px 0;
+  color: var(--text-leise); padding: 3px 0;
   border-bottom: 1px solid transparent; transition: color .15s, border-color .15s;
 }
 .kopf-nav a:hover, .kopf-abmelden button:hover { color: var(--text); }
@@ -80,253 +107,456 @@ a { color: inherit; text-decoration: none; }
 .kopf-abmelden { display: inline; }
 
 .hinweis-demo {
-  padding: 8px 24px; font-size: 12.5px; color: #f0d9a8;
-  background: rgba(232, 176, 74, .10);
-  border-bottom: 1px solid rgba(232, 176, 74, .25);
+  flex-shrink: 0;
+  padding: 5px 20px; font-size: 11.5px; color: #c9b184;
+  background: rgba(232, 176, 74, .08);
+  border-bottom: 1px solid rgba(232, 176, 74, .18);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .hinweis-demo strong { color: var(--warn); font-weight: 500; }
 
-/* ─── 3. Raster ───────────────────────────────────────────── */
-/* Steuerleiste oben ueber die volle Breite, darunter drei Spalten:
-   Draftzustand | Brawlerauswahl | Empfehlungen. Die mittlere Spalte
-   ist die einzige, die waechst - sie haelt das Gitter. */
-.drafter-raster {
-  display: grid;
-  grid-template-columns: 260px minmax(420px, 1fr) 380px;
-  grid-template-areas:
-    "leiste leiste leiste"
-    "draft  auswahl panel";
-  gap: 16px;
-  padding: 16px 24px 40px;
-  align-items: start;
-  max-width: 1800px; margin: 0 auto;
+/* ─── 3. Aktionsleiste ────────────────────────────────────── */
+/* Map, First Pick, Ban/Pick und "wer ist dran" auf einer Zeile. Alles
+   vier braucht man waehrend des ganzen Drafts - nichts davon darf in
+   einem Menue liegen oder aus dem Bild scrollen. */
+.aktionsleiste {
+  display: flex; align-items: stretch; gap: 14px; flex-shrink: 0;
+  padding: 10px 20px;
+  background: var(--bg-2); border-bottom: 1px solid var(--rand);
 }
-.leiste       { grid-area: leiste; }
-.draftbereich { grid-area: draft; }
-.auswahl      { grid-area: auswahl; }
-.panel        { grid-area: panel; }
 
-/* ─── 4. Steuerleiste ─────────────────────────────────────── */
-.leiste {
-  display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px;
-  padding: 14px 16px;
-  background: var(--bg-2); border: 1px solid var(--rand); border-radius: var(--radius);
-}
-.feld { display: flex; flex-direction: column; gap: 5px; min-width: 150px; }
-.feld--weit { min-width: 190px; }
-.feld label {
-  font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+.steuerpaar { display: flex; flex-direction: column; gap: 4px; }
+.steuer-etikett {
+  font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase;
   color: var(--text-sehr-leise);
 }
-.feld select {
-  background: var(--bg-3); border: 1px solid var(--rand-hell);
-  border-radius: 4px; padding: 7px 9px; font-size: 13px;
+
+/* Segmentschalter. Gross genug fuer den Daumen, aktiver Zustand
+   nicht nur farbig, sondern gefuellt - auf einem hellen Bildschirm im
+   Sonnenlicht ist ein Rahmenwechsel nicht zu sehen. */
+.schalter {
+  display: flex; border: 1px solid var(--rand-hell);
+  border-radius: 5px; overflow: hidden;
 }
-.feld select:focus-visible, input:focus-visible, button:focus-visible {
-  outline: 2px solid var(--akzent); outline-offset: 1px;
-}
-.schalter { display: flex; border: 1px solid var(--rand-hell); border-radius: 4px; overflow: hidden; }
 .schalter button {
-  flex: 1; padding: 7px 12px; font-size: 12.5px; color: var(--text-leise);
-  background: var(--bg-3); transition: background .15s, color .15s;
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 14px; font-size: 13px; color: var(--text-leise);
+  background: var(--bg-3); transition: background .12s, color .12s;
+  min-height: 38px;
 }
+.schalter button:hover { color: var(--text); }
 .schalter button.ist-aktiv { background: var(--akzent); color: #12100e; }
-.phase, .datenlage {
-  padding: 7px 9px; font-size: 12.5px; border-radius: 4px;
-  background: var(--bg-3); border: 1px solid var(--rand);
+.schalter button.ist-aktiv kbd { background: rgba(0, 0, 0, .2); color: #3a2a1e; border-color: rgba(0,0,0,.25); }
+.schalter--modus button[data-modus="ban"].ist-aktiv { background: var(--ban-hell); color: #14161a; }
+
+/* Map als Knopf, nicht als <select>: der Waehler dahinter kann suchen,
+   gruppieren und zuletzt Benutztes zeigen. Ein Dropdown kann das nicht. */
+.mapknopf {
+  display: flex; flex-direction: column; gap: 3px; align-items: flex-start;
+  padding: 6px 14px; min-width: 190px;
+  background: var(--bg-3); border: 1px solid var(--rand-hell); border-radius: 5px;
+  transition: border-color .12s;
 }
-.phase { color: var(--akzent); }
-.datenlage { color: var(--text-leise); }
+.mapknopf:hover { border-color: var(--akzent); }
+.mapknopf-etikett {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--text-sehr-leise);
+}
+.mapknopf-zeile { display: flex; align-items: baseline; gap: 8px; min-width: 0; max-width: 100%; }
+.mapknopf-name {
+  font-size: 14px; color: var(--text);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.mapknopf-modus { font-size: 11px; color: var(--akzent); white-space: nowrap; }
+.mapknopf.ist-leer { border-color: var(--akzent); }
+
+/* Der wichtigste Text der Seite. */
+.jetzt {
+  flex: 1; min-width: 0;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 4px 16px; border-radius: 5px;
+  background: var(--bg-3); border: 1px solid var(--rand);
+  border-left: 4px solid var(--rand-hell);
+}
+.jetzt-text {
+  font-family: var(--display); font-size: 27px; line-height: 1.05;
+  letter-spacing: .05em; text-transform: uppercase;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.jetzt-zusatz { font-size: 10.5px; color: var(--text-sehr-leise); }
+.jetzt--wir    { border-left-color: var(--wir); }
+.jetzt--wir    .jetzt-text { color: var(--wir); }
+.jetzt--gegner { border-left-color: var(--gegner); }
+.jetzt--gegner .jetzt-text { color: var(--gegner); }
+.jetzt--ban    { border-left-color: var(--ban-hell); }
+.jetzt--ban    .jetzt-text { color: var(--ban-hell); }
+.jetzt--fertig .jetzt-text { color: var(--text-leise); }
+
+.leiste-rechts { display: flex; align-items: center; gap: 10px; }
+.datenlage {
+  font-size: 11px; color: var(--text-leise); white-space: nowrap;
+  padding: 4px 8px; border-radius: 4px; background: var(--bg-3);
+  border: 1px solid var(--rand); cursor: help;
+}
 .knopf-zuruecksetzen {
-  margin-left: auto; align-self: flex-end;
-  padding: 7px 14px; font-size: 12.5px; color: var(--text-leise);
-  border: 1px solid var(--rand-hell); border-radius: 4px;
+  padding: 8px 14px; font-size: 12.5px; color: var(--text-leise);
+  border: 1px solid var(--rand-hell); border-radius: 5px; min-height: 38px;
 }
 .knopf-zuruecksetzen:hover { color: var(--gegner); border-color: var(--gegner); }
 
-/* ─── 5. Draftbereich ─────────────────────────────────────── */
-.draftbereich { display: flex; flex-direction: column; gap: 14px; }
-.team, .bans {
-  padding: 12px; background: var(--bg-2);
+/* ─── 4. Map-Waehler ──────────────────────────────────────── */
+.mapwaehler {
+  position: fixed; inset: 0; z-index: 80;
+  background: rgba(0, 0, 0, .55);
+}
+.mapwaehler[hidden] { display: none; }
+/* Der Kasten haengt am Map-Knopf - seine Position setzt JavaScript aus
+   dem Rechteck des Knopfes. Eine feste Zahl waere hier eine Falle: sie
+   haengt an der Hoehe von Kopf, Demo-Hinweis und Leiste, und die drei
+   aendern sich beim naechsten Satz mehr Text. */
+.mapwaehler-kasten {
+  position: fixed;
+  width: min(380px, calc(100vw - 40px)); max-height: min(62vh, 560px);
+  display: flex; flex-direction: column;
+  background: var(--bg-2); border: 1px solid var(--rand-hell);
+  border-radius: 8px; box-shadow: var(--schatten); overflow: hidden;
+}
+.mapwaehler-suche {
+  padding: 11px 14px; font-size: 14px; border: none;
+  background: var(--bg-3); border-bottom: 1px solid var(--rand);
+}
+.mapwaehler-liste { overflow-y: auto; padding: 6px; }
+.mapwaehler-gruppe { margin-bottom: 6px; }
+.mapwaehler-gruppe h3 {
+  padding: 6px 8px 4px; font-size: 9.5px; font-weight: 400;
+  letter-spacing: .14em; text-transform: uppercase; color: var(--text-sehr-leise);
+}
+.mapzeile {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 7px 8px; border-radius: 5px; text-align: left;
+}
+.mapzeile-bild {
+  width: 34px; height: 34px; border-radius: 4px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg-3); background-size: cover; background-position: center;
+  font-family: var(--display); font-size: 13px; color: var(--text-sehr-leise);
+}
+.mapzeile-text { display: flex; flex-direction: column; min-width: 0; }
+.mapzeile-name { font-size: 13px; }
+.mapzeile-modus { font-size: 10.5px; color: var(--text-sehr-leise); }
+.mapzeile:hover, .mapzeile.ist-markiert { background: var(--bg-3); }
+.mapzeile.ist-markiert { outline: 1px solid var(--akzent); }
+.mapzeile.ist-aktuell .mapzeile-name { color: var(--akzent); }
+
+/* ─── 5. Raster ───────────────────────────────────────────── */
+/* Drei Spalten: Brett | Brawlergitter | Empfehlungen. Die mittlere
+   waechst, die aeusseren sind fest - ein Gitter, dessen Spaltenzahl
+   sich beim Tippen aendert, macht das Wiederfinden unmoeglich. */
+.drafter-raster {
+  display: grid;
+  grid-template-columns: 216px minmax(0, 1fr) 340px;
+  gap: 12px; padding: 12px 20px;
+  max-width: 1900px; margin: 0 auto; width: 100%;
+}
+/* Rasterkinder haben von Haus aus `min-width: auto` und wachsen damit
+   ueber ihre Spalte hinaus, sobald etwas darin breiter ist - auf
+   schmalen Fenstern schob der waagerechte Empfehlungsstreifen so die
+   ganze Seite auf 1400px auf. */
+.drafter-raster > * { min-width: 0; }
+
+/* Auf dem Desktop scrollt die Seite nicht, sondern jede Spalte fuer
+   sich. Alles, was man waehrend eines Drafts braucht, ist damit
+   gleichzeitig sichtbar - Scrollen ist die teuerste Geste, die eine
+   Oberflaeche verlangen kann, wenn eine Uhr laeuft. */
+@media (min-width: 1101px) {
+  body.ist-draftseite { height: 100dvh; overflow: hidden; display: flex; flex-direction: column; }
+  .drafter-raster { flex: 1; min-height: 0; }
+  .brett, .auswahl, .panel { max-height: 100%; min-height: 0; }
+  .brett, .panel { overflow-y: auto; }
+  .auswahl { display: flex; flex-direction: column; }
+}
+
+/* ─── 6. Brett ────────────────────────────────────────────── */
+.brett { display: flex; flex-direction: column; gap: 10px; }
+.brett-block {
+  padding: 9px 10px; background: var(--bg-2);
   border: 1px solid var(--rand); border-radius: var(--radius);
 }
-.team h2, .bans h2 {
-  font-family: var(--display); font-size: 16px; letter-spacing: .1em;
-  font-weight: 400; margin-bottom: 10px; display: flex; gap: 8px; align-items: baseline;
+.brett-block h2 {
+  font-family: var(--display); font-size: 15px; letter-spacing: .1em;
+  font-weight: 400; margin-bottom: 7px;
+  display: flex; gap: 8px; align-items: baseline; justify-content: space-between;
 }
-.team--wir h2 { color: var(--wir); }
-.team--gegner h2 { color: var(--gegner); }
-.bans h2 { color: var(--ban); }
-.team-hinweis { font-family: var(--mono); font-size: 11px; color: var(--text-sehr-leise); letter-spacing: 0; }
+.brett-block--wir h2 { color: var(--wir); }
+.brett-block--gegner h2 { color: var(--gegner); }
+.brett-block--ban h2 { color: var(--ban-hell); }
+.brett-hinweis {
+  font-family: var(--mono); font-size: 10.5px;
+  color: var(--text-sehr-leise); letter-spacing: 0;
+}
 
-.slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.slots--ban { grid-template-columns: repeat(6, 1fr); gap: 5px; }
+.slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.slots--ban { grid-template-columns: repeat(6, 1fr); gap: 4px; }
 
 .slot {
   aspect-ratio: 1; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 4px;
+  align-items: center; justify-content: center; gap: 3px;
   background: var(--bg-3); border: 1px dashed var(--rand-hell);
   border-radius: 4px; font-size: 11px; color: var(--text-sehr-leise);
-  transition: border-color .15s, background .15s;
-  overflow: hidden; text-align: center; padding: 4px;
+  transition: border-color .12s, background .12s;
+  overflow: hidden; text-align: center; padding: 3px;
 }
-.slot.ist-ziel { border-style: solid; border-color: var(--akzent); background: rgba(255, 106, 42, .08); }
-.slot.ist-belegt { border-style: solid; cursor: pointer; }
-.slot.ist-belegt:hover { border-color: var(--gegner); }
-.slot-kuerzel { font-family: var(--display); font-size: 22px; letter-spacing: .04em; color: #0d0e10; }
+.slot.ist-ziel {
+  border-style: solid; border-color: var(--akzent);
+  background: rgba(255, 106, 42, .10); color: var(--akzent);
+}
+.slot.ist-belegt { border-style: solid; }
+.slot.ist-belegt:hover { border-color: var(--gegner) !important; }
 .slot-bild {
-  width: 44px; height: 44px; border-radius: 4px;
+  width: 40px; height: 40px; border-radius: 4px;
   display: flex; align-items: center; justify-content: center;
+  font-family: var(--display); font-size: 19px; letter-spacing: .04em; color: #0d0e10;
   background-size: cover; background-position: center;
 }
-.slot-name { font-size: 10.5px; color: var(--text); line-height: 1.2; }
-.slots--ban .slot-bild { width: 30px; height: 30px; }
-.slots--ban .slot-kuerzel { font-size: 15px; }
+.slot-name {
+  font-size: 10px; color: var(--text); line-height: 1.15;
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.slots--ban .slot-bild { width: 26px; height: 26px; font-size: 13px; }
 .slots--ban .slot-name { display: none; }
 .slot--ban.ist-belegt .slot-bild { filter: grayscale(1) brightness(.6); }
 
-.knopf-klein {
-  margin-top: 9px; width: 100%; padding: 6px; font-size: 12px;
-  color: var(--text-leise); border: 1px solid var(--rand-hell); border-radius: 4px;
-}
-.knopf-klein:hover { color: var(--text); border-color: var(--text-leise); }
-
 .siegchance {
-  padding: 14px; text-align: center;
+  display: flex; align-items: baseline; justify-content: space-between;
+  padding: 9px 12px;
   background: var(--bg-2); border: 1px solid var(--rand); border-radius: var(--radius);
 }
-.siegchance-wert { font-family: var(--display); font-size: 42px; line-height: 1; color: var(--wir); }
-.siegchance-label { font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--text-sehr-leise); }
-.siegchance-fuss { margin-top: 7px; font-size: 11px; color: var(--text-leise); }
+.siegchance:empty { display: none; }
+.siegchance-wert { font-family: var(--display); font-size: 30px; line-height: 1; color: var(--wir); }
+.siegchance-label {
+  font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--text-sehr-leise);
+}
 
-/* ─── 6. Brawler-Gitter ───────────────────────────────────── */
+/* ─── 7. Brawler-Gitter ───────────────────────────────────── */
 .auswahl {
-  padding: 12px; background: var(--bg-2);
+  padding: 10px; background: var(--bg-2);
   border: 1px solid var(--rand); border-radius: var(--radius);
 }
-.auswahl-kopf { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 12px; }
+.auswahl-kopf {
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+  margin-bottom: 10px; flex-shrink: 0;
+}
+.suchfeld { position: relative; flex: 1; min-width: 170px; }
 #suche {
-  flex: 1; min-width: 180px; padding: 8px 11px; font-size: 13px;
-  background: var(--bg-3); border: 1px solid var(--rand-hell); border-radius: 4px;
+  width: 100%; padding: 9px 34px 9px 12px; font-size: 14px;
+  background: var(--bg-3); border: 1px solid var(--rand-hell); border-radius: 5px;
+}
+.suchfeld-taste { position: absolute; right: 9px; top: 50%; transform: translateY(-50%); }
+#suche:focus + .suchfeld-taste { display: none; }
+
+.sortierung select {
+  padding: 9px 8px; font-size: 12.5px;
+  background: var(--bg-3); border: 1px solid var(--rand-hell); border-radius: 5px;
 }
 .rollenfilter { display: flex; flex-wrap: wrap; gap: 4px; }
 .rollenfilter button {
-  padding: 4px 9px; font-size: 11px; color: var(--text-sehr-leise);
+  padding: 5px 10px; font-size: 11px; color: var(--text-sehr-leise);
   border: 1px solid var(--rand); border-radius: 20px;
+  transition: color .12s, border-color .12s;
 }
+.rollenfilter button:hover { color: var(--text-leise); border-color: var(--rand-hell); }
 .rollenfilter button.ist-aktiv { color: var(--akzent); border-color: var(--akzent); }
-.ziel {
-  padding: 5px 11px; font-size: 11.5px; border-radius: 20px;
-  background: rgba(255, 106, 42, .12); color: var(--akzent);
-  border: 1px solid rgba(255, 106, 42, .3);
-}
+.rollenfilter-meine.ist-aktiv { color: var(--wir); border-color: var(--wir); }
 
+/* Portraits so gross wie moeglich, ohne dass die Zahl der gleichzeitig
+   sichtbaren Kacheln faellt. 74px Spaltenbreite sind auf 1440px rund
+   zehn Kacheln je Zeile und zugleich ein sicheres Touch-Ziel. */
 .gitter {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
-  gap: 8px; max-height: calc(100vh - 260px); overflow-y: auto; padding-right: 4px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(74px, 1fr));
+  gap: 6px; overflow-y: auto; padding-right: 4px; align-content: start;
+  flex: 1; min-height: 0;
 }
-.karte {
+.kachel {
   position: relative; display: flex; flex-direction: column; align-items: center;
-  gap: 5px; padding: 8px 5px 7px;
+  gap: 4px; padding: 6px 3px 5px; overflow: hidden;
   background: var(--bg-3); border: 1px solid var(--rand);
-  border-radius: var(--radius); transition: border-color .12s, transform .12s;
+  border-radius: var(--radius); transition: border-color .1s;
 }
-.karte:hover:not(.ist-gesperrt) { border-color: var(--rand-hell); transform: translateY(-1px); }
-.karte.ist-gesperrt { opacity: .28; cursor: not-allowed; filter: grayscale(1); }
-.karte.ist-empfohlen { border-color: var(--akzent); }
-.karte-bild {
-  width: 46px; height: 46px; border-radius: 5px;
+.kachel:hover:not(.ist-gesperrt) { border-color: var(--rand-hell); }
+.kachel.ist-gesperrt { opacity: .22; cursor: not-allowed; filter: grayscale(1); }
+.kachel-bild {
+  width: 54px; height: 54px; border-radius: 5px;
   display: flex; align-items: center; justify-content: center;
-  font-family: var(--display); font-size: 21px; color: #0d0e10;
+  font-family: var(--display); font-size: 24px; color: #0d0e10;
   background-size: cover; background-position: center;
 }
-.karte-name { font-size: 11px; color: var(--text); text-align: center; line-height: 1.2; }
-.karte-rollen { font-size: 9.5px; color: var(--text-sehr-leise); text-align: center; }
-.karte-score {
-  position: absolute; top: 4px; right: 4px;
-  padding: 1px 5px; font-size: 10px; border-radius: 3px;
-  background: rgba(0, 0, 0, .6); color: var(--text-leise);
+.kachel-name {
+  font-size: 10.5px; color: var(--text); text-align: center; line-height: 1.15;
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.karte-score.ist-gut { color: var(--gut); }
-.karte-score.ist-schwach { color: var(--gegner); }
-.karte-confidence {
-  position: absolute; top: 4px; left: 4px; width: 5px; height: 5px;
-  border-radius: 50%; background: var(--wir);
+.kachel-score {
+  position: absolute; top: 3px; right: 3px;
+  padding: 1px 4px; font-size: 10px; border-radius: 3px;
+  background: rgba(0, 0, 0, .72); color: var(--text-leise);
 }
+.kachel-score.ist-gut { color: var(--gut); }
+.kachel-score.ist-schwach { color: var(--gegner); }
+.kachel-rang {
+  position: absolute; top: 3px; left: 3px;
+  min-width: 16px; padding: 1px 3px; text-align: center;
+  font-family: var(--display); font-size: 12px; line-height: 1.25; border-radius: 3px;
+  background: var(--akzent); color: #12100e;
+}
+/* Persoenliche Sicherheit als Streifen am unteren Rand: sichtbar, ohne
+   eine Zahl mehr auf die Kachel zu holen. */
+.kachel-sicher { position: absolute; left: 0; bottom: 0; height: 2px; }
+.kachel-sicher.ist-hoch { background: var(--wir); }
+.kachel-sicher.ist-niedrig { background: var(--gegner); opacity: .6; }
 
-/* ─── 7. Empfehlungspanel ─────────────────────────────────── */
+/* Modifikator-Regeln stehen IMMER hinter ihrer Basisregel - bei
+   gleicher Spezifitaet gewinnt die spaetere. Siehe CLAUDE.md. */
+.kachel.ist-empfohlen { border-color: rgba(255, 106, 42, .55); }
+.kachel.ist-bester { border-color: var(--akzent); }
+.gitter.ist-banmodus .kachel.ist-empfohlen { border-color: rgba(154, 163, 176, .55); }
+.gitter.ist-banmodus .kachel.ist-bester { border-color: var(--ban-hell); }
+.gitter.ist-banmodus .kachel-rang { background: var(--ban-hell); color: #14161a; }
+
+/* ─── 8. Empfehlungspanel ─────────────────────────────────── */
 .panel {
-  position: sticky; top: 74px;
-  max-height: calc(100vh - 92px); overflow-y: auto;
-  padding: 14px; background: var(--bg-2);
+  padding: 10px; background: var(--bg-2);
   border: 1px solid var(--rand); border-radius: var(--radius);
+  transition: opacity .12s;
+}
+/* Waehrend eine Antwort unterwegs ist bleibt der alte Inhalt stehen und
+   wird nur gedaempft. Loeschen waere ehrlicher, fuehlt sich aber an wie
+   ein Haenger - und die vorige Empfehlung ist fuer eine Sekunde eine
+   bessere Auskunft als eine leere Flaeche. */
+.panel.ist-laedt { opacity: .5; }
+.panel.ist-laedt .vorschlag-waehlen { pointer-events: none; }
+.panel-kopf {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 8px; margin-bottom: 8px;
 }
 .panel h2 {
   font-family: var(--display); font-size: 17px; letter-spacing: .1em;
-  font-weight: 400; color: var(--text-leise); margin-bottom: 10px;
+  font-weight: 400; color: var(--text-leise);
 }
-.panel-leer { font-size: 12.5px; color: var(--text-sehr-leise); }
+.panel-kopf-zusatz { font-size: 10px; color: var(--text-sehr-leise); white-space: nowrap; }
+.panel h2 { white-space: nowrap; }
+.panel-leer { font-size: 12px; color: var(--text-sehr-leise); }
+.panel-fehler { font-size: 12.5px; color: var(--gegner); }
 
+.vorschlaege { display: flex; flex-direction: column; gap: 6px; }
 .vorschlag {
-  padding: 11px; margin-bottom: 9px; text-align: left; width: 100%;
+  position: relative;
   background: var(--bg-3); border: 1px solid var(--rand);
-  border-radius: var(--radius); transition: border-color .12s;
+  border-radius: var(--radius); transition: border-color .1s;
 }
 .vorschlag:hover { border-color: var(--rand-hell); }
-.vorschlag--top { border-color: var(--akzent); }
-/* Der Kopf ist das Bedienelement, nicht die ganze Karte: darin steckt
-   die aufklappbare Aufschlüsselung, und ein Button im Button wäre
-   ungültiges HTML. */
-.vorschlag-kopf {
-  display: flex; align-items: center; gap: 9px; margin-bottom: 7px;
-  width: 100%; text-align: left; cursor: pointer;
+
+/* Der ganze Kasten setzt den Pick - ein Klick vom Lesen zum Setzen.
+   Das Fragezeichen liegt DANEBEN, nicht darin: ein Button im Button
+   waere ungueltiges HTML und fuer Tastatur und Screenreader kaputt. */
+.vorschlag-waehlen {
+  display: grid; align-items: center; column-gap: 9px; row-gap: 5px;
+  grid-template-columns: 14px 40px minmax(0, 1fr) auto;
+  grid-template-areas:
+    "rang bild kern  score"
+    ".    bild zeile zeile";
+  width: 100%; padding: 8px 32px 8px 9px; text-align: left;
 }
-.vorschlag-kopf:hover .vorschlag-name { color: var(--akzent); }
+.vorschlag-rang { grid-area: rang; }
+.vorschlag-bild { grid-area: bild; align-self: start; }
+.vorschlag-kern { grid-area: kern; }
+.vorschlag-score { grid-area: score; }
+.chips, .vorschlag-bangrund { grid-area: zeile; }
+.vorschlag-rang {
+  font-family: var(--display); font-size: 14px; line-height: 1;
+  min-width: 14px; color: var(--text-sehr-leise);
+}
 .vorschlag-bild {
-  width: 34px; height: 34px; border-radius: 4px; flex-shrink: 0;
+  width: 40px; height: 40px; border-radius: 5px; flex-shrink: 0;
   display: flex; align-items: center; justify-content: center;
-  font-family: var(--display); font-size: 16px; color: #0d0e10;
+  font-family: var(--display); font-size: 18px; color: #0d0e10;
   background-size: cover; background-position: center;
 }
-.vorschlag-name { font-size: 13.5px; }
-.vorschlag-rolle { font-size: 10.5px; color: var(--text-sehr-leise); }
-.vorschlag-score {
-  margin-left: auto; text-align: right;
-  font-family: var(--display); font-size: 24px; line-height: 1; color: var(--akzent);
+.vorschlag-kern { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.vorschlag-name {
+  font-size: 14px; line-height: 1.2;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
-.vorschlag-wp { font-size: 10px; color: var(--text-sehr-leise); font-family: var(--mono); }
+.vorschlag-rolle {
+  font-size: 10px; color: var(--text-sehr-leise);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.vorschlag-score {
+  display: flex; flex-direction: column; align-items: flex-end;
+  font-family: var(--display); font-size: 25px; line-height: 1;
+  color: var(--akzent); flex-shrink: 0;
+}
+.vorschlag-wp { font-family: var(--mono); font-size: 9.5px; color: var(--text-sehr-leise); }
+.vorschlag-info {
+  position: absolute; top: 6px; right: 6px;
+  width: 20px; height: 20px; border-radius: 50%;
+  font-size: 12px; line-height: 1; color: var(--text-sehr-leise);
+  border: 1px solid var(--rand-hell);
+}
+.vorschlag-info:hover { color: var(--text); border-color: var(--text-leise); }
+
+/* Statt ausformulierter Gruende: die drei staerksten Komponenten mit
+   ihrem Beitrag. Gleiche Aussage, ein Blick statt einer Zeile. Der
+   ganze Satz steht im Detailfenster und im title. */
+/* Eine Zeile, nie mehr: was nicht passt, faellt GANZ ab. Dafuer darf
+   die Zeile umbrechen, ist aber genau eine Chiphoehe hoch - ein Chip,
+   der nicht mehr passt, rutscht in die unsichtbare zweite Zeile, statt
+   mitten im Wort abgeschnitten zu werden. Die Chips sind nach Betrag
+   sortiert; es faellt also immer der schwaechste Grund weg. */
+.chips { display: flex; flex-wrap: wrap; gap: 3px; height: 19px; overflow: hidden; min-width: 0; }
+.chip {
+  display: inline-flex; flex-shrink: 0; white-space: nowrap; align-items: baseline; gap: 3px;
+  padding: 1px 5px; border-radius: 3px; font-size: 9.5px; line-height: 1.5;
+  background: rgba(255, 255, 255, .04); border: 1px solid var(--rand);
+  color: var(--text-leise); cursor: help;
+}
+.chip-wert { font-size: 9px; }
+.chip.ist-plus .chip-wert { color: var(--gut); }
+.chip.ist-minus .chip-wert { color: var(--gegner); }
+
+.vorschlag-bangrund { display: flex; flex-direction: column; gap: 1px; margin-top: 2px; }
+.bangrund {
+  font-size: 10px; color: var(--text-leise); line-height: 1.3;
+  display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Modifikatoren hinter der Basis. */
+.vorschlag--top { border-color: var(--akzent); }
+.vorschlag--top .vorschlag-rang { color: var(--akzent); }
+.vorschlag--ban .vorschlag-score { color: var(--ban-hell); }
+.vorschlag--ban.vorschlag--top { border-color: var(--ban-hell); }
+.vorschlag--ban.vorschlag--top .vorschlag-rang { color: var(--ban-hell); }
+
+.abschnitt { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--rand); }
+.abschnitt h3 {
+  font-size: 9.5px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--text-sehr-leise); font-weight: 400; margin-bottom: 6px;
+}
+.luecken { display: flex; flex-direction: column; gap: 4px; }
+.luecke { display: flex; align-items: center; gap: 8px; font-size: 11px; }
+.luecke-balken { flex: 1; height: 4px; background: var(--bg-3); border-radius: 2px; overflow: hidden; }
+.luecke-fuellung { height: 100%; background: var(--gegner); }
+.luecke.ist-kritisch .luecke-fuellung { background: var(--akzent); }
+.luecke-wert { font-size: 10px; color: var(--text-sehr-leise); min-width: 26px; text-align: right; }
+
+/* ─── 9. Matchplan und Aufschluesselung ───────────────────── */
 .gruende { list-style: none; display: flex; flex-direction: column; gap: 3px; }
-.gruende li { font-size: 11.5px; color: var(--text-leise); padding-left: 14px; position: relative; }
+.gruende li { font-size: 12px; color: var(--text-leise); padding-left: 14px; position: relative; }
 .gruende li::before { position: absolute; left: 0; }
 .gruende li.pro::before { content: "+"; color: var(--gut); }
 .gruende li.contra::before { content: "−"; color: var(--gegner); }
 .quelle-heuristik { color: var(--text-sehr-leise); font-size: 9.5px; }
-
-.abschnitt { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--rand); }
-.abschnitt h3 {
-  font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
-  color: var(--text-sehr-leise); font-weight: 400; margin-bottom: 8px;
-}
-.luecken { display: flex; flex-direction: column; gap: 5px; }
-.luecke { display: flex; align-items: center; gap: 8px; font-size: 11.5px; }
-.luecke-balken { flex: 1; height: 4px; background: var(--bg-3); border-radius: 2px; overflow: hidden; }
-.luecke-fuellung { height: 100%; background: var(--gegner); }
-.luecke.ist-kritisch .luecke-fuellung { background: var(--akzent); }
-.luecke-wert { font-size: 10px; color: var(--text-sehr-leise); min-width: 28px; text-align: right; }
-
-.bankarten { display: flex; flex-direction: column; gap: 8px; }
-.bankarte {
-  display: flex; gap: 9px; padding: 9px; text-align: left; width: 100%;
-  background: var(--bg-3); border: 1px solid var(--rand); border-radius: var(--radius);
-}
-.bankarte:hover { border-color: var(--ban); }
-.bankarte-text { flex: 1; }
-.bankarte-name { font-size: 12.5px; margin-bottom: 3px; }
-.bankarte-grund { font-size: 11px; color: var(--text-leise); }
-
-/* ─── Aufschlüsselung und Matchplan-Details ───────────────── */
-/* Modifikator-Regeln stehen IMMER hinter ihrer Basisregel - bei
-   gleicher Spezifität gewinnt die spätere. Siehe CLAUDE.md. */
 
 .klappe { margin-top: 9px; border-top: 1px solid var(--rand); padding-top: 7px; }
 .klappe summary {
@@ -339,33 +569,17 @@ a { color: inherit; text-decoration: none; }
 .klappe summary:hover { color: var(--text-leise); }
 .klappe > .komponenten, .klappe > .liste { margin-top: 8px; }
 
-.komponenten-fuss {
-  margin-top: 7px; font-size: 10px; color: var(--text-sehr-leise);
-}
-.komponente-roh {
-  min-width: 92px; text-align: right;
-  font-size: 10px; color: var(--text-sehr-leise);
-}
-.komponente--kompakt { font-size: 11px; gap: 7px; }
-.komponente--kompakt .komponente-label { min-width: 92px; }
+.komponenten { display: flex; flex-direction: column; gap: 3px; }
+.komponente { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+.komponente-label { min-width: 120px; color: var(--text-leise); }
+.komponente-balken { flex: 1; height: 5px; background: var(--bg-3); border-radius: 3px; position: relative; }
+.komponente-fuellung { position: absolute; top: 0; height: 100%; border-radius: 3px; }
+.komponente-fuellung.ist-plus { background: var(--gut); left: 50%; }
+.komponente-fuellung.ist-minus { background: var(--gegner); right: 50%; }
+.komponente-wert { min-width: 46px; text-align: right; font-size: 11px; }
+.komponente-roh { min-width: 92px; text-align: right; font-size: 10px; color: var(--text-sehr-leise); }
 .komponente.ist-ohne-wirkung { opacity: .4; }
-
-.matchplan-lane {
-  margin-left: auto; padding: 2px 8px; border-radius: 20px;
-  font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
-  color: var(--text-leise); border: 1px solid var(--rand-hell);
-}
-.matchplan-zeile {
-  display: flex; gap: 9px; font-size: 12px; padding: 3px 0;
-  color: var(--text-leise);
-}
-.matchplan-art {
-  min-width: 82px; flex-shrink: 0;
-  font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
-  color: var(--text-sehr-leise);
-}
-.matchplan-zeile.ist-gut .matchplan-art { color: var(--gut); }
-.matchplan-zeile.ist-schlecht .matchplan-art { color: var(--gegner); }
+.komponenten-fuss { margin-top: 7px; font-size: 10px; color: var(--text-sehr-leise); }
 
 .datenlage-kasten {
   padding: 9px 11px; margin-bottom: 12px;
@@ -374,6 +588,33 @@ a { color: inherit; text-decoration: none; }
 }
 .datenlage-kasten strong { font-size: 12px; font-weight: 500; color: var(--warn); }
 .datenlage-kasten p { margin-top: 4px; font-size: 11px; color: var(--text-leise); }
+
+.matchplan { display: flex; flex-direction: column; gap: 12px; }
+.matchplan-spieler {
+  padding: 10px; background: var(--bg-3);
+  border: 1px solid var(--rand); border-left: 3px solid var(--wir); border-radius: 4px;
+}
+.matchplan-kopf { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
+.matchplan-name { font-family: var(--display); font-size: 18px; letter-spacing: .05em; }
+.matchplan-rolle { font-size: 11px; color: var(--text-sehr-leise); }
+.matchplan-lane {
+  margin-left: auto; padding: 2px 8px; border-radius: 20px;
+  font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--text-leise); border: 1px solid var(--rand-hell);
+}
+.matchplan-zeile { display: flex; gap: 9px; font-size: 12px; padding: 3px 0; color: var(--text-leise); }
+.matchplan-art {
+  min-width: 82px; flex-shrink: 0;
+  font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-sehr-leise);
+}
+.matchplan-zeile.ist-gut .matchplan-art { color: var(--gut); }
+.matchplan-zeile.ist-schlecht .matchplan-art { color: var(--gegner); }
+.matchplan-paar {
+  display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0;
+  border-bottom: 1px solid var(--rand);
+}
+.matchplan-paar:last-child { border-bottom: none; }
 
 .schwaeche {
   display: flex; align-items: baseline; gap: 8px;
@@ -386,7 +627,15 @@ a { color: inherit; text-decoration: none; }
 .schwaeche.ist-ausnutzbar { color: var(--text); }
 .schwaeche.ist-ausnutzbar .schwaeche-punkt { background: var(--gegner); }
 
-/* ─── 8. Modal ────────────────────────────────────────────── */
+.build { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; }
+.build-zeile { display: flex; gap: 10px; }
+.build-art { min-width: 96px; color: var(--text-sehr-leise); font-size: 11px; }
+.liste { list-style: none; display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; }
+.liste li { padding-left: 14px; position: relative; color: var(--text-leise); }
+.liste li::before { content: "▸"; position: absolute; left: 0; color: var(--text-sehr-leise); }
+.liste--warnung li::before { content: "!"; color: var(--warn); }
+
+/* ─── 10. Modal ───────────────────────────────────────────── */
 .modal {
   position: fixed; inset: 0; z-index: 90;
   display: flex; align-items: center; justify-content: center; padding: 24px;
@@ -407,38 +656,9 @@ a { color: inherit; text-decoration: none; }
   font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
   color: var(--text-sehr-leise); font-weight: 400; margin: 16px 0 7px;
 }
-.komponenten { display: flex; flex-direction: column; gap: 3px; }
-.komponente { display: flex; align-items: center; gap: 10px; font-size: 12px; }
-.komponente-label { min-width: 120px; color: var(--text-leise); }
-.komponente-balken { flex: 1; height: 5px; background: var(--bg-3); border-radius: 3px; position: relative; }
-.komponente-fuellung { position: absolute; top: 0; height: 100%; border-radius: 3px; }
-.komponente-fuellung.ist-plus { background: var(--gut); left: 50%; }
-.komponente-fuellung.ist-minus { background: var(--gegner); right: 50%; }
-.komponente-wert { min-width: 46px; text-align: right; font-size: 11px; }
-.build { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; }
-.build-zeile { display: flex; gap: 10px; }
-.build-art { min-width: 96px; color: var(--text-sehr-leise); font-size: 11px; }
-.liste { list-style: none; display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; }
-.liste li { padding-left: 14px; position: relative; color: var(--text-leise); }
-.liste li::before { content: "▸"; position: absolute; left: 0; color: var(--text-sehr-leise); }
-.liste--warnung li::before { content: "!"; color: var(--warn); }
+.modal-unterzeile { font-size: 12px; color: var(--text-sehr-leise); }
 
-/* ─── Matchplan ───────────────────────────────────────────── */
-.matchplan { display: flex; flex-direction: column; gap: 14px; }
-.matchplan-spieler {
-  padding: 11px; background: var(--bg-3);
-  border: 1px solid var(--rand); border-left: 3px solid var(--wir); border-radius: 4px;
-}
-.matchplan-kopf { display: flex; align-items: baseline; gap: 8px; margin-bottom: 6px; }
-.matchplan-name { font-family: var(--display); font-size: 19px; letter-spacing: .05em; }
-.matchplan-rolle { font-size: 11px; color: var(--text-sehr-leise); }
-.matchplan-paar {
-  display: flex; justify-content: space-between; font-size: 12px; padding: 4px 0;
-  border-bottom: 1px solid var(--rand);
-}
-.matchplan-paar:last-child { border-bottom: none; }
-
-/* ─── 9. Nebenseiten ──────────────────────────────────────── */
+/* ─── 11. Nebenseiten ─────────────────────────────────────── */
 .seite { max-width: 1100px; margin: 0 auto; padding: 28px 24px 60px; }
 .seite h1 { font-family: var(--display); font-size: 34px; letter-spacing: .06em; font-weight: 400; }
 .seite-einleitung { color: var(--text-leise); font-size: 13px; margin: 6px 0 24px; max-width: 70ch; }
@@ -464,6 +684,7 @@ a { color: inherit; text-decoration: none; }
   background: var(--bg-2); border: 1px solid var(--rand); border-radius: 8px;
 }
 .anmeldung h1 { font-size: 26px; margin-bottom: 4px; }
+.anmeldung-unterzeile { font-size: 12.5px; color: var(--text-leise); }
 .anmeldung label { display: block; font-size: 11px; letter-spacing: .14em;
   text-transform: uppercase; color: var(--text-sehr-leise); margin: 14px 0 5px; }
 .anmeldung input {
@@ -477,21 +698,118 @@ a { color: inherit; text-decoration: none; }
 .anmeldung .fehler { margin-top: 12px; font-size: 12px; color: var(--gegner); }
 .anmeldung .hinweis { margin-top: 16px; font-size: 11.5px; color: var(--text-sehr-leise); }
 
-/* ─── 10. Schmale Fenster ─────────────────────────────────── */
-/* Der Drafter darf breit sein - unter 1280px wandert das Panel unter
-   die Auswahl, statt sie zu erdruecken. Unter 900px steht alles
-   untereinander: nicht ideal, aber vollstaendig benutzbar. */
-@media (max-width: 1280px) {
-  .drafter-raster {
-    grid-template-columns: 240px 1fr;
-    grid-template-areas: "leiste leiste" "draft auswahl" "panel panel";
-  }
-  .panel { position: static; max-height: none; }
+/* ─── 12. Schmale Fenster ─────────────────────────────────── */
+/* Unter 1280px faellt die Empfehlungsspalte unter die Auswahl, statt
+   sie zu erdruecken. */
+@media (max-width: 1280px) and (min-width: 1101px) {
+  .drafter-raster { grid-template-columns: 200px minmax(0, 1fr) 300px; }
 }
-@media (max-width: 900px) {
-  .drafter-raster { grid-template-columns: 1fr; grid-template-areas: "leiste" "draft" "auswahl" "panel"; }
-  .kopf { flex-wrap: wrap; gap: 10px; }
-  .leiste { gap: 10px; }
-  .feld { min-width: 130px; }
-  .gitter { max-height: none; }
+
+/* Unter 1100px steht alles untereinander und die Seite scrollt wieder.
+   Reihenfolge nach Benutzung: Leiste (klebt), Brett, Empfehlungen,
+   Gitter. Die Empfehlungen liegen dabei als waagerechter Streifen ueber
+   dem Gitter - senkrecht gestapelt wuerden acht Karten das Gitter aus
+   dem Bild schieben, und genau das Gitter braucht man am haeufigsten. */
+@media (max-width: 1100px) {
+  .aktionsleiste {
+    position: sticky; top: 0; z-index: 30;
+    flex-wrap: wrap; gap: 8px; padding: 8px 12px;
+  }
+  .mapknopf { min-width: 150px; flex: 1; }
+  .jetzt { order: -1; flex-basis: 100%; padding: 6px 12px; }
+  .jetzt-text { font-size: 24px; }
+  .leiste-rechts { margin-left: auto; }
+  .datenlage { display: none; }
+  /* Auf schmalen Fenstern in der Mitte statt am Knopf - dort ist
+     rechts daneben ohnehin kein Platz mehr. */
+  .mapwaehler { display: flex; align-items: center; justify-content: center; }
+  .mapwaehler-kasten {
+    position: static;
+    width: min(420px, calc(100vw - 24px)); max-height: 78vh;
+  }
+
+  .drafter-raster { grid-template-columns: 1fr; padding: 10px 12px 40px; }
+
+  /* Das Brett waagerecht statt als Turm: Gegner und Wir teilen sich
+     eine Zeile, die sechs Bans stehen darunter. Sonst liegen 400px
+     Brett zwischen Leiste und Gitter - und das Gitter ist das, was man
+     am haeufigsten braucht.
+
+     Die Reihenfolge macht `order`, nicht das Markup: im Quelltext steht
+     das Brett von oben nach unten Gegner - Bans - Wir, so wie es auf
+     dem Desktop aussieht und wie ein Screenreader es vorliest. */
+  .brett { flex-direction: row; flex-wrap: wrap; gap: 8px; }
+  .brett-block { flex: 1; min-width: 150px; }
+  .brett-block--gegner { order: 1; }
+  .brett-block--wir { order: 2; }
+  .brett-block--ban { order: 3; flex-basis: 100%; }
+  .siegchance { order: 4; flex-basis: 100%; }
+  .slot-name { display: none; }
+  .slot { aspect-ratio: auto; height: 58px; }
+  .slot-bild { width: 34px; height: 34px; font-size: 16px; }
+  .slots--ban .slot { height: 48px; }
+
+  /* Empfehlungen als waagerechter Streifen. */
+  .panel { order: 1; }
+  .auswahl { order: 2; }
+  .vorschlaege { flex-direction: row; overflow-x: auto; padding-bottom: 4px; }
+  .vorschlag { flex: 0 0 200px; }
+  .chips, .vorschlag-bangrund { display: none; }
+  .vorschlag-waehlen { grid-template-areas: "rang bild kern score"; }
+  .panel .abschnitt { display: none; }
+
+  .gitter { grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); }
+  .kachel-bild { width: 50px; height: 50px; }
+  kbd { display: none; }
+}
+
+/* Telefonbreite. Messlatte: auf 390x844 muss das Gitter ohne Scrollen
+   anfangen. Vor dieser Regel lag es bei y=934 - Kopf, Demo-Hinweis,
+   Leiste und Brett fuellten den ganzen Bildschirm.
+
+   Die Leiste wird zweizeilig: oben "was jetzt" neben Ban/Pick (das
+   aendert sich staendig), darunter Map, First Pick und Reset (das
+   setzt man einmal). Die Etiketten fallen weg - "Wir first" und
+   "Ban/Pick" erklaeren sich selbst. */
+@media (max-width: 560px) {
+  .kopf { gap: 10px; padding: 6px 12px; }
+  .kopf-marke { font-size: 19px; }
+  .kopf-nav { gap: 12px; font-size: 11.5px; }
+  .kopf-zurueck { display: none; }
+  .hinweis-demo { padding: 4px 12px; font-size: 10.5px; }
+
+  .aktionsleiste { gap: 6px; padding: 6px 10px; }
+  .steuer-etikett, .mapknopf-etikett { display: none; }
+  .jetzt { order: -2; flex: 1 1 180px; padding: 3px 10px; }
+  .jetzt-text { font-size: 22px; }
+  .steuerpaar--modus { order: -1; }
+  .mapknopf { flex: 1 1 110px; min-width: 0; padding: 4px 10px; justify-content: center; }
+  .mapknopf-zeile { flex-direction: column; gap: 0; }
+  .mapknopf-name { font-size: 12.5px; max-width: 100%; }
+  .mapknopf-modus { font-size: 10px; }
+  .schalter button { padding: 6px 9px; font-size: 12px; min-height: 40px; }
+  .leiste-rechts { margin-left: 0; }
+  .knopf-zuruecksetzen { padding: 6px 9px; min-height: 40px; }
+
+  .drafter-raster { gap: 8px; padding: 8px 10px 40px; }
+  .brett { gap: 6px; }
+  .brett-block { padding: 6px 7px; min-width: 0; }
+  .brett-block h2 { font-size: 13px; margin-bottom: 4px; }
+  .slot { height: 46px; }
+  .slot-bild { width: 30px; height: 30px; font-size: 14px; }
+  .slots--ban .slot { height: 38px; }
+  .siegchance { padding: 3px 10px; }
+  .siegchance-wert { font-size: 20px; }
+
+  .panel { padding: 7px; }
+  .panel-kopf { margin-bottom: 4px; }
+  .vorschlag { flex-basis: 172px; }
+  .vorschlag-waehlen { padding: 6px 26px 6px 6px; gap: 6px; }
+
+  .auswahl { padding: 7px; }
+  .auswahl-kopf { gap: 6px; margin-bottom: 7px; }
+  /* Rollen als eine wischbare Zeile statt drei umgebrochener. */
+  .rollenfilter { flex-wrap: nowrap; overflow-x: auto; width: 100%; padding-bottom: 2px; }
+  .rollenfilter button { flex-shrink: 0; padding: 6px 10px; }
+  .gitter { grid-template-columns: repeat(auto-fill, minmax(68px, 1fr)); gap: 5px; }
 }

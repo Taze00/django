@@ -5,11 +5,13 @@
  * sich darauf neu zeichnen muss. Ohne das wuerde jeder Klick an drei
  * Stellen von Hand nachgezogen - und eine davon wuerde man vergessen.
  *
- * Der Zustand ist absichtlich klein: Modus, Map, drei Listen, ein
- * Schalter. Alles Abgeleitete (Phase, wer am Zug ist, Empfehlungen)
- * rechnet der Server, damit Anzeige und Bewertung nicht auseinander
- * laufen koennen.
+ * Der Zustand ist absichtlich klein: Modus, Map, drei Listen, zwei
+ * Schalter. Alles Abgeleitete (Phase, Empfehlungen, Bewertung) rechnet
+ * der Server, damit Anzeige und Bewertung nicht auseinander laufen.
  */
+
+export const BANS_GESAMT = 6;
+export const PICKS_JE_TEAM = 3;
 
 const LEER = () => ({
   mode: null,
@@ -18,9 +20,19 @@ const LEER = () => ({
   enemy_picks: [],
   bans: [],
   own_team_first_pick: true,
+
   // Reine Anzeigezustaende - gehen nicht an den Server.
-  banphase: true,
-  ziel: null,
+  //
+  // `modus` ist der Ban/Pick-Schalter aus der Aktionsleiste. Er stand
+  // frueher nicht im Zustand, sondern steckte in einem Knopf
+  // ("Ban-Phase beenden"), der nur in eine Richtung ging: einmal aus der
+  // Ban-Phase heraus, nie zurueck. Ein echter Draft braucht beides -
+  // man verklickt sich, oder der Gegner bannt noch, waehrend man die
+  // eigenen Picks schon durchspielt.
+  modus: 'ban',
+  // Einmalige Zielkorrektur durch Klick auf einen freien Slot. Gilt fuer
+  // genau eine Auswahl und faellt danach auf die Reihenfolge zurueck.
+  seite: null,
 });
 
 let zustand = LEER();
@@ -68,15 +80,24 @@ export function gesperrt() {
  * Server in services/context.py benutzt. Sie steht hier ein zweites
  * Mal, weil die Oberflaeche schon VOR der Antwort wissen muss, wohin
  * ein Klick geht; der Server bleibt die Instanz, die es bewertet.
+ *
+ * Reihenfolge der Entscheidung:
+ *   1. Ban-Modus und noch Bans frei  -> Ban. Der Schalter gewinnt, damit
+ *      ein Klick darauf sofort wirkt und nicht erst "ab dem naechsten Mal".
+ *   2. Eine angeklickte freie Position -> die.
+ *   3. Sonst die Standardreihenfolge.
  */
 const REIHENFOLGE = ['first', 'second', 'second', 'first', 'first', 'second'];
 
 export function naechstesZiel() {
-  if (zustand.ziel) return zustand.ziel;
-  if (zustand.banphase && zustand.bans.length < 6) return 'ban';
+  if (zustand.modus === 'ban' && zustand.bans.length < BANS_GESAMT) return 'ban';
+
+  if (zustand.seite === 'ban' && zustand.bans.length < BANS_GESAMT) return 'ban';
+  if (zustand.seite === 'wir' && zustand.own_picks.length < PICKS_JE_TEAM) return 'wir';
+  if (zustand.seite === 'gegner' && zustand.enemy_picks.length < PICKS_JE_TEAM) return 'gegner';
 
   const gesamt = zustand.own_picks.length + zustand.enemy_picks.length;
-  if (gesamt >= 6) return null;
+  if (gesamt >= REIHENFOLGE.length) return null;
 
   const unser = zustand.own_team_first_pick ? 'first' : 'second';
   const dran = REIHENFOLGE[gesamt];
@@ -85,17 +106,41 @@ export function naechstesZiel() {
   // Weicht der tatsaechliche Stand von der Reihenfolge ab (der Nutzer
   // hat korrigiert), zaehlt der Platz, der noch frei ist.
   const liste = seite === 'wir' ? zustand.own_picks : zustand.enemy_picks;
-  if (liste.length >= 3) return seite === 'wir' ? 'gegner' : 'wir';
+  if (liste.length >= PICKS_JE_TEAM) return seite === 'wir' ? 'gegner' : 'wir';
   return seite;
+}
+
+/**
+ * Die laufende Nummer der naechsten Aktion - fuer "UNSER PICK 2/3".
+ * Ohne sie muesste die Anzeige denselben Schluss noch einmal ziehen.
+ */
+export function zielStand() {
+  const ziel = naechstesZiel();
+  if (ziel === 'ban') return { ziel, nummer: zustand.bans.length + 1, von: BANS_GESAMT };
+  if (ziel === 'wir') return { ziel, nummer: zustand.own_picks.length + 1, von: PICKS_JE_TEAM };
+  if (ziel === 'gegner') return { ziel, nummer: zustand.enemy_picks.length + 1, von: PICKS_JE_TEAM };
+  return { ziel: null, nummer: 0, von: 0 };
 }
 
 export function hinzufuegen(slug) {
   const ziel = naechstesZiel();
   if (!ziel || gesperrt().has(slug)) return false;
 
-  if (ziel === 'ban') setzen({ bans: [...zustand.bans, slug], ziel: null });
-  else if (ziel === 'wir') setzen({ own_picks: [...zustand.own_picks, slug], ziel: null });
-  else setzen({ enemy_picks: [...zustand.enemy_picks, slug], ziel: null });
+  if (ziel === 'ban') {
+    const bans = [...zustand.bans, slug];
+    // Sind alle sechs Bans gesetzt, schaltet die Leiste von selbst auf
+    // Pick. Die Automatik bleibt - nur ist sie jetzt sichtbar, weil sie
+    // denselben Schalter umlegt, den auch der Nutzer bedient.
+    setzen({
+      bans,
+      seite: null,
+      modus: bans.length >= BANS_GESAMT ? 'pick' : zustand.modus,
+    });
+  } else if (ziel === 'wir') {
+    setzen({ own_picks: [...zustand.own_picks, slug], seite: null, modus: 'pick' });
+  } else {
+    setzen({ enemy_picks: [...zustand.enemy_picks, slug], seite: null, modus: 'pick' });
+  }
   return true;
 }
 
