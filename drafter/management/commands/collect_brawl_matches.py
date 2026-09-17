@@ -43,6 +43,11 @@ class Command(BaseCommand):
                             help="Keine Rangliste abrufen - nur bereits bekannte Spieler")
         parser.add_argument("--ohne-katalog", action="store_true",
                             help="/brawlers nicht abrufen (nur wenn alle IDs schon stehen)")
+        parser.add_argument("--strategie", default=config.COLLECTOR_STRATEGIE,
+                            choices=list(config.COLLECTOR_STRATEGIEN),
+                            help="Reihenfolge der Spieler: standard (Tiefe/Rang) oder "
+                                 "luecken (groesste Datenluecken zuerst, siehe "
+                                 "collector_prioritaet). Standard: %(default)s")
         parser.add_argument("--dateien", action="store_true",
                             help=f"Rohantworten zusätzlich als Dateien nach "
                                  f"{config.FIXTURE_VERZEICHNIS}")
@@ -57,6 +62,7 @@ class Command(BaseCommand):
                 katalog=not optionen["ohne_katalog"],
                 spieler_tags=optionen["spieler"],
                 datei_verzeichnis=config.FIXTURE_VERZEICHNIS if optionen["dateien"] else None,
+                strategie=optionen["strategie"],
             )
         except (ValueError, ApiFehler) as fehler:
             raise CommandError(str(fehler))

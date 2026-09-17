@@ -424,6 +424,59 @@ BERICHT_VERZEICHNIS = getattr(
 
 
 # =========================================================================
+# Priorisierung der Spielerauswahl (services/prioritaet.py)
+# =========================================================================
+# Welchen Spieler als naechsten abrufen? Nicht "irgendeinen", sondern den,
+# dessen bekannte Historie die groessten Luecken beruehrt. Keine dieser
+# Zahlen steht im Code - wer die Strategie aendern will, aendert sie hier.
+#
+# WICHTIG: Ein Defizit > 0 heisst nur "hier fehlen Daten", nicht "diese
+# Daten gelten jetzt als belastbar". Die Confidence-Stufen
+# (CONFIDENCE_VOLL_AB, CONFIDENCE_STUFEN) bleiben davon unberuehrt.
+
+# Zielstichprobe je Einheit - vorlaeufig, nur fuer die Priorisierung.
+PRIORITAET_ZIELE = {
+    "brawler_global": 195,   # Wilson ±7 pp
+    "brawler_modus": 80,     # Wilson ±11 pp
+    "counter": 390,          # Paare messen eine Differenz: rund doppelte Streuung
+    "synergie": 390,
+}
+
+# Was ein Beitrag wiegt. Die Map-Ebene steht bewusst auf 0: 1474 Zeilen,
+# Median 5 Partien - sie wuerde die Auswahl mit Rauschen steuern.
+PRIORITAET_GEWICHTE = {
+    "brawler_global": 1.00,
+    "brawler_modus": 0.50,
+    "counter": 0.20,
+    "synergie": 0.15,
+    "brawler_map": 0.00,
+    # Brawler ohne gepflegtes Profil UND ohne belastbare Messung
+    # (Stufe "katalog") zaehlen zusaetzlich: dort fehlt nicht eine Zahl,
+    # sondern jede.
+    #
+    # Die Hoehe ist nachgerechnet, nicht geraten: ein Spieler mit lauter
+    # mittelhaeufigen Brawlern kommt ueber die Kappung auf hoechstens
+    # 3 x ~0,8 = 2,4 Punkte aus `brawler_global`. Ein einzelner
+    # Catalog-Only-Brawler bringt ~0,95 x (1,0 + 4,0) = 4,75 - er steht
+    # damit sicher vor der Breite, wie gefordert.
+    "katalog_bonus": 4.00,
+    # Nur Gleichstandsentscheid: hohe Trophaeen deuten auf aktives Spiel.
+    # Bewusst winzig - Rang ist kein Ranked-Rang (die API kennt keinen).
+    "rang": 0.05,
+}
+
+# Wie viele Beitraege je Kategorie hoechstens zaehlen - die groessten
+# zuerst. Ohne diese Kappung gewaenne allein, wer viele Partien in der
+# Historie hat: breite Vielspieler statt gezielter Luecken.
+PRIORITAET_MAX_BEITRAEGE = {
+    "brawler_global": 3,
+    "brawler_modus": 5,
+    "counter": 8,
+    "synergie": 8,
+}
+
+
+# =========================================================================
 # Offizielle API: Wiederholen, Pausen, Collector
 # =========================================================================
 # Die Dokumentation nennt kein Ratenlimit, und die Antworten tragen keine
@@ -439,6 +492,12 @@ API_BACKOFF_BASIS_SEKUNDEN = 1.0
 API_BACKOFF_MAX_SEKUNDEN = 30.0
 # Nennt eine 429-Antwort Retry-After, gilt dieser Wert - hoechstens so lange.
 API_RETRY_AFTER_MAX_SEKUNDEN = 120.0
+
+# Auswahlstrategie des Collectors:
+#   "standard" - Tiefe, dann Ranglistenplatz (die bisherige Reihenfolge)
+#   "luecken"  - nach Datenluecken, siehe services/prioritaet.py
+COLLECTOR_STRATEGIEN = ("standard", "luecken")
+COLLECTOR_STRATEGIE = "standard"
 
 # Battlelogs je Collector-Lauf. Klein halten: ein Lauf soll ueberschaubar
 # bleiben und jederzeit abbrechbar sein.

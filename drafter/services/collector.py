@@ -244,7 +244,7 @@ class SammelBericht:
 class Collector:
     def __init__(self, client=None, max_spieler=None, max_tiefe=None, abruf_abstand=None,
                  rangliste=True, katalog=True, spieler_tags=(), datei_verzeichnis=None,
-                 jetzt=None):
+                 jetzt=None, strategie=None):
         self.client = client if client is not None else BrawlApiClient()
         self.max_spieler = int(
             config.COLLECTOR_MAX_SPIELER if max_spieler is None else max_spieler
@@ -267,6 +267,16 @@ class Collector:
         self.datei_verzeichnis = datei_verzeichnis
         self._jetzt = jetzt or timezone.now
         self._katalog_nachgeladen = False
+        strategie = (strategie or config.COLLECTOR_STRATEGIE).lower()
+        if strategie not in config.COLLECTOR_STRATEGIEN:
+            raise ValueError(
+                f"Unbekannte Strategie '{strategie}'. Erlaubt: "
+                f"{', '.join(config.COLLECTOR_STRATEGIEN)}"
+            )
+        self.strategie = strategie
+        # Reihenfolge der Strategie "luecken" - einmal je Lauf gerechnet,
+        # aus bereits importierten Partien. Kein API-Zugriff.
+        self._prio_tags = None
 
     # --- Ablauf ---------------------------------------------------------
     def ausfuehren(self):
@@ -303,6 +313,7 @@ class Collector:
         return {
             "max_spieler": self.max_spieler,
             "max_tiefe": self.max_tiefe,
+            "strategie": self.strategie,
             "abruf_abstand_stunden": round(self.abruf_abstand.total_seconds() / 3600, 2),
             "rangliste": self.rangliste,
             "katalog": self.katalog,
@@ -409,7 +420,8 @@ class Collector:
             bericht.rangliste_neu += int(neu)
 
     # --- Schritt 3: Battlelogs ------------------------------------------
-    def _naechster(self, schon_abgefragt):
+    def _abrufbar(self, schon_abgefragt):
+        """Wer ueberhaupt in Frage kommt - unabhaengig von der Reihenfolge."""
         jetzt = self._jetzt()
         grenze = jetzt - self.abruf_abstand
         return (
@@ -418,9 +430,32 @@ class Collector:
             .exclude(tag__in=schon_abgefragt)
             .filter(Q(last_fetched_at__isnull=True) | Q(last_fetched_at__lt=grenze))
             .filter(Q(next_fetch_after__isnull=True) | Q(next_fetch_after__lte=jetzt))
-            .order_by("depth", F("ranking_position").asc(nulls_last=True), "created_at", "tag")
-            .first()
         )
+
+    def _luecken_reihenfolge(self):
+        """Tags nach Datenluecke, beste zuerst - einmal je Lauf.
+
+        Rechnet ausschliesslich auf importierten Partien (services/
+        prioritaet.py). Wer in der Historie nicht vorkommt, steht nicht in
+        dieser Liste und wird ueber die Standardreihenfolge nachgezogen.
+        """
+        if self._prio_tags is None:
+            from drafter.services.prioritaet import Priorisierung
+            prio = Priorisierung()
+            self._prio_tags = [b.tag for b in prio.rangliste(anzahl=None) if b.punkte > 0]
+        return self._prio_tags
+
+    def _naechster(self, schon_abgefragt):
+        abrufbar = self._abrufbar(schon_abgefragt)
+        if self.strategie == "luecken":
+            offen = set(abrufbar.values_list("tag", flat=True))
+            for tag in self._luecken_reihenfolge():
+                if tag in offen:
+                    return abrufbar.filter(tag=tag).first()
+        # Standard und Rueckfall: flach vor tief, Rangliste vor Rest.
+        return abrufbar.order_by(
+            "depth", F("ranking_position").asc(nulls_last=True), "created_at", "tag"
+        ).first()
 
     def _battlelogs(self, bericht):
         abgefragt = set()
