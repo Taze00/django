@@ -63,6 +63,11 @@ def katalog(request):
             "image_url": b.image_url,
             "ist_demo": b.is_demo,
             "limited": not b.is_active,
+            # Im Ranked-Modus nicht waehlbar - bleibt im Katalog, wird aber
+            # nie empfohlen und zaehlt nirgends als fehlende Datenlage.
+            "ranked_verfuegbar": b.ranked_verfuegbar,
+            "draft_rolle": b.draft_rolle_label,
+            "draft_faehigkeiten": list(b.draft_faehigkeiten or []),
         }
         for b in Brawler.objects.filter(
             Q(is_active=True) | Q(external_id__isnull=False)

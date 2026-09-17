@@ -110,8 +110,12 @@ class Datenraum:
         # bewertet werden, entscheidet `stufe()` - nicht der Ausschluss
         # aus dem Pool. Frueher standen hier nur aktive, und alles andere
         # war fuer die Engine unsichtbar, auch mit Messdaten.
+        # `ranked_verfuegbar=False` heisst: im Ranked-Modus nicht waehlbar.
+        # Solche Brawler sind weder Kandidat noch Datenluecke - sie fehlen
+        # nicht, sie gehoeren nicht hierher. Im Katalog bleiben sie.
         self.brawler = list(
             Brawler.objects.filter(Q(is_active=True) | Q(external_id__isnull=False))
+            .filter(ranked_verfuegbar=True)
             .prefetch_related("balance_changes__patch")
         )
         self._nach_id = {b.id: b for b in self.brawler}

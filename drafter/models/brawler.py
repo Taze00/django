@@ -68,6 +68,29 @@ class Brawler(Zeitstempel):
         help_text="Hex-Farbe der Platzhalterkachel, z.B. #7d5fff",
     )
 
+    # --- Gepflegtes Draft-Wissen (Role & Ability Map) -------------------
+    # Fachquelle, keine Messung: was ein Brawler im Draft TUT, nicht wie
+    # stark er gerade ist. Leer, solange nichts gepflegt ist.
+    draft_rolle = models.CharField(
+        max_length=20, choices=attr.DRAFT_ROLLEN, blank=True,
+        help_text="Aufgabe im Draft laut Role-&-Ability-Map (nicht die Katalogrolle)",
+    )
+    draft_faehigkeiten = models.JSONField(
+        default=list, blank=True,
+        help_text="Zusatzfähigkeiten laut Map: good_hyper, knockback_stun, wallbreak, "
+                  "pierce, special. Leere Liste = keine der hervorgehobenen.",
+    )
+
+    # Ob dieser Brawler im Ranked-Modus ueberhaupt waehlbar ist. False
+    # heisst: er fehlt dort NICHT - er gehoert nicht hin. Solche Brawler
+    # zaehlen nirgends als Datenluecke und tauchen in keiner Empfehlung
+    # auf, bleiben aber im Katalog. Supercell aendert das von Zeit zu
+    # Zeit; die Sperre ist deshalb ein Feld und kein Codezweig.
+    ranked_verfuegbar = models.BooleanField(
+        default=True,
+        help_text="Im Ranked-Modus wählbar? Aus = weder Empfehlung noch Datenlücke.",
+    )
+
     source = models.CharField(
         max_length=20, choices=Datenquelle.choices, default=Datenquelle.DEMO
     )
@@ -90,6 +113,16 @@ class Brawler(Zeitstempel):
         fehler += attr.pruefe_attribute(
             self.draft_values, attr.DRAFTWERT_KEYS, "draft_values"
         )
+        if self.draft_faehigkeiten is not None:
+            if not isinstance(self.draft_faehigkeiten, list):
+                fehler.append("draft_faehigkeiten: erwartet eine Liste")
+            else:
+                unbekannt = [
+                    f for f in self.draft_faehigkeiten
+                    if f not in attr.DRAFT_FAEHIGKEITEN_KEYS
+                ]
+                if unbekannt:
+                    fehler.append(f"draft_faehigkeiten: unbekannt {unbekannt}")
         if not isinstance(self.tags, list):
             fehler.append("tags: erwartet eine Liste")
         else:
@@ -100,6 +133,14 @@ class Brawler(Zeitstempel):
             raise ValidationError(fehler)
 
     # --- Datenstand ----------------------------------------------------
+    @property
+    def draft_rolle_label(self):
+        return attr.DRAFT_ROLLEN_LABEL.get(self.draft_rolle, "")
+
+    def kann(self, faehigkeit):
+        """Traegt dieser Brawler diese Zusatzfaehigkeit laut Map?"""
+        return faehigkeit in (self.draft_faehigkeiten or [])
+
     @property
     def hat_profil(self):
         """Gibt es ein gepflegtes Eigenschaftsprofil?

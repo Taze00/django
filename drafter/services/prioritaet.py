@@ -117,6 +117,11 @@ class Datenluecken:
         ).exclude(winner_side="")
         for b in Brawler.objects.all():
             self.brawler_namen[b.id] = b.name
+        # Nicht ranked-waehlbare Brawler erzeugen kein Defizit: ihre Null
+        # ist kein Mangel an Daten, sondern die Abwesenheit des Brawlers.
+        self.ausgeschlossen = {
+            b.id for b in Brawler.objects.filter(ranked_verfuegbar=False)
+        }
         from drafter.models import GameMode
         for m in GameMode.objects.all():
             self.modus_namen[m.id] = m.name
@@ -177,7 +182,7 @@ class Datenluecken:
     def seltene_brawler(self, grenze=None):
         """Brawler unterhalb der Zielstichprobe - nach Defizit sortiert."""
         grenze = _ziel("brawler_global") if grenze is None else grenze
-        alle = set(self.brawler_namen) | set(self.brawler_global)
+        alle = (set(self.brawler_namen) | set(self.brawler_global)) - self.ausgeschlossen
         return sorted(
             (b for b in alle if self.brawler_global.get(b, 0) < grenze),
             key=lambda b: self.brawler_global.get(b, 0),
@@ -226,6 +231,8 @@ class Priorisierung:
         # 1. Brawler global - der Hauptgrund.
         einzeln = []
         for brawler in luecken.spieler_brawler.get(tag, {}):
+            if brawler in luecken.ausgeschlossen:
+                continue
             n = luecken.brawler_global.get(brawler, 0)
             d = defizit(n, "brawler_global")
             if d <= 0:
@@ -241,6 +248,8 @@ class Priorisierung:
         # 2. Brawler je Modus.
         einzeln = []
         for modus, brawler in luecken.spieler_modus.get(tag, ()):
+            if brawler in luecken.ausgeschlossen:
+                continue
             n = luecken.brawler_modus.get((modus, brawler), 0)
             d = defizit(n, "brawler_modus")
             if d <= 0:

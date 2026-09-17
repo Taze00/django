@@ -175,6 +175,42 @@ ROLLEN = [
 ]
 
 ROLLEN_KEYS = tuple(k for k, _ in ROLLEN)
+
+
+# =========================================================================
+# Draft-Rollen und Zusatzfaehigkeiten (gepflegte Fachquelle)
+# =========================================================================
+# Getrennt von ROLLEN, weil es eine andere Frage beantwortet: ROLLEN sind
+# der Archetyp aus dem Katalog ("Marksman"), DRAFT_ROLLEN die Aufgabe im
+# Draft aus der Role-&-Ability-Map ("Anti-Tank"). Beides nebeneinander zu
+# fuehren ist Absicht - ein Marksman kann im Draft Anti-Tank sein.
+#
+# Diese Angaben sagen NICHTS darueber, wie stark ein Brawler gerade ist.
+# Sie sind stabiles Draft-Wissen, keine Meta.
+
+DRAFT_ROLLEN = [
+    ("thrower", "Thrower"),
+    ("tank", "Tank"),
+    ("space_maker", "Space Maker / Assassin"),
+    ("anti_tank", "Anti-Tank"),
+    ("support", "Support"),
+    ("sniper", "Sniper"),
+    ("control", "Control"),
+]
+DRAFT_ROLLEN_KEYS = tuple(k for k, _ in DRAFT_ROLLEN)
+DRAFT_ROLLEN_LABEL = dict(DRAFT_ROLLEN)
+
+# Die Farblegende der Map. "weiss" ist keine Faehigkeit, sondern ihr
+# Fehlen - es wird deshalb nicht gespeichert, sondern ist die leere Liste.
+DRAFT_FAEHIGKEITEN = [
+    ("good_hyper", "Gute Hypercharge"),
+    ("knockback_stun", "Rückstoß / Betäubung"),
+    ("wallbreak", "Wände brechen"),
+    ("pierce", "Durchdringender Schaden"),
+    ("special", "Besondere Fähigkeit"),
+]
+DRAFT_FAEHIGKEITEN_KEYS = tuple(k for k, _ in DRAFT_FAEHIGKEITEN)
+DRAFT_FAEHIGKEITEN_LABEL = dict(DRAFT_FAEHIGKEITEN)
 ROLLEN_LABEL = dict(ROLLEN)
 
 
