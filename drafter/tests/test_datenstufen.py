@@ -214,3 +214,63 @@ class QuellenprioritaetTest(DrafterTest):
         for e in self.engine(gegner=["bull"]).empfehlungen():
             for k in e.als_dict()["komponenten"]:
                 self.assertIn(k["quelle"], erlaubt, (e.brawler.slug, k["key"]))
+
+
+class RankedVerfuegbarkeitTest(DrafterTest):
+    """Nicht ranked-wählbare Brawler sind keine Datenlücke."""
+
+    def setUp(self):
+        self.gesperrt = Brawler.objects.create(
+            name="COSMO", slug="cosmo", external_id="16000200",
+            is_active=False, ranked_verfuegbar=False,
+        )
+
+    def test_gesperrter_brawler_ist_kein_kandidat(self):
+        engine = DraftEngine(self.context())
+        self.assertNotIn("cosmo", {b.slug for b in engine.raum.brawler})
+        self.assertNotIn("cosmo", engine.als_dict()["scores"])
+
+    def test_gesperrter_brawler_bleibt_im_katalog(self):
+        from django.urls import reverse
+        daten = self.client.get(reverse("drafter:api_katalog")).json()
+        eintrag = next(b for b in daten["brawler"] if b["slug"] == "cosmo")
+        self.assertFalse(eintrag["ranked_verfuegbar"])
+
+    def test_gesperrter_brawler_erzeugt_kein_defizit(self):
+        from drafter.services.prioritaet import Datenluecken
+        luecken = Datenluecken()
+        self.assertIn(self.gesperrt.id, luecken.ausgeschlossen)
+        self.assertNotIn(self.gesperrt.id, luecken.seltene_brawler())
+
+    def test_sperre_ist_umstellbar(self):
+        Brawler.objects.filter(pk=self.gesperrt.pk).update(ranked_verfuegbar=True, is_active=True)
+        engine = DraftEngine(self.context())
+        self.assertIn("cosmo", {b.slug for b in engine.raum.brawler})
+
+
+class PersoenlicheConfidenceOptionalTest(DrafterTest):
+    """Ohne gepflegte Werte darf nichts schlechter werden."""
+
+    def test_ohne_werte_kein_malus_und_keine_luecke(self):
+        e = next(x for x in DraftEngine(self.context()).empfehlungen() if x.brawler.slug == "gale")
+        persoenlich = e.komponenten[config.K_PERSONAL]
+        self.assertFalse(persoenlich.verfuegbar)
+        self.assertEqual(persoenlich.beitrag, 0.0)
+        self.assertEqual(e.datenabdeckung, 1.0, "Abdeckung bleibt voll")
+        self.assertEqual(e.ausgelassen, [], "gilt nicht als fehlende Komponente")
+
+    def test_ohne_werte_ist_die_confidence_nicht_niedriger(self):
+        ohne = next(x for x in DraftEngine(self.context()).empfehlungen()
+                    if x.brawler.slug == "gale")
+        mit = next(x for x in DraftEngine(
+            self.context(personal={self.brawler("gale").id: {"confidence": 50.0}})
+        ).empfehlungen() if x.brawler.slug == "gale")
+        self.assertGreaterEqual(ohne.confidence, mit.confidence - 1e-9)
+
+    def test_gepflegter_wert_wirkt_weiterhin_begrenzt(self):
+        e = next(x for x in DraftEngine(
+            self.context(personal={self.brawler("gale").id: {"confidence": 100.0}})
+        ).empfehlungen() if x.brawler.slug == "gale")
+        komp = e.komponenten[config.K_PERSONAL]
+        self.assertTrue(komp.verfuegbar)
+        self.assertLessEqual(abs(komp.beitrag), config.PERSOENLICH_MAX_AUSSCHLAG + 1e-9)

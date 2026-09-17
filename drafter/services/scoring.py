@@ -198,7 +198,16 @@ class Empfehlung:
 
     @property
     def ausgelassen(self):
-        return [k for k in self.aufschluesselung() if k.key in self.komponenten and not k.verfuegbar]
+        """Komponenten, die mangels Daten aus dem Score fallen.
+
+        Ohne die persoenliche Sicherheit: sie ist freiwillig. Wer keine
+        pflegt, soll nicht lesen, dass ihm etwas fehlt - sie zaehlt weder
+        zur Abdeckung noch zur Confidence.
+        """
+        return [
+            k for k in self.aufschluesselung()
+            if k.key in self.komponenten and not k.verfuegbar and k.key != config.K_PERSONAL
+        ]
 
     @property
     def roher_score(self):

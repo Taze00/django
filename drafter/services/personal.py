@@ -80,7 +80,13 @@ def komponente(kandidat, ctx):
     komp = Komponente(key=config.K_PERSONAL)
     eintrag = (ctx.personal or {}).get(kandidat.id)
     if not eintrag:
-        komp.confidence = 0.3
+        # Ohne gepflegten Wert faellt die Komponente heraus - kein Malus,
+        # keine gesenkte Confidence, kein "Unknown-Problem". Der Drafter
+        # muss ohne jede persoenliche Angabe vollstaendig funktionieren.
+        # Frueher blieb sie mit Wert 0 und Confidence 0.3 stehen und zog
+        # die Gesamtsicherheit jeder Empfehlung nach unten.
+        komp.verfuegbar = False
+        komp.confidence = 0.0
         return komp
 
     confidence = float(eintrag.get("confidence", config.PERSOENLICH_NEUTRAL))
