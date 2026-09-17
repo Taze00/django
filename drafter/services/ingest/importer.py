@@ -131,13 +131,24 @@ class MatchImporter:
 
     # --- Ablauf ---------------------------------------------------------
     def ausfuehren(self):
+        """Alle Lieferungen importieren.
+
+        **Ohne umspannende Transaktion** (ausser im Trockenlauf): jede
+        Lieferung und jede Partie sichert sich selbst. Frueher lag alles in
+        EINER Transaktion - ein einziger Fehler nahm damit auch die schon
+        gespeicherte Rohantwort zurueck, und die Antwort war ohne neuen
+        Abruf nicht wiederherstellbar (2026-09-17: ein Battlelog, 17 Partien).
+        """
         bericht = ImportBericht()
-        with transaction.atomic():
-            for lieferung in self.provider.lieferungen():
-                self._lieferung(lieferung, bericht)
-            if self.trockenlauf:
+        if self.trockenlauf:
+            with transaction.atomic():
+                for lieferung in self.provider.lieferungen():
+                    self._lieferung(lieferung, bericht)
                 transaction.set_rollback(True)
                 bericht.meldungen.append("Trockenlauf - nichts wurde gespeichert")
+            return bericht
+        for lieferung in self.provider.lieferungen():
+            self._lieferung(lieferung, bericht)
         return bericht
 
     def _lieferung(self, lieferung, bericht):
@@ -151,21 +162,30 @@ class MatchImporter:
             return
 
         hash_wert = inhalts_hash(lieferung.rohdaten)
-        if RawPayload.objects.filter(content_hash=hash_wert).exists():
+        # Schon gespeicherte Rohantwort: die Partien werden trotzdem noch
+        # einmal durchgegangen. Nur so laesst sich eine Antwort, deren
+        # Import beim ersten Mal teilweise scheiterte, spaeter nachholen -
+        # ohne neuen Abruf. Neu entsteht dabei nichts: die Deduplizierung
+        # erkennt jede vorhandene Partie am Fingerprint.
+        vorhandene = RawPayload.objects.filter(content_hash=hash_wert).first()
+        if vorhandene is not None:
             bericht.bereits_importiert += 1
-            bericht.meldungen.append(f"{lieferung.referenz}: bereits importiert - übersprungen")
-            return
+            bericht.meldungen.append(
+                f"{lieferung.referenz}: Rohantwort lag schon vor - Partien erneut geprüft"
+            )
 
         status = {
             "ausgewertet": RawPayload.ParseStatus.PARSED,
             "nicht_unterstuetzt": RawPayload.ParseStatus.UNSUPPORTED,
         }.get(lieferung.status, RawPayload.ParseStatus.ERROR)
 
+        # 1. Rohantwort ZUERST und in eigener Transaktion. Sie ist das
+        #    Original; alles andere laesst sich daraus neu rechnen. Schlaegt
+        #    der Import danach fehl, bleibt sie erhalten und kann mit
+        #    `import_brawl_fixture` erneut eingespielt werden.
         try:
-            # Eigener Sicherungspunkt je Lieferung: eine kaputte Datei
-            # soll nicht den ganzen Import zuruecknehmen.
             with transaction.atomic():
-                payload = RawPayload.objects.create(
+                payload = vorhandene or RawPayload.objects.create(
                     source=lieferung.source,
                     format=lieferung.format[:60],
                     reference=lieferung.referenz[:300],
@@ -174,24 +194,42 @@ class MatchImporter:
                     parse_status=status,
                     parse_message=lieferung.meldung,
                 )
-                if lieferung.matches is None:
-                    if status == RawPayload.ParseStatus.UNSUPPORTED:
-                        bericht.nicht_unterstuetzt += 1
-                    else:
-                        bericht.fehlerhaft += 1
-                    bericht.meldungen.append(f"{lieferung.referenz}: {lieferung.meldung}")
-                    return
+        except (DatabaseError, ValueError, TypeError) as fehler:
+            bericht.fehlerhaft += 1
+            bericht.meldungen.append(
+                f"{lieferung.referenz}: Rohantwort nicht speicherbar - {fehler}")
+            return
 
-                neu_vorher = bericht.neu
-                for record in lieferung.matches:
-                    bericht.matches_gelesen += 1
+        if lieferung.matches is None:
+            if status == RawPayload.ParseStatus.UNSUPPORTED:
+                bericht.nicht_unterstuetzt += 1
+            else:
+                bericht.fehlerhaft += 1
+            bericht.meldungen.append(f"{lieferung.referenz}: {lieferung.meldung}")
+            return
+
+        # 2. Jede Partie einzeln absichern. Eine kaputte Partie (etwa eine
+        #    Map, deren Katalogeintrag sich nicht anlegen laesst) kostet
+        #    genau diese Partie - nicht den ganzen Battlelog.
+        neu_vorher = bericht.neu
+        for record in lieferung.matches:
+            bericht.matches_gelesen += 1
+            try:
+                with transaction.atomic():
                     self._match(record, payload, lieferung.source, bericht)
+            except (DatabaseError, ValueError, TypeError) as fehler:
+                bericht.fehlerhaft += 1
+                bericht.meldungen.append(
+                    f"{lieferung.referenz}: Partie übersprungen - {self._kennung(record)}: {fehler}"
+                )
 
-                bericht.ungueltig += len(lieferung.fehler)
-                bericht.uebersprungen += len(lieferung.uebersprungen)
-                for fehler in lieferung.fehler[:5]:
-                    bericht.meldungen.append(f"{lieferung.referenz}: {fehler}")
+        bericht.ungueltig += len(lieferung.fehler)
+        bericht.uebersprungen += len(lieferung.uebersprungen)
+        for fehler in lieferung.fehler[:5]:
+            bericht.meldungen.append(f"{lieferung.referenz}: {fehler}")
 
+        try:
+            with transaction.atomic():
                 payload.match_count = len(lieferung.matches)
                 payload.new_match_count = bericht.neu - neu_vorher
                 if lieferung.fehler or lieferung.uebersprungen:
@@ -200,9 +238,22 @@ class MatchImporter:
                         + [f"ÜBERSPRUNGEN: {u}" for u in lieferung.uebersprungen]
                     )
                 payload.save(update_fields=["match_count", "new_match_count", "parse_message"])
-        except (DatabaseError, ValueError, TypeError) as fehler:
-            bericht.fehlerhaft += 1
-            bericht.meldungen.append(f"{lieferung.referenz}: Import abgebrochen - {fehler}")
+        except DatabaseError as fehler:   # Zaehler sind Beiwerk, die Daten stehen
+            bericht.meldungen.append(f"{lieferung.referenz}: Zähler nicht gespeichert - {fehler}")
+
+    def _kennung(self, record):
+        """Was eine Partie im Fehlertext identifizierbar macht."""
+        try:
+            modus, karte, ort = self._ort_fuer(record)
+            fingerprint = eindeutiger_fingerprint(record, self._identitaet, ort)[:16]
+        except Exception:      # noqa: BLE001 - im Fehlerpfad nie noch einmal scheitern
+            fingerprint = "?"
+        return (
+            f"fingerprint {fingerprint}, Partie-ID '{record.external_id or '-'}', "
+            f"Map '{record.map or '-'}' (ID {record.external_map_id or '-'}), "
+            f"Modus '{record.mode or '-'}' (ID {record.external_mode_id or '-'}), "
+            f"Typ '{record.battle_type or '-'}', gespielt {record.played_at}"
+        )
 
     # --- Aufloesung gegen den Katalog -----------------------------------
     def _brawler_fuer(self, name, externe_id):

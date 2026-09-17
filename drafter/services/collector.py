@@ -36,6 +36,7 @@ importiert Partien - was daraus folgt, rechnet die Aggregation.
 from collections import Counter
 from dataclasses import dataclass, field
 from datetime import timedelta
+from itertools import combinations
 
 from django.db.models import F, Q
 from django.utils import timezone
@@ -43,7 +44,7 @@ from django.utils import timezone
 from drafter import config
 from drafter.models import Brawler, Datenquelle
 from drafter.models.collector import CollectorRun, TrackedPlayer
-from drafter.models.matches import RawPayload
+from drafter.models.matches import Match, RawPayload
 from drafter.services.brawl_api_client import (
     PFAD_BRAWLER, ApiFehler, BrawlApiClient, KeinKeyFehler, NetzwerkFehler, NichtGefundenFehler,
     RatenlimitFehler, ServerFehler, UngueltigerKeyFehler, ZugriffVerweigertFehler,
@@ -102,6 +103,7 @@ class SammelBericht:
     id_widersprueche: list = field(default_factory=list)
     unbekannte_brawler: set = field(default_factory=set)
     api: dict = field(default_factory=dict)
+    datenlage: dict = field(default_factory=dict)
 
     def uebernehmen(self, imp):
         """Zahlen eines Importberichts aufaddieren."""
@@ -144,6 +146,44 @@ class SammelBericht:
             "id_widersprueche": self.id_widersprueche,
             "unbekannte_brawler": sorted(self.unbekannte_brawler),
             "api": self.api,
+            "datenlage": self.datenlage,
+        }
+
+    def datenlage_aktualisieren(self):
+        """Kennzahlen nur aus zaehlbaren soloRanked-Partien berechnen."""
+        brawler = Counter()
+        kombination = Counter()
+        counter = Counter()
+        synergie = Counter()
+        matches = Match.objects.filter(
+            source=Datenquelle.API, battle_type__in=config.DRAFT_STATISTIK_BATTLE_TYPEN,
+            winner_side__in=[Match.Seite.A, Match.Seite.B], has_conflict=False,
+        ).prefetch_related("players")
+        for match in matches:
+            teams = {side: [] for side in (Match.Seite.A, Match.Seite.B)}
+            kontext = (match.external_map_id or match.map_name or "?",
+                       match.external_mode_id or match.mode_name or "?")
+            for player in match.players.all():
+                key = player.external_brawler_id or str(player.brawler_id or player.brawler_name)
+                brawler[key] += 1
+                kombination[(kontext, key)] += 1
+                if player.side in teams:
+                    teams[player.side].append(key)
+            for seite in teams.values():
+                for paar in combinations(sorted(set(seite)), 2):
+                    synergie[paar] += 1
+            for links in teams[Match.Seite.A]:
+                for rechts in teams[Match.Seite.B]:
+                    counter[tuple(sorted((links, rechts)))] += 1
+        self.datenlage = {
+            "brawler_ab_20": sum(n >= 20 for n in brawler.values()),
+            "brawler_ab_50": sum(n >= 50 for n in brawler.values()),
+            "brawler_ab_100": sum(n >= 100 for n in brawler.values()),
+            "brawler_ab_250": sum(n >= 250 for n in brawler.values()),
+            "map_mode_brawler_ab_20": sum(n >= 20 for n in kombination.values()),
+            "map_mode_brawler_ab_50": sum(n >= 50 for n in kombination.values()),
+            "counter_paare_ab_20": sum(n >= 20 for n in counter.values()),
+            "synergie_paare_ab_20": sum(n >= 20 for n in synergie.values()),
         }
 
     def zeilen(self):
@@ -167,6 +207,19 @@ class SammelBericht:
             f"  Dubletten entfernt: {self.duplikate} ({typ(self.duplikate_nach_typ)})",
             f"  Konflikte:          {self.konflikte}",
         ]
+        if self.datenlage:
+            zeilen += [
+                "Datenlage soloRanked: "
+                f"Brawler >=20 {self.datenlage['brawler_ab_20']}, "
+                f">=50 {self.datenlage['brawler_ab_50']}, "
+                f">=100 {self.datenlage['brawler_ab_100']}, "
+                f">=250 {self.datenlage['brawler_ab_250']}",
+                "  Map/Mode/Brawler:  "
+                f">=20 {self.datenlage['map_mode_brawler_ab_20']}, "
+                f">=50 {self.datenlage['map_mode_brawler_ab_50']}",
+                f"  Counter-Paare >=20: {self.datenlage['counter_paare_ab_20']}",
+                f"  Synergie-Paare >=20: {self.datenlage['synergie_paare_ab_20']}",
+            ]
         if self.katalog_neu:
             zeilen.append(f"Katalog neu (inaktiv): {', '.join(self.katalog_neu)}")
         if self.katalog_verknuepft:
@@ -236,6 +289,7 @@ class Collector:
             bericht.fehler[str(fehler.status)] += 1
             bericht.abbruch = str(fehler)
         finally:
+            bericht.datenlage_aktualisieren()
             bericht.api = self.client.statistik.als_dict()
             lauf.finished_at = timezone.now()
             lauf.status = CollectorRun.Status.ABORTED if bericht.abbruch \

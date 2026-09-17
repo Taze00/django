@@ -170,6 +170,32 @@ def brawler_abgleichen(items):
 # Modi und Maps aus Partien
 # =========================================================================
 
+def _anlegen(modell, ext, bericht, **felder):
+    """Katalogeintrag anlegen - ein Konflikt kostet nie die Partie.
+
+    Zwei Eintraege koennen denselben Namen und verschiedene IDs haben
+    (Brawl Ball 3v3 und 5v5). Der Slug loest das ueber `freier_slug`,
+    aber zwischen Pruefung und Anlage kann ein anderer Prozess denselben
+    Slug belegen, und eine doppelte `external_id` ist ebenfalls moeglich.
+    Frueher flog daraus ein IntegrityError bis in den Importer und nahm
+    den ganzen Battlelog zurueck.
+
+    Die Anlage laeuft deshalb in einem eigenen Sicherungspunkt. Scheitert
+    sie, gilt ein vorhandener Eintrag mit derselben ID - sonst gibt es
+    keinen, und die Partie wird ohne Katalogbezug gespeichert.
+    """
+    try:
+        with transaction.atomic():
+            return modell.objects.create(**felder)
+    except IntegrityError as fehler:
+        vorhanden = modell.objects.filter(external_id=ext).first()
+        bericht.id_widersprueche.append(
+            f"{modell.__name__} '{felder.get('name')}' (ID {ext}) nicht angelegt: {fehler}"
+            + (f" - vorhandener Eintrag '{vorhanden.name}' benutzt" if vorhanden else "")
+        )
+        return vorhanden
+
+
 class KatalogErgaenzer:
     """Legt Modi und Maps an, die eine Partie mit Quellen-ID nennt.
 
@@ -202,12 +228,15 @@ class KatalogErgaenzer:
             # oder ein anderer Endpoint-Name derselben ID. Die ID entscheidet,
             # also bekommt sie einen eigenen Eintrag - mit ID im Namen, weil
             # der Name allein nicht mehr unterscheidet.
-            modus = GameMode.objects.create(
+            modus = _anlegen(
+                GameMode, ext, bericht,
                 name=f"{modus_anzeigename(record.mode)} ({ext})"[:60],
                 slug=freier_slug(GameMode, schluessel, ext), external_id=ext,
                 description=HINWEIS_OHNE_PROFIL[:200], base_requirements={},
                 is_active=False, order=ORDNUNG_NEUER_MODI,
             )
+            if modus is None:
+                return None
             self._modi[modus.slug] = modus
             self._modi_ext[ext] = modus
             bericht.katalog_neu.append(
@@ -221,11 +250,14 @@ class KatalogErgaenzer:
             bericht.katalog_verknuepft.append(f"Modus {modus.name} → {ext}")
             return modus
 
-        modus = GameMode.objects.create(
+        modus = _anlegen(
+            GameMode, ext, bericht,
             name=modus_anzeigename(record.mode)[:60], slug=freier_slug(GameMode, schluessel),
             external_id=ext, description=HINWEIS_OHNE_PROFIL[:200], base_requirements={},
             is_active=False, order=ORDNUNG_NEUER_MODI,
         )
+        if modus is None:
+            return None
         self._modi[modus.slug] = modus
         self._modi_ext[ext] = modus
         bericht.katalog_neu.append(f"Modus {modus.name} ({ext})")
@@ -255,11 +287,14 @@ class KatalogErgaenzer:
             bericht.katalog_verknuepft.append(f"Map {karte.name} ({modus.name}) → {ext}")
             return
 
-        karte = BrawlMap.objects.create(
+        karte = _anlegen(
+            BrawlMap, ext, bericht,
             name=record.map[:80], slug=freier_slug(BrawlMap, schluessel, modus.slug),
             external_id=ext, game_mode=modus, requirements={}, traits={},
             source=Datenquelle.API, is_active=False, notes=HINWEIS_OHNE_PROFIL,
         )
+        if karte is None:
+            return
         self._maps[karte.slug] = karte
         self._maps_ext[ext] = karte
         bericht.katalog_neu.append(f"Map {karte.name} ({modus.name}, {ext})")
