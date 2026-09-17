@@ -69,3 +69,7 @@ data/brawl_reports/
 # Drafter: Portraits und Map-Bilder aus dem Supercell Fan Kit. Gehoeren
 # Supercell, werden mit import_fankit_bilder eingespielt, nicht versioniert.
 static/drafter/fankit/
+
+# Fan-Kit-Downloads: Ausgangsdateien von Hand geladen, gehoeren Supercell.
+# Eingespielt wird mit import_fankit_bilder nach static/drafter/fankit/.
+fankit_download/

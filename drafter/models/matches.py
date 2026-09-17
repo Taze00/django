@@ -49,6 +49,20 @@ class RawPayload(Zeitstempel):
         max_length=20, choices=ParseStatus.choices, default=ParseStatus.PARSED
     )
     parse_message = models.TextField(blank=True)
+    # Woher diese Antwort stammt. Die Herkunft haengt an der ROHANTWORT,
+    # nicht am Match: dieselbe Partie kann ueber mehrere Laeufe und
+    # Strategien auftauchen (sechs Spieler, sechs Battlelogs). Ueber die
+    # M2M `Match.payloads` gehoeren einem Match damit beliebig viele
+    # Herkuenfte - ohne dass ein String ueberschrieben wuerde.
+    collector_run = models.ForeignKey(
+        "drafter.CollectorRun", on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="payloads",
+    )
+    sampling = models.CharField(
+        max_length=30, blank=True, db_index=True,
+        help_text="Auswahlstrategie des Laufs: standard, luecken, broad_high_rank …",
+    )
+
     match_count = models.PositiveIntegerField(default=0)
     new_match_count = models.PositiveIntegerField(default=0)
 
@@ -132,6 +146,17 @@ class Match(Zeitstempel):
 
     has_conflict = models.BooleanField(default=False, db_index=True)
     conflict_note = models.CharField(max_length=300, blank=True)
+
+    @property
+    def sampling_quellen(self):
+        """Alle Auswahlstrategien, ueber die diese Partie gefunden wurde.
+
+        Mehrere sind der Normalfall und kein Widerspruch: eine Partie aus
+        einem Luecken-Lauf kann spaeter in einem breiten Lauf erneut
+        auftauchen. Welche Auswertung welche Herkunft zulaesst, entscheidet
+        die Auswertung - hier wird nichts verworfen.
+        """
+        return sorted({p.sampling for p in self.payloads.all() if p.sampling})
 
     class Meta:
         ordering = ["-played_at"]

@@ -301,6 +301,9 @@ class Lieferung:
     rohdaten: object
     source: str
     matches: list = None
+    # Herkunft der Lieferung - wird an der Rohantwort gespeichert.
+    sampling: str = ""
+    collector_run_id: int = None
     status: str = "ausgewertet"       # ausgewertet | nicht_unterstuetzt | fehler
     meldung: str = ""
     # Einzelne Matches, die beim Auswerten verworfen wurden - die

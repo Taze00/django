@@ -211,6 +211,43 @@ DRAFT_FAEHIGKEITEN = [
 ]
 DRAFT_FAEHIGKEITEN_KEYS = tuple(k for k, _ in DRAFT_FAEHIGKEITEN)
 DRAFT_FAEHIGKEITEN_LABEL = dict(DRAFT_FAEHIGKEITEN)
+
+
+# =========================================================================
+# Map-Merkmale
+# =========================================================================
+# Beschreibende Merkmale einer Map (0-100 bzw. Anzahl). Anders als die
+# `requirements` sagen sie nicht, was hier ZAEHLT, sondern wie die Map
+# AUSSIEHT - daraus leiten Coach, Builds und Ableitungen ab.
+MAP_TRAITS = [
+    ("openness", "Offenheit", "0 = verwinkelt, 100 = freies Feld"),
+    ("wall_density", "Wanddichte", "Wie viel Deckung steht herum"),
+    ("bush_density", "Buschdichte", "Sicht und Hinterhalte"),
+    ("choke_points", "Engstellen", "Wie stark Wege gebuendelt sind"),
+    ("lane_count", "Lanes", "Anzahl paralleler Wege, meist 2-3"),
+]
+MAP_TRAIT_KEYS = tuple(k for k, _, _ in MAP_TRAITS)
+MAP_TRAIT_LABEL = {k: l for k, l, _ in MAP_TRAITS}
+
+
+def pruefe_map_traits(werte):
+    """Wie pruefe_attribute, aber fuer Map-Merkmale. Liste von Fehlertexten."""
+    fehler = []
+    if not isinstance(werte, dict):
+        return ["traits: erwartet ein Objekt"]
+    for key, wert in werte.items():
+        if key not in MAP_TRAIT_KEYS:
+            fehler.append(f"traits: unbekannter Schlüssel '{key}'")
+            continue
+        try:
+            zahl = float(wert)
+        except (TypeError, ValueError):
+            fehler.append(f"traits.{key}: keine Zahl ({wert!r})")
+            continue
+        grenze = 10 if key == "lane_count" else 100
+        if not 0 <= zahl <= grenze:
+            fehler.append(f"traits.{key}: {zahl} liegt nicht zwischen 0 und {grenze}")
+    return fehler
 ROLLEN_LABEL = dict(ROLLEN)
 
 

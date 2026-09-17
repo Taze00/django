@@ -274,9 +274,12 @@ class Collector:
                 f"{', '.join(config.COLLECTOR_STRATEGIEN)}"
             )
         self.strategie = strategie
-        # Reihenfolge der Strategie "luecken" - einmal je Lauf gerechnet,
-        # aus bereits importierten Partien. Kein API-Zugriff.
+        # Reihenfolge der auswaehlenden Strategien - einmal je Lauf
+        # gerechnet, aus bereits importierten Partien. Kein API-Zugriff.
         self._prio_tags = None
+        self._broad_tags = None
+        # Fuer die Herkunft an der Rohantwort (models/matches.RawPayload).
+        self._lauf_id = None
 
     # --- Ablauf ---------------------------------------------------------
     def ausfuehren(self):
@@ -285,6 +288,7 @@ class Collector:
                 "BRAWL_STARS_API_KEY ist nicht gesetzt - es wurde nichts abgerufen."
             )
         lauf = CollectorRun.objects.create(parameters=self._parameter())
+        self._lauf_id = lauf.id
         bericht = SammelBericht()
         try:
             if self.katalog:
@@ -335,6 +339,7 @@ class Collector:
             defaults=dict(
                 source=Datenquelle.API, format=format_name[:60], reference=str(referenz)[:300],
                 payload=huelle, fetched_at=antwort.abgerufen_am,
+                sampling=self.strategie, collector_run_id=self._lauf_id,
                 parse_status=RawPayload.ParseStatus.UNSUPPORTED,
                 parse_message="Gespeichert, nicht ausgewertet - enthält keine Partien.",
             ),
@@ -445,8 +450,28 @@ class Collector:
             self._prio_tags = [b.tag for b in prio.rangliste(anzahl=None) if b.punkte > 0]
         return self._prio_tags
 
+    def _broad_reihenfolge(self):
+        """Tags der breiten High-Rank-Stichprobe, einmal je Lauf.
+
+        Traegt fehlende High-Rank-Spieler vorher nach: sie stehen in
+        importierten Partien, waren aber wegen der Tiefengrenze nie
+        gespeichert. Das kostet keine API-Anfrage.
+        """
+        if self._broad_tags is None:
+            from drafter.services.stichprobe import HighRankStichprobe
+            stichprobe = HighRankStichprobe()
+            stichprobe.nachtragen(tiefe=min(self.max_tiefe, config.COLLECTOR_TIEFE_OBERGRENZE))
+            self._broad_tags = stichprobe.reihenfolge()
+        return self._broad_tags
+
     def _naechster(self, schon_abgefragt):
         abrufbar = self._abrufbar(schon_abgefragt)
+        if self.strategie == "broad_high_rank":
+            offen = set(abrufbar.values_list("tag", flat=True))
+            for tag in self._broad_reihenfolge():
+                if tag in offen:
+                    return abrufbar.filter(tag=tag).first()
+            return None    # kein belegter High-Rank-Spieler mehr offen
         if self.strategie == "luecken":
             offen = set(abrufbar.values_list("tag", flat=True))
             for tag in self._luecken_reihenfolge():
@@ -531,6 +556,7 @@ class Collector:
             bericht.uebernehmen(MatchImporter(_EineLieferung(Lieferung(
                 referenz=spieler.tag, format=FORMAT_OFFIZIELLER_BATTLELOG, rohdaten=huelle,
                 source=Datenquelle.API, matches=None, status="fehler", meldung=str(fehler),
+                sampling=self.strategie, collector_run_id=self._lauf_id,
             ))).ausfuehren())
             bericht.fehler["parser"] += 1
             self._markieren(spieler, "parser", fehler, timedelta(hours=1), gesehen=True)
@@ -542,6 +568,7 @@ class Collector:
                 referenz=spieler.tag, format=FORMAT_OFFIZIELLER_BATTLELOG, rohdaten=huelle,
                 source=Datenquelle.API, matches=ergebnis.matches,
                 fehler=ergebnis.fehler, uebersprungen=ergebnis.uebersprungen,
+                sampling=self.strategie, collector_run_id=self._lauf_id,
             )),
             katalog_ergaenzen=True,
         ).ausfuehren())

@@ -119,6 +119,7 @@ class BrawlMap(Zeitstempel):
 
     def clean(self):
         fehler = attr.pruefe_attribute(self.requirements, attr.ATTRIBUT_KEYS, "requirements")
+        fehler += attr.pruefe_map_traits(self.traits or {})
         if fehler:
             raise ValidationError(fehler)
 

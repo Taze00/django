@@ -424,6 +424,50 @@ BERICHT_VERZEICHNIS = getattr(
 
 
 # =========================================================================
+# Abgeleitete Signale (services/faehigkeiten.py)
+# =========================================================================
+# KEINE Scoring-Gewichte. Diese Zahlen uebersetzen gepflegtes Wissen in
+# abgeleitete Groessen, die der Coach lesen kann - sie gehen (noch) in
+# keinen Score ein.
+
+# Welche Zusatzfaehigkeit der Role-&-Ability-Map welchen Attributen
+# entspricht. Liegt ein Profil vor, gilt der gemessene/gepflegte
+# Attributwert; sonst sagt die Map nur "kann das" - ohne Staerke.
+FAEHIGKEIT_ATTRIBUTE = {
+    "wallbreak": ("wallbreak",),
+    "knockback_stun": ("knockback", "stun"),
+    # Fuer diese drei gibt es im 32er-Vokabular keine Entsprechung. Sie
+    # bleiben qualitativ: "hat es" oder "hat es nicht".
+    "pierce": (),
+    "good_hyper": (),
+    "special": (),
+}
+
+# Wie sehr eine Draft-Rolle typischerweise von Waenden lebt, 0-1.
+# ANNAHMEN, keine Messung - sie stehen hier, damit sie an einer Stelle
+# korrigierbar sind. Thrower brauchen Waende (sie werfen darueber),
+# Sniper und Anti-Tank brauchen Sichtlinien.
+WANDABHAENGIGKEIT_ROLLE = {
+    "thrower": 0.85,
+    "space_maker": 0.60,
+    "tank": 0.50,
+    "support": 0.50,
+    "control": 0.45,
+    "anti_tank": 0.30,
+    "sniper": 0.15,
+}
+
+# Welche Attribute dieselbe Frage aus dem Profil beantworten, mit
+# Vorzeichen: Nahkampf und Flaechenkontrolle sprechen fuer Waende,
+# Reichweite dagegen.
+WANDABHAENGIGKEIT_ATTRIBUTE = {
+    "close_range": 0.5,
+    "area_control": 0.5,
+    "long_range": -0.5,
+}
+
+
+# =========================================================================
 # Priorisierung der Spielerauswahl (services/prioritaet.py)
 # =========================================================================
 # Welchen Spieler als naechsten abrufen? Nicht "irgendeinen", sondern den,
@@ -496,7 +540,25 @@ API_RETRY_AFTER_MAX_SEKUNDEN = 120.0
 # Auswahlstrategie des Collectors:
 #   "standard" - Tiefe, dann Ranglistenplatz (die bisherige Reihenfolge)
 #   "luecken"  - nach Datenluecken, siehe services/prioritaet.py
-COLLECTOR_STRATEGIEN = ("standard", "luecken")
+#   "broad_high_rank" - breite Stichprobe belegter High-Rank-Spieler,
+#                       ohne Auswahl nach Brawler (services/stichprobe.py)
+COLLECTOR_STRATEGIEN = ("standard", "luecken", "broad_high_rank")
+
+# Ab welchem belegten Ranked-Rang ein Spieler als "high rank" gilt.
+#
+# NUMERISCH, nicht benannt: der Wert steht so in `brawler.trophies` von
+# soloRanked-Partien (beobachtet 2026-09-17: durchgehend 3 bis 22, Power
+# immer 11; zum Vergleich tragen Trophaeen-Partien dort 5 bis 5882).
+# Welche Stufe welcher Zahl entspricht, ist NICHT aus der API belegt -
+# die Vermutung 16-18 = Legendary, 19+ = Masters steht bewusst nur als
+# Kommentar und nirgends als Label in der Oberflaeche.
+BROAD_MIN_RANG = 16
+
+# Wie viele Spieler je bereits bekannter Partie hoechstens ausgewaehlt
+# werden. 1 heisst: von sechs Mitspielern derselben Partie holt ein Lauf
+# hoechstens einen - sonst importiert er dieselbe Partie mehrfach.
+# Gemessen: 1434 von 2596 Partien enthalten mehr als einen Kandidaten.
+BROAD_MAX_JE_PARTIE = 1
 COLLECTOR_STRATEGIE = "standard"
 
 # Battlelogs je Collector-Lauf. Klein halten: ein Lauf soll ueberschaubar

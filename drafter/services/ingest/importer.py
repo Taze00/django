@@ -193,6 +193,8 @@ class MatchImporter:
                     payload=lieferung.rohdaten,
                     parse_status=status,
                     parse_message=lieferung.meldung,
+                    sampling=(getattr(lieferung, "sampling", "") or "")[:30],
+                    collector_run_id=getattr(lieferung, "collector_run_id", None),
                 )
         except (DatabaseError, ValueError, TypeError) as fehler:
             bericht.fehlerhaft += 1
