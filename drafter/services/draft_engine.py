@@ -158,6 +158,10 @@ class DraftEngine:
             }
             for key, komp in komponenten.items():
                 komp.gewicht = gewichte.get(key, 0.0)
+                if not komp.verfuegbar:
+                    komp.quelle = "Unknown"
+                elif komp.quelle == "Unknown":
+                    komp.quelle = "Profile"
 
             # Leitplanke: die persoenliche Sicherheit darf den Score nur
             # um config.PERSOENLICH_MAX_AUSSCHLAG verschieben.

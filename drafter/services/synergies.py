@@ -13,6 +13,7 @@ Das Paar ist mehr als beide einzeln - zwei Belles waeren es nicht.
 """
 
 from drafter import config
+from drafter.services import quellen
 from drafter.services.scoring import Grund, Komponente, klemme
 
 
@@ -78,43 +79,67 @@ def heuristische_synergie(a, b):
 
 
 def paar(a, b, raum):
-    """Synergie eines Paares: gepflegt, sonst geschaetzt."""
+    """Synergie eines Paares nach Quellenprioritaet (services/quellen.py).
+
+    Gibt (wert, grund, quelle) zurueck; quelle None = nichts bekannt.
+    """
     eintrag = raum.synergie(a, b)
-    if eintrag:
-        quelle = "demo" if eintrag.is_demo else "daten"
-        grund = eintrag.reason or (
-            f"{a.name} und {b.name} ergänzen sich" if eintrag.synergy > 0
+    prior = raum.synergie_prior(a, b)
+    gemessen = eintrag if (eintrag is not None and not eintrag.is_demo
+                           and (eintrag.games or 0) > 0) else None
+    if prior is None and eintrag is not None and gemessen is None:
+        prior = eintrag    # reiner Demo-Provider oder synthetisch: gilt als gepflegt
+
+    if gemessen is not None or prior is not None:
+        n = float(gemessen.sample_size or gemessen.games or 0) if gemessen else 0.0
+        wert, quelle = quellen.mischen(
+            gemessen.synergy if gemessen else None,
+            prior.synergy if prior else None,
+            n, config.PAAR_PRIOR_STAERKE,
+        )
+        text = (prior.reason if prior is not None and gemessen is None else "") or (
+            f"{a.name} und {b.name} ergänzen sich" if wert > 0
             else f"{a.name} und {b.name} beißen sich"
         )
-        return klemme(eintrag.synergy), grund, quelle
+        return klemme(wert), text, quelle
     if not (a.hat_profil and b.hat_profil):
         # Ergaenzung laesst sich ohne Eigenschaften nicht schaetzen.
         return 0.0, None, None
     wert, grund = heuristische_synergie(a, b)
-    return wert, grund, "heuristik"
+    return wert, grund, quellen.PROFILE
 
 
 def komponente(kandidat, ctx, raum):
     """Synergie-Komponente: wie gut passt der Kandidat zu unseren Picks."""
     komp = Komponente(key=config.K_SYNERGY)
     if not ctx.own_picks:
+        komp.quelle = quellen.PROFILE if kandidat.hat_profil else quellen.UNKNOWN
         return komp
 
     werte = []
+    herkunft = []
     for mitspieler in ctx.own_picks:
         wert, grund, quelle = paar(kandidat, mitspieler, raum)
         if quelle is None:
             continue
         werte.append(wert)
+        herkunft.append(quelle)
         if grund and abs(wert) > 0.15:
             komp.gruende.append(Grund(
-                text=grund, positiv=wert > 0, staerke=min(1.0, abs(wert) + 0.25), quelle=quelle
+                text=grund, positiv=wert > 0, staerke=min(1.0, abs(wert) + 0.25),
+                quelle=(
+                    "heuristik" if raum.synergie(kandidat, mitspieler) is None
+                    and raum.synergie_prior(kandidat, mitspieler) is None
+                    else "daten" if quelle != quellen.PROFILE else "demo"
+                ),
             ))
 
     if not werte:
         komp.verfuegbar = False
         komp.confidence = 0.0
+        komp.quelle = quellen.UNKNOWN
         return komp
     komp.wert = klemme(sum(werte) / len(werte))
     komp.confidence = min(1.0, 0.5 + 0.25 * len(werte))
+    komp.quelle = quellen.schwaechste(herkunft)
     return komp

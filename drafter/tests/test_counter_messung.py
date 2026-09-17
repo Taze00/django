@@ -57,7 +57,7 @@ class GemessenerCounterTest(CounterBasis):
         raum = self.raum(self.zeile("gale", "bull", 0.3, quelle=Datenquelle.SYNTHETIC))
         wert, _, quelle = self.v(raum, "bull", "gale")
         self.assertAlmostEqual(wert, -0.3)
-        self.assertEqual(quelle, "demo", "Synthetisch ist nicht gemessen - so benannt")
+        self.assertEqual(quelle, "Profile", "Synthetisch ist nicht gemessen - Profil bleibt Prior")
 
     def test_grund_nennt_die_stichprobe_statt_eines_mechanismus(self):
         raum = self.raum(self.zeile("gale", "bull", 0.3, spiele=812))
@@ -66,11 +66,26 @@ class GemessenerCounterTest(CounterBasis):
         self.assertIn("als erwartet", grund)
 
     def test_messung_hat_vorrang_vor_pflege(self):
+        """Genug Partien: die Messung ersetzt den gepflegten Wert ganz."""
         raum = self.raum(
             self.zeile("gale", "bull", 0.6, quelle=Datenquelle.DEMO),
-            self.zeile("bull", "gale", -0.2, quelle=Datenquelle.FIXTURE),
+            self.zeile("bull", "gale", -0.2, quelle=Datenquelle.FIXTURE,
+                       spiele=config.CONFIDENCE_VOLL_AB),
         )
-        self.assertAlmostEqual(self.v(raum, "gale", "bull")[0], 0.2)
+        wert, _, quelle = self.v(raum, "gale", "bull")
+        self.assertAlmostEqual(wert, 0.2)
+        self.assertEqual(quelle, "Measured")
+
+    def test_wenig_messung_wird_mit_pflege_gemischt(self):
+        """Kleine Stichprobe: Messung und gepflegter Wert, nach Stichprobe gewichtet."""
+        raum = self.raum(
+            self.zeile("gale", "bull", 0.6, quelle=Datenquelle.DEMO),
+            self.zeile("bull", "gale", -0.2, quelle=Datenquelle.FIXTURE, spiele=40),
+        )
+        wert, _, quelle = self.v(raum, "gale", "bull")
+        w = 40 / (40 + config.PAAR_PRIOR_STAERKE)
+        self.assertAlmostEqual(wert, w * 0.2 + (1 - w) * 0.6)
+        self.assertEqual(quelle, "Measured + Prior")
 
 
 class GepflegterCounterTest(CounterBasis):
@@ -97,7 +112,8 @@ class GepflegterCounterTest(CounterBasis):
         her, _ = heuristischer_vorteil(bull, gale)
         erwartet = max(-1.0, min(1.0, hin - her * config.HEURISTISCHER_COUNTER_GEGENRICHTUNG))
         self.assertAlmostEqual(vorteil(gale, bull, raum)[0], erwartet)
-        self.assertEqual(vorteil(gale, bull, raum)[2], "heuristik")
+        # Heuristik aus Eigenschaften zaehlt als Quelle "Profile".
+        self.assertEqual(vorteil(gale, bull, raum)[2], "Profile")
 
     def test_zugriffe_trennen_die_bedeutungen(self):
         gepflegt = self.zeile("gale", "bull", 0.3, quelle=Datenquelle.MANUAL)

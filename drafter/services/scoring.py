@@ -88,6 +88,7 @@ class Komponente:
     # anwendbar" (Counter ohne bekannte Gegner) bleibt dagegen verfuegbar
     # mit Wert 0 - das gilt fuer alle Kandidaten gleich.
     verfuegbar: bool = True
+    quelle: str = "Unknown"   # Measured | Measured + Prior | Profile | Unknown
 
     @property
     def beitrag(self):
@@ -113,6 +114,7 @@ class Komponente:
             "key": self.key,
             "label": self.label,
             "verfuegbar": self.verfuegbar,
+            "quelle": self.quelle if self.verfuegbar else "Unknown",
             # Der Rohwert der Komponente in [-1, +1]. Steht mit dabei,
             # weil Beitrag = Wert x Gewicht ist: ohne den Wert kann man
             # "schwache Komponente" nicht von "kleines Gewicht"

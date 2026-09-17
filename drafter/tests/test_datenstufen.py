@@ -82,6 +82,13 @@ class DatenstufenTest(DrafterTest):
         )
         self.assertAlmostEqual(bewertung, meta.beitrag * e.skalierung, places=6)
 
+    def test_quelle_steht_an_jeder_komponente(self):
+        self.messe(self.nori, 30)
+        e = self.empfehlung(self.engine(), "nori")
+        self.assertEqual(e.komponenten[config.K_META].quelle, "Measured + Prior")
+        quellen = {k["key"]: k["quelle"] for k in e.als_dict()["komponenten"]}
+        self.assertEqual(quellen[config.K_MAP_MODE], "Unknown")
+
     def test_voll_bekannter_brawler_wird_nicht_skaliert(self):
         e = self.empfehlung(DraftEngine(self.context()), "gale")
         self.assertEqual(e.skalierung, 1.0)
@@ -151,3 +158,59 @@ class DatenstufenTest(DrafterTest):
         self.assertFalse(engine.raum.nur_demo)
         gale = self.empfehlung(engine, "gale")
         self.assertLessEqual(gale.confidence, DEMO_DECKEL)
+
+
+class QuellenprioritaetTest(DrafterTest):
+    """Messung ersetzt Gepflegtes nur, wenn tatsaechlich gemessen wurde."""
+
+    def engine(self, **kwargs):
+        from drafter.services.providers.datenbank import gemessen_mit_prior_provider
+        return DraftEngine(self.context(**kwargs), provider=gemessen_mit_prior_provider())
+
+    def meta(self, engine, slug):
+        e = next(x for x in engine.empfehlungen(anzahl=200) if x.brawler.slug == slug)
+        return e.komponenten[config.K_META]
+
+    def messe(self, slug, spiele, rate):
+        BrawlerStat.objects.create(
+            brawler=self.brawler(slug), games=spiele, sample_size=spiele,
+            wins=round(spiele * rate), raw_rate=rate, adjusted_rate=rate,
+            confidence=0.2, source=Datenquelle.API, window_label="90d",
+        )
+
+    def test_profil_ohne_messung_behaelt_seine_meta(self):
+        # Irgendeine Messung im Datenraum - aber keine fuer Gale.
+        self.messe("sandy", 30, 0.55)
+        meta = self.meta(self.engine(), "gale")
+        self.assertTrue(meta.verfuegbar)
+        self.assertEqual(meta.quelle, "Profile")
+
+    def test_wenig_messung_mischt_mit_dem_profil(self):
+        from drafter.services.quellen import meta_aufloesen
+        prior = BrawlerStat.objects.get(brawler__slug="gale", source=Datenquelle.DEMO)
+        self.messe("gale", 30, 0.30)
+        engine = self.engine()
+        auskunft = engine.raum.meta(self.brawler("gale"))
+        w = 30 / (30 + config.PRIOR_STAERKE)
+        self.assertEqual(auskunft.quelle, "Measured + Prior")
+        self.assertAlmostEqual(auskunft.rate, w * 0.30 + (1 - w) * prior.adjusted_rate)
+        self.assertEqual(self.meta(engine, "gale").quelle, "Measured + Prior")
+
+    def test_genug_messung_ersetzt_das_profil(self):
+        self.messe("gale", config.CONFIDENCE_VOLL_AB, 0.30)
+        auskunft = self.engine().raum.meta(self.brawler("gale"))
+        self.assertEqual(auskunft.quelle, "Measured")
+        self.assertAlmostEqual(auskunft.rate, 0.30)
+
+    def test_weder_messung_noch_profil_ist_unknown(self):
+        nori = Brawler.objects.create(name="NORI", slug="nori", external_id="1", is_active=False)
+        auskunft = self.engine().raum.meta(nori)
+        self.assertEqual(auskunft.quelle, "Unknown")
+        self.assertIsNone(auskunft.rate)
+
+    def test_jede_komponente_nennt_ihre_quelle(self):
+        self.messe("sandy", 30, 0.55)
+        erlaubt = {"Measured", "Measured + Prior", "Profile", "Unknown"}
+        for e in self.engine(gegner=["bull"]).empfehlungen():
+            for k in e.als_dict()["komponenten"]:
+                self.assertIn(k["quelle"], erlaubt, (e.brawler.slug, k["key"]))

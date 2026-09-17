@@ -80,6 +80,13 @@ class Datenraum:
         # die spezifischste Zeile (Map mit 3 Spielen) sagt nichts darueber,
         # ob es fuer den Brawler insgesamt genug Messungen gibt.
         self._spiele = {}     # brawler_id                -> int
+        # Gepflegte Werte (demo/manual) GETRENNT von den gemessenen. Sie
+        # sind der Prior je Komponente - siehe `quellen.py`. Leer, wenn der
+        # Provider keine getrennte Prior-Quelle mitbringt.
+        self._stat_prior = {}
+        self._counter_prior = {}
+        self._synergie_prior = {}
+        self._build_prior = {}
         self._geladen = False
 
     # --- Laden ----------------------------------------------------------
@@ -116,7 +123,24 @@ class Datenraum:
             brawl_map_id=self.brawl_map.id if self.brawl_map else None,
             rank_pool=self.rank_pool or "",
         )
-        brawler_zeilen = self.provider.brawler_stats(anfrage)
+        # Mischt der Provider Messung und Prior (OverlayStatProvider), werden
+        # beide Seiten einzeln geladen: welche Quelle je Komponente gilt,
+        # entscheidet die Komponente, nicht eine Zeilenauswahl vorab.
+        messung = getattr(self.provider, "gemessen", self.provider)
+        prior = getattr(self.provider, "prior", None)
+        if prior is not None:
+            self._stat_prior = self._bestes_je_schluessel(
+                prior.brawler_stats(anfrage), lambda r: r.brawler_id, ids)
+            self._counter_prior = self._bestes_je_schluessel(
+                prior.counter_stats(anfrage), lambda r: (r.brawler_id, r.partner_id), ids)
+            self._synergie_prior = self._bestes_je_schluessel(
+                prior.synergy_stats(anfrage),
+                lambda r: tuple(sorted((r.brawler_id, r.partner_id))), ids)
+            self._build_prior = self._bestes_je_schluessel(
+                prior.build_stats(anfrage),
+                lambda r: (r.brawler_id, r.item_kind, r.item_slug), ids)
+
+        brawler_zeilen = messung.brawler_stats(anfrage)
         self._stat = self._bestes_je_schluessel(
             brawler_zeilen, lambda r: r.brawler_id, ids,
         )
@@ -127,14 +151,14 @@ class Datenraum:
                     self._spiele.get(zeile.brawler_id, 0), zeile.games or 0
                 )
         self._counter = self._bestes_je_schluessel(
-            self.provider.counter_stats(anfrage), lambda r: (r.brawler_id, r.partner_id), ids,
+            messung.counter_stats(anfrage), lambda r: (r.brawler_id, r.partner_id), ids,
         )
         self._synergie = self._bestes_je_schluessel(
-            self.provider.synergy_stats(anfrage),
+            messung.synergy_stats(anfrage),
             lambda r: tuple(sorted((r.brawler_id, r.partner_id))), ids,
         )
         self._build = self._bestes_je_schluessel(
-            self.provider.build_stats(anfrage),
+            messung.build_stats(anfrage),
             lambda r: (r.brawler_id, r.item_kind, r.item_slug), ids,
         )
         self._geladen = True
@@ -157,12 +181,29 @@ class Datenraum:
             if punkte < 0:
                 continue
             k = schluessel(record)
-            if punkte > bewertung.get(k, -1):
+            rang = (1 if record.ist_gemessen else 0, punkte)
+            if rang > bewertung.get(k, (-1, -1)):
                 gewaehlt[k] = record
-                bewertung[k] = punkte
+                bewertung[k] = rang
         return gewaehlt
 
     # --- Abfragen -------------------------------------------------------
+    # --- Prior (gepflegte Werte) ---------------------------------------
+    def stat_prior(self, brawler):
+        return self._stat_prior.get(brawler.id)
+
+    def counter_prior(self, brawler, gegner):
+        return self._counter_prior.get((brawler.id, gegner.id))
+
+    def synergie_prior(self, a, b):
+        schluessel = (a.id, b.id) if a.id < b.id else (b.id, a.id)
+        return self._synergie_prior.get(schluessel)
+
+    def meta(self, brawler):
+        """Meta-Rate nach Quellenprioritaet - siehe services/quellen.py."""
+        from drafter.services.quellen import meta_aufloesen
+        return meta_aufloesen(self.stat(brawler), self.stat_prior(brawler))
+
     def counter(self, brawler, gegner):
         """Vorteil von `brawler` gegen `gegner` laut Statistik, sonst None.
 
@@ -180,7 +221,12 @@ class Datenraum:
         return self._stat.get(brawler.id)
 
     def build_stat(self, brawler, art, slug):
-        return self._build.get((brawler.id, art, slug))
+        # Builds: Messung, sonst gepflegt. Eine Mischung lohnt hier nicht -
+        # sie verschieben nur die Regelwahl (BUILD_STAT_EINFLUSS).
+        messung = self._build.get((brawler.id, art, slug))
+        if messung is not None and (messung.games or 0) > 0:
+            return messung
+        return self._build_prior.get((brawler.id, art, slug)) or messung
 
     def gemessene_spiele(self, brawler):
         return self._spiele.get(brawler.id, 0)
@@ -214,6 +260,8 @@ class Datenraum:
         alle = (
             list(self._stat.values()) + list(self._counter.values())
             + list(self._synergie.values()) + list(self._build.values())
+            + list(self._stat_prior.values()) + list(self._counter_prior.values())
+            + list(self._synergie_prior.values())
         )
         return all(r.is_demo for r in alle) if alle else True
 

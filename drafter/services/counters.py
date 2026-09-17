@@ -19,6 +19,7 @@ entsteht, ist Sache des Aggregators, nicht dieser Datei.
 """
 
 from drafter import config
+from drafter.services import quellen
 from drafter.services.scoring import Grund, Komponente, klemme
 
 # Ab welchem Attributwert eine Eigenschaft ueberhaupt als Antwort zaehlt.
@@ -103,80 +104,106 @@ def _gemessener_vorteil(hin, her):
     return None
 
 
+def _gepflegter_vorteil(hin, her, gegner):
+    """Netto aus gepflegten, gerichteten Zeilen - oder (None, None)."""
+    hin_wert = hin.manual_counter_score if hin is not None else None
+    her_wert = her.manual_counter_score if her is not None else None
+    if hin_wert is None and her_wert is None:
+        return None, None
+    wert = (hin_wert or 0.0) - (her_wert or 0.0) * config.GEPFLEGTER_COUNTER_GEGENRICHTUNG
+    # Vier Faelle, nicht zwei: ein Vorteil kann auch daraus entstehen,
+    # dass der GEGNER gegen uns schlecht dasteht. Wurde das uebersehen,
+    # rechnete die Engine den Vorteil zwar richtig, konnte ihn aber
+    # nicht begruenden - die Empfehlung stand oben und sagte nicht warum.
+    grund = None
+    if hin_wert is not None and hin_wert > 0.15:
+        grund = hin.reason or f"ist stark gegen {gegner.name}"
+    elif her_wert is not None and her_wert < -0.15:
+        grund = her.reason or f"hat gegen {gegner.name} die besseren Werkzeuge"
+    elif her_wert is not None and her_wert > 0.15:
+        grund = her.reason or f"verliert das Matchup gegen {gegner.name}"
+    elif hin_wert is not None and hin_wert < -0.15:
+        grund = hin.reason or f"kommt gegen {gegner.name} nicht durch"
+    return klemme(wert), grund
+
+
 def vorteil(kandidat, gegner, raum):
     """Netto-Vorteil im Matchup, [-1, +1] - plus Begruendung und Quelle.
 
-    Drei Rechenwege, weil die drei Quellen Verschiedenes bedeuten:
+    Quelle nach services/quellen.py: "Measured", "Measured + Prior",
+    "Profile" - oder None, wenn nichts bekannt ist (Aufrufer lassen das
+    Paar dann aus).
 
-    1. **Gemessen** (aus Partien aggregiert, `measured_counter_advantage`):
-       Der Wert IST bereits die Netto-Aussage - die Abweichung der
-       Paar-Siegquote von der log5-Erwartung aus den Einzelstaerken. Die
-       Gegenrichtung ist exakt ihr Negativ und wird daraus abgeleitet,
-       nicht zusaetzlich abgezogen. Symmetrisch per Konstruktion:
-       vorteil(A, B) == -vorteil(B, A).
+    Drei Wertarten, weil sie Verschiedenes bedeuten:
 
-    2. **Gepflegt** (Demo, manuell, `manual_counter_score`): Zwei
-       eigenstaendige, gerichtete Einschaetzungen, die asymmetrisch sein
-       duerfen. Netto = hin - Faktor * her.
+    1. **Gemessen** (`measured_counter_advantage`): bereits die Netto-
+       Aussage (Abweichung von der log5-Erwartung), die Gegenrichtung ist
+       ihr Negativ - symmetrisch per Konstruktion.
+    2. **Gepflegt** (`manual_counter_score`): zwei gerichtete
+       Einschaetzungen, Netto = hin - Faktor * her.
+    3. **Heuristik** aus Eigenschaften - nur, wenn weder 1 noch 2 vorliegt
+       und BEIDE ein Profil haben. Zaehlt als "Profile".
 
-    3. **Heuristik** (keine Zeile): wie gepflegt, aus Attributen geschaetzt.
-
-    Gibt es fuer ein Paar Messung und Pflege zugleich, gilt die Messung.
-
-    Frueher liefen 1 und 2 durch dieselbe Formel "hin - 0,8 * her". Fuer
-    gepflegte Werte ist das richtig; fuer gemessene, gegengleiche Werte
-    wurde dasselbe Matchup damit 1,8-fach gezaehlt.
+    Liegen 1 und 2 vor, entscheidet die Stichprobe: wenig Partien mischen
+    die Messung mit dem gepflegten Wert, viele ersetzen ihn. Die frueher
+    gemeinsame Formel "hin - 0,8 * her" fuer beide zaehlte gemessene
+    Matchups 1,8-fach.
     """
     hin = raum.counter(kandidat, gegner)
     her = raum.counter(gegner, kandidat)
 
-    # --- 1. Gemessen ----------------------------------------------------
+    # --- 1. Gemessen (echte Partien) -----------------------------------
+    gem_wert, gem_zeile = None, None
     gemessen = _gemessener_vorteil(hin, her)
-    if gemessen is not None:
-        wert, zeile = gemessen
-        quelle = "demo" if zeile.is_demo else "daten"
-        grund = None
-        # Gemessene Zeilen haben keinen gepflegten Grundtext - der Satz
-        # nennt deshalb, WORAUF die Aussage beruht, statt einen Mechanismus
-        # zu behaupten, den die Messung nicht kennt.
-        if wert > 0.15:
-            grund = f"gewinnt gegen {gegner.name} öfter als erwartet ({zeile.games} Partien)"
-        elif wert < -0.15:
-            grund = f"verliert gegen {gegner.name} öfter als erwartet ({zeile.games} Partien)"
-        return klemme(wert), grund, quelle
+    if gemessen is not None and not gemessen[1].is_demo and (gemessen[1].games or 0) > 0:
+        gem_wert, gem_zeile = gemessen
 
-    # --- 2. Gepflegt ----------------------------------------------------
-    hin_wert = hin.manual_counter_score if hin is not None else None
-    her_wert = her.manual_counter_score if her is not None else None
-    if hin_wert is not None or her_wert is not None:
-        wert = (hin_wert or 0.0) - (her_wert or 0.0) * config.GEPFLEGTER_COUNTER_GEGENRICHTUNG
-        quelle = "demo" if (hin or her).is_demo else "daten"
-        # Vier Faelle, nicht zwei: ein Vorteil kann auch daraus entstehen,
-        # dass der GEGNER gegen uns schlecht dasteht. Wurde das uebersehen,
-        # rechnete die Engine den Vorteil zwar richtig, konnte ihn aber
-        # nicht begruenden - die Empfehlung stand oben und sagte nicht warum.
-        grund = None
-        if hin_wert is not None and hin_wert > 0.15:
-            grund = hin.reason or f"ist stark gegen {gegner.name}"
-        elif her_wert is not None and her_wert < -0.15:
-            grund = her.reason or f"hat gegen {gegner.name} die besseren Werkzeuge"
-        elif her_wert is not None and her_wert > 0.15:
-            grund = her.reason or f"verliert das Matchup gegen {gegner.name}"
-        elif hin_wert is not None and hin_wert < -0.15:
-            grund = hin.reason or f"kommt gegen {gegner.name} nicht durch"
+    # --- 2. Gepflegt: aus der Prior-Quelle; ohne getrennten Prior (reiner
+    #        Demo-Provider) stehen die gepflegten Zeilen im Messplatz.
+    p_hin = raum.counter_prior(kandidat, gegner) or (hin if hin is not None and hin.ist_gepflegt else None)
+    p_her = raum.counter_prior(gegner, kandidat) or (her if her is not None and her.ist_gepflegt else None)
+    gep_wert, gep_grund = _gepflegter_vorteil(p_hin, p_her, gegner)
+
+    # Nicht gemessene "Messungen" (synthetische Testdaten) sind kein Beleg:
+    # sie gelten wie ein gepflegter Wert, wenn es keinen echten gibt.
+    if gem_wert is None and gep_wert is None and gemessen is not None:
+        return klemme(gemessen[0]), None, quellen.PROFILE
+
+    if gem_wert is not None or gep_wert is not None:
+        n = float(gem_zeile.sample_size or gem_zeile.games or 0) if gem_zeile else 0.0
+        wert, quelle = quellen.mischen(gem_wert, gep_wert, n, config.PAAR_PRIOR_STAERKE)
+        grund = gep_grund
+        if gem_zeile is not None:
+            # Gemessene Zeilen haben keinen gepflegten Grundtext - der Satz
+            # nennt, WORAUF die Aussage beruht, statt einen Mechanismus zu
+            # behaupten, den die Messung nicht kennt.
+            if wert > 0.15:
+                grund = f"gewinnt gegen {gegner.name} öfter als erwartet ({gem_zeile.games} Partien)"
+            elif wert < -0.15:
+                grund = f"verliert gegen {gegner.name} öfter als erwartet ({gem_zeile.games} Partien)"
+            else:
+                grund = None
         return klemme(wert), grund, quelle
 
     # --- 3. Heuristik ---------------------------------------------------
     # Nur, wenn BEIDE ein Profil haben. Sonst rechnete sie mit Nullen
     # ("schießt weiter als SHELLY", weil Shellys Reichweite als 0 galt).
-    # Quelle None = keine Auskunft; Aufrufer lassen das Paar aus.
     if not (kandidat.hat_profil and gegner.hat_profil):
         return 0.0, None, None
     hin_h, grund_hin = heuristischer_vorteil(kandidat, gegner)
     her_h, grund_her = heuristischer_vorteil(gegner, kandidat)
     wert = klemme(hin_h - her_h * config.HEURISTISCHER_COUNTER_GEGENRICHTUNG)
     grund = grund_hin if abs(hin_h) >= abs(her_h) else grund_her
-    return wert, grund, "heuristik"
+    return wert, grund, quellen.PROFILE
+
+
+def ist_heuristisch(kandidat, gegner, raum):
+    """Beruht das Matchup nur auf Eigenschaften (fuer "(geschätzt)" im Text)?"""
+    return (
+        raum.counter(kandidat, gegner) is None and raum.counter(gegner, kandidat) is None
+        and raum.counter_prior(kandidat, gegner) is None
+        and raum.counter_prior(gegner, kandidat) is None
+    )
 
 
 def komponente(kandidat, ctx, raum):
@@ -186,20 +213,31 @@ def komponente(kandidat, ctx, raum):
     zusaetzlich: ein Pick, der gegen zwei Gegner neutral und gegen einen
     hart verliert, ist kein neutraler Pick - genau dieser eine Gegner
     wird ihn den ganzen Kampf lang jagen.
+
+    Quelle der Komponente ist die schwaechste beteiligte Quelle.
     """
     komp = Komponente(key=config.K_COUNTER)
     if not ctx.enemy_picks:
+        # Nicht anwendbar (fuer alle gleich) - verfuegbar mit Wert 0.
+        komp.quelle = quellen.PROFILE if kandidat.hat_profil else quellen.UNKNOWN
         return komp
 
     werte = []
+    herkunft = []
     for gegner in ctx.enemy_picks:
         wert, grund, quelle = vorteil(kandidat, gegner, raum)
         if quelle is None:
             continue   # unbekanntes Matchup - weder Vorteil noch Nachteil
         werte.append(wert)
+        herkunft.append(quelle)
         if grund and abs(wert) > 0.12:
+            grund_quelle = (
+                "heuristik" if ist_heuristisch(kandidat, gegner, raum)
+                else "daten" if quelle != quellen.PROFILE else "demo"
+            )
             komp.gruende.append(Grund(
-                text=grund, positiv=wert > 0, staerke=min(1.0, abs(wert) + 0.3), quelle=quelle
+                text=grund, positiv=wert > 0, staerke=min(1.0, abs(wert) + 0.3),
+                quelle=grund_quelle,
             ))
 
     if not werte:
@@ -207,12 +245,14 @@ def komponente(kandidat, ctx, raum):
         # "neutral", sondern nicht berechenbar.
         komp.verfuegbar = False
         komp.confidence = 0.0
+        komp.quelle = quellen.UNKNOWN
         return komp
     mittel = sum(werte) / len(werte)
     schlechtester = min(werte)
     komp.wert = klemme(mittel * 0.7 + schlechtester * 0.3)
     # Jeder bekannte Gegner macht die Aussage sicherer.
     komp.confidence = min(1.0, 0.45 + 0.2 * len(werte))
+    komp.quelle = quellen.schwaechste(herkunft)
     return komp
 
 

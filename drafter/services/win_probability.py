@@ -94,7 +94,7 @@ class HeuristicWinProbabilityProvider(WinProbabilityProvider):
 
     def _meta_diff(self, ctx, raum):
         def staerke(picks):
-            werte = [raum.stat(b).staerke for b in picks if raum.stat(b)]
+            werte = [raum.meta(b).staerke for b in picks if raum.meta(b).rate is not None]
             return sum(werte) / len(werte) if werte else None
 
         eigen = staerke(ctx.own_picks)

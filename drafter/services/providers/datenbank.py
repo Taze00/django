@@ -75,6 +75,47 @@ class DatenbankStatProvider(StatProvider):
         return self._zeilen(BuildStat, anfrage, "brawler_id")
 
 
+class OverlayStatProvider(StatProvider):
+    """Gemessene Werte bevorzugen, gepflegte Werte je Schluessel behalten."""
+
+    name = "gemessen"
+
+    def __init__(self, gemessen, prior):
+        self.gemessen = gemessen
+        self.prior = prior
+
+    def status(self):
+        return self.gemessen.status()
+
+    def _overlay(self, gemessen, prior, schluessel):
+        zeilen = {schluessel(record): record for record in prior}
+        for record in gemessen:
+            if record.games > 0:
+                zeilen[schluessel(record)] = record
+        return list(zeilen.values())
+
+    def brawler_stats(self, anfrage):
+        return self._overlay(self.gemessen.brawler_stats(anfrage), self.prior.brawler_stats(anfrage),
+                             lambda r: (r.brawler_id, r.game_mode_id, r.brawl_map_id,
+                                        r.rank_pool, r.window_label))
+
+    def counter_stats(self, anfrage):
+        return self._overlay(self.gemessen.counter_stats(anfrage), self.prior.counter_stats(anfrage),
+                             lambda r: (r.brawler_id, r.partner_id, r.game_mode_id,
+                                        r.brawl_map_id, r.rank_pool, r.window_label))
+
+    def synergy_stats(self, anfrage):
+        return self._overlay(self.gemessen.synergy_stats(anfrage), self.prior.synergy_stats(anfrage),
+                             lambda r: (r.brawler_id, r.partner_id, r.game_mode_id,
+                                        r.brawl_map_id, r.rank_pool, r.window_label))
+
+    def build_stats(self, anfrage):
+        return self._overlay(self.gemessen.build_stats(anfrage), self.prior.build_stats(anfrage),
+                             lambda r: (r.brawler_id, r.item_kind, r.item_slug,
+                                        r.game_mode_id, r.brawl_map_id, r.rank_pool,
+                                        r.window_label))
+
+
 # Quellen, deren Zeilen aus echten Matches aggregiert wurden. SYNTHETIC
 # fehlt hier mit Absicht: synthetische Fixtures testen die Pipeline und
 # duerfen nie automatisch als Messung auf der Seite landen.
@@ -83,6 +124,12 @@ GEMESSENE_QUELLEN = (Datenquelle.FIXTURE, Datenquelle.API, Datenquelle.AGGREGATE
 
 def gemessener_provider():
     return DatenbankStatProvider(GEMESSENE_QUELLEN, name="gemessen")
+
+
+def gemessen_mit_prior_provider():
+    return OverlayStatProvider(gemessener_provider(), DatenbankStatProvider(
+        (Datenquelle.DEMO, Datenquelle.MANUAL), name="prior"
+    ))
 
 
 def synthetischer_provider():

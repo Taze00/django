@@ -8,7 +8,9 @@ aendert, wenn eine neue Quelle dazukommt.
 """
 
 from drafter import config
-from drafter.services.providers.datenbank import gemessener_provider, synthetischer_provider
+from drafter.services.providers.datenbank import (
+    gemessen_mit_prior_provider, gemessener_provider, synthetischer_provider,
+)
 from drafter.services.providers.demo import DemoDataProvider
 
 STAT_PROVIDER_NAMEN = ("auto", "demo", "gemessen", "synthetisch")
@@ -44,7 +46,7 @@ def hole_stat_provider(name=None):
         # Vergleichsbericht, nicht auf die Seite.
         if not config.GEMESSENE_STATS_FREIGEGEBEN:
             return DemoDataProvider()
-        gemessen = gemessener_provider()
+        gemessen = gemessen_mit_prior_provider()
         return gemessen if gemessen.status().verfuegbar else DemoDataProvider()
     raise ValueError(
         f"Unbekannter StatProvider '{name}'. Erlaubt: {', '.join(STAT_PROVIDER_NAMEN)}"
