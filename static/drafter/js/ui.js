@@ -366,7 +366,9 @@ function aufschluesselung(komponenten) {
     }
     if (Math.abs(k.beitrag) < 0.05) zeile.classList.add('ist-ohne-wirkung');
 
-    const label = el('span', 'komponente-label', k.label);
+    // Quelle mitnennen: Measured, Measured + Prior oder Profile. Ohne sie
+    // sieht eine gemessene Zeile aus wie eine geschaetzte.
+    const label = el('span', 'komponente-label', `${k.label} · ${k.quelle || 'Unknown'}`);
     if (k.gruende && k.gruende.length) {
       label.title = k.gruende.map((g) => g.text).join('\n');
     }
