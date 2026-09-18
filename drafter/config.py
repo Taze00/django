@@ -200,22 +200,35 @@ PHASEN_GEWICHTE = {
 # =========================================================================
 # Datenstufen: was ueber einen Brawler bekannt ist
 # =========================================================================
-# Drei Stufen, von der Engine je Anfrage bestimmt (Datenraum.stufe):
+# Vier Stufen, von der Engine je Anfrage bestimmt (Datenraum.stufe):
 #
-#   profil   - gepflegtes Eigenschaftsprofil (32 Attribute, Rolle,
-#              Draft-Werte). Alle Komponenten berechenbar.
-#   gemessen - kein Profil, aber gemessene soloRanked-Statistik mit
-#              mindestens PROFIL_MESS_MINDESTSPIELE Spielen in einem auf
-#              diesen Draft anwendbaren Kontext (Map, Modus oder gesamt).
-#              Bewertet wird nur, was die Messung hergibt: Meta, gemessene
-#              Counter und Synergien, persoenliche Sicherheit.
-#   katalog  - weder noch. Waehl- und bannbar, bekommt aber KEINEN Score.
+#   profil     - gepflegtes Eigenschaftsprofil (32 Attribute, Rolle,
+#                Draft-Werte). Alle Komponenten berechenbar.
+#   gemessen   - kein Profil, aber mindestens EINE gemessene soloRanked-
+#                Partie in einem anwendbaren Kontext. Bewertet wird, was
+#                die Messung hergibt, plus was die Rolle qualitativ sagt.
+#   fachwissen - weder Profil noch Messung, aber eine gepflegte
+#                Draft-Rolle. Kein CURRENT STRENGTH (dafuer braucht es
+#                Beobachtung), aber ein Draft-Fit aus der Fachquelle.
+#   katalog    - nichts davon. Waehl- und bannbar, bekommt KEINEN Score.
 #
-# Die Grenze ist eine Festlegung, keine Statistik: darunter traegt die
-# geglaettete Siegquote (PRIOR_STAERKE 120) praktisch nur noch den Prior,
-# und ein Score wuerde Wissen vortaeuschen. Hoeher gesetzt, faellt stand
-# 16.09.2026 fast jeder Brawler aus der Bewertung (max. 35 Spiele).
-PROFIL_MESS_MINDESTSPIELE = 20
+# **Es gibt keine Mindestzahl von Partien mehr.** Bis zum 2026-09-18 stand
+# hier PROFIL_MESS_MINDESTSPIELE = 20, und acht Ranked-Brawler (HANK,
+# SAM, BONNIE, MR. P, DRACO, ZIGGY, CLANCY, JACKY) bekamen deshalb gar
+# keinen Score - obwohl Messwerte vorlagen. Die Grenze stammte aus einer
+# Zeit ohne Shrinkage: damals konnte eine Zahl aus 6 Partien ungebremst
+# in den Score laufen, und der Ausschluss war die einzige Bremse.
+#
+# Inzwischen bremst das Modell selbst, an drei Stellen gleichzeitig:
+# der Beta-Binomial-Posterior zieht 6 Partien praktisch vollstaendig zum
+# Prior, die eigene Streuung steht im Nenner der Feldskalierung, und die
+# Statistical Confidence weist die Unsicherheit getrennt aus. Eine feste
+# Schwelle obendrauf waere eine zweite Antwort auf dieselbe Frage - und
+# eine schlechtere, weil sie am Stichtag springt statt zu verlaufen.
+#
+# Was bleibt, ist die Grenze zwischen "beobachtet" und "nicht beobachtet":
+# n = 0 heisst Unknown, nicht 50 %. Ein Prior ist eine Annahme, keine
+# Messung.
 
 # Datenabdeckung = Anteil der Bewertungsgewichte (ohne persoenliche
 # Sicherheit), dessen Komponenten fuer diesen Brawler berechenbar sind.
@@ -622,6 +635,12 @@ WANDABHAENGIGKEIT_ATTRIBUTE = {
 # (CONFIDENCE_VOLL_AB, CONFIDENCE_STUFEN) bleiben davon unberuehrt.
 
 # Zielstichprobe je Einheit - vorlaeufig, nur fuer die Priorisierung.
+# Ab wann gilt ein Brawler dem COLLECTOR als datenarm? Das ist eine
+# Reihenfolge fuer Abfragen, keine Aussage ueber seine Bewertung - hier
+# darf eine runde Zahl stehen, weil sie nur bestimmt, wen wir als
+# naechstes fragen. Mit dem Scoring hat sie nichts zu tun.
+COLLECTOR_DATENARM_UNTER = 20
+
 PRIORITAET_ZIELE = {
     "brawler_global": 195,   # Wilson ±7 pp
     "brawler_modus": 80,     # Wilson ±11 pp

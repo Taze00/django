@@ -120,7 +120,7 @@ Vorschlag auch dann 95 gäbe, wenn alle schlecht sind.
 | Komponente | Quelle |
 |---|---|
 | Map & Modus | Skalarprodukt Brawlerprofil × Mapanforderung, feldrelativ normalisiert |
-| Meta | `BrawlerStat`, abgewertet nach Alter und Patch |
+| Current Strength | Beta-Binomial-Posterior über `BrawlerStat`, **am Feld gemessen** |
 | Counter | `CounterStat`, sonst Heuristik aus sechs Attributsignalen |
 | Synergie | `SynergyStat`, sonst Heuristik (Ergänzung, nicht Summe) |
 | Teambedarf | Dringlichkeit × **Zuwachs am Teamprofil** |
@@ -129,7 +129,24 @@ Vorschlag auch dann 95 gäbe, wenn alle schlecht sind.
 | Flexibilität | `flexibility_value` |
 | − Redundanz | Attributüberschuss + Rollenüberhang + „bringt nichts Neues" |
 | − Angreifbarkeit | Restlücken × Fähigkeit des Gegners, sie auszunutzen |
-| − Datenlage | `−(1 − Confidence)` |
+| − Datenlage | Rückstand auf die Confidence-**Mitte des Feldes** |
+
+### Drei Aussagen, nie eine Zahl
+**CURRENT STRENGTH** (läuft er gerade), **DRAFT FIT** (passt er hier) und
+**PERSÖNLICH** (beherrscht der Spieler ihn) stehen getrennt in jeder
+Antwort (`erklaerung`), zusammen mit Datenabdeckung und statistischer
+Sicherheit. Gepflegtes Wissen — Attribute, Rolle, Fähigkeiten — speist
+ausschließlich den Draft Fit; es kann **nie** als aktuelle Stärke zählen.
+Dass ein Brawler Wände bricht, sagt nichts darüber, ob er gewinnt.
+
+### Unbekanntes bleibt neutral
+Eine Komponente, die für einen Brawler nicht berechenbar ist, trägt 0 bei
+und wird **nicht** durch Hochrechnen der übrigen ersetzt. Bis zum
+18.09.2026 rechnete `Empfehlung.skalierung` die verbliebenen Gewichte auf
+100 % hoch — wer nur über eine einzige Komponente bekannt war, bekam
+deren Wert vervierfacht, und je weniger man über einen Brawler wusste,
+desto weiter oben stand er. Wie viel bekannt ist, steht jetzt getrennt in
+`datenabdeckung` und in der Confidence, nicht im Score.
 
 ### Die Aufschlüsselung
 **Jede** Empfehlung trägt ihre vollständige Aufschlüsselung — nicht nur
@@ -291,9 +308,27 @@ gewicht = zeit_gewicht × patch_gewicht
 - **Zeit**: exponentieller Zerfall, Halbwertszeit 14 Tage.
 - **Patch**: `severity` entscheidet — Rework 0.05, groß 0.20, mittel
   0.50, klein 0.75. Mehrere Änderungen multiplizieren sich.
-- **Stichprobe**: Bayes-Glättung gegen einen Prior von 120 Spielen bei
-  50 %. Damit schlägt „62 % aus 150 Spielen" nicht mehr „59 % aus
-  30 000" — ein eigener Test hält genau diesen Fall fest.
+- **Stichprobe**: Beta-Binomial-Posterior gegen einen Prior von 120
+  Spielen. Damit schlägt „62 % aus 150 Spielen" nicht mehr „59 % aus
+  30 000" — ein eigener Test hält genau diesen Fall fest. 1 Sieg aus
+  1 Spiel landet bei 50,4 %, 1100 aus 2000 bei 54,7 %.
+- **Ebenen**: global, Modus und Map zählen **zusammen**, die gröberen mit
+  Abschlag, jede Partie genau einmal (die Ebenen sind verschachtelt).
+  Früher gewann die spezifischste Zeile — eine Map-Zeile mit 4 Partien
+  verdrängte eine globale mit 44.
+- **Feldskalierung**: Der Score-Wert ist die Lage im Feld,
+  `(rate − Median) / (2·√(Feldstreuung² + eigene sd²))`, nicht der
+  Abstand zu festen 50 %. Echte Siegquoten liegen zwischen 45 und 58 %;
+  `(rate − 0.5) × 2` machte aus 22 % nominellem Gewicht real etwa 1 %.
+  Die eigene Streuung steht im Nenner, weil die Feldstreuung (robust
+  0,012) kleiner ist als die typische Einzelunsicherheit (0,041) — ohne
+  sie würde aus Rauschen Signal.
+- **Pickrate**: senkt die *Sicherheit* einer Siegquote, nie ihren Wert.
+  Selten gespielt heißt „von Spezialisten gespielt", nicht „schlecht".
+- **Keine Mindestzahl von Partien.** Eine einzige Partie ist eine
+  Beobachtung; wie wenig sie wiegt, entscheiden Posterior und Confidence.
+  `n = 0` dagegen heißt **Unknown**, nicht 50 % — ein Prior ist eine
+  Annahme, keine Messung.
 
 Nicht abgebildet ist der *indirekte* Patcheffekt (Tanks werden gebufft,
 also wird Anti-Tank besser). Das braucht Matchdaten; hier wäre es

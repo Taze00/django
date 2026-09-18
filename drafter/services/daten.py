@@ -301,11 +301,20 @@ class Datenraum:
         return self._spiele.get(brawler.id, 0)
 
     def stufe(self, brawler):
-        """profil | gemessen | katalog - siehe config.PROFIL_MESS_MINDESTSPIELE."""
+        """profil | gemessen | fachwissen | katalog - siehe config.
+
+        Keine Mindestzahl von Partien: EINE gemessene Partie ist eine
+        Beobachtung, keine zwanzig. Wie wenig sie wiegt, entscheiden
+        Posterior und Confidence, nicht ein Tuersteher. Ohne jede
+        Beobachtung entscheidet, ob wenigstens die Rolle bekannt ist.
+        """
         if brawler.hat_profil:
             return "profil"
-        if self.gemessene_spiele(brawler) >= config.PROFIL_MESS_MINDESTSPIELE:
+        if self.gemessene_spiele(brawler) > 0:
             return "gemessen"
+        from drafter.services.rollenwissen import hat_fachwissen
+        if hat_fachwissen(brawler):
+            return "fachwissen"
         return "katalog"
 
     def bewertbar(self, brawler):

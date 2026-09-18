@@ -43,21 +43,54 @@ class DatenstufenTest(DrafterTest):
         return next((e for e in engine.empfehlungen(anzahl=200) if e.brawler.slug == slug), None)
 
     # --- Stufen ---------------------------------------------------------
-    def test_stufen_folgen_profil_und_stichprobe(self):
-        self.messe(self.nori, config.PROFIL_MESS_MINDESTSPIELE)
-        self.messe(self.shelly, config.PROFIL_MESS_MINDESTSPIELE - 1)
+    def test_stufen_folgen_profil_und_beobachtung(self):
+        """Eine einzige Partie ist eine Beobachtung - es gibt keine Mindestzahl.
+
+        Bis zum 2026-09-18 brauchte es 20 Partien fuer einen Score. Die
+        Grenze stammte aus der Zeit vor der Shrinkage; heute bremsen
+        Posterior, Feldskalierung und Confidence gleichzeitig.
+        """
+        self.messe(self.nori, 1)
         self.messe(self.brawler("gale"), 3)
         raum = self.engine().raum
         self.assertEqual(raum.stufe(self.brawler("gale")), "profil")
         self.assertEqual(raum.stufe(self.nori), "gemessen")
+        # Ohne jede Partie entscheidet, ob wenigstens die Rolle bekannt ist.
         self.assertEqual(raum.stufe(self.shelly), "katalog")
+        self.shelly.draft_rolle = "tank"
+        self.shelly.save()
+        self.assertEqual(self.engine().raum.stufe(self.shelly), "fachwissen")
 
-    def test_katalog_brawler_bekommt_keinen_score(self):
-        self.messe(self.shelly, 3)
+    def test_ohne_jede_evidenz_kein_score(self):
+        """Weder Profil noch Partie noch Rolle: kein Score, sondern LD."""
         engine = self.engine()
+        self.assertEqual(engine.raum.stufe(self.shelly), "katalog")
         self.assertIsNone(self.empfehlung(engine, "shelly"))
         engine.empfehlungen()
         self.assertNotIn("shelly", engine.alle_scores)
+
+    def test_wenige_partien_reichen_fuer_einen_score(self):
+        """Der Fall der acht ausgeschlossenen Brawler (HANK & Co., 6-19 Partien)."""
+        self.messe(self.shelly, 6, rate=0.62)
+        e = self.empfehlung(self.engine(), "shelly")
+        self.assertIsNotNone(e, "sechs Partien duerfen nicht aus der Liste werfen")
+        staerke = e.komponenten[config.K_META].staerke
+        self.assertTrue(staerke.bekannt)
+        # ... aber sie duerfen kaum etwas behaupten.
+        self.assertLess(abs(staerke.rate - 0.5), 0.02, "6 Partien bleiben beim Prior")
+        self.assertLess(staerke.confidence, 0.05)
+
+    def test_ohne_partien_ist_die_staerke_unbekannt(self):
+        """n = 0 heisst Unknown - ein Prior ist keine Beobachtung."""
+        self.shelly.draft_rolle = "tank"
+        self.shelly.save()
+        e = self.empfehlung(self.engine(), "shelly")
+        self.assertIsNotNone(e, "die Rolle traegt einen Draft-Fit")
+        self.assertFalse(e.komponenten[config.K_META].verfuegbar)
+        erklaerung = e.erklaerung()["current_strength"]
+        self.assertFalse(erklaerung["empirisch"])
+        self.assertIn("empirische", erklaerung["hinweis"])
+        self.assertIsNone(erklaerung["rate"])
 
     def test_gemessener_brawler_wird_nur_aus_messwerten_bewertet(self):
         self.messe(self.nori, 30)

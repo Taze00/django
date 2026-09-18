@@ -190,16 +190,25 @@ class Datenluecken:
 
 
 def katalog_brawler_ids(raum=None):
-    """Brawler der Stufe "katalog" - ohne Profil und ohne belastbare Messung.
+    """Brawler ohne Profil und mit fast keinen Partien - der groesste Zuschlag.
 
-    Sie bekommen den groessten Zuschlag: dort fehlt nicht eine Zahl,
-    sondern jede. Die Stufe kommt aus dem Datenraum, damit hier keine
-    zweite Definition entsteht.
+    Bis zum 2026-09-18 war das genau die Score-Stufe "katalog". Seit die
+    Bewertung keine Mindestzahl von Partien mehr kennt (config, Abschnitt
+    Datenstufen), waere das die falsche Menge: ein Brawler mit sechs
+    Partien bekommt jetzt einen Score, ist aber weiterhin genau der, den
+    wir als naechstes messen wollen.
+
+    `COLLECTOR_DATENARM_UNTER` ist deshalb eine Abfrage-Reihenfolge, keine
+    Bewertungsgrenze - sie bestimmt, wen wir fragen, nicht was wir sagen.
     """
     if raum is None:
         from drafter.services.daten import Datenraum
         raum = Datenraum().laden()
-    return {b.id for b in raum.brawler if raum.stufe(b) == "katalog"}
+    return {
+        b.id for b in raum.brawler
+        if not b.hat_profil
+        and raum.gemessene_spiele(b) < config.COLLECTOR_DATENARM_UNTER
+    }
 
 
 class Priorisierung:

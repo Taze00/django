@@ -17,6 +17,7 @@ from dataclasses import dataclass, field
 from statistics import fmean, pstdev
 
 from drafter import config
+from drafter.services import quellen
 from drafter.services import staerke as staerke_modul
 
 
@@ -321,9 +322,21 @@ class Empfehlung:
         """
         st = self.staerke
         persoenlich = self.komponenten.get(config.K_PERSONAL)
+        empirisch = bool(
+            st is not None and st.bekannt and st.spiele > 0
+            and st.quelle in (quellen.MEASURED, quellen.MEASURED_PRIOR)
+        )
         return {
             "current_strength": {
                 "punkte": round(self.gruppen_beitrag(config.G_CURRENT_STRENGTH), 1),
+                # Beruht die Staerke auf BEOBACHTUNG? Ein gepflegter Wert
+                # und ein Prior sind Annahmen, keine Messung - wer das
+                # nicht sieht, haelt 50 % fuer ein Ergebnis.
+                "empirisch": empirisch,
+                "hinweis": (
+                    None if empirisch
+                    else "keine aktuelle empirische Datenbasis"
+                ),
                 "rate": round(st.rate, 4) if st is not None and st.bekannt else None,
                 "feldwert": (round(staerke_modul.feldwert(st, self.staerke_feld), 3)
                              if st is not None and st.bekannt

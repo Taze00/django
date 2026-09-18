@@ -875,9 +875,10 @@ function erklaerungsTafel(x) {
   const sc = x.statistical_confidence;
   const zeilen = [
     ['Current Strength', punkte(cs.punkte),
-      cs.rate === null ? 'keine Messung'
-        : `${(cs.rate * 100).toFixed(1)} % aus ${cs.spiele} Partien `
-          + `(effektiv ${cs.n_effektiv}) · ${cs.quelle}`],
+      cs.empirisch
+        ? `${(cs.rate * 100).toFixed(1)} % aus ${cs.spiele} Partien `
+          + `(effektiv ${cs.n_effektiv}) · ${cs.quelle}`
+        : `${cs.hinweis}${cs.rate === null ? '' : ` (gepflegter Wert ${(cs.rate * 100).toFixed(1)} %)`}`],
     ['Draft Fit', punkte(x.draft_fit.punkte),
       x.draft_fit.komponenten.map((k) => `${k.label} ${punkte(k.punkte)}`).join(' · ')
         || 'keine Komponente berechenbar'],
