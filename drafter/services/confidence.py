@@ -50,8 +50,9 @@ def fuer_empfehlung(komponenten, ctx, raum, kandidat=None):
         g = abs(komp.gewicht)
         # Nicht berechenbare Komponenten gehen nicht ein: ihre Unsicherheit
         # steckt schon in der Datenabdeckung, doppelt gezaehlt waere sie
-        # eine zweite Strafe fuer dieselbe Luecke.
-        if g <= 0 or not komp.verfuegbar:
+        # eine zweite Strafe fuer dieselbe Luecke. Unanwendbare auch nicht -
+        # "es gibt noch keine Gegner" ist kein Wissen ueber den Kandidaten.
+        if g <= 0 or not komp.verfuegbar or not komp.anwendbar:
             continue
         gewicht_summe += g
         gewichtet += g * komp.confidence

@@ -70,8 +70,8 @@ def empfehlungen(ctx, raum, anzahl=None):
         if b.hat_profil:
             roh["map_strength"][b.id] = roh_passung(b, anforderungen)
 
-        meta = raum.meta(b)
-        if meta.rate is not None:
+        meta = raum.staerke(b)
+        if meta.bekannt:
             roh["meta_strength"][b.id] = meta.rate
 
         if b.hat_draftwerte:
@@ -122,8 +122,8 @@ def empfehlungen(ctx, raum, anzahl=None):
 
         # Duenne Datenlage senkt die Dringlichkeit eines Bans: einen Ban
         # auf Verdacht auszugeben, kostet einen von drei.
-        meta = raum.meta(b)
-        sicherheit = meta.confidence if meta.rate is not None else 0.15
+        meta = raum.staerke(b)
+        sicherheit = meta.confidence if meta.bekannt else 0.15
         gesamt -= (1.0 - sicherheit) * 0.10
 
         bewertet.append((gesamt, b, teile, sicherheit, abdeckung))

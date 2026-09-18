@@ -88,7 +88,16 @@ class Komponente:
     # anwendbar" (Counter ohne bekannte Gegner) bleibt dagegen verfuegbar
     # mit Wert 0 - das gilt fuer alle Kandidaten gleich.
     verfuegbar: bool = True
+    # False = fuer JEDEN Kandidaten gleich unanwendbar (Counter beim First
+    # Pick, Synergie ohne eigene Picks). Der Wert 0 ist dann richtig, aber
+    # die Komponente weiss nichts - sie zaehlt deshalb nicht zur
+    # Confidence. Frueher stand sie dort mit dem Vorgabewert 1.0 und liess
+    # einen leeren Draft sicherer aussehen als einen bekannten.
+    anwendbar: bool = True
     quelle: str = "Unknown"   # Measured | Measured + Prior | Profile | Unknown
+    # Nur bei CURRENT STRENGTH gesetzt: die Schaetzung samt Stichprobe,
+    # Unsicherheit und Herkunft je Ebene (services/staerke.Staerke).
+    staerke: object = None
 
     @property
     def beitrag(self):
@@ -102,17 +111,16 @@ class Komponente:
     def ist_strafe(self):
         return self.key in config.STRAF_KOMPONENTEN
 
-    def als_dict(self, skalierung=1.0):
-        """`skalierung` rechnet die Bewertungsgewichte hoch, wenn andere
-        Komponenten nicht verfuegbar sind - so summieren sich die
-        angezeigten Beitraege weiter genau zum Score."""
-        faktor = (
-            1.0 if self.ist_strafe or not self.verfuegbar or self.key == config.K_PERSONAL
-            else skalierung
-        )
+    @property
+    def gruppe(self):
+        """current_strength | draft_fit | persoenlich - siehe config.KOMPONENTEN_GRUPPE."""
+        return config.KOMPONENTEN_GRUPPE.get(self.key, config.G_DRAFT_FIT)
+
+    def als_dict(self):
         return {
             "key": self.key,
             "label": self.label,
+            "gruppe": self.gruppe,
             "verfuegbar": self.verfuegbar,
             "quelle": self.quelle if self.verfuegbar else "Unknown",
             # Der Rohwert der Komponente in [-1, +1]. Steht mit dabei,
@@ -120,11 +128,13 @@ class Komponente:
             # "schwache Komponente" nicht von "kleines Gewicht"
             # unterscheiden. Genau das will die Aufschluesselung zeigen.
             "wert": round(self.wert, 3),
-            "gewicht": round(self.gewicht * faktor, 3),
+            "gewicht": round(self.gewicht, 3),
             # Beitrag in Anzeigepunkten - das ist die Zahl, die in der
             # Aufschluesselung steht ("Map Fit +18").
-            "beitrag": round(self.beitrag * faktor * 50, 1),
+            "beitrag": round(self.beitrag * 50, 1),
             "ist_strafe": self.ist_strafe,
+            # Nur CURRENT STRENGTH: worauf die Schaetzung beruht.
+            "schaetzung": self.staerke.als_dict() if self.staerke is not None else None,
             # Begruendungen der Komponente, damit jede Zeile der Tabelle
             # aufklappbar ist und nicht nur eine Zahl bleibt.
             "gruende": [g.als_dict() for g in self.gruende],
@@ -164,22 +174,6 @@ class Empfehlung:
         return gesamt, verfuegbar
 
     @property
-    def skalierung(self):
-        """Faktor, mit dem die verfuegbaren Bewertungsbeitraege hochgerechnet
-        werden. 1.0, wenn alles berechenbar ist - dann ist der Score exakt
-        die alte Summe.
-
-        Ohne die persoenliche Sicherheit gerechnet und nicht auf sie
-        angewandt: sie hat einen harten Deckel (PERSOENLICH_MAX_AUSSCHLAG),
-        und hochgerechnet koennte sie bei einem nur gemessenen Brawler ein
-        Vielfaches davon ausmachen.
-        """
-        gesamt, verfuegbar = self._bewertungsgewichte(ohne_persoenlich=True)
-        if verfuegbar <= 0 or verfuegbar >= gesamt:
-            return 1.0
-        return gesamt / verfuegbar
-
-    @property
     def datenabdeckung(self):
         """0-1: auf welchem Anteil der Bewertungsgewichte der Score beruht.
 
@@ -209,6 +203,24 @@ class Empfehlung:
             if k.key in self.komponenten and not k.verfuegbar and k.key != config.K_PERSONAL
         ]
 
+    # --- Die drei Aussagen, getrennt ------------------------------------
+    def gruppen_beitrag(self, gruppe):
+        """Summe der Beitraege einer Gruppe, in Anzeigepunkten (x 50)."""
+        return 50 * sum(
+            k.beitrag for k in self.komponenten.values() if k.gruppe == gruppe
+        )
+
+    @property
+    def staerke(self):
+        """Die CURRENT-STRENGTH-Schaetzung, falls es eine gibt.
+
+        Kommt aus der Meta-Komponente und damit ausschliesslich aus
+        Siegquoten. Gepflegtes Wissen landet hier nie - es steht im
+        Draft-Fit.
+        """
+        komp = self.komponenten.get(config.K_META)
+        return komp.staerke if komp is not None else None
+
     @property
     def roher_score(self):
         """Ungeklemmte Summe der gewichteten Komponenten.
@@ -221,17 +233,18 @@ class Empfehlung:
         auf (tiefster gemessener Wert -0.95 ueber 900 Kandidaten), mit
         echten Daten ist es nicht ausgeschlossen.
         """
-        komps = self.komponenten.values()
-        bewertung = sum(
-            k.beitrag for k in komps if not k.ist_strafe and k.key != config.K_PERSONAL
-        )
-        persoenlich = sum(k.beitrag for k in komps if k.key == config.K_PERSONAL)
-        strafen = sum(k.beitrag for k in komps if k.ist_strafe)
-        # Fehlende Bewertungskomponenten fallen heraus, die vorhandenen
-        # werden auf die volle Gewichtssumme hochgerechnet. Nicht die
-        # persoenliche Sicherheit (Deckel) und nicht die Strafen: eine
-        # Strafe, die nicht berechenbar ist, faellt einfach weg.
-        return bewertung * self.skalierung + persoenlich + strafen
+        # Eine unbekannte Komponente traegt 0 bei - das ist genau
+        # "durchschnittlich", also neutral. Sie wird NICHT durch
+        # Hochrechnen der uebrigen ersetzt.
+        #
+        # Frueher stand hier `bewertung * self.skalierung`: fehlten zwei
+        # Drittel der Gewichte, wurde das verbliebene Drittel verdreifacht.
+        # Ein einziger positiver Messwert wurde so zum vollen Score, und je
+        # weniger man ueber einen Brawler wusste, desto weiter oben stand
+        # er. OLLIE kam damit auf Platz 3 von 65. Wie viel bekannt ist,
+        # steht jetzt getrennt in `datenabdeckung` und in der Confidence -
+        # nicht im Score.
+        return sum(k.beitrag for k in self.komponenten.values())
 
     @property
     def score(self):
@@ -310,7 +323,15 @@ class Empfehlung:
             # zur Spitze: sie ist der Grund, warum das Werkzeug kein
             # Orakel ist. Sie kostet nichts extra - die Komponenten sind
             # ohnehin gerechnet, sonst gaebe es keinen Score.
-            "komponenten": [k.als_dict(self.skalierung) for k in self.aufschluesselung()],
+            "komponenten": [k.als_dict() for k in self.aufschluesselung()],
+            # Die drei Aussagen getrennt - nie in einer Zahl vermischt.
+            "current_strength": (
+                self.staerke.als_dict() if self.staerke is not None
+                and self.staerke.bekannt else None
+            ),
+            "draft_fit": round(self.gruppen_beitrag(config.G_DRAFT_FIT), 1),
+            "current_strength_beitrag": round(
+                self.gruppen_beitrag(config.G_CURRENT_STRENGTH), 1),
             "datenstufe": self.stufe,
             "datenabdeckung": round(self.datenabdeckung * 100),
             "datenabdeckung_label": self.datenabdeckung_label,

@@ -13,7 +13,7 @@ Das Paar ist mehr als beide einzeln - zwei Belles waeren es nicht.
 """
 
 from drafter import config
-from drafter.services import quellen
+from drafter.services import quellen, staerke
 from drafter.services.scoring import Grund, Komponente, klemme
 
 
@@ -109,21 +109,41 @@ def paar(a, b, raum):
     return wert, grund, quellen.PROFILE
 
 
+def paar_sicherheit(a, b, raum):
+    """Sicherheit der Aussage ueber GENAU DIESES Paar (0-1).
+
+    Wie bei den Countern aus der Stichprobe des Paares, nicht aus der
+    Zahl der Mitspieler.
+    """
+    zeile = raum.synergie(a, b)
+    if zeile is not None and zeile.ist_gemessen:
+        n = float(zeile.sample_size or zeile.games or 0)
+        if n > 0:
+            return staerke.paar_confidence(n)
+    prior = raum.synergie_prior(a, b) or (zeile if zeile is not None and zeile.ist_gepflegt else None)
+    if prior is not None:
+        return prior.confidence or 0.0
+    return config.HEURISTIK_PAAR_CONFIDENCE
+
+
 def komponente(kandidat, ctx, raum):
     """Synergie-Komponente: wie gut passt der Kandidat zu unseren Picks."""
     komp = Komponente(key=config.K_SYNERGY)
     if not ctx.own_picks:
+        komp.anwendbar = False
         komp.quelle = quellen.PROFILE if kandidat.hat_profil else quellen.UNKNOWN
         return komp
 
     werte = []
     herkunft = []
+    sicherheiten = []
     for mitspieler in ctx.own_picks:
         wert, grund, quelle = paar(kandidat, mitspieler, raum)
         if quelle is None:
             continue
         werte.append(wert)
         herkunft.append(quelle)
+        sicherheiten.append(paar_sicherheit(kandidat, mitspieler, raum))
         if grund and abs(wert) > 0.15:
             komp.gruende.append(Grund(
                 text=grund, positiv=wert > 0, staerke=min(1.0, abs(wert) + 0.25),
@@ -140,6 +160,7 @@ def komponente(kandidat, ctx, raum):
         komp.quelle = quellen.UNKNOWN
         return komp
     komp.wert = klemme(sum(werte) / len(werte))
-    komp.confidence = min(1.0, 0.5 + 0.25 * len(werte))
+    komp.confidence = (sum(sicherheiten) / len(sicherheiten)) * (
+        len(werte) / len(ctx.own_picks))
     komp.quelle = quellen.schwaechste(herkunft)
     return komp

@@ -21,6 +21,7 @@ from django.db.models import Q
 
 from drafter import config
 from drafter.models import Brawler
+from drafter.services import staerke as staerke_modul
 from drafter.services.providers.records import StatAnfrage
 
 
@@ -58,6 +59,15 @@ def _spezifitaet(zeile, brawl_map, game_mode, rank_pool):
     return punkte
 
 
+def _ebene(zeile):
+    """Auf welcher Ebene beschreibt diese Zeile den Brawler?"""
+    if zeile.brawl_map_id:
+        return staerke_modul.MAP
+    if zeile.game_mode_id:
+        return staerke_modul.MODUS
+    return staerke_modul.GLOBAL
+
+
 class Datenraum:
     """Vorgeladene Statistiken fuer genau einen Draft-Kontext."""
 
@@ -80,6 +90,13 @@ class Datenraum:
         # die spezifischste Zeile (Map mit 3 Spielen) sagt nichts darueber,
         # ob es fuer den Brawler insgesamt genug Messungen gibt.
         self._spiele = {}     # brawler_id                -> int
+        # Gemessene Zeilen GETRENNT nach Ebene: global / modus / map.
+        # Frueher gewann die spezifischste Zeile allein - eine Map-Zeile
+        # mit 4 Partien verdraengte damit eine globale mit 400. Die
+        # Schaetzung in services/staerke.py setzt die Ebenen stattdessen
+        # aufeinander (grob ist Prior fuer fein) und braucht sie deshalb
+        # alle drei.
+        self._ebenen = {}     # brawler_id -> {"global"|"modus"|"map": StatRecord}
         # Gepflegte Werte (demo/manual) GETRENNT von den gemessenen. Sie
         # sind der Prior je Komponente - siehe `quellen.py`. Leer, wenn der
         # Provider keine getrennte Prior-Quelle mitbringt.
@@ -148,12 +165,22 @@ class Datenraum:
         self._stat = self._bestes_je_schluessel(
             brawler_zeilen, lambda r: r.brawler_id, ids,
         )
+        ebenen_rang = {}
         for zeile in brawler_zeilen:
-            if (zeile.brawler_id in ids and zeile.ist_gemessen
-                    and _spezifitaet(zeile, self.brawl_map, self.game_mode, self.rank_pool) >= 0):
-                self._spiele[zeile.brawler_id] = max(
-                    self._spiele.get(zeile.brawler_id, 0), zeile.games or 0
-                )
+            if zeile.brawler_id not in ids or not zeile.ist_gemessen:
+                continue
+            punkte = _spezifitaet(zeile, self.brawl_map, self.game_mode, self.rank_pool)
+            if punkte < 0:
+                continue
+            self._spiele[zeile.brawler_id] = max(
+                self._spiele.get(zeile.brawler_id, 0), zeile.games or 0
+            )
+            ebene = _ebene(zeile)
+            schluessel = (zeile.brawler_id, ebene)
+            rang = (punkte, zeile.games or 0)
+            if rang > ebenen_rang.get(schluessel, (-1, -1)):
+                ebenen_rang[schluessel] = rang
+                self._ebenen.setdefault(zeile.brawler_id, {})[ebene] = zeile
         self._counter = self._bestes_je_schluessel(
             messung.counter_stats(anfrage), lambda r: (r.brawler_id, r.partner_id), ids,
         )
@@ -203,10 +230,48 @@ class Datenraum:
         schluessel = (a.id, b.id) if a.id < b.id else (b.id, a.id)
         return self._synergie_prior.get(schluessel)
 
-    def meta(self, brawler):
-        """Meta-Rate nach Quellenprioritaet - siehe services/quellen.py."""
-        from drafter.services.quellen import meta_aufloesen
-        return meta_aufloesen(self.stat(brawler), self.stat_prior(brawler))
+    def staerke(self, brawler):
+        """CURRENT STRENGTH: geschaetzte Siegquote samt Unsicherheit.
+
+        Die Ebenen global/Modus/Map gehen als Kette in die Schaetzung
+        (services/staerke.py), der gepflegte Wert ist ihr Prior. Ohne
+        jede Messung bleibt der gepflegte Wert allein (Profile), ohne
+        beides ist die Auskunft unbekannt - nicht 50 %.
+        """
+        zeilen = dict(self._ebenen.get(brawler.id, {}))
+        prior = self.stat_prior(brawler)
+        if prior is None:
+            # Ohne getrennte Prior-Quelle (reiner Demo-Provider) steht der
+            # gepflegte Wert im Messplatz - dann ist ER der Prior.
+            kandidat = self._stat.get(brawler.id)
+            if kandidat is not None and not kandidat.ist_gemessen:
+                prior = kandidat
+        profil_rate = prior.adjusted_rate if prior is not None else None
+        return staerke_modul.schaetze(
+            zeilen, profil_rate=profil_rate, pickrate=self.pickrate(brawler),
+            profil_record=prior, kontext_ebene=self.kontext_ebene,
+        )
+
+    @property
+    def kontext_ebene(self):
+        """Auf welcher Ebene wird gefragt - Map, Modus oder global?"""
+        if self.brawl_map is not None:
+            return staerke_modul.MAP
+        if self.game_mode is not None:
+            return staerke_modul.MODUS
+        return staerke_modul.GLOBAL
+
+    def pickrate(self, brawler):
+        """Anteil der Partien, in denen er gewaehlt wurde - feinste Ebene zuerst.
+
+        Nur aus Messungen: eine gepflegte Pickrate gibt es nicht.
+        """
+        zeilen = self._ebenen.get(brawler.id, {})
+        for ebene in (staerke_modul.MAP, staerke_modul.MODUS, staerke_modul.GLOBAL):
+            zeile = zeilen.get(ebene)
+            if zeile is not None and (zeile.pick_rate or 0) > 0:
+                return zeile.pick_rate
+        return None
 
     def counter(self, brawler, gegner):
         """Vorteil von `brawler` gegen `gegner` laut Statistik, sonst None.

@@ -70,17 +70,45 @@ class DatenstufenTest(DrafterTest):
         self.assertLess(e.datenabdeckung, 0.5)
         self.assertEqual(e.datenabdeckung_label, "Niedrig")
 
-    def test_fehlende_komponenten_ziehen_nicht_zur_mitte(self):
-        """Hochgerechnet: eine starke Meta wirkt so, als waere sie alles, was bekannt ist."""
+    def test_fehlende_komponenten_werden_nicht_hochgerechnet(self):
+        """Eine fehlende Komponente ist neutral - sie vergroessert keine andere.
+
+        Frueher wurden die verbliebenen Gewichte auf 100 % hochgerechnet.
+        Wer nur ueber eine einzige Komponente bekannt war, bekam deren
+        Wert dadurch mit vollem Gewicht - je weniger man wusste, desto
+        weiter oben stand er.
+        """
         self.messe(self.nori, 30, rate=0.60)
         e = self.empfehlung(self.engine(), "nori")
         meta = e.komponenten[config.K_META]
-        self.assertGreater(e.skalierung, 1.0)
+        self.assertGreater(meta.beitrag, 0, "Vorbedingung: positive Meta")
         bewertung = e.roher_score - sum(
             k.beitrag for k in e.komponenten.values()
             if k.ist_strafe or k.key == config.K_PERSONAL
         )
-        self.assertAlmostEqual(bewertung, meta.beitrag * e.skalierung, places=6)
+        # Genau der eine bekannte Beitrag - kein Faktor darauf.
+        self.assertAlmostEqual(bewertung, meta.beitrag, places=6)
+        self.assertLess(e.datenabdeckung, 0.5, "Vorbedingung: viel ist unbekannt")
+
+    def test_weniger_wissen_hebt_den_score_nie(self):
+        """Dieselbe Messung, weniger Kontext: der Score darf nicht steigen."""
+        from drafter.services.scoring import Empfehlung, Komponente
+
+        voll = Empfehlung(brawler=self.nori, komponenten={
+            config.K_META: Komponente(key=config.K_META, wert=0.6, gewicht=0.3),
+            config.K_MAP_MODE: Komponente(key=config.K_MAP_MODE, wert=0.2, gewicht=0.3),
+        })
+        luecke = Empfehlung(brawler=self.nori, komponenten={
+            config.K_META: Komponente(key=config.K_META, wert=0.6, gewicht=0.3),
+            config.K_MAP_MODE: Komponente(key=config.K_MAP_MODE, wert=0.2, gewicht=0.3,
+                                          verfuegbar=False),
+        })
+        self.assertAlmostEqual(luecke.roher_score, 0.18, places=6)
+        self.assertLess(luecke.roher_score, voll.roher_score)
+        # ... und auch nicht, wenn die fehlende Komponente negativ waere:
+        # ihr Wegfall darf den Score nicht ueber den bekannten Teil heben.
+        self.assertLessEqual(luecke.roher_score,
+                             luecke.komponenten[config.K_META].beitrag + 1e-9)
 
     def test_quelle_steht_an_jeder_komponente(self):
         self.messe(self.nori, 30)
@@ -89,11 +117,12 @@ class DatenstufenTest(DrafterTest):
         quellen = {k["key"]: k["quelle"] for k in e.als_dict()["komponenten"]}
         self.assertEqual(quellen[config.K_MAP_MODE], "Unknown")
 
-    def test_voll_bekannter_brawler_wird_nicht_skaliert(self):
+    def test_voll_bekannter_brawler_ist_die_schlichte_summe(self):
         e = self.empfehlung(DraftEngine(self.context()), "gale")
-        self.assertEqual(e.skalierung, 1.0)
         self.assertEqual(e.datenabdeckung, 1.0)
         self.assertEqual(e.ausgelassen, [])
+        self.assertAlmostEqual(
+            e.roher_score, sum(k.beitrag for k in e.komponenten.values()), places=9)
 
     def test_persoenliche_sicherheit_wird_nicht_hochgerechnet(self):
         self.messe(self.nori, 30)
@@ -186,27 +215,36 @@ class QuellenprioritaetTest(DrafterTest):
         self.assertEqual(meta.quelle, "Profile")
 
     def test_wenig_messung_mischt_mit_dem_profil(self):
-        from drafter.services.quellen import meta_aufloesen
+        """30 Partien verschieben das Profil, ersetzen es aber nicht."""
         prior = BrawlerStat.objects.get(brawler__slug="gale", source=Datenquelle.DEMO)
         self.messe("gale", 30, 0.30)
         engine = self.engine()
-        auskunft = engine.raum.meta(self.brawler("gale"))
-        w = 30 / (30 + config.PRIOR_STAERKE)
+        auskunft = engine.raum.staerke(self.brawler("gale"))
         self.assertEqual(auskunft.quelle, "Measured + Prior")
-        self.assertAlmostEqual(auskunft.rate, w * 0.30 + (1 - w) * prior.adjusted_rate)
-        self.assertEqual(self.meta(engine, "gale").quelle, "Measured + Prior")
+        self.assertLess(auskunft.rate, prior.adjusted_rate)
+        self.assertGreater(auskunft.rate, 0.30)
+        # Naeher am Profil als an der duennen Messung.
+        self.assertLess(abs(auskunft.rate - prior.adjusted_rate),
+                        abs(auskunft.rate - 0.30))
 
-    def test_genug_messung_ersetzt_das_profil(self):
+    def test_viel_messung_verdraengt_das_profil(self):
+        """Der Prior verschwindet nicht schlagartig, er wird bedeutungslos.
+
+        Frueher gab es bei CONFIDENCE_VOLL_AB eine Kante: eine Partie
+        weniger hiess "mit Profil gemischt", eine mehr hiess "Profil
+        ignoriert". Der Posterior laeuft stetig dorthin.
+        """
         self.messe("gale", config.CONFIDENCE_VOLL_AB, 0.30)
-        auskunft = self.engine().raum.meta(self.brawler("gale"))
+        auskunft = self.engine().raum.staerke(self.brawler("gale"))
         self.assertEqual(auskunft.quelle, "Measured")
-        self.assertAlmostEqual(auskunft.rate, 0.30)
+        self.assertAlmostEqual(auskunft.rate, 0.30, delta=0.05)
 
     def test_weder_messung_noch_profil_ist_unknown(self):
         nori = Brawler.objects.create(name="NORI", slug="nori", external_id="1", is_active=False)
-        auskunft = self.engine().raum.meta(nori)
+        auskunft = self.engine().raum.staerke(nori)
         self.assertEqual(auskunft.quelle, "Unknown")
         self.assertIsNone(auskunft.rate)
+        self.assertFalse(auskunft.bekannt)
 
     def test_jede_komponente_nennt_ihre_quelle(self):
         self.messe("sandy", 30, 0.55)

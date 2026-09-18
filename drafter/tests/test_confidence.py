@@ -62,7 +62,18 @@ class EmpfehlungsConfidenceTest(DrafterTest):
         from unittest import mock
 
         from drafter.models import Brawler, BrawlerStat, Datenquelle
+        from drafter.models.stats import CounterStat, SynergyStat
         BrawlerStat.objects.update(source=Datenquelle.AGGREGATED, confidence=0.8)
+        # Die Paarwerte ebenso belastbar machen wie die Siegquoten. Seit
+        # die Counter- und Synergie-Confidence aus der Stichprobe DES
+        # PAARES kommt (2026-09-18), macht ein bekannter Draft die Aussage
+        # nur dann sicherer, wenn zu den Matchups auch etwas bekannt ist.
+        # Bliebe es bei geratenen Matchups, waere ein voller Draft zu
+        # Recht unsicherer - dann pruefte dieser Test die Zahl der Picks
+        # statt des Wissens. Die Quelle bleibt "demo": berechnete Counter
+        # duerfen laut Constraint nur in kanonischer Richtung stehen.
+        for modell in (CounterStat, SynergyStat):
+            modell.objects.update(confidence=0.8)
         # Seit 2026-09-16 deckelt auch ein Demo-PROFIL die Confidence, nicht
         # nur ein reiner Demo-Datenraum. Manuell gepflegte Profile nicht.
         Brawler.objects.update(source=Datenquelle.MANUAL)

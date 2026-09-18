@@ -68,6 +68,39 @@ KOMPONENTEN_LABEL = {
     K_UNCERTAINTY: "Datenlage",
 }
 
+# =========================================================================
+# Drei Arten von Aussage - streng getrennt
+# =========================================================================
+# CURRENT STRENGTH  Wie gut laeuft er gerade? Kommt NUR aus gemessenen
+#                   (ersatzweise gepflegten) Siegquoten.
+# DRAFT FIT         Passt er in DIESEN Draft? Map, Gegner, Team, Position.
+#                   Speist sich aus gepflegtem WISSEN (Attribute, Rollen,
+#                   Faehigkeiten) und aus gemessenen Paarwerten.
+# PERSOENLICH       Wie sicher beherrscht der Spieler ihn? Freiwillig.
+#
+# Wissen ist keine Staerke: dass ein Brawler Waende bricht, sagt nichts
+# darueber, ob er im aktuellen Patch gewinnt. Frueher liefen beide in
+# eine Zahl und Profilwissen konnte eine fehlende Messung ersetzen - bei
+# GALE standen +0,594 aus Wissen gegen +0,014 aus Messung, ohne dass man
+# das der Zahl ansah. Die Gruppen stehen deshalb einzeln in der Ausgabe.
+G_CURRENT_STRENGTH = "current_strength"
+G_DRAFT_FIT = "draft_fit"
+G_PERSOENLICH = "persoenlich"
+
+KOMPONENTEN_GRUPPE = {
+    K_META: G_CURRENT_STRENGTH,
+    K_PERSONAL: G_PERSOENLICH,
+    K_MAP_MODE: G_DRAFT_FIT,
+    K_COUNTER: G_DRAFT_FIT,
+    K_SYNERGY: G_DRAFT_FIT,
+    K_TEAM_NEED: G_DRAFT_FIT,
+    K_DRAFT_POSITION: G_DRAFT_FIT,
+    K_FLEXIBILITY: G_DRAFT_FIT,
+    K_REDUNDANCY: G_DRAFT_FIT,
+    K_WEAKNESS: G_DRAFT_FIT,
+    K_UNCERTAINTY: G_DRAFT_FIT,
+}
+
 # Komponenten, die nur abziehen koennen: ihr WERT liegt in [-1, 0],
 # ihr GEWICHT ist wie bei allen anderen ein positiver Betrag.
 STRAF_KOMPONENTEN = (K_REDUNDANCY, K_WEAKNESS, K_UNCERTAINTY)
@@ -421,6 +454,48 @@ DRAFT_STATISTIK_BATTLE_TYPEN = ("soloRanked",)
 BERICHT_VERZEICHNIS = getattr(
     settings, "DRAFTER_BERICHT_VERZEICHNIS", settings.BASE_DIR / "data" / "brawl_reports"
 )
+
+
+# =========================================================================
+# Aktuelle Staerke (services/staerke.py)
+# =========================================================================
+# CURRENT STRENGTH ist die einzige empirische Groesse der Engine: wie gut
+# laeuft ein Brawler MESSBAR gerade. Sie kommt nie aus Profilwissen.
+#
+# Geschaetzt wird als Beta-Binomial-Posterior. Kleine Stichproben ziehen
+# stark zum Prior, grosse ueberstimmen ihn - ohne harte Schwelle:
+#
+#     mittel = (siege + a) / (spiele + a + b)
+#
+# Die Hierarchie global -> Modus -> Map laeuft als Kette: die groebere
+# Ebene ist der Prior der feineren. Gerechnet wird auf ROHZAEHLUNGEN
+# (games/wins), nicht auf `adjusted_rate` - die Aggregation hat dort
+# bereits einmal geschrumpft (aggregator._brawler_prior), ein zweites Mal
+# waere doppelt.
+
+# Sicherheit einer Paaraussage, die nur auf Eigenschaften beruht
+# (Counter/Synergie ohne jede Zeile). Bewusst niedrig: sie ist eine
+# Herleitung, keine Beobachtung.
+HEURISTIK_PAAR_CONFIDENCE = 0.25
+
+# Prior-Staerke der obersten Ebene, in "gedachten Spielen" zu 50 %.
+STAERKE_PRIOR_GLOBAL = 120
+# Wie viel eine Partie einer GROEBEREN Ebene zaehlt, je Stufe Abstand
+# zur feinsten vorhandenen. Eine Map-Partie zaehlt voll, eine Partie, die
+# nur fuer den Modus vorliegt, halb, eine nur globale ein Viertel.
+#
+# Warum nicht die Ketten-Form (jede Ebene als Prior der naechsten): dort
+# konnte eine duenne Map-Zeile die Schaetzung VERSCHLECHTERN - 4 Partien
+# auf der Map zogen den Wert um 3 Punkte und senkten die effektive
+# Stichprobe von 164 auf 64, weil die feinere Ebene die Praezision der
+# groeberen wegwarf. Mehr Daten duerfen nie weniger Gewissheit ergeben.
+STAERKE_EBENEN_ABSCHLAG = 0.5
+
+# Selection Bias: wer selten gespielt wird, wird von Spezialisten
+# gespielt. Das macht die Rate nicht falsch, aber weniger uebertragbar -
+# es senkt die SICHERHEIT, nie den Schaetzwert.
+STAERKE_PICKRATE_REFERENZ = 0.05     # ab hier gilt ein Brawler als normal verbreitet
+STAERKE_BIAS_MAX_ABZUG = 0.40        # hoechstens so viel Sicherheit kostet das
 
 
 # =========================================================================

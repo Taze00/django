@@ -19,7 +19,7 @@ entsteht, ist Sache des Aggregators, nicht dieser Datei.
 """
 
 from drafter import config
-from drafter.services import quellen
+from drafter.services import quellen, staerke
 from drafter.services.scoring import Grund, Komponente, klemme
 
 # Ab welchem Attributwert eine Eigenschaft ueberhaupt als Antwort zaehlt.
@@ -197,6 +197,31 @@ def vorteil(kandidat, gegner, raum):
     return wert, grund, quellen.PROFILE
 
 
+def paar_sicherheit(kandidat, gegner, raum):
+    """Wie sicher ist die Aussage ueber GENAU DIESES Paar? (0-1)
+
+    Aus der Stichprobe des Paares, nicht aus der Zahl der Gegner im
+    Draft: frueher stand hier `0.45 + 0.2 * Anzahl bekannter Gegner` -
+    drei Gegner ergaben 1.0, auch wenn zu jedem Paar drei Partien
+    vorlagen. Ein gemessenes Matchup mit 4 Partien und eines mit 400
+    waren ununterscheidbar.
+    """
+    hin = raum.counter(kandidat, gegner)
+    her = raum.counter(gegner, kandidat)
+    gemessen = [z for z in (hin, her) if z is not None and z.ist_gemessen]
+    n = max((float(z.sample_size or z.games or 0) for z in gemessen), default=0.0)
+    if n > 0:
+        return staerke.paar_confidence(n)
+    gepflegt = [
+        z for z in (raum.counter_prior(kandidat, gegner), raum.counter_prior(gegner, kandidat),
+                    hin, her)
+        if z is not None and z.ist_gepflegt
+    ]
+    if gepflegt:
+        return max(z.confidence or 0.0 for z in gepflegt)
+    return config.HEURISTIK_PAAR_CONFIDENCE
+
+
 def ist_heuristisch(kandidat, gegner, raum):
     """Beruht das Matchup nur auf Eigenschaften (fuer "(geschätzt)" im Text)?"""
     return (
@@ -219,17 +244,20 @@ def komponente(kandidat, ctx, raum):
     komp = Komponente(key=config.K_COUNTER)
     if not ctx.enemy_picks:
         # Nicht anwendbar (fuer alle gleich) - verfuegbar mit Wert 0.
+        komp.anwendbar = False
         komp.quelle = quellen.PROFILE if kandidat.hat_profil else quellen.UNKNOWN
         return komp
 
     werte = []
     herkunft = []
+    sicherheiten = []
     for gegner in ctx.enemy_picks:
         wert, grund, quelle = vorteil(kandidat, gegner, raum)
         if quelle is None:
             continue   # unbekanntes Matchup - weder Vorteil noch Nachteil
         werte.append(wert)
         herkunft.append(quelle)
+        sicherheiten.append(paar_sicherheit(kandidat, gegner, raum))
         if grund and abs(wert) > 0.12:
             grund_quelle = (
                 "heuristik" if ist_heuristisch(kandidat, gegner, raum)
@@ -250,8 +278,11 @@ def komponente(kandidat, ctx, raum):
     mittel = sum(werte) / len(werte)
     schlechtester = min(werte)
     komp.wert = klemme(mittel * 0.7 + schlechtester * 0.3)
-    # Jeder bekannte Gegner macht die Aussage sicherer.
-    komp.confidence = min(1.0, 0.45 + 0.2 * len(werte))
+    # Sicherheit aus den Stichproben der Paare, gedaempft um die Gegner,
+    # zu denen nichts bekannt ist: zwei von drei Matchups bekannt heisst
+    # zwei Drittel der Aussage.
+    komp.confidence = (sum(sicherheiten) / len(sicherheiten)) * (
+        len(werte) / len(ctx.enemy_picks))
     komp.quelle = quellen.schwaechste(herkunft)
     return komp
 

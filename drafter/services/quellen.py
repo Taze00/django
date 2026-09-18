@@ -24,9 +24,12 @@ Ohne gepflegten Wert bleibt in Stufe 2 die geglaettete Messung allein
 stehen - der Prior ist dann der neutrale aus der Aggregation.
 
 Nichts hier erfindet einen Wert: gemischt wird nur, was vorliegt.
-"""
 
-from dataclasses import dataclass
+Fuer die **Meta-Staerke eines Brawlers** gilt diese Mischung nicht mehr:
+sie wird in services/staerke.py als Beta-Binomial-Posterior ueber die
+Ebenen global -> Modus -> Map geschaetzt. `mischen()` bleibt fuer die
+Paarwerte (Counter, Synergie), wo es nur eine Ebene gibt.
+"""
 
 from drafter import config
 
@@ -75,43 +78,3 @@ def mischen(gemessen, gepflegt, n, k):
     if gepflegt is not None:
         return gepflegt, PROFILE
     return None, UNKNOWN
-
-
-@dataclass(frozen=True)
-class MetaAuskunft:
-    rate: float = None          # 0-1, None = unbekannt
-    quelle: str = UNKNOWN
-    games: int = 0              # gemessene Spiele (0 bei Profile)
-    confidence: float = 0.0
-    record: object = None       # die Zeile, deren Patch/Kontext gilt
-
-    @property
-    def staerke(self):
-        return max(-1.0, min(1.0, (self.rate - 0.5) * 2)) if self.rate is not None else None
-
-    @property
-    def is_demo(self):
-        return self.quelle == PROFILE
-
-
-def meta_aufloesen(messung, prior):
-    # Ohne getrennte Prior-Quelle (reiner Demo-Provider, synthetische
-    # Testdaten) steht der gepflegte Wert im Messplatz - dann ist ER der Prior.
-    if prior is None and messung is not None and not _gemessen(messung):
-        messung, prior = None, messung
-    gem = messung if _gemessen(messung) and messung.adjusted_rate is not None else None
-    pri = prior if prior is not None and prior.adjusted_rate is not None else None
-    rate, quelle = mischen(
-        gem.adjusted_rate if gem else None,
-        pri.adjusted_rate if pri else None,
-        _n(gem), config.PRIOR_STAERKE,
-    )
-    if quelle == UNKNOWN:
-        return MetaAuskunft()
-    if quelle == PROFILE:
-        return MetaAuskunft(rate, quelle, 0, pri.confidence, pri)
-    confidence = gem.confidence
-    if quelle == MEASURED_PRIOR and pri is not None:
-        # Mischung: nie sicherer als die sicherere der beiden Quellen.
-        confidence = max(gem.confidence, pri.confidence)
-    return MetaAuskunft(rate, quelle, gem.games, confidence, gem)
