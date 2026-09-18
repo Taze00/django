@@ -78,7 +78,11 @@ class DatenstufenTest(DrafterTest):
         Wert dadurch mit vollem Gewicht - je weniger man wusste, desto
         weiter oben stand er.
         """
+        # Zwei gemessene Brawler, damit es ueberhaupt ein Feld gibt: die
+        # Staerke ist die Lage IM Feld, und ein Feld aus einem einzigen
+        # Brawler sagt nichts (Feldwert 0, wie z_werte bei Gleichstand).
         self.messe(self.nori, 30, rate=0.60)
+        self.messe(self.brawler("gale"), 200, rate=0.40)
         e = self.empfehlung(self.engine(), "nori")
         meta = e.komponenten[config.K_META]
         self.assertGreater(meta.beitrag, 0, "Vorbedingung: positive Meta")

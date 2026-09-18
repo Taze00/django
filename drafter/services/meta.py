@@ -23,16 +23,23 @@ fuer eine andere Fassung des Brawlers gemessen wurde.
 """
 
 from drafter import config
-from drafter.services import quellen
+from drafter.services import quellen, staerke
 from drafter.services.scoring import Grund, Komponente
 from drafter.services.patch_weighting import statistik_gewicht
 
 
 def komponenten_fuer_pool(kandidaten, raum, patch=None):
+    # Erst alle Schaetzungen, dann das Feld: der Score-Wert ist die Lage
+    # IM FELD, nicht der Abstand zu einer festen 50-%-Marke. Warum, steht
+    # bei config.STAERKE_FELD_K.
+    auskuenfte = {b.id: raum.staerke(b) for b in kandidaten}
+    feld = staerke.Feld.aus([a.rate for a in auskuenfte.values() if a.bekannt])
+
     ergebnis = {}
     for b in kandidaten:
         komp = Komponente(key=config.K_META)
-        auskunft = raum.staerke(b)
+        komp.feld = feld
+        auskunft = auskuenfte[b.id]
         # Weder Messung noch gepflegter Wert: keine Auskunft, nicht "50 %".
         if not auskunft.bekannt:
             komp.verfuegbar = False
@@ -44,7 +51,7 @@ def komponenten_fuer_pool(kandidaten, raum, patch=None):
 
         gewicht = (statistik_gewicht(auskunft.record, b, patch)
                    if auskunft.record is not None else 1.0)
-        komp.wert = auskunft.wert * gewicht
+        komp.wert = staerke.feldwert(auskunft, feld) * gewicht
         komp.confidence = auskunft.confidence * gewicht
         komp.quelle = auskunft.quelle
         komp.staerke = auskunft
@@ -56,7 +63,18 @@ def komponenten_fuer_pool(kandidaten, raum, patch=None):
         umfang = f", {auskunft.spiele} Spiele" if auskunft.spiele else ""
         if auskunft.quelle == quellen.MEASURED_PRIOR and raum.stat_prior(b):
             umfang += ", mit Profil gemischt"
-        if rate >= 0.55 and gewicht > 0.5:
+        lage = komp.wert
+        if lage >= 0.25 and gewicht > 0.5:
+            komp.gruende.append(Grund(
+                text=f"läuft derzeit besser als das Feld ({rate:.0%} Siegquote{umfang})",
+                positiv=True, staerke=0.5 + 0.2 * lage, quelle=grund_quelle,
+            ))
+        elif lage <= -0.25 and gewicht > 0.5:
+            komp.gruende.append(Grund(
+                text=f"läuft derzeit schlechter als das Feld ({rate:.0%} Siegquote{umfang})",
+                positiv=False, staerke=0.5 + 0.2 * abs(lage), quelle=grund_quelle,
+            ))
+        elif rate >= 0.55 and gewicht > 0.5:
             komp.gruende.append(Grund(
                 text=f"läuft im aktuellen Patch stark ({rate:.0%} Siegquote{umfang})",
                 positiv=True, staerke=0.55, quelle=grund_quelle,

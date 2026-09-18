@@ -13,7 +13,9 @@ dort schlechter passen. Erst der Vergleich innerhalb derselben Map macht
 die Zahl aussagekraeftig.
 """
 
+from drafter import attributes as attr
 from drafter import config
+from drafter.services import quellen, rollenwissen
 from drafter.services.scoring import Grund, Komponente, z_werte
 
 
@@ -38,6 +40,19 @@ def komponenten_fuer_pool(kandidaten, anforderungen, brawl_map=None):
     roh = {b.id: roh_passung(b, anforderungen) for b in kandidaten if b.hat_profil}
     z = z_werte(roh)
 
+    # Ohne Profil, aber mit gepflegter Draft-Rolle: die Rolle sagt, WELCHE
+    # Anforderungen der Map sie ueberhaupt beruehrt - das Gewicht steht in
+    # der Map, nicht im Brawler. Eigenes Bezugsfeld, ebenfalls bei 0
+    # zentriert und gedeckelt (services/rollenwissen.py).
+    roh_rolle = {}
+    for b in kandidaten:
+        if b.hat_profil:
+            continue
+        anteil = rollenwissen.anforderungsdeckung(b, anforderungen)
+        if anteil is not None:
+            roh_rolle[b.id] = anteil
+    z_rolle = rollenwissen.rollen_z(roh_rolle)
+
     # Welche Eigenschaften praegen diese Map? Nur darueber wird begruendet -
     # "passt gut zur Map" ohne Grund ist keine Erklaerung.
     wichtigste = sorted(anforderungen.items(), key=lambda p: -p[1])[:3]
@@ -45,14 +60,32 @@ def komponenten_fuer_pool(kandidaten, anforderungen, brawl_map=None):
     ergebnis = {}
     for b in kandidaten:
         if not b.hat_profil:
-            ergebnis[b.id] = Komponente(key=config.K_MAP_MODE, verfuegbar=False)
+            if b.id not in z_rolle:
+                ergebnis[b.id] = Komponente(key=config.K_MAP_MODE, verfuegbar=False)
+                continue
+            komp = Komponente(key=config.K_MAP_MODE, wert=z_rolle[b.id],
+                              quelle=quellen.FACHWISSEN)
+            for faehigkeit, treffer in rollenwissen.faehigkeiten_gruende(
+                    b, anforderungen)[:2]:
+                label = attr.EIGENSCHAFT_NACH_KEY[treffer[0]].label
+                komp.gruende.append(Grund(
+                    text=f"{b.draft_rolle_label}: {label} zählt hier",
+                    positiv=komp.wert >= 0, staerke=0.45, quelle="fachquelle",
+                ))
+            if not komp.gruende:
+                richtung = "passt zu" if komp.wert >= 0 else "passt wenig zu"
+                komp.gruende.append(Grund(
+                    text=f"{b.draft_rolle_label} {richtung} dem, was diese Map verlangt"
+                         " (Rolle, kein Profil)",
+                    positiv=komp.wert >= 0, staerke=0.35, quelle="fachquelle",
+                ))
+            ergebnis[b.id] = komp
             continue
         komp = Komponente(key=config.K_MAP_MODE, wert=z.get(b.id, 0.0))
         if komp.wert > 0.15:
             treffer = [
                 (k, w) for k, w in wichtigste if w > 0.3 and b.wert(k) >= 0.6
             ]
-            from drafter import attributes as attr
             for k, w in treffer[:2]:
                 label = attr.EIGENSCHAFT_NACH_KEY[k].label
                 ort = brawl_map.name if brawl_map else "diesem Modus"
@@ -69,7 +102,6 @@ def komponenten_fuer_pool(kandidaten, anforderungen, brawl_map=None):
             fehlend = [
                 (k, w) for k, w in wichtigste if w > 0.4 and b.wert(k) < 0.35
             ]
-            from drafter import attributes as attr
             for k, w in fehlend[:1]:
                 komp.gruende.append(Grund(
                     text=f"bringt kaum {attr.EIGENSCHAFT_NACH_KEY[k].label}, was hier wichtig wäre",

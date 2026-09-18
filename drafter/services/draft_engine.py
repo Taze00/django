@@ -108,6 +108,49 @@ class DraftEngine:
             return attr.als_vektor(self.ctx.game_mode.base_requirements or {})
         return {}
 
+    @staticmethod
+    def _datenlage_strafe(ergebnisse):
+        """Risikoabschlag - nur fuer den Rueckstand auf die Sicherheit des Feldes.
+
+        Frueher: `-(1 - confidence)`. Das bestrafte eine duenne Stichprobe
+        ein drittes Mal. Nachgerechnet am 2026-09-18 fuer eine rohe
+        Siegquote von 60 %:
+
+            n=20    Posterior zieht 9.6 pp ab, uebrig +0.29 Punkte
+                    Confidence 0.02, Malus -4.90  ->  netto -4.61
+            n=1000  Posterior zieht 3.2 pp ab, uebrig +8.50 Punkte
+                    Confidence 0.43, Malus -2.83  ->  netto +5.67
+
+        Bei n=20 hatte die Shrinkage bereits 97 % des Signals entfernt -
+        der Malus zog danach das Sechzehnfache des Verbliebenen ab. Und er
+        traf ALLE: im echten Feld verlor der sicherste Brawler 1.46, der
+        unsicherste 4.98 Punkte, ein Sockel ohne Aussage.
+
+        Jetzt zaehlt nur der Abstand nach unten zum Median des Feldes. Ist
+        die Datenlage ueberall gleich, kostet sie niemanden etwas - wie
+        unsicher die Lage insgesamt ist, steht in der Confidence, nicht im
+        Score. Wer deutlich schlechter belegt ist als das Feld, zahlt
+        weiterhin eine Praemie: im Draft ist ein unsicherer Pick ein Risiko.
+        """
+        from statistics import median
+
+        from drafter.services.scoring import Grund
+
+        werte = [e.confidence for e in ergebnisse]
+        if not werte:
+            return
+        mitte = median(werte)
+        for e in ergebnisse:
+            komp = e.komponenten.get(config.K_UNCERTAINTY)
+            if komp is None:
+                continue
+            komp.wert = -max(0.0, min(1.0, mitte - e.confidence))
+            if komp.wert < -0.1:
+                komp.gruende.append(Grund(
+                    text="dünner belegt als die übrigen Vorschläge",
+                    positiv=False, staerke=0.3 + abs(komp.wert) * 0.3,
+                ))
+
     # --- Empfehlungen ---------------------------------------------------
     def empfehlungen(self, anzahl=None, mit_details=None):
         """Bewertete Kandidaten, bester zuerst.
@@ -168,20 +211,14 @@ class DraftEngine:
             personal.deckel_anwenden(komponenten[config.K_PERSONAL])
 
             # Datenlage zum Schluss - sie bewertet die anderen Komponenten.
+            # Der Wert kommt erst nach der Schleife: er ist der Abstand zur
+            # Sicherheit des FELDES, nicht die Unsicherheit an sich.
             conf = confidence.fuer_empfehlung(komponenten, self.ctx, self.raum, kandidat)
-            unsicherheit = Komponente(
+            komponenten[config.K_UNCERTAINTY] = Komponente(
                 key=config.K_UNCERTAINTY,
-                wert=-(1.0 - conf),
                 gewicht=gewichte.get(config.K_UNCERTAINTY, 0.0),
                 confidence=1.0,
             )
-            if conf < 0.3:
-                from drafter.services.scoring import Grund
-                unsicherheit.gruende.append(Grund(
-                    text="dünne Datenlage - die Einschätzung ist unsicher",
-                    positiv=False, staerke=0.3,
-                ))
-            komponenten[config.K_UNCERTAINTY] = unsicherheit
 
             ergebnisse.append(Empfehlung(
                 brawler=kandidat,
@@ -190,6 +227,8 @@ class DraftEngine:
                 rolle=coach.rolle_im_team(kandidat, self.eigene_analyse),
                 stufe=self.raum.stufe(kandidat),
             ))
+
+        self._datenlage_strafe(ergebnisse)
 
         # Nach dem ungeklemmten Wert - sonst waeren Kandidaten unterhalb
         # von -1 ununterscheidbar (siehe Empfehlung.roher_score).

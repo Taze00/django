@@ -14,6 +14,7 @@ das gegnerische Team gerade bestraft (Angreifbarkeit -).
 
 from drafter import attributes as attr
 from drafter import config
+from drafter.services import quellen, rollenwissen
 from drafter.services.scoring import Grund, Komponente, klemme, z_werte
 
 
@@ -53,12 +54,46 @@ def komponenten_fuer_pool(kandidaten, analyse, ctx):
     z = z_werte(roh)
     kritisch = analyse.kritische_luecken()
 
+    # Ohne Profil, aber mit Draft-Rolle: welche unserer Luecken beruehrt
+    # diese Rolle ueberhaupt? Die Dringlichkeit kommt aus der Teamanalyse,
+    # also aus den Profilen der schon gepickten Brawler - die Rolle sagt
+    # nur, ob sie zum Thema gehoert (services/rollenwissen.py).
+    luecken = analyse.groesste_luecken(anzahl=5)
+    roh_rolle = {}
+    for b in kandidaten:
+        if b.hat_profil:
+            continue
+        anteil = rollenwissen.lueckendeckung(b, luecken)
+        if anteil is not None:
+            roh_rolle[b.id] = anteil
+    z_rolle = rollenwissen.rollen_z(roh_rolle)
+
     ergebnis = {}
     for b in kandidaten:
         komp = Komponente(key=config.K_TEAM_NEED)
         if not b.hat_profil:
-            # Was er dem Team hinzufuegt, ist ohne Eigenschaften unbekannt.
-            komp.verfuegbar = False
+            if b.id not in z_rolle:
+                # Weder Eigenschaften noch Rolle: unbekannt, nicht 0.
+                komp.verfuegbar = False
+                ergebnis[b.id] = komp
+                continue
+            komp.wert = z_rolle[b.id]
+            komp.quelle = quellen.FACHWISSEN
+            if komp.wert > 0.1 and luecken:
+                getroffen = [e.label for e, _ in luecken
+                             if e.key in rollenwissen.deckt(b)][:1]
+                if getroffen:
+                    komp.gruende.append(Grund(
+                        text=f"{b.draft_rolle_label} - deckt das Thema "
+                             f"{getroffen[0]}, das uns fehlt (Rolle, kein Profil)",
+                        positiv=True, staerke=0.5, quelle="fachquelle",
+                    ))
+            elif komp.wert < -0.1 and luecken:
+                komp.gruende.append(Grund(
+                    text=f"{b.draft_rolle_label} trifft unsere größte Lücke "
+                         f"({luecken[0][0].label}) nicht",
+                    positiv=False, staerke=0.45, quelle="fachquelle",
+                ))
             ergebnis[b.id] = komp
             continue
         absolut = klemme(roh[b.id] * 2.5)
@@ -95,7 +130,22 @@ def redundanz(kandidat, analyse, ctx):
     """Strafkomponente: wovon wir schon genug haben. Immer <= 0."""
     komp = Komponente(key=config.K_REDUNDANCY)
     if not kandidat.hat_profil:
-        komp.verfuegbar = False
+        # Ohne Eigenschaften laesst sich nicht sagen, WOVON wir zu viel
+        # haetten - aber sehr wohl, ob dieselbe Draft-Rolle schon einmal
+        # steht. Der Betrag kommt aus der Zahl der Picks, nicht aus einer
+        # Einschaetzung. Ohne Rolle bleibt es unbekannt.
+        if not rollenwissen.hat_fachwissen(kandidat) or not ctx.own_picks:
+            komp.verfuegbar = False
+            return komp
+        doppelt = rollenwissen.gleiche_rolle(kandidat, ctx.own_picks)
+        komp.wert = -klemme(doppelt * config.ROLLEN_REDUNDANZ_JE_PICK, 0.0, 1.0)
+        komp.quelle = quellen.FACHWISSEN
+        if doppelt:
+            komp.gruende.append(Grund(
+                text=f"wir haben schon {doppelt}x {kandidat.draft_rolle_label} "
+                     "im Team (Rolle, kein Profil)",
+                positiv=False, staerke=0.4 + 0.1 * doppelt, quelle="fachquelle",
+            ))
         return komp
     strafe = 0.0
 

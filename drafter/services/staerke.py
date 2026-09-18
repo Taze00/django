@@ -124,7 +124,13 @@ class Staerke:
 
     @property
     def wert(self):
-        """Abweichung von 50 % in [-1, +1] - der Score-Vertrag der Engine."""
+        """Absolute Abweichung von 50 % in [-1, +1].
+
+        Nur fuer Vergleiche zwischen Picks EINES Drafts (Siegwahr-
+        scheinlichkeit, Ban-Bewertung) - nicht der Score-Wert. Den liefert
+        `feldwert()`, weil echte Siegquoten nur zwischen etwa 45 und 58 %
+        liegen und diese Form deshalb fast keinen Ausschlag hat.
+        """
         if self.rate is None:
             return None
         return max(-1.0, min(1.0, (self.rate - 0.5) * 2))
@@ -151,10 +157,15 @@ class Staerke:
             return None
         return (max(0.0, self.rate - 1.96 * self.sd), min(1.0, self.rate + 1.96 * self.sd))
 
-    def als_dict(self):
+    def als_dict(self, feld=None):
+        relativ = feldwert(self, feld) if feld is not None else None
         return {
             "rate": round(self.rate, 4) if self.rate is not None else None,
             "wert": round(self.wert, 4) if self.rate is not None else None,
+            # Score-Wert: die Staerke gemessen am aktuellen Feld.
+            "feldwert": round(relativ, 4) if relativ is not None else None,
+            "feld_zentrum": round(feld.zentrum, 4) if feld is not None else None,
+            "feld_streuung": round(feld.streuung, 4) if feld is not None else None,
             "sd": round(self.sd, 4),
             "n_effektiv": round(self.n_effektiv, 1),
             "spiele": self.spiele,
@@ -288,6 +299,60 @@ def schaetze(zeilen, profil_rate=None, pickrate=None, profil_record=None,
         beitraege=beitraege, referenz_sd=referenz,
         record=zeilen.get(feinste),
     )
+
+
+@dataclass(frozen=True)
+class Feld:
+    """Bezugspunkt und Streuung des aktuellen Kandidatenfeldes.
+
+    Robust geschaetzt (Median, MAD), damit ein einzelner Ausreisser den
+    Bezug nicht fuer alle verschiebt. Der Bezugspunkt ist bewusst NICHT
+    fest 50 %: ist das beobachtete Feld verschoben, ist die Mitte des
+    Feldes die ehrlichere Aussage.
+    """
+
+    zentrum: float = 0.5
+    streuung: float = config.STAERKE_FELD_MIN_STREUUNG
+    anzahl: int = 0
+
+    @classmethod
+    def aus(cls, raten):
+        raten = [r for r in raten if r is not None]
+        if not raten:
+            return cls()
+        zentrum = _median(raten)
+        # MAD auf die Normalverteilung geeicht (x 1.4826), damit
+        # "Streuung" dasselbe bedeutet wie eine Standardabweichung.
+        mad = _median([abs(r - zentrum) for r in raten]) * 1.4826
+        return cls(zentrum=zentrum,
+                   streuung=max(config.STAERKE_FELD_MIN_STREUUNG, mad),
+                   anzahl=len(raten))
+
+
+def _median(werte):
+    werte = sorted(werte)
+    n = len(werte)
+    if not n:
+        return 0.0
+    mitte = n // 2
+    return werte[mitte] if n % 2 else (werte[mitte - 1] + werte[mitte]) / 2
+
+
+def feldwert(staerke, feld):
+    """Die Staerke als Score-Wert in [-1, +1], gemessen am Feld.
+
+    Die eigene Unsicherheit steht im Nenner: wer wenig gemessen ist,
+    bekommt weniger Ausschlag - zusaetzlich zur Shrinkage, die schon im
+    Schaetzwert steckt. Ohne das wuerde eine duenne Stichprobe, die
+    zufaellig weit oben liegt, den vollen Ausschlag bekommen.
+    """
+    if staerke is None or not staerke.bekannt:
+        return None
+    nenner = config.STAERKE_FELD_K * math.sqrt(
+        feld.streuung ** 2 + staerke.sd ** 2)
+    if nenner <= 0:
+        return 0.0
+    return max(-1.0, min(1.0, (staerke.rate - feld.zentrum) / nenner))
 
 
 def paar_confidence(spiele, prior_staerke=None):

@@ -5,7 +5,12 @@ Prioritaet je Komponente (nicht je Brawler):
     1. genug Messung  (Stichprobe >= CONFIDENCE_VOLL_AB)  -> Measured
     2. wenig Messung  (> 0 Spiele)                         -> Measured + Prior
     3. keine Messung, gepflegter Wert vorhanden            -> Profile
-    4. weder noch                                          -> Unknown
+    4. nur Rolle/Faehigkeiten der Fachquelle               -> Fachquelle
+    5. weder noch                                          -> Unknown
+
+Stufe 4 liefert keine Zahl, sondern eine Richtung: die Rolle sagt, WORUM
+es bei dem Brawler geht, der Betrag kommt aus Map-Anforderung oder
+Team-Luecke. Details in services/rollenwissen.py.
 
 Stufe 2 mischt, statt zu ersetzen. Die Messung ist in der Aggregation
 schon Bayes-geglaettet - aber zum NEUTRALEN Erwartungswert (50 % bzw.
@@ -36,13 +41,18 @@ from drafter import config
 MEASURED = "Measured"
 MEASURED_PRIOR = "Measured + Prior"
 PROFILE = "Profile"
+# Gepflegtes Fachwissen ohne Zahlen: Draft-Rolle und Faehigkeiten aus der
+# Role-&-Ability-Map. Schwaecher als ein Profil, weil es nur die Richtung
+# kennt - aber ungleich besser als Unknown, das die Komponente ganz
+# ausfallen laesst. Siehe services/rollenwissen.py.
+FACHWISSEN = "Fachquelle"
 UNKNOWN = "Unknown"
 
 # Rangfolge fuer zusammengesetzte Komponenten (Counter ueber drei Gegner):
 # es gilt die schwaechste beteiligte Quelle. "Measured" nur, wenn ALLES
 # gemessen ist - sonst taeuschte ein gemessenes Paar Sicherheit fuer die
 # ganze Komponente vor.
-_RANG = {MEASURED: 3, MEASURED_PRIOR: 2, PROFILE: 1, UNKNOWN: 0}
+_RANG = {MEASURED: 4, MEASURED_PRIOR: 3, PROFILE: 2, FACHWISSEN: 1, UNKNOWN: 0}
 
 
 def schwaechste(quellen):

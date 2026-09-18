@@ -17,6 +17,7 @@ from dataclasses import dataclass, field
 from statistics import fmean, pstdev
 
 from drafter import config
+from drafter.services import staerke as staerke_modul
 
 
 def klemme(wert, unten=-1.0, oben=1.0):
@@ -98,6 +99,9 @@ class Komponente:
     # Nur bei CURRENT STRENGTH gesetzt: die Schaetzung samt Stichprobe,
     # Unsicherheit und Herkunft je Ebene (services/staerke.Staerke).
     staerke: object = None
+    # Bezugsfeld der Staerke (services/staerke.Feld) - der Score-Wert ist
+    # relativ zu ihm, also gehoert es in die Erklaerung.
+    feld: object = None
 
     @property
     def beitrag(self):
@@ -134,7 +138,8 @@ class Komponente:
             "beitrag": round(self.beitrag * 50, 1),
             "ist_strafe": self.ist_strafe,
             # Nur CURRENT STRENGTH: worauf die Schaetzung beruht.
-            "schaetzung": self.staerke.als_dict() if self.staerke is not None else None,
+            "schaetzung": (self.staerke.als_dict(self.feld)
+                           if self.staerke is not None else None),
             # Begruendungen der Komponente, damit jede Zeile der Tabelle
             # aufklappbar ist und nicht nur eine Zahl bleibt.
             "gruende": [g.als_dict() for g in self.gruende],
@@ -222,6 +227,11 @@ class Empfehlung:
         return komp.staerke if komp is not None else None
 
     @property
+    def staerke_feld(self):
+        komp = self.komponenten.get(config.K_META)
+        return komp.feld if komp is not None else None
+
+    @property
     def roher_score(self):
         """Ungeklemmte Summe der gewichteten Komponenten.
 
@@ -300,6 +310,59 @@ class Empfehlung:
         gesammelt.sort(key=lambda g: -g.staerke)
         return gesammelt[: config.GRUENDE_MAX]
 
+    def erklaerung(self):
+        """Die fuenf Groessen einer Empfehlung, getrennt ausgewiesen.
+
+        CURRENT STRENGTH (wie gut laeuft er), DRAFT FIT (passt er hier),
+        PERSOENLICH (beherrscht der Spieler ihn), DATENABDECKUNG (worauf
+        beruht das) und STATISTISCHE SICHERHEIT (wie belastbar ist die
+        Messung). Sie beantworten verschiedene Fragen und duerfen deshalb
+        nie zu einer Zahl verrechnet werden.
+        """
+        st = self.staerke
+        persoenlich = self.komponenten.get(config.K_PERSONAL)
+        return {
+            "current_strength": {
+                "punkte": round(self.gruppen_beitrag(config.G_CURRENT_STRENGTH), 1),
+                "rate": round(st.rate, 4) if st is not None and st.bekannt else None,
+                "feldwert": (round(staerke_modul.feldwert(st, self.staerke_feld), 3)
+                             if st is not None and st.bekannt
+                             and self.staerke_feld is not None else None),
+                "spiele": st.spiele if st is not None else 0,
+                "n_effektiv": round(st.n_effektiv, 1) if st is not None else 0.0,
+                "quelle": st.quelle if st is not None else "Unknown",
+            },
+            "draft_fit": {
+                "punkte": round(self.gruppen_beitrag(config.G_DRAFT_FIT), 1),
+                "komponenten": [
+                    {"key": k.key, "label": k.label,
+                     "punkte": round(k.beitrag * 50, 1), "quelle": k.quelle}
+                    for k in self.aufschluesselung()
+                    if k.gruppe == config.G_DRAFT_FIT and k.verfuegbar
+                    and abs(k.beitrag) >= 0.002
+                ],
+            },
+            "personal": {
+                "punkte": round(self.gruppen_beitrag(config.G_PERSOENLICH), 1),
+                "gepflegt": bool(persoenlich is not None and persoenlich.verfuegbar),
+            },
+            "data_coverage": {
+                "prozent": round(self.datenabdeckung * 100),
+                "label": self.datenabdeckung_label,
+                "ausgelassen": [k.label for k in self.ausgelassen],
+            },
+            "statistical_confidence": {
+                "gesamt": round(self.confidence, 3),
+                "label": self.confidence_label,
+                # Nur die Messung - ohne Profil-, Fachwissens- und
+                # Draftanteile, die in die Gesamtconfidence einfliessen.
+                "messung": round(st.confidence, 3) if st is not None else 0.0,
+                "sd": round(st.sd, 4) if st is not None else None,
+                "intervall": ([round(x, 4) for x in st.intervall]
+                              if st is not None and st.bekannt else None),
+            },
+        }
+
     def als_dict(self, ausfuehrlich=False):
         b = self.brawler
         daten = {
@@ -326,12 +389,16 @@ class Empfehlung:
             "komponenten": [k.als_dict() for k in self.aufschluesselung()],
             # Die drei Aussagen getrennt - nie in einer Zahl vermischt.
             "current_strength": (
-                self.staerke.als_dict() if self.staerke is not None
+                self.staerke.als_dict(self.staerke_feld) if self.staerke is not None
                 and self.staerke.bekannt else None
             ),
             "draft_fit": round(self.gruppen_beitrag(config.G_DRAFT_FIT), 1),
             "current_strength_beitrag": round(
                 self.gruppen_beitrag(config.G_CURRENT_STRENGTH), 1),
+            # Fuenf Zahlen, aus denen eine Empfehlung besteht - fuer die
+            # Fehlersuche an EINER Stelle, statt aus der Komponentenliste
+            # zusammengerechnet werden zu muessen.
+            "erklaerung": self.erklaerung(),
             "datenstufe": self.stufe,
             "datenabdeckung": round(self.datenabdeckung * 100),
             "datenabdeckung_label": self.datenabdeckung_label,

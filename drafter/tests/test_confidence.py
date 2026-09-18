@@ -90,7 +90,22 @@ class EmpfehlungsConfidenceTest(DrafterTest):
         text = confidence.erklaerung(0.3, engine.raum, engine.ctx)
         self.assertIn("Demo", text)
 
-    def test_schlechte_datenlage_zieht_den_score(self):
-        # Die Unsicherheits-Komponente muss negativ beitragen.
-        for empfehlung in self.engine(gegner=["bull"]).empfehlungen():
-            self.assertLess(empfehlung.komponenten[config.K_UNCERTAINTY].beitrag, 0)
+    def test_datenlage_bestraft_nur_den_rueckstand_aufs_feld(self):
+        """Seit 2026-09-18 ein Risikoabschlag, keine zweite Abwertung.
+
+        `-(1 - confidence)` traf jeden Kandidaten, auch wenn alle gleich
+        gut belegt waren - ein Sockel ohne Aussage, und fuer duenne
+        Stichproben die dritte Strafe nach Shrinkage und niedriger
+        Confidence. Jetzt zaehlt nur der Abstand nach unten zum Median.
+        """
+        empfehlungen = self.engine(gegner=["bull"]).empfehlungen(anzahl=200)
+        beitraege = [e.komponenten[config.K_UNCERTAINTY].beitrag for e in empfehlungen]
+        self.assertTrue(all(b <= 0 for b in beitraege), "nie ein Bonus")
+        self.assertTrue(any(b == 0 for b in beitraege),
+                        "wer mindestens so sicher ist wie das Feld, zahlt nichts")
+        # Und der Abschlag folgt der Confidence, nicht dem Zufall.
+        sicherster = max(empfehlungen, key=lambda e: e.confidence)
+        unsicherster = min(empfehlungen, key=lambda e: e.confidence)
+        self.assertGreaterEqual(
+            sicherster.komponenten[config.K_UNCERTAINTY].beitrag,
+            unsicherster.komponenten[config.K_UNCERTAINTY].beitrag)

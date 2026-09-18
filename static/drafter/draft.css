@@ -940,3 +940,21 @@ kbd {
   .rollenfilter button { flex-shrink: 0; padding: 6px 10px; }
   .gitter { grid-template-columns: repeat(auto-fill, minmax(68px, 1fr)); gap: 5px; }
 }
+
+/* Debug-Tafel im Detail-Modal: die fuenf Groessen einer Empfehlung.
+   Bewusst eine schlichte Liste - sie erklaert, sie wirbt nicht. */
+.erklaerung-zeile {
+  display: grid;
+  grid-template-columns: 11rem 5rem 1fr;
+  gap: 12px;
+  align-items: baseline;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--rand);
+}
+.erklaerung-name { font-weight: 600; }
+.erklaerung-wert { font-family: var(--mono); text-align: right; }
+.erklaerung-hinweis { color: var(--text-leise); font-size: 0.85rem; }
+@media (max-width: 640px) {
+  .erklaerung-zeile { grid-template-columns: 1fr auto; }
+  .erklaerung-hinweis { grid-column: 1 / -1; }
+}

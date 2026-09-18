@@ -491,11 +491,79 @@ STAERKE_PRIOR_GLOBAL = 120
 # groeberen wegwarf. Mehr Daten duerfen nie weniger Gewissheit ergeben.
 STAERKE_EBENEN_ABSCHLAG = 0.5
 
+# Feldrelative Skalierung
+# -----------------------
+# Der Score-Vertrag verlangt [-1, +1], aber echte Siegquoten leben
+# zwischen 45 und 58 %. `(rate - 0.5) * 2` liefert damit nur -0.10 bis
+# +0.16: 22 % nominelles Gewicht wurden real zu etwa 1 %. Gemessen an
+# 106 Ranked-Brawlern (2026-09-18) hatte die Komponente eine Streuung von
+# 0.042 - der ganze Unterschied zwischen dem besten und dem schlechtesten
+# Brawler des Feldes war ein einziger Scorepunkt.
+#
+# Also wird am FELD gemessen, nicht an einer festen 50-%-Marke:
+#
+#     wert = (rate - Median des Feldes) / (K * sqrt(Feldstreuung^2 + sd^2))
+#
+# Drei Gruende fuer genau diese Form:
+#
+# * **Median und MAD statt Mittelwert und sd** - ein einzelner extremer
+#   Brawler verschiebt den Bezugspunkt sonst fuer alle anderen mit.
+# * **Der Bezugspunkt ist nicht 50 %.** Ist das ganze beobachtete Feld
+#   verschoben (Sampling, Banphase, Patch), waere eine feste Marke eine
+#   Behauptung ueber Daten, die wir nicht haben.
+# * **Die eigene Unsicherheit steht im Nenner.** Die Feldstreuung der
+#   Posterior-Raten (robust 0.012) ist KLEINER als die typische
+#   Einzelunsicherheit (0.041). Wer nur durch die Feldstreuung teilt,
+#   macht aus Rauschen Signal: z-Score, MAD und Perzentil gaben GALE mit
+#   44 Partien +1.00, +1.00 und +0.98 - Vollausschlag aus einer
+#   Stichprobe, die 14 Prozentpunkte Spielraum hat. Mit der eigenen
+#   Streuung im Nenner bekommt GUS (1131 Partien) +0.54 und GALE +0.33.
+#
+# K = 2 heisst "zwei kombinierte Streuungen sind Vollausschlag" - dieselbe
+# Konvention wie in scoring.z_werte.
+STAERKE_FELD_K = 2.0
+# Untergrenze der Feldstreuung. Ohne sie teilte ein sehr einheitliches
+# Feld (oder eines aus zwei Brawlern) durch fast null.
+STAERKE_FELD_MIN_STREUUNG = 0.01
+
 # Selection Bias: wer selten gespielt wird, wird von Spezialisten
 # gespielt. Das macht die Rate nicht falsch, aber weniger uebertragbar -
 # es senkt die SICHERHEIT, nie den Schaetzwert.
 STAERKE_PICKRATE_REFERENZ = 0.05     # ab hier gilt ein Brawler als normal verbreitet
 STAERKE_BIAS_MAX_ABZUG = 0.40        # hoechstens so viel Sicherheit kostet das
+
+
+# =========================================================================
+# Was eine Draft-Rolle qualitativ adressiert (services/rollenwissen.py)
+# =========================================================================
+# Die sieben Rollen der Fachquelle, uebersetzt in die Eigenschaften, um
+# die es bei ihnen GEHT. Das ist eine Zuordnung, keine Bewertung: hier
+# steht, WOVON ein Thrower handelt, nicht wie gut er darin ist. Die
+# Betraege kommen immer von der anderen Seite - Map-Anforderung oder
+# Team-Luecke. Siehe den Kopf von services/rollenwissen.py.
+#
+# Absichtlich kurz gehalten: drei bis fuenf Posten je Rolle, die im Draft
+# tatsaechlich entscheiden. Eine vollstaendige Matrix waere
+# Scheingenauigkeit - sie sieht praeziser aus, als die Quelle ist.
+ROLLE_DECKT = {
+    "thrower":     ("area_control", "zone_control", "safe_damage", "objective_damage"),
+    "tank":        ("frontline", "tankiness", "engage", "peel"),
+    "space_maker": ("engage", "mobility", "backline_pressure", "anti_assassin"),
+    "anti_tank":   ("anti_tank", "burst_damage", "poke"),
+    "support":     ("healing", "support", "peel", "survivability"),
+    "sniper":      ("long_range", "poke", "lane_control", "backline_pressure"),
+    "control":     ("area_control", "mid_control", "crowd_control", "zone_control"),
+}
+
+# Wie weit eine rein qualitative Auskunft ausschlagen darf. Eine Rolle ist
+# eine Schublade, ein Profil eine Beschreibung - wer nur eingeordnet ist,
+# bekommt hoechstens die Haelfte des Ausschlags, den ein gepflegtes Profil
+# erreichen kann.
+FACHWISSEN_MAX_AUSSCHLAG = 0.5
+
+# Wie stark ein zweiter Brawler derselben Rolle im eigenen Team zaehlt.
+# Der Betrag kommt aus der Zahl der Picks, nicht aus einer Einschaetzung.
+ROLLEN_REDUNDANZ_JE_PICK = 0.3
 
 
 # =========================================================================

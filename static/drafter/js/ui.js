@@ -864,6 +864,45 @@ export function zeichneMatchplan(analyse) {
   }
 }
 
+// Die fuenf Groessen einer Empfehlung nebeneinander. Bewusst schlicht und
+// ohne eigenes Layout: das ist eine Debug-Ansicht, kein Umbau der Oberflaeche.
+// Sie beantworten verschiedene Fragen und werden deshalb nie verrechnet.
+function erklaerungsTafel(x) {
+  const abschnitt = el('div', 'erklaerung');
+  abschnitt.appendChild(el('h3', null, 'Die fünf Größen'));
+  const punkte = (w) => `${w > 0 ? '+' : ''}${w.toFixed(1)}`;
+  const cs = x.current_strength;
+  const sc = x.statistical_confidence;
+  const zeilen = [
+    ['Current Strength', punkte(cs.punkte),
+      cs.rate === null ? 'keine Messung'
+        : `${(cs.rate * 100).toFixed(1)} % aus ${cs.spiele} Partien `
+          + `(effektiv ${cs.n_effektiv}) · ${cs.quelle}`],
+    ['Draft Fit', punkte(x.draft_fit.punkte),
+      x.draft_fit.komponenten.map((k) => `${k.label} ${punkte(k.punkte)}`).join(' · ')
+        || 'keine Komponente berechenbar'],
+    ['Personal', punkte(x.personal.punkte),
+      x.personal.gepflegt ? 'eigene Sicherheit gepflegt' : 'nicht gepflegt'],
+    ['Data Coverage', `${x.data_coverage.prozent} %`,
+      x.data_coverage.label
+        + (x.data_coverage.ausgelassen.length
+          ? ` · ohne ${x.data_coverage.ausgelassen.join(', ')}` : '')],
+    ['Statistical Confidence', sc.gesamt.toFixed(2),
+      `${sc.label} · Messung ${sc.messung.toFixed(2)}`
+        + (sc.intervall
+          ? ` · ${(sc.intervall[0] * 100).toFixed(1)}–${(sc.intervall[1] * 100).toFixed(1)} %`
+          : '')],
+  ];
+  zeilen.forEach(([name, wert, hinweis]) => {
+    const zeile = el('div', 'erklaerung-zeile');
+    zeile.appendChild(el('span', 'erklaerung-name', name));
+    zeile.appendChild(el('span', 'erklaerung-wert', wert));
+    zeile.appendChild(el('span', 'erklaerung-hinweis', hinweis));
+    abschnitt.appendChild(zeile);
+  });
+  return abschnitt;
+}
+
 // ─── Modal ──────────────────────────────────────────────────
 export function zeigeDetail(e) {
   const inhalt = $('modal-inhalt');
@@ -873,6 +912,8 @@ export function zeigeDetail(e) {
     `${e.rolle} · Score ${e.score}/100 · ~${e.win_probability}% Siegchance · `
     + `Confidence: ${e.confidence_label} · `
     + `Datenabdeckung ${e.datenabdeckung} % · ${e.datenabdeckung_label}`));
+
+  if (e.erklaerung) inhalt.appendChild(erklaerungsTafel(e.erklaerung));
 
   if (e.pro.length || e.contra.length) {
     inhalt.appendChild(el('h3', null, 'Warum dieser Pick'));
