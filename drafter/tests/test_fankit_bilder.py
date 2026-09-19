@@ -75,10 +75,22 @@ class ImportTest(DrafterTest):
             self.assertEqual(bild.size, (160, 160))
 
     def test_seitenverhaeltnis_bleibt_erhalten(self):
+        """Quadratische Flaeche, unverzerrtes Motiv.
+
+        Seit dem 2026-09-20 landet jedes Portrait auf einer einheitlichen
+        quadratischen Leinwand - sonst wirken Brawler im gleich grossen
+        Rahmen der Oberflaeche verschieden gross. Das Motiv selbst wird
+        dabei nur proportional verkleinert, nie gestreckt und nie
+        beschnitten: die sichtbare Flaeche behaelt ihr Verhaeltnis.
+        """
         bild_schreiben(self.quelle / "Gale.png", groesse=(400, 800))
         self.importieren(brawler=str(self.quelle))
         with Image.open(self.ziel / "brawler" / "gale.png") as bild:
-            self.assertEqual(bild.size, (80, 160))
+            self.assertEqual(bild.size, (160, 160))
+            sichtbar = bild.convert("RGBA").split()[3].getbbox()
+            breite = sichtbar[2] - sichtbar[0]
+            hoehe = sichtbar[3] - sichtbar[1]
+            self.assertEqual((breite, hoehe), (80, 160))
 
     def test_mehrdeutige_dateien_werden_nicht_geraten(self):
         bild_schreiben(self.quelle / "gale_portrait_1.png")
@@ -122,6 +134,10 @@ class ImportTest(DrafterTest):
         self.importieren(maps=str(self.quelle))
         karte = BrawlMap.objects.get(slug="hard-rock-mine")
         self.assertTrue(karte.image_url.startswith("/static/drafter/fankit/maps/hard-rock-mine.png"))
+        # Quadratisch wird nur das Portrait: eine Map ist ein Spielfeld
+        # und behaelt ihr Seitenverhaeltnis.
+        with Image.open(self.ziel / "maps" / "hard-rock-mine.png") as bild:
+            self.assertEqual(bild.size, (144, 240))
 
     def test_api_liefert_die_bilder_an_allen_stellen(self):
         from django.urls import reverse

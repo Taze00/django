@@ -210,6 +210,40 @@ class Command(BaseCommand):
                 self.stdout.write(f"  Ohne Bild: {', '.join(ohne)}")
         return geschrieben
 
+    @staticmethod
+    def _auf_quadrat(bild, kante, Image):
+        """Proportional verkleinern und auf eine quadratische Flaeche legen.
+
+        Die Fan-Kit-Portraits haben sehr verschiedene Seitenverhaeltnisse -
+        gemessen am 2026-09-20 von 160x108 (GUS) bis 160x160 (BYRON).
+        Im quadratischen Rahmen der Oberflaeche wirken sie dadurch
+        unterschiedlich gross, obwohl an keinem etwas falsch ist.
+
+        Was hier passiert, ist ausschliesslich **proportionales
+        Verkleinern und transparentes Auffuellen**: kein Zuschnitt, keine
+        Verzerrung, keine Farbaenderung. Das Motiv selbst bleibt
+        unveraendert - nur die Leinwand ist fuer alle gleich. Die
+        Originale in `fankit_download/` werden nie angefasst.
+
+        Gibt None zurueck, wenn nichts zu tun ist (schon quadratisch und
+        klein genug) - dann wird die Datei unveraendert kopiert.
+        """
+        breite, hoehe = bild.size
+        if breite == hoehe == kante:
+            return None
+        quelle = bild.convert("RGBA")
+        faktor = min(kante / breite, kante / hoehe, 1.0)
+        neu_groesse = (max(1, round(breite * faktor)), max(1, round(hoehe * faktor)))
+        if neu_groesse != quelle.size:
+            quelle = quelle.resize(neu_groesse, Image.LANCZOS)
+        leinwand = Image.new("RGBA", (kante, kante), (0, 0, 0, 0))
+        leinwand.paste(
+            quelle,
+            ((kante - quelle.size[0]) // 2, (kante - quelle.size[1]) // 2),
+            quelle,
+        )
+        return leinwand
+
     def _schreiben(self, quelle, art, slug, ziel, static_wurzel):
         from PIL import Image
 
@@ -219,7 +253,14 @@ class Command(BaseCommand):
         datei = ordner / f"{slug}{endung}"
 
         with Image.open(quelle) as bild:
-            if max(bild.size) > MAX_KANTE[art]:
+            # Quadratisch wird nur das PORTRAIT. Eine Map ist ein
+            # Spielfeld - sie hat ihr Seitenverhaeltnis aus gutem Grund
+            # und steht auf der Seite auch nicht neben ihresgleichen.
+            fertig = (self._auf_quadrat(bild, MAX_KANTE[art], Image)
+                      if art == "brawler" else None)
+            if fertig is not None:
+                fertig.save(datei, optimize=True)
+            elif max(bild.size) > MAX_KANTE[art]:
                 # thumbnail() verkleinert proportional und nie ueber das
                 # Original hinaus - genau die eine Aenderung, die das Fan
                 # Kit erlaubt.
