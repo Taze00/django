@@ -761,7 +761,25 @@ OBJECTIVE_FACHWISSEN_DAEMPFUNG = 0.5
 # geratenen. Der Betrag selbst kommt aus der Streuung, nicht aus einer
 # Schwelle.
 DRAFTLAGE_MIN_PAARE = 8            # gemessene Matchups fuer eine Streuungsaussage
-DRAFTLAGE_MIN_MODUS_PARTIEN = 30   # je Modus, damit eine Modus-Rate zaehlt
+
+# Ab wann die Messung ein altes Profil ueberstimmt - stetig, ohne Kante.
+#
+# Bis zum 2026-09-19 galt hier eine harte Prioritaet: wer gepflegte
+# `draft_values` hatte, wurde danach bewertet, egal wie viel inzwischen
+# gemessen war. Gemessen an diesem Tag: BROCK hatte 11 521 Partien ueber
+# sechs Modi und 3 114 Partien in 102 Matchups - und seine Flexibilitaet
+# kam trotzdem aus einem Demo-Wert. SANDY zog +6.3 Flex- und +4.1
+# Positionspunkte aus gepflegten Zahlen, zusammen ein Sechstel ihres
+# Scores, ohne dass eine einzige Partie dahinterstand.
+#
+#     w     = Evidenz / (Evidenz + K)
+#     final = w * gemessen + (1 - w) * Profil-Prior
+#
+# Ein Profil ist damit ein Prior und keine Wahrheit: mit wachsender
+# Evidenz verschwindet es von selbst. Wer keines hat, hat den neutralen
+# Prior 0 - Unknown bleibt Unknown und wird nicht zu einer Behauptung.
+FLEX_EVIDENZ_K = 1500          # Partien ueber alle Modi
+DRAFTLAGE_EVIDENZ_K = 1200     # Partien ueber alle gemessenen Matchups
 
 
 # =========================================================================

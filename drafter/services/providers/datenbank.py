@@ -74,6 +74,16 @@ class DatenbankStatProvider(StatProvider):
     def build_stats(self, anfrage):
         return self._zeilen(BuildStat, anfrage, "brawler_id")
 
+    def modus_stats(self, anfrage):
+        """Alle Modus-Zeilen, unabhaengig vom gefragten Modus."""
+        zeilen = (BrawlerStat.objects
+                  .filter(source__in=self.quellen,
+                          brawl_map__isnull=True, game_mode__isnull=False)
+                  .select_related("patch"))
+        if anfrage.brawler_ids:
+            zeilen = zeilen.filter(brawler_id__in=anfrage.brawler_ids)
+        return [StatRecord.aus_model(z) for z in zeilen]
+
 
 class OverlayStatProvider(StatProvider):
     """Gemessene Werte bevorzugen, gepflegte Werte je Schluessel behalten."""
@@ -103,6 +113,11 @@ class OverlayStatProvider(StatProvider):
         return self._overlay(self.gemessen.counter_stats(anfrage), self.prior.counter_stats(anfrage),
                              lambda r: (r.brawler_id, r.partner_id, r.game_mode_id,
                                         r.brawl_map_id, r.rank_pool, r.window_label))
+
+    def modus_stats(self, anfrage):
+        # Nur die gemessene Seite: die Frage "laeuft er ueberall aehnlich"
+        # ist eine Messfrage, ein gepflegter Prior beantwortet sie nicht.
+        return self.gemessen.modus_stats(anfrage)
 
     def synergy_stats(self, anfrage):
         return self._overlay(self.gemessen.synergy_stats(anfrage), self.prior.synergy_stats(anfrage),

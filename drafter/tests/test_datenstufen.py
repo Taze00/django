@@ -288,7 +288,8 @@ class QuellenprioritaetTest(DrafterTest):
 
     def test_jede_komponente_nennt_ihre_quelle(self):
         self.messe("sandy", 30, 0.55)
-        erlaubt = {"Measured", "Measured + Prior", "Profile", "Unknown"}
+        erlaubt = {"Measured", "Measured + Prior", "Profile", "Profile Prior",
+                   "Fachquelle", "Unknown"}
         for e in self.engine(gegner=["bull"]).empfehlungen():
             for k in e.als_dict()["komponenten"]:
                 self.assertIn(k["quelle"], erlaubt, (e.brawler.slug, k["key"]))

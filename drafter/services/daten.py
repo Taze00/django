@@ -317,16 +317,26 @@ class Datenraum:
         je Draft gecacht.
         """
         if self._modus_zeilen is None:
-            from drafter.models import BrawlerStat
-            from drafter.models.base import NICHT_GEMESSEN
             self._modus_zeilen = {}
-            zeilen = (BrawlerStat.objects
-                      .filter(brawl_map__isnull=True, game_mode__isnull=False)
-                      .exclude(source__in=NICHT_GEMESSEN)
-                      .only("brawler_id", "game_mode_id", "games", "raw_rate",
-                            "adjusted_rate", "window_label", "source"))
+            anfrage = StatAnfrage(brawler_ids=frozenset(self._nach_id))
+            # Ueber den Provider, nicht an ihm vorbei: die Engine fragt
+            # Statistiken ausschliesslich ueber das Protokoll ab. Ein
+            # Provider ohne Modusvergleich liefert eine leere Liste, und
+            # die Flexibilitaet faellt dann eben aus.
+            quelle = getattr(self.provider, "gemessen", self.provider)
+            zeilen = quelle.modus_stats(anfrage)
+            # JE MODUS nur eine Zeile - die mit den meisten Partien. Zu
+            # jedem Modus gibt es mehrere Zeitfenster (7d, 30d, 90d,
+            # seit_patch); alle mitzuzaehlen machte aus sechs Modi
+            # vierundzwanzig und zaehlte dieselben Partien mehrfach.
+            beste = {}
             for zeile in zeilen:
-                self._modus_zeilen.setdefault(zeile.brawler_id, []).append(zeile)
+                schluessel = (zeile.brawler_id, zeile.game_mode_id)
+                vorhanden = beste.get(schluessel)
+                if vorhanden is None or (zeile.games or 0) > (vorhanden.games or 0):
+                    beste[schluessel] = zeile
+            for (brawler_id, _), zeile in beste.items():
+                self._modus_zeilen.setdefault(brawler_id, []).append(zeile)
         return self._modus_zeilen.get(brawler.id, [])
 
     def gemessene_spiele(self, brawler):

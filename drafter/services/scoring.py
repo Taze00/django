@@ -105,6 +105,10 @@ class Komponente:
     feld: object = None
     # Nur bei Map & Modus: die Modus-Eignung (services/objective.Auskunft).
     objective: object = None
+    # Anteil, mit dem eine MESSUNG in den Wert eingeht (0-1). Der Rest ist
+    # ein gepflegter Prior. Nur dort gesetzt, wo beides gemischt wird -
+    # Flexibilitaet und Draft-Position.
+    mess_anteil: float = None
 
     @property
     def beitrag(self):
@@ -140,6 +144,10 @@ class Komponente:
             # Aufschluesselung steht ("Map Fit +18").
             "beitrag": round(self.beitrag * 50, 1),
             "ist_strafe": self.ist_strafe,
+            "measured_weight": (round(self.mess_anteil, 3)
+                                if self.mess_anteil is not None else None),
+            "prior_weight": (round(1.0 - self.mess_anteil, 3)
+                             if self.mess_anteil is not None else None),
             # Nur CURRENT STRENGTH: worauf die Schaetzung beruht.
             "schaetzung": (self.staerke.als_dict(self.feld)
                            if self.staerke is not None else None),

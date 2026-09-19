@@ -22,8 +22,9 @@ from drafter.services.providers.records import (
 class SnapshotStatProvider(StatProvider):
     name = "snapshot"
 
-    def __init__(self, records, name=None):
+    def __init__(self, records, name=None, modus_records=()):
         self._records = list(records)
+        self._modus = list(modus_records)
         if name:
             self.name = name
 
@@ -37,7 +38,18 @@ class SnapshotStatProvider(StatProvider):
             + provider.synergy_stats(anfrage)
             + provider.build_stats(anfrage)
         )
-        return cls(records, name=name or f"snapshot:{provider.name}")
+        # Modus-Zeilen anderer Modi getrennt merken: sie wuerden vom
+        # Kontextfilter verworfen, werden aber fuer den Modusvergleich
+        # gebraucht.
+        modus = [r for r in provider.modus_stats(anfrage)]
+        eigen = cls(records, name=name or f"snapshot:{provider.name}")
+        eigen._modus = modus
+        return eigen
+
+    def modus_stats(self, anfrage):
+        if not anfrage.brawler_ids:
+            return list(self._modus)
+        return [r for r in self._modus if r.brawler_id in anfrage.brawler_ids]
 
     def status(self):
         if self._records:

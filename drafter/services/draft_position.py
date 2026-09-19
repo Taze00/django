@@ -91,19 +91,52 @@ def gegnerabhaengigkeit(kandidat, raum):
 
 
 def modusbreite(kandidat, raum):
-    """Wie gleichmaessig laeuft er ueber die Modi? (Streuung) oder None.
+    """(Streuung, Partien, Modi) seiner Modus-Eignung - oder None.
 
-    Aus den gemessenen Modus-Zeilen: wer ueberall aehnlich abschneidet,
-    legt uns nicht fest. Braucht mindestens zwei Modi mit Messung, sonst
-    gibt es nichts zu vergleichen.
+    **Was hier gemessen wird:** wie stark seine Siegquote zwischen den
+    Modi auseinandergeht. Wenig Streuung heisst "laeuft ueberall aehnlich"
+    und damit flexibel; viel Streuung heisst spezialisiert.
+
+    Zwei Fallen, beide entschaerft:
+
+    1. **Datenarmut sieht aus wie Flexibilitaet.** Wer in jedem Modus drei
+       Partien hat, liegt ueberall beim Prior - die Streuung ist dann fast
+       null, und er saehe maximal flexibel aus. Deshalb zwei Dinge: je
+       Modus wird der geschrumpfte Posterior verwendet (nicht die rohe
+       Rate), und die AUSSAGEKRAFT wandert als Evidenzgewicht nach
+       draussen, wo sie ueber das Profil entscheidet.
+    2. **Ein einzelner Ausreisser.** Jede Modus-Rate zaehlt mit ihrer
+       Partienzahl, nicht gleich viel.
+
+    Unter zwei Modi gibt es nichts zu vergleichen - dann None.
     """
+    from drafter.services import staerke
     raten, gewichte = [], []
+    global_zeile = raum.ebenen(kandidat).get(staerke.GLOBAL)
+    global_rate = 0.5
+    if global_zeile is not None and (global_zeile.games or 0) > 0:
+        n_g = float(global_zeile.games)
+        s_g = float(global_zeile.wins or 0) or n_g * (
+            global_zeile.raw_rate if global_zeile.raw_rate is not None
+            else (global_zeile.adjusted_rate or 0.5))
+        global_rate, _ = staerke.posterior(n_g, s_g)
+
     for zeile in raum.modus_zeilen(kandidat):
         n = float(zeile.games or 0)
-        rate = zeile.raw_rate if zeile.raw_rate is not None else zeile.adjusted_rate
-        if n < config.DRAFTLAGE_MIN_MODUS_PARTIEN or rate is None:
+        if n <= 0:
             continue
-        raten.append(rate)
+        siege = float(zeile.wins or 0)
+        if not siege:
+            rate = zeile.raw_rate if zeile.raw_rate is not None else zeile.adjusted_rate
+            if rate is None:
+                continue
+            siege = n * rate
+        # Der globale Wert ist der Prior: ein duenner Modus landet dort
+        # und traegt dann zur Streuung nichts bei - richtig so, er sagt
+        # ja auch nichts.
+        posterior, _ = staerke.posterior(n, siege, prior_rate=global_rate,
+                                         prior_staerke=config.STAERKE_PRIOR_GLOBAL)
+        raten.append(posterior)
         gewichte.append(n)
     if len(raten) < 2:
         return None
@@ -111,6 +144,21 @@ def modusbreite(kandidat, raum):
     mittel = sum(r * g for r, g in zip(raten, gewichte)) / gesamt
     varianz = sum(g * (r - mittel) ** 2 for r, g in zip(raten, gewichte)) / gesamt
     return varianz ** 0.5, gesamt, len(raten)
+
+
+def evidenzgewicht(menge, k, modi=None):
+    """0-1: wie sehr die Messung den Profil-Prior verdraengen darf.
+
+    Stetig, ohne Schwelle - dieselbe Form wie im Objective Fit. `modi`
+    daempft zusaetzlich, wenn die Streuung ueber sehr wenige Gruppen
+    gerechnet wurde: zwei Modi sagen weniger als sechs.
+    """
+    if menge <= 0:
+        return 0.0
+    w = menge / (menge + k)
+    if modi:
+        w *= (modi - 1) / modi
+    return max(0.0, min(1.0, w))
 
 
 def _felder(kandidaten, raum, roh_profil, roh_messung):
@@ -124,7 +172,7 @@ def _felder(kandidaten, raum, roh_profil, roh_messung):
 
 
 def komponenten_fuer_pool(kandidaten, ctx, raum):
-    """Draft-Position fuer alle Kandidaten - feldrelativ, zwei Quellen."""
+    """Draft-Position fuer alle Kandidaten - Messung mischt sich mit dem Profil."""
     phase = ctx.phase
     anteile = _PROFILE.get(phase, _PROFILE[config.PHASE_MID])
     # Frueher Pick: Berechenbarkeit ist gut. Spaeter Pick: gerade die
@@ -136,7 +184,6 @@ def komponenten_fuer_pool(kandidaten, ctx, raum):
         if b.hat_draftwerte:
             roh_profil[b.id] = sum(b.draftwert(key) * anteil
                                    for key, anteil in anteile.items())
-            continue
         lage = gegnerabhaengigkeit(b, raum)
         if lage is not None:
             streuung, n, paare = lage
@@ -147,38 +194,52 @@ def komponenten_fuer_pool(kandidaten, ctx, raum):
     ergebnis = {}
     for b in kandidaten:
         komp = Komponente(key=config.K_DRAFT_POSITION)
-        if b.id in z_profil:
-            komp.wert = klemme(z_profil[b.id])
-            komp.quelle = quellen.PROFILE
-            _profiltexte(komp, b, ctx, phase)
-        elif b.id in z_messung:
-            komp.wert = klemme(z_messung[b.id])
-            komp.quelle = quellen.MEASURED_PRIOR
-            streuung, n, paare = belege[b.id]
-            if abs(komp.wert) > 0.3:
-                offen = ctx.gegner_restpicks
-                komp.gruende.append(Grund(
-                    text=(f"sein Ergebnis hängt stark vom Gegner ab "
-                          f"({paare} gemessene Matchups)"
-                          + (f" - und der Gegner hat noch {offen} Pick(s)"
-                             if offen and komp.wert < 0 else
-                             " - jetzt lässt er sich gezielt setzen")),
-                    positiv=komp.wert > 0, staerke=0.4 + abs(komp.wert) * 0.2,
-                    quelle="daten",
-                ))
-        else:
+        prior = z_profil.get(b.id)
+        gemessen = z_messung.get(b.id)
+        if prior is None and gemessen is None:
             komp.verfuegbar = False
+            ergebnis[b.id] = komp
+            continue
+        w = 0.0
+        if gemessen is not None:
+            _, n, paare = belege[b.id]
+            w = evidenzgewicht(n, config.DRAFTLAGE_EVIDENZ_K)
+        komp.wert = klemme(w * (gemessen or 0.0) + (1.0 - w) * (prior or 0.0))
+        komp.mess_anteil = w
+        komp.quelle = _quelle(w, prior is not None)
+        if gemessen is not None and w > 0.3 and abs(komp.wert) > 0.3:
+            _, n, paare = belege[b.id]
+            offen = ctx.gegner_restpicks
+            komp.gruende.append(Grund(
+                text=(f"sein Ergebnis hängt stark vom Gegner ab "
+                      f"({paare} gemessene Matchups)"
+                      + (f" - und der Gegner hat noch {offen} Pick(s)"
+                         if offen and komp.wert < 0 else
+                         " - jetzt lässt er sich gezielt setzen")),
+                positiv=komp.wert > 0, staerke=0.4 + abs(komp.wert) * 0.2,
+                quelle="daten",
+            ))
+        elif prior is not None and w <= 0.5:
+            _profiltexte(komp, b, ctx, phase)
         ergebnis[b.id] = komp
     return ergebnis
 
 
+def _quelle(w, hat_prior):
+    """Wie die Mischung heisst - damit man sie im Debug-Output sieht."""
+    if w >= 0.8:
+        return quellen.MEASURED
+    if w > 0.0:
+        return quellen.MEASURED_PRIOR
+    return quellen.PROFIL_PRIOR if hat_prior else quellen.UNKNOWN
+
+
 def flexibilitaet_fuer_pool(kandidaten, ctx, raum):
-    """Flexibilitaet fuer alle Kandidaten - feldrelativ, zwei Quellen."""
+    """Flexibilitaet fuer alle Kandidaten - Messung mischt sich mit dem Profil."""
     roh_profil, roh_messung, belege = {}, {}, {}
     for b in kandidaten:
         if b.hat_draftwerte:
             roh_profil[b.id] = b.draftwert("flexibility_value")
-            continue
         breite = modusbreite(b, raum)
         if breite is not None:
             streuung, n, modi = breite
@@ -190,23 +251,26 @@ def flexibilitaet_fuer_pool(kandidaten, ctx, raum):
     ergebnis = {}
     for b in kandidaten:
         komp = Komponente(key=config.K_FLEXIBILITY)
-        if b.id in z_profil:
-            komp.wert = klemme(z_profil[b.id])
-            komp.quelle = quellen.PROFILE
-        elif b.id in z_messung:
-            komp.wert = klemme(z_messung[b.id])
-            komp.quelle = quellen.MEASURED_PRIOR
-            if komp.wert > 0.35:
-                _, _, modi = belege[b.id]
-                komp.gruende.append(Grund(
-                    text=f"läuft über {modi} Modi hinweg ähnlich - legt uns wenig fest",
-                    positiv=True, staerke=0.4, quelle="daten",
-                ))
-        else:
+        prior = z_profil.get(b.id)
+        gemessen = z_messung.get(b.id)
+        if prior is None and gemessen is None:
             komp.verfuegbar = False
             ergebnis[b.id] = komp
             continue
-        if komp.wert > 0.35 and ctx.unsere_restpicks > 1 and not komp.gruende:
+        w = 0.0
+        if gemessen is not None:
+            _, n, modi = belege[b.id]
+            w = evidenzgewicht(n, config.FLEX_EVIDENZ_K, modi=modi)
+        komp.wert = klemme(w * (gemessen or 0.0) + (1.0 - w) * (prior or 0.0))
+        komp.mess_anteil = w
+        komp.quelle = _quelle(w, prior is not None)
+        if gemessen is not None and w > 0.3 and komp.wert > 0.35:
+            _, _, modi = belege[b.id]
+            komp.gruende.append(Grund(
+                text=f"läuft über {modi} Modi hinweg ähnlich - legt uns wenig fest",
+                positiv=True, staerke=0.4, quelle="daten",
+            ))
+        elif komp.wert > 0.35 and ctx.unsere_restpicks > 1:
             komp.gruende.append(Grund(
                 text="flexibel - legt unsere restlichen Picks nicht fest",
                 positiv=True, staerke=0.45,

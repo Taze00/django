@@ -80,6 +80,20 @@ class StatProvider(DataProvider):
         """Optional. Ohne Build-Daten laeuft die Build-Empfehlung auf Regeln."""
         return []
 
+    def modus_stats(self, anfrage):
+        """Optional: Zeilen je Modus ueber ALLE Modi, nicht nur den gefragten.
+
+        Gebraucht fuer Aussagen, die den Vergleich ZWISCHEN Modi brauchen -
+        etwa "laeuft er ueberall aehnlich" (Flexibilitaet). Die normale
+        Abfrage filtert auf den aktuellen Kontext und kann das nicht
+        beantworten.
+
+        Leere Liste heisst "keine Auskunft": ein Provider ohne Modus-
+        vergleich laesst die entsprechende Ableitung einfach ausfallen,
+        statt dass jemand an den Tabellen vorbei nachsieht.
+        """
+        return []
+
 
 class MatchProvider(DataProvider):
     """Rohmatches fuer den Import.

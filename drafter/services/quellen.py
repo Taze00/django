@@ -46,13 +46,19 @@ PROFILE = "Profile"
 # kennt - aber ungleich besser als Unknown, das die Komponente ganz
 # ausfallen laesst. Siehe services/rollenwissen.py.
 FACHWISSEN = "Fachquelle"
+# Ein gepflegter Wert, der als PRIOR dient und von wachsender Messung
+# verdraengt wird - nicht als Wahrheit. Steht getrennt von "Profile",
+# damit im Debug-Output sichtbar ist, dass hier (noch) keine belastbare
+# Messung vorliegt. Siehe services/draft_position.py.
+PROFIL_PRIOR = "Profile Prior"
 UNKNOWN = "Unknown"
 
 # Rangfolge fuer zusammengesetzte Komponenten (Counter ueber drei Gegner):
 # es gilt die schwaechste beteiligte Quelle. "Measured" nur, wenn ALLES
 # gemessen ist - sonst taeuschte ein gemessenes Paar Sicherheit fuer die
 # ganze Komponente vor.
-_RANG = {MEASURED: 4, MEASURED_PRIOR: 3, PROFILE: 2, FACHWISSEN: 1, UNKNOWN: 0}
+_RANG = {MEASURED: 5, MEASURED_PRIOR: 4, PROFILE: 3, PROFIL_PRIOR: 2,
+         FACHWISSEN: 1, UNKNOWN: 0}
 
 
 def schwaechste(quellen):
