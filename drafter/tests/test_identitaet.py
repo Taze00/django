@@ -1,120 +1,107 @@
 # -*- coding: utf-8 -*-
-"""Zuordnung ueber IDs vor Namen, Partie-ID vor Zeittoleranz."""
+"""Einen Brawler aus einer Eingabe finden - ohne zu raten.
 
-import copy
+Die Web-App schickt Slugs aus ihrem eigenen Katalog. Ein Mensch tippt,
+was er sieht: "WILLOW", "Larry & Lawrie", "R-T", "Mr. P". Beides muss auf
+denselben Eintrag zeigen, und wo es mehrdeutig waere, muss es scheitern.
+"""
 
-from drafter.models import Brawler, BrawlMap
-from drafter.models.matches import Match
+import io
+
+from django.core.management import call_command
+from django.core.management.base import CommandError
+
+from drafter.models import Brawler, Datenquelle, Praxisfall
+from drafter.services.identitaet import Mehrdeutig, finde_brawler
 from drafter.tests.basis import DrafterTest
-from drafter.tests.fixture_helfer import FixtureMixin, partie
-
-TEAM_A = ("gale", "belle", "max")
-TEAM_B = ("buster", "gene", "tick")
 
 
-class IdentitaetTest(FixtureMixin, DrafterTest):
-    def setUp(self):
-        super().setUp()
-        # Ausgedachte IDs - ausschliesslich fuer diesen Test. Welche IDs die
-        # offizielle API benutzt, ist nicht bekannt und wird nicht erfunden.
-        for i, slug in enumerate(TEAM_A + TEAM_B + ("piper",), start=1):
-            Brawler.objects.filter(slug=slug).update(external_id=f"TEST-B{i}")
-        BrawlMap.objects.filter(slug="hard-rock-mine").update(external_id="TEST-K1")
+class AufloesungTest(DrafterTest):
+    def test_slug_name_und_schreibweise(self):
+        gale = self.brawler("gale")
+        for eingabe in ("gale", "GALE", "Gale", " gale "):
+            self.assertEqual(finde_brawler(eingabe), gale, eingabe)
 
-    def _nur_ids(self, eintrag):
-        """Dieselbe Partie, aber nur mit IDs statt Namen."""
-        ids = dict(Brawler.objects.exclude(external_id=None).values_list("slug", "external_id"))
-        neu = copy.deepcopy(eintrag)
-        for seite in ("a", "b"):
-            neu["teams"][seite] = [{"brawler_id": ids[s["brawler"]]} for s in neu["teams"][seite]]
-        del neu["mode"], neu["map"]
-        neu["map_id"] = "TEST-K1"
-        return neu
+    def test_name_mit_sonderzeichen(self):
+        """Der Fall aus dem Praxistest: 'Larry & Lawrie' ist kein Slug."""
+        larry = Brawler.objects.create(name="LARRY & LAWRIE", slug="larry-lawrie",
+                                       external_id="96001", is_active=True)
+        for eingabe in ("larry-lawrie", "LARRY & LAWRIE", "Larry & Lawrie"):
+            self.assertEqual(finde_brawler(eingabe), larry, eingabe)
 
-    def test_namen_und_ids_fuehren_zur_selben_partie(self):
-        mit_namen = partie(a=TEAM_A, b=TEAM_B)
-        self.importiere(mit_namen)
-        bericht = self.importiere(self._nur_ids(partie(a=TEAM_A, b=TEAM_B)))
-        self.assertEqual(bericht.duplikate, 1)
-        self.assertEqual(Match.objects.count(), 1)
+    def test_punkt_und_bindestrich(self):
+        """Exakter Name schlaegt kanonischen Schluessel - und ist eindeutig."""
+        mrp = Brawler.objects.create(name="MR. P", slug="mr-p", external_id="96002",
+                                     is_active=True)
+        rt = Brawler.objects.create(name="R-T", slug="r-t", external_id="96003",
+                                    is_active=True)
+        for eingabe, erwartet in (("mr. p", mrp), ("MR. P", mrp), ("mr-p", mrp),
+                                  ("r-t", rt), ("R-T", rt)):
+            self.assertEqual(finde_brawler(eingabe), erwartet, eingabe)
 
-    def test_id_hat_vorrang_vor_dem_namen(self):
-        eintrag = partie(a=({"brawler": "belle", "brawler_id": "TEST-B1"}, "piper", "max"))
-        bericht = self.importiere(eintrag)
-        match = Match.objects.get()
-        spieler = match.players.get(brawler_name="belle")
-        self.assertEqual(spieler.brawler.slug, "gale", "Die ID TEST-B1 gehoert zu Gale")
-        # Gezaehlt wird, WIE geliefert wurde: nur der erste Spieler kam mit
-        # ID, die uebrigen fuenf mit Namen - auch wenn der Katalog fuer sie
-        # ebenfalls IDs kennt.
-        self.assertEqual(bericht.zuordnung_per_id, 1)
-        self.assertEqual(bericht.zuordnung_per_name, 5)
+    def test_externe_id(self):
+        b = Brawler.objects.create(name="NORI", slug="nori", external_id="16000107",
+                                   is_active=True)
+        self.assertEqual(finde_brawler("16000107"), b)
 
-    def test_unbekannte_id_faellt_auf_den_namen_zurueck(self):
-        bericht = self.importiere(partie(a=({"brawler": "gale", "brawler_id": "UNBEKANNT"}, "belle", "max")))
-        self.assertEqual(Match.objects.get().players.get(brawler_name="gale").brawler.slug, "gale")
-        self.assertGreaterEqual(bericht.zuordnung_per_name, 1)
+    def test_unbekannt_ist_none(self):
+        self.assertIsNone(finde_brawler("gibtsnicht"))
+        self.assertIsNone(finde_brawler(""))
+        self.assertIsNone(finde_brawler(None))
 
-    def test_nur_id_ohne_katalogtreffer_bleibt_als_id_erhalten(self):
-        bericht = self.importiere(partie(a=({"brawler_id": "NEU-99"}, "belle", "max")))
-        self.assertIn("id:NEU-99", bericht.unbekannte_brawler)
-        self.assertIsNone(Match.objects.get().players.get(brawler_name="id:NEU-99").brawler)
+    def test_mehrdeutig_wird_gemeldet_statt_geraten(self):
+        """Zwei verschiedene Namen, ein kanonischer Schluessel.
 
-    def test_map_wird_ueber_die_id_zugeordnet(self):
-        self.importiere(self._nur_ids(partie(a=TEAM_A, b=TEAM_B)))
-        match = Match.objects.get()
-        self.assertEqual(match.brawl_map.slug, "hard-rock-mine")
-        self.assertEqual(match.game_mode.slug, "gem-grab")
-
-
-class PartieIdVorToleranzTest(FixtureMixin, DrafterTest):
-    """Die Partie-ID der Quelle schlaegt die Rekonstruktion aus Zeit und Teams."""
-
-    def test_gleiche_partie_id_ist_dieselbe_partie_ohne_zeittoleranz(self):
-        self.importiere(partie(external_id="SYNTH-7"))
-        bericht = self.importiere(partie(minuten=180, external_id="SYNTH-7"))
-        self.assertEqual(bericht.duplikate, 1)
-
-    def test_verschiedene_partie_ids_sind_zwei_partien_trotz_gleicher_rekonstruktion(self):
-        self.importiere(partie(external_id="SYNTH-1"))
-        self.importiere(partie(external_id="SYNTH-2"))
-        self.assertEqual(Match.objects.count(), 2)
-
-    def test_sichtung_ohne_id_findet_partie_mit_id(self):
-        self.importiere(partie(external_id="SYNTH-3"))
-        bericht = self.importiere(partie())
-        self.assertEqual(bericht.duplikate, 1)
-        self.assertEqual(Match.objects.get().external_id, "SYNTH-3")
-
-    def test_sichtung_mit_id_ergaenzt_partie_ohne_id(self):
-        self.importiere(partie())
-        bericht = self.importiere(partie(external_id="SYNTH-4"))
-        self.assertEqual(bericht.duplikate, 1)
-        match = Match.objects.get()
-        self.assertEqual(match.external_id, "SYNTH-4")
-        self.assertTrue(match.reconstructed_fingerprint)
-
-
-class MigrationsRechnungTest(FixtureMixin, DrafterTest):
-    def test_migration_rechnet_denselben_fingerprint_wie_der_importer(self):
-        """Sonst wuerden bereits gespeicherte Partien nie wiedererkannt.
-
-        Geprueft wird die JUENGSTE Rechnung (0009, sekundengenau). Aeltere
-        Migrationen frieren die Regel ein, die zu ihrer Zeit galt - sie
-        duerfen nicht mit dem heutigen Importer uebereinstimmen muessen.
+        `Brawler.name` ist eindeutig, zwei gleiche Namen kann es also
+        nicht geben. Sehr wohl aber zwei Schreibweisen, die auf denselben
+        Schluessel fallen - "MR. P" und "Mr P" werden beide zu `mr-p`.
+        Dann wird gemeldet statt geraten.
         """
-        import importlib
-        from django.apps import apps
+        Brawler.objects.create(name="Mr. P", slug="mr-p-eins", external_id="96010",
+                               is_active=True)
+        Brawler.objects.create(name="Mr P", slug="mr-p-zwei", external_id="96011",
+                               is_active=True)
+        # Weder Slug noch exakter Name treffen - erst der kanonische
+        # Schluessel, und der passt auf beide.
+        with self.assertRaises(Mehrdeutig) as fehler:
+            finde_brawler("mr-p")
+        self.assertIn("mr-p-eins", str(fehler.exception))
+        self.assertIn("mr-p-zwei", str(fehler.exception))
 
-        modul = importlib.import_module("drafter.migrations.0009_fingerprint_sekundengenau")
-        self.importiere(
-            partie(a=TEAM_A, b=TEAM_B),
-            partie(a=("Kit", "belle", "max"), karte="Unbekannte Testmap", minuten=30),
-            partie(a=TEAM_B, b=TEAM_A, sieger="b", minuten=60),
-        )
-        erwartet = dict(Match.objects.values_list("id", "reconstructed_fingerprint"))
-        self.assertTrue(all(erwartet.values()))
+    def test_inaktive_brawler_werden_gefunden(self):
+        """Der Katalog kennt sie, die Engine bewertet sie - also auch hier."""
+        b = Brawler.objects.create(name="KATALOG", slug="katalog", external_id="96020",
+                                   is_active=False, source=Datenquelle.API)
+        self.assertEqual(finde_brawler("KATALOG"), b)
 
-        Match.objects.update(reconstructed_fingerprint="")
-        modul.neu_berechnen(apps, None)
-        self.assertEqual(dict(Match.objects.values_list("id", "reconstructed_fingerprint")), erwartet)
+
+class KommandoTest(DrafterTest):
+    """Der Praxisfall-Befehl benutzt dieselbe Aufloesung."""
+
+    def eintragen(self, **extra):
+        call_command("praxisfall", map=self.karte().slug, stdout=io.StringIO(), **extra)
+        return Praxisfall.objects.latest("id")
+
+    def test_name_statt_slug(self):
+        fall = self.eintragen(gewaehlt="Gale", eigene="SANDY")
+        self.assertEqual(fall.gewaehlt, "gale")
+        self.assertEqual(fall.own_picks, ["sandy"])
+
+    def test_unbekannter_brawler_nennt_das_feld(self):
+        with self.assertRaises(CommandError) as fehler:
+            self.eintragen(gegner="gibtsnicht")
+        self.assertIn("--gegner", str(fehler.exception))
+        self.assertIn("gibtsnicht", str(fehler.exception))
+
+    def test_mehrdeutige_eingabe_bricht_ab(self):
+        Brawler.objects.create(name="Mr. P", slug="mr-p-eins", external_id="96030",
+                               is_active=True)
+        Brawler.objects.create(name="Mr P", slug="mr-p-zwei", external_id="96031",
+                               is_active=True)
+        with self.assertRaises(CommandError) as fehler:
+            self.eintragen(gewaehlt="mr-p")
+        self.assertIn("mehrdeutig", str(fehler.exception).lower())
+
+    def test_konkurrenzliste_wird_ebenfalls_aufgeloest(self):
+        fall = self.eintragen(konkurrenz="Gale, SANDY")
+        self.assertEqual(fall.competitor_top, ["gale", "sandy"])

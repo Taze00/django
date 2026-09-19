@@ -23,17 +23,38 @@ from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
 from drafter import config
-from drafter.models import BrawlMap, Brawler, Ergebnis, Fehlerklasse, Praxisfall
+from drafter.models import BrawlMap, Ergebnis, Fehlerklasse, Praxisfall
 from drafter.services.anfrage import context_aus_daten
 from drafter.services.draft_engine import DraftEngine
+from drafter.services.identitaet import Mehrdeutig, finde_brawler
 
 MODELLSTAND = "modell-praxistest-2026-09-19"
 
 
-def _slugs(text):
+def _eingaben(text):
+    """Kommagetrennte Eingabe in einzelne Stuecke - ohne sie zu deuten."""
     if not text:
         return []
-    return [t.strip().lower() for t in text.replace(";", ",").split(",") if t.strip()]
+    return [t.strip() for t in text.replace(";", ",").split(",") if t.strip()]
+
+
+def _slugs(text, feld):
+    """Eingaben auf Katalog-Slugs aufloesen - Name, Slug oder ID.
+
+    Getippt wird, was man sieht ("WILLOW", "Larry & Lawrie", "R-T"); der
+    Katalog kennt Slugs. Die Aufloesung ist dieselbe wie im Import
+    (services/identitaet.py) und raet nie.
+    """
+    ergebnis = []
+    for eingabe in _eingaben(text):
+        try:
+            b = finde_brawler(eingabe)
+        except Mehrdeutig as fehler:
+            raise CommandError(f"--{feld}: {fehler}")
+        if b is None:
+            raise CommandError(f"--{feld}: unbekannter Brawler '{eingabe}'")
+        ergebnis.append(b.slug)
+    return ergebnis
 
 
 class Command(BaseCommand):
@@ -79,9 +100,9 @@ class Command(BaseCommand):
 
         daten = {
             "map": karte.slug,
-            "own_picks": _slugs(o["eigene"]),
-            "enemy_picks": _slugs(o["gegner"]),
-            "bans": _slugs(o["bans"]),
+            "own_picks": _slugs(o["eigene"], "eigene"),
+            "enemy_picks": _slugs(o["gegner"], "gegner"),
+            "bans": _slugs(o["bans"], "bans"),
             "own_team_first_pick": not o["gegner_first"],
         }
         ctx = context_aus_daten(daten)
@@ -89,11 +110,9 @@ class Command(BaseCommand):
         if not empfehlungen:
             raise CommandError("Die Engine liefert hier keine Empfehlung")
 
-        gewaehlt = _slugs(o["gewaehlt"])[:1]
+        gewaehlt = _slugs(o["gewaehlt"], "gewaehlt")[:1]
         rang = score = None
         if gewaehlt:
-            if not Brawler.objects.filter(slug=gewaehlt[0]).exists():
-                raise CommandError(f"Unbekannter Brawler '{gewaehlt[0]}'")
             for i, e in enumerate(empfehlungen, 1):
                 if e.brawler.slug == gewaehlt[0]:
                     rang, score = i, e.anzeige_score
@@ -109,7 +128,7 @@ class Command(BaseCommand):
             empfehlungen=[e.als_dict(ausfuehrlich=True) for e in empfehlungen],
             gewaehlt=gewaehlt[0] if gewaehlt else "",
             gewaehlter_rang=rang, gewaehlter_score=score,
-            competitor_top=_slugs(o["konkurrenz"]),
+            competitor_top=_slugs(o["konkurrenz"], "konkurrenz"),
             ergebnis=o["ergebnis"], auffaellig=o["auffaellig"],
             fehlerklasse=o["klasse"], notizen=o["notiz"],
             modellstand=MODELLSTAND,
@@ -160,7 +179,7 @@ class Command(BaseCommand):
         if o["ergebnis"] != Ergebnis.UNBEKANNT:
             fall.ergebnis = o["ergebnis"]
         if o["konkurrenz"]:
-            fall.competitor_top = _slugs(o["konkurrenz"])
+            fall.competitor_top = _slugs(o["konkurrenz"], "konkurrenz")
         fall.save()
         self.stdout.write(self.style.SUCCESS(
             f"#{fall.id}: {fall.fehlerklasse or 'ohne Klasse'}, "

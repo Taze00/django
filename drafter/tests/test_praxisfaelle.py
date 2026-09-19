@@ -127,12 +127,26 @@ class KeineRueckwirkungTest(DrafterTest):
 
     def test_konkurrenz_wird_nur_protokolliert(self):
         call_command("praxisfall", map=self.karte().slug,
-                     konkurrenz="colette,penny,gale", stdout=io.StringIO())
+                     konkurrenz="Colette, PIPER, gale", stdout=io.StringIO())
         fall = Praxisfall.objects.latest("id")
-        self.assertEqual(fall.competitor_top, ["colette", "penny", "gale"])
+        self.assertEqual(fall.competitor_top, ["colette", "piper", "gale"])
         # Keine Spur davon in den Empfehlungen.
         for e in fall.empfehlungen:
             self.assertNotIn("competitor", str(e).lower())
+
+    def test_unbekannte_konkurrenz_wird_gemeldet_statt_gespeichert(self):
+        """Ein nicht aufloesbarer Name darf nicht stumm im Protokoll landen.
+
+        `overlap()` vergleicht die fremde Liste mit unseren Slugs. Ein
+        Name, den der Katalog nicht kennt, trifft dort nie - die
+        Uebereinstimmung saehe kleiner aus, als sie ist, und zwar ohne
+        jeden Hinweis. Lieber abbrechen.
+        """
+        with self.assertRaises(CommandError) as fehler:
+            call_command("praxisfall", map=self.karte().slug,
+                         konkurrenz="gale,gibtsnicht", stdout=io.StringIO())
+        self.assertIn("konkurrenz", str(fehler.exception))
+        self.assertIn("gibtsnicht", str(fehler.exception))
 
 
 class MarkierenTest(DrafterTest):
