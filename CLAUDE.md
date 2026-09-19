@@ -139,6 +139,14 @@ docker compose restart django-dev
 
 11. **Das Scoring-Modell ist seit 2026-09-18 eingefroren** (Commit `5c47b72` + Wegfall der Mindestpartien). Drei getrennte Aussagen je Empfehlung — CURRENT STRENGTH (Beta-Binomial-Posterior über global/Modus/Map, am Feld skaliert), DRAFT FIT (Map, Counter, Synergie, Teambedarf, Position; gespeist aus Profil **oder** qualitativer Draft-Rolle) und PERSÖNLICH — dazu Datenabdeckung und statistische Sicherheit, alles unter `erklaerung` in der API. Wissen zählt nie als Stärke. **An den Gewichten wird nicht weiter gedreht, bevor nicht deutlich mehr echte Partien vorliegen**: die Zahlen der letzten Runden stammen aus 6–1131 Partien je Brawler, jede Optimierung darauf wäre Kurvenanpassung an Rauschen. Details: `DRAFTER_DOKUMENTATION.md` §5 und §9.
 
+**Einzelanalyse für die Fehlersuche:** Schalter „Analyse" neben der Sortierung (Klick auf eine Kachel erklärt, statt zu wählen) oder
+```
+python manage.py drafter_analyse --map belles-rock --eigene gus,gray --gegner belle,sandy,mortis --brawler edgar
+```
+Zeigt Rang im ganzen Feld, alle Komponenten mit Quelle und die Counter-/Synergiewerte **je Gegner und Mitspieler**. Kein zweiter Rechenweg — `DraftEngine.analyse()` ist derselbe Lauf wie die Vorschlagsliste, nur ungekürzt; `services/analyse.py` rechnet nichts Eigenes und wirkt nicht zurück. Details: `DRAFTER_DOKUMENTATION.md` §19b.
+
+**In Django-Templates keine mehrzeiligen `{# … #}`.** Djangos Kurzkommentar ist **einzeilig** — über mehrere Zeilen steht er als Text auf der Seite. Mehrzeilig nur `{% comment %}…{% endcomment %}`. Ist am 2026-09-19 im Draft-Template passiert und stand bis zum Fund sichtbar über der Seite.
+
 **Anzeigetexte mit echten Umlauten, Kommentare in ASCII-Umschrift.** Die Engine erzeugt ihre Sätze aus Attributen; sie landen unverändert auf der Seite. „Flaechenkontrolle zaehlt" sieht dort falsch aus.
 
 **Demo-Daten:** Alles ist mit `source="demo"` gekennzeichnet, die Confidence dadurch auf 0,35 gedeckelt, und die Oberfläche weist oben darauf hin. `python manage.py seed_brawl_data [--reset]` legt sie an (idempotent; `--reset` löscht nur Demo-Zeilen, keine manuell gepflegten).

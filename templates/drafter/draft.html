@@ -19,9 +19,14 @@ Aufbau von oben nach unten, nach Benutzungshaeufigkeit sortiert:
 {% endcomment %}
 
 {% block inhalt %}
-{# Der Hinweis kommt aus dem tatsaechlich aktiven Provider (views/pages.py),
-   nicht aus dieser Datei: ein fest verdrahteter Satz ueberlebt jede
-   Umstellung und behauptet irgendwann das Gegenteil. #}
+{% comment %}
+Der Hinweis kommt aus dem tatsaechlich aktiven Provider (views/pages.py),
+nicht aus dieser Datei: ein fest verdrahteter Satz ueberlebt jede
+Umstellung und behauptet irgendwann das Gegenteil.
+
+{# #} geht hier NICHT: Djangos Kurzkommentar ist einzeilig. Ueber mehrere
+Zeilen steht er als Text auf der Seite - genau das ist hier passiert.
+{% endcomment %}
 <p class="hinweis-demo" role="status">
   {% if datenlage.gemessen %}
     <strong>Gemessene Statistiken</strong> — {{ datenlage.partien }} ausgewertete
@@ -144,6 +149,17 @@ Aufbau von oben nach unten, nach Benutzungshaeufigkeit sortiert:
           <option value="rolle">Rolle</option>
         </select>
       </label>
+      {% comment %}
+      Analysemodus: ein Klick auf eine Kachel erklaert dann, statt zu
+      waehlen. Absichtlich EIN Schalter statt eines Fragezeichens auf
+      jeder der gut hundert Kacheln - das haette die Tabreihenfolge
+      verdoppelt und jede Kachel zugestellt.
+      {% endcomment %}
+      <button type="button" class="analyseschalter" id="analysemodus"
+              aria-pressed="false"
+              title="Analysemodus: Klick auf eine Kachel zeigt die vollständige Bewertung, statt zu wählen">
+        <span aria-hidden="true">?</span> Analyse
+      </button>
       <div class="rollenfilter" id="rollenfilter" role="group" aria-label="Nach Rolle filtern"></div>
     </div>
     <div class="gitter" id="gitter"></div>
