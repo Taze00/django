@@ -813,6 +813,17 @@ PRIOR_VERLAESSLICHKEIT_UNBEKANNT = 0.25
 
 
 # =========================================================================
+# Praxistest
+# =========================================================================
+# Ab wann lohnt eine Auswertung? Unter dieser Zahl sagt eine Verteilung
+# ueber sechs Modi und drei Draftphasen nichts - jede Zelle haette ein
+# oder zwei Faelle. Es ist eine Zielmarke fuer den Bericht, keine
+# Schwelle im Code: auswerten laesst sich jederzeit, nur belastbar wird
+# es spaeter.
+PRAXIS_MINDESTFAELLE = 30
+
+
+# =========================================================================
 # Welche Maps der Drafter anbietet
 # =========================================================================
 # Nicht mehr allein die von Hand freigeschalteten: am 2026-09-19 lagen

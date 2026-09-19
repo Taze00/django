@@ -11,6 +11,7 @@ from drafter.models.collector import CollectorRun, TrackedPlayer
 from drafter.models.maps import BrawlMap, GameMode
 from drafter.models.matches import Match, MatchBan, MatchPlayer, RawPayload
 from drafter.models.patches import BrawlerBalanceChange, Patch
+from drafter.models.praxis import Ergebnis, Fehlerklasse, Praxisfall
 from drafter.models.prefs import UserBrawlerPreference
 from drafter.models.stats import BrawlerStat, BuildStat, CounterStat, SynergyStat
 
@@ -24,4 +25,5 @@ __all__ = [
     "UserBrawlerPreference",
     "RawPayload", "Match", "MatchPlayer", "MatchBan",
     "TrackedPlayer", "CollectorRun",
+    "Praxisfall", "Ergebnis", "Fehlerklasse",
 ]

@@ -16,7 +16,7 @@ from drafter.models import (
     CollectorRun, TrackedPlayer,
     Brawler, BrawlerBalanceChange, BrawlerItem, BrawlerStat, BrawlMap, BuildStat,
     BuildRule, CounterStat, Datenquelle, GameMode, Patch, SynergyStat,
-    UserBrawlerPreference,
+    Praxisfall, UserBrawlerPreference,
 )
 
 
@@ -312,3 +312,34 @@ class CollectorRunAdmin(admin.ModelAdmin):
     readonly_fields = (
         "started_at", "finished_at", "status", "abort_reason", "parameters", "report",
     )
+
+
+@admin.register(Praxisfall)
+class PraxisfallAdmin(admin.ModelAdmin):
+    """Die schnelle Nachpflege: Ergebnis und Einordnung eintragen.
+
+    Eingetragen werden Faelle mit `manage.py praxisfall` - dort holt sich
+    der Befehl die Empfehlungen selbst. Hier wird nur nachgetragen, was
+    man erst spaeter weiss: wie die Partie ausging und ob der Fall
+    auffaellig war. Beides laesst sich direkt in der Liste aendern.
+    """
+
+    list_display = ("gespielt_am", "game_mode", "brawl_map", "draft_phase",
+                    "gewaehlt", "gewaehlter_rang", "ergebnis", "auffaellig",
+                    "fehlerklasse")
+    list_editable = ("ergebnis", "auffaellig", "fehlerklasse")
+    list_filter = ("game_mode", "draft_phase", "ergebnis", "auffaellig",
+                   "fehlerklasse", "modellstand")
+    search_fields = ("gewaehlt", "notizen", "brawl_map__name")
+    date_hierarchy = "gespielt_am"
+    # Der Schnappschuss ist das Protokoll - er wird nicht nachtraeglich
+    # veraendert, sonst waere er als Beleg wertlos.
+    readonly_fields = ("empfehlungen", "spitze_lesbar", "bans", "own_picks",
+                       "enemy_picks", "gewaehlter_rang", "gewaehlter_score",
+                       "draft_phase", "modellstand", "created_at", "updated_at")
+
+    @admin.display(description="Unsere Empfehlung")
+    def spitze_lesbar(self, obj):
+        return format_html("<br>".join(
+            f"{i}. {e.get('name')} {e.get('score')}"
+            for i, e in enumerate(obj.empfehlungen or [], 1)))
