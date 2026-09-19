@@ -599,7 +599,13 @@ ROLLE_DECKT = {
     "anti_tank":   ("anti_tank",),
     "support":     ("support", "peel"),
     "sniper":      ("long_range", "poke", "lane_control"),
-    "control":     ("area_control", "zone_control", "mid_control"),
+    # `mid_control` ist am 2026-09-19 gestrichen worden: "Control" ist ein
+    # Spielstil, "Mid" eine Position auf der Map. Die Zuordnung trug in
+    # Gem Grab allein 37,9 % des Anforderungsgewichts - derselbe Fehler
+    # wie `thrower -> objective_damage` bei Heist, nur groesser.
+    # Ableiten laesst sie sich nicht: wer Mid haelt, braucht Eigenschaften,
+    # und die haben Brawler ohne Profil nicht. Also lieber unbekannt.
+    "control":     ("area_control", "zone_control"),
 }
 
 # Die zwei Haelften der Komponente "Map & Modus" (services/map_fit.py):
@@ -682,6 +688,45 @@ WANDABHAENGIGKEIT_ATTRIBUTE = {
 # (CONFIDENCE_VOLL_AB, CONFIDENCE_STUFEN) bleiben davon unberuehrt.
 
 # Zielstichprobe je Einheit - vorlaeufig, nur fuer die Priorisierung.
+# =========================================================================
+# Was ein Modus von einem Brawler WILL - in Aspekten statt in einer Summe
+# =========================================================================
+# Der flache Anforderungsvektor beantwortet nur eine Frage: "wie viel von
+# allem bringt er mit". Ein Modus verlangt aber verschiedene Dinge, und
+# **kein Brawler muss alle koennen** - ein starker Gem-Traeger, der keinen
+# Druck macht, ist trotzdem ein guter Pick.
+#
+# Deshalb hat ein Modus benannte Aspekte, jeder ein Buendel vorhandener
+# Eigenschaften mit Gewichten. Bewertet wird der BESTE erfuellte Aspekt,
+# nicht der Durchschnitt: Spezialisierung zaehlt, Mittelmass in allem
+# nicht. Keine Mindestanforderung, keine neuen Felder.
+#
+# Die Tabelle ist Daten, kein Code - services/objective.py liest sie und
+# kennt keinen einzigen Modusnamen.
+MODUS_ZIELASPEKTE = {
+    # Gem Grab: Gems tragen, Mid halten, den gegnerischen Traeger jagen.
+    # Bis 2026-09-19 kannte das Profil nur Kontrolle - "wer traegt" und
+    # "wer holt sie zurueck" kamen darin gar nicht vor.
+    "gem-grab": {
+        "carrier": {"survivability": 1.0, "disengage": 0.9, "safe_poke": 0.6},
+        "mid_lane": {"mid_control": 1.0, "lane_control": 0.8, "area_control": 0.7,
+                     "zone_control": 0.7, "peel": 0.6},
+        "druck_auf_traeger": {"engage": 0.9, "backline_pressure": 0.9,
+                              "burst_damage": 0.7, "mobility": 0.7},
+    },
+    # Brawl Ball: das Tor ist das Ziel. `objective_damage` fehlte im
+    # Modusprofil vollstaendig - nur eine einzelne Map nannte es.
+    "brawl-ball": {
+        "abschluss": {"objective_damage": 1.0, "mobility": 0.8, "engage": 0.8,
+                      "frontline": 0.6, "wallbreak": 0.6},
+        "ballzugang": {"mobility": 1.0, "engage": 0.9, "close_range": 0.5},
+        "raum": {"frontline": 1.0, "peel": 0.8, "crowd_control": 0.7,
+                 "close_range": 0.6},
+        "teamwipe": {"burst_damage": 1.0, "crowd_control": 0.8},
+    },
+}
+
+
 # Wie sich Messung und Fachwissen im OBJECTIVE FIT mischen
 # (services/objective.py).
 #

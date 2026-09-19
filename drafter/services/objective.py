@@ -76,11 +76,16 @@ class Auskunft:
     modus_rate: float = None
     global_rate: float = None
     modus_spiele: int = 0
+    map_diff: float = None
+    map_spiele: int = 0
     faehigkeiten: tuple = ()
     # Anteil, mit dem die Messung in den Wert eingeht (0-1). Der Rest ist
     # gedaempftes Fachwissen - siehe config.OBJECTIVE_EVIDENZ_K.
     mess_anteil: float = 0.0
     qualitativ: float = None
+    # Welcher Zielaspekt des Modus ihn traegt, und wie weit er alle erfuellt.
+    aspekt: str = ""
+    aspekte: dict = field(default_factory=dict)
     text: str = ""
 
     def als_dict(self):
@@ -93,8 +98,13 @@ class Auskunft:
             "modus_rate": round(self.modus_rate, 4) if self.modus_rate else None,
             "global_rate": round(self.global_rate, 4) if self.global_rate else None,
             "modus_spiele": self.modus_spiele,
+            "map_diff_pp": (round(self.map_diff * 100, 2)
+                            if self.map_diff is not None else None),
+            "map_spiele": self.map_spiele,
             "faehigkeiten": list(self.faehigkeiten),
             "mess_anteil": round(self.mess_anteil, 3),
+            "aspekt": self.aspekt,
+            "aspekte": {k: round(v, 3) for k, v in (self.aspekte or {}).items()},
             "qualitativ": (round(self.qualitativ, 3)
                            if self.qualitativ is not None else None),
             "text": self.text,
@@ -148,16 +158,113 @@ def modus_eignung(brawler, raum, patch=None):
     referenz = staerke.prior_sd()
     basis_gewicht = max(0.0, min(1.0, 1.0 - sd_global / referenz)) if referenz else 0.0
     gewicht = statistik_gewicht(feiner, brawler, patch) * basis_gewicht
-    return {
-        "differenz": (rate_modus - rate_global) * gewicht,
+    differenz = (rate_modus - rate_global) * gewicht
+    ergebnis = {
+        "differenz": differenz,
+        "modus_diff": differenz,
+        "map_diff": 0.0,
         "modus_rate": rate_modus,
         "global_rate": rate_global,
         "sd": sd_modus,
         "spiele": int(n_modus),
+        "map_spiele": 0,
+        "map_rate": None,
     }
 
+    # Die Map-Ebene ist derselbe Gedanke eine Stufe tiefer: laeuft er auf
+    # DIESER Map besser als im Modus insgesamt? Die Modus-Rate ist ihr
+    # Prior, also schrumpft auch dieser Zuwachs bei duenner Stichprobe von
+    # selbst. Beide Differenzen sind Zuwaechse und ueberschneiden sich
+    # nicht - zusammen sind sie "Map gegen global", zerlegt in zwei
+    # Schritte. Mit CURRENT STRENGTH hat keiner von beiden zu tun: dort
+    # steht das Niveau, hier der Unterschied zum eigenen Schnitt.
+    karte = zeilen.get(staerke.MAP)
+    if karte is not None:
+        n_map, s_map = _zaehlung(karte)
+        if n_map > 0:
+            n_rest_modus = max(0.0, n_modus - n_map)
+            s_rest_modus = min(max(0.0, s_modus - s_map), n_rest_modus)
+            rate_modus_rest, sd_modus_rest = staerke.posterior(
+                n_rest_modus, s_rest_modus, prior_rate=rate_global,
+                prior_staerke=config.STAERKE_PRIOR_GLOBAL)
+            rate_map, sd_map = staerke.posterior(
+                n_map, s_map, prior_rate=rate_modus_rest,
+                prior_staerke=config.STAERKE_PRIOR_GLOBAL)
+            referenz_modus = staerke.prior_sd()
+            basis_modus = max(0.0, min(1.0, 1.0 - sd_modus_rest / referenz_modus))
+            map_gewicht = statistik_gewicht(karte, brawler, patch) * basis_modus
+            ergebnis["map_diff"] = (rate_map - rate_modus_rest) * map_gewicht
+            ergebnis["differenz"] = differenz + ergebnis["map_diff"]
+            ergebnis["map_rate"] = rate_map
+            ergebnis["map_spiele"] = int(n_map)
+            ergebnis["sd"] = (sd_modus ** 2 + sd_map ** 2) ** 0.5
+    return ergebnis
 
-def _qualitativ(brawler, anforderungen):
+
+def aspekte(modus):
+    """Die benannten Zielaspekte eines Modus - oder {} wenn keine gepflegt.
+
+    Daten aus config.MODUS_ZIELASPEKTE. Dieses Modul kennt keinen
+    Modusnamen; es schlaegt nach, was zum Slug hinterlegt ist.
+    """
+    slug = getattr(modus, "slug", "") or ""
+    return config.MODUS_ZIELASPEKTE.get(slug, {})
+
+
+def aspekt_erfuellung(brawler, aspekte_tabelle):
+    """Wie weit erfuellt er jeden Aspekt? {name: 0-1} - nur mit Profil.
+
+    Gewichteter Mittelwert seiner Eigenschaften ueber die Schluessel des
+    Aspekts. Ohne Profil gibt es nichts zu mitteln: `wert()` liefert dann
+    ueberall 0, und das hiesse "kann nichts" statt "unbekannt".
+    """
+    if not brawler.hat_profil or not aspekte_tabelle:
+        return {}
+    ergebnis = {}
+    for name, keys in aspekte_tabelle.items():
+        gesamt = sum(keys.values())
+        if gesamt <= 0:
+            continue
+        ergebnis[name] = sum(g * brawler.wert(k) for k, g in keys.items()) / gesamt
+    return ergebnis
+
+
+def aspekt_beruehrung(brawler, aspekte_tabelle):
+    """Wie viel eines Aspekts beruehrt sein Fachwissen? {name: 0-1}.
+
+    Fuer Brawler ohne Profil: Anteil des Aspektgewichts, den Rolle und
+    gepflegte Faehigkeiten ueberhaupt adressieren. Wieder nur "beruehrt
+    er das", nie "wie gut".
+    """
+    if not aspekte_tabelle:
+        return {}
+    abgedeckt = rollenwissen.deckt(brawler)
+    if not abgedeckt:
+        return {}
+    ergebnis = {}
+    for name, keys in aspekte_tabelle.items():
+        gesamt = sum(keys.values())
+        if gesamt <= 0:
+            continue
+        ergebnis[name] = sum(g for k, g in keys.items() if k in abgedeckt) / gesamt
+    return ergebnis
+
+
+def bester_aspekt(erfuellung):
+    """(Name, Wert) des am besten erfuellten Aspekts.
+
+    Bewusst das Maximum und nicht der Durchschnitt: ein Modus verlangt
+    verschiedene Dinge, und niemand muss sie alle koennen. Ein starker
+    Gem-Traeger ohne Zugriff auf den gegnerischen Traeger ist ein guter
+    Pick - ein Mittelmass in allem dreien nicht unbedingt.
+    """
+    if not erfuellung:
+        return None, None
+    name = max(erfuellung, key=lambda k: erfuellung[k])
+    return name, erfuellung[name]
+
+
+def _qualitativ(brawler, anforderungen, modus=None):
     """(Anteil, belegte Faehigkeiten) - ohne einen Zahlenwert zu erfinden.
 
     Der Anteil kommt aus `rollenwissen.deckt()`: Rolle UND gepflegte
@@ -167,18 +274,31 @@ def _qualitativ(brawler, anforderungen):
     Modus Waende brechen, zaehlt das, und es wird trotzdem nie eine Zahl
     wie 0.8 daraus.
     """
-    anteil = rollenwissen.anforderungsdeckung(brawler, anforderungen)
-    if anteil is None:
-        return None, ()
+    tabelle = aspekte(modus)
     treffer = tuple(sorted(
         f for f in (brawler.draft_faehigkeiten or ())
         if any(anforderungen.get(k, 0.0) > 0
                for k in config.FAEHIGKEIT_ATTRIBUTE.get(f, ()))
     ))
-    return anteil, treffer
+    if tabelle:
+        # **Nur Rolle und Faehigkeiten, nie die Profilattribute.** Die
+        # stecken schon vollstaendig in der anderen Haelfte von Map &
+        # Modus; sie hier noch einmal zu lesen, waere dieselbe Evidenz
+        # zweimal - derselbe Fehler, den wir zwischen Map-Fit und
+        # Teambedarf beseitigt haben. Gemessen am 2026-09-19: zwei
+        # profilierte Brawler sprangen dadurch von +6.8 auf +9.3
+        # Map-Fit-Punkte und verdraengten den bestbelegten Kandidaten.
+        erfuellung = aspekt_beruehrung(brawler, tabelle)
+        name, wert = bester_aspekt(erfuellung)
+        if name is not None:
+            return wert, treffer, (name, erfuellung), quellen.FACHWISSEN
+    anteil = rollenwissen.anforderungsdeckung(brawler, anforderungen)
+    if anteil is None:
+        return None, (), (None, {}), quellen.UNKNOWN
+    return anteil, treffer, (None, {}), quellen.FACHWISSEN
 
 
-def fuer_pool(kandidaten, raum, anforderungen, patch=None):
+def fuer_pool(kandidaten, raum, anforderungen, patch=None, modus=None):
     """Objective Fit fuer alle Kandidaten - feldrelativ skaliert.
 
     Feldrelativ aus demselben Grund wie ueberall: ein Unterschied von drei
@@ -201,12 +321,21 @@ def fuer_pool(kandidaten, raum, anforderungen, patch=None):
     # ihr Vorzeichen daran, wie viele Posten ein Modus zufaellig auflistet.
     # Das Fachwissen wird fuer ALLE gerechnet, nicht nur fuer die ohne
     # Messung: es ist der Prior, zu dem eine duenne Messung zurueckfaellt.
-    roh_qualitativ, faehigkeiten_je_id = {}, {}
+    # EIN Feld. Die qualitative Seite ist hier immer dieselbe Groesse -
+    # welchen Anteil des Ziels Rolle und Faehigkeiten beruehren - egal ob
+    # der Brawler ausserdem ein Profil hat. Zwei getrennte Felder haetten
+    # die Nullpunkte gegeneinander verschoben: gemessen am 2026-09-19
+    # verschoben sich dadurch Spitzenplaetze in Modi, an denen gar nichts
+    # geaendert worden war (bis zu 4 Scorepunkte).
+    roh_qualitativ, faehigkeiten_je_id, aspekt_je_id, qual_quelle = {}, {}, {}, {}
     for b in kandidaten:
-        anteil, faehigkeiten = _qualitativ(b, anforderungen)
-        if anteil is not None:
-            roh_qualitativ[b.id] = anteil
-            faehigkeiten_je_id[b.id] = faehigkeiten
+        anteil, faehigkeiten, aspekt_info, q = _qualitativ(b, anforderungen, modus)
+        if anteil is None:
+            continue
+        roh_qualitativ[b.id] = anteil
+        faehigkeiten_je_id[b.id] = faehigkeiten
+        aspekt_je_id[b.id] = aspekt_info
+        qual_quelle[b.id] = q
     z_qualitativ = rollenwissen.rollen_z(roh_qualitativ)
 
     ergebnis = {}
@@ -234,23 +363,34 @@ def fuer_pool(kandidaten, raum, anforderungen, patch=None):
             text = (f"läuft in diesem Modus {richtung} als sonst "
                     f"({m['modus_rate']:.0%} gegen {m['global_rate']:.0%} insgesamt, "
                     f"{m['spiele']} Partien)")
+            if m["map_spiele"] and abs(m["map_diff"]) > 0.005:
+                wohin = "noch besser" if m["map_diff"] > 0 else "schlechter"
+                text += (f"; auf dieser Map {wohin} "
+                         f"({m['map_spiele']} Partien)")
         elif m is not None:
-            quelle = quellen.schwaechste([MESSUNG, quellen.FACHWISSEN])
+            quelle = quellen.schwaechste(
+                [MESSUNG, qual_quelle.get(b.id, quellen.FACHWISSEN)])
             text = (f"{m['spiele']} Partien in diesem Modus - zu wenig für eine "
                     f"eigene Aussage, mit dem Fachwissen gemischt")
         else:
-            quelle = quellen.FACHWISSEN
+            quelle = qual_quelle.get(b.id, quellen.FACHWISSEN)
             text = (f"{b.draft_rolle_label} berührt das Ziel dieses Modus"
                     if b.draft_rolle_label else "gepflegtes Fachwissen zum Ziel")
             if faehigkeiten:
                 text += f"; gepflegt: {', '.join(faehigkeiten)}"
 
+        aspekt_name, erfuellung = aspekt_je_id.get(b.id, (None, {}))
+        if aspekt_name:
+            text += f"; stark als: {aspekt_name}"
         ergebnis[b.id] = Auskunft(
+            aspekt=aspekt_name or "", aspekte=erfuellung,
             wert=wert, quelle=quelle, verfuegbar=True,
             differenz=m["differenz"] if m else None,
             modus_rate=m["modus_rate"] if m else None,
             global_rate=m["global_rate"] if m else None,
             modus_spiele=m["spiele"] if m else 0,
+            map_diff=m["map_diff"] if m else None,
+            map_spiele=m["map_spiele"] if m else 0,
             faehigkeiten=faehigkeiten, mess_anteil=w, qualitativ=qual,
             text=text,
         )

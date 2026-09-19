@@ -323,18 +323,29 @@ MODI = [
         "name": "Gem Grab", "slug": "gem-grab", "order": 1,
         "description": "Zehn Edelsteine halten, Countdown überleben.",
         "win_condition": "Mid kontrollieren und den Träger schützen",
+        # Drei Aufgaben, nicht eine: Mid halten, Gems tragen koennen, den
+        # gegnerischen Traeger unter Druck setzen. Bis 2026-09-19 kannte
+        # das Profil nur Kontrolle - "wer traegt" und "wer holt sie
+        # zurueck" kamen darin nicht vor. Die Aspekte dazu stehen in
+        # config.MODUS_ZIELASPEKTE.
         "base_requirements": {
             "mid_control": 85, "area_control": 65, "zone_control": 60,
-            "lane_control": 55, "peel": 60, "survivability": 50,
+            "survivability": 65, "peel": 60, "lane_control": 55,
+            "disengage": 55, "engage": 50, "backline_pressure": 45,
         },
     },
     {
         "name": "Brawl Ball", "slug": "brawl-ball", "order": 2,
         "description": "Zwei Tore, ein Ball.",
         "win_condition": "Raum für den Ballführenden schaffen",
+        # Das TOR kam im Ziel dieses Modus bis 2026-09-19 nicht vor:
+        # `objective_damage` stand nur auf einer einzelnen Map. Jetzt
+        # steht es oben, daneben der Weg dorthin (mobility, engage) und
+        # der Raum, den es dafuer braucht (frontline, peel).
         "base_requirements": {
-            "frontline": 75, "engage": 65, "peel": 60, "mobility": 65,
-            "wallbreak": 55, "crowd_control": 60, "close_range": 55,
+            "objective_damage": 85, "frontline": 75, "engage": 70,
+            "mobility": 70, "crowd_control": 60, "peel": 60,
+            "wallbreak": 55, "close_range": 55, "burst_damage": 50,
         },
     },
     {

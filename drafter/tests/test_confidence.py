@@ -54,35 +54,36 @@ class EmpfehlungsConfidenceTest(DrafterTest):
             self.assertNotEqual(empfehlung.confidence_label, "Hoch")
 
     def test_mehr_bekannter_draft_erhoeht_die_confidence(self):
-        # Mit reinen Demo-Daten liegen beide Werte am Deckel - der
-        # Zusammenhang waere dann nicht messbar. Also eine Statistik auf
-        # "gemessen" stellen, damit der Deckel nicht greift. Seit es die
-        # Freigabe gibt, reicht die Quelle dafuer nicht mehr: ohne sie
-        # nimmt "auto" weiterhin die Demo-Daten.
+        """Bei gleich guten Komponenten macht ein bekannter Draft sicherer.
+
+        Geprueft wird der Mechanismus, nicht das Feld: nimmt man zwei
+        echte Lagen, kommen mit den Gegnern auch Matchups ohne gemessene
+        Paardaten dazu (Heuristik-Confidence), und der Schnitt faellt - zu
+        Recht. Die Aussage dieses Tests ist die andere: WENN das Wissen je
+        Komponente gleich bleibt, zaehlt der Draftstand positiv.
+        """
         from unittest import mock
 
         from drafter.models import Brawler, BrawlerStat, Datenquelle
-        from drafter.models.stats import CounterStat, SynergyStat
+        from drafter.services.scoring import Komponente
+
+        # Ohne das greift der Demo-Deckel und beide Werte landen bei 0.35.
         BrawlerStat.objects.update(source=Datenquelle.AGGREGATED, confidence=0.8)
-        # Die Paarwerte ebenso belastbar machen wie die Siegquoten. Seit
-        # die Counter- und Synergie-Confidence aus der Stichprobe DES
-        # PAARES kommt (2026-09-18), macht ein bekannter Draft die Aussage
-        # nur dann sicherer, wenn zu den Matchups auch etwas bekannt ist.
-        # Bliebe es bei geratenen Matchups, waere ein voller Draft zu
-        # Recht unsicherer - dann pruefte dieser Test die Zahl der Picks
-        # statt des Wissens. Die Quelle bleibt "demo": berechnete Counter
-        # duerfen laut Constraint nur in kanonischer Richtung stehen.
-        for modell in (CounterStat, SynergyStat):
-            modell.objects.update(confidence=0.8)
-        # Seit 2026-09-16 deckelt auch ein Demo-PROFIL die Confidence, nicht
-        # nur ein reiner Demo-Datenraum. Manuell gepflegte Profile nicht.
         Brawler.objects.update(source=Datenquelle.MANUAL)
 
+        engine = self.engine()
+        komponenten = {
+            config.K_MAP_MODE: Komponente(key=config.K_MAP_MODE, gewicht=0.3,
+                                          confidence=0.8),
+            config.K_META: Komponente(key=config.K_META, gewicht=0.2, confidence=0.8),
+        }
         with mock.patch.object(config, "GEMESSENE_STATS_FREIGEGEBEN", True):
-            wenig = self.engine().empfehlungen()[0].confidence
-            viel = self.engine(
-                eigene=["gale"], gegner=["bull", "tick"]
-            ).empfehlungen()[0].confidence
+            raum = self.engine().raum.laden()
+            wenig = confidence.fuer_empfehlung(
+                komponenten, self.context(), raum, self.brawler("gale"))
+            viel = confidence.fuer_empfehlung(
+                komponenten, self.context(eigene=["gale"], gegner=["bull", "tick"]),
+                raum, self.brawler("gale"))
         self.assertGreater(viel, wenig)
 
     def test_erklaerung_nennt_die_demo_lage(self):

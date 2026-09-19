@@ -55,7 +55,23 @@ def komponenten_fuer_pool(kandidaten, anforderungen, brawl_map=None,
     # Nur ueber Brawler mit Profil: ohne Eigenschaften ist die Passung
     # unbekannt, nicht 0 - und ein Feld voller Nullen wuerde ausserdem
     # die z-Werte aller anderen verschieben.
-    roh = {b.id: roh_passung(b, anforderungen) for b in kandidaten if b.hat_profil}
+    # Mit gepflegten Zielaspekten zaehlt der BESTE erfuellte statt der
+    # flachen Summe ueber alles: ein Modus verlangt verschiedene Dinge,
+    # und niemand muss sie alle koennen (config.MODUS_ZIELASPEKTE). Ohne
+    # Aspekte bleibt es beim Skalarprodukt.
+    aspekt_tabelle = objective.aspekte(brawl_map.game_mode if brawl_map else None)
+    roh, aspekt_je_id = {}, {}
+    for b in kandidaten:
+        if not b.hat_profil:
+            continue
+        if aspekt_tabelle:
+            erfuellung = objective.aspekt_erfuellung(b, aspekt_tabelle)
+            name, wert = objective.bester_aspekt(erfuellung)
+            if name is not None:
+                roh[b.id] = wert
+                aspekt_je_id[b.id] = (name, erfuellung)
+                continue
+        roh[b.id] = roh_passung(b, anforderungen)
     z = z_werte(roh)
 
     # Ohne Profil, aber mit gepflegter Draft-Rolle: die Rolle sagt, WELCHE
@@ -71,7 +87,8 @@ def komponenten_fuer_pool(kandidaten, anforderungen, brawl_map=None,
             roh_rolle[b.id] = anteil
     z_rolle = rollenwissen.rollen_z(roh_rolle)
 
-    objektiv = (objective.fuer_pool(kandidaten, raum, anforderungen, patch)
+    objektiv = (objective.fuer_pool(kandidaten, raum, anforderungen, patch,
+                                    modus=brawl_map.game_mode if brawl_map else None)
                 if raum is not None else {})
 
     # Welche Eigenschaften praegen diese Map? Nur darueber wird begruendet -
@@ -116,6 +133,12 @@ def komponenten_fuer_pool(kandidaten, anforderungen, brawl_map=None,
                 quelle="daten" if auskunft.quelle == objective.MESSUNG else "fachquelle",
             ))
         if b.hat_profil and allgemein is not None:
+            name, _erfuellung = aspekt_je_id.get(b.id, (None, {}))
+            if name and allgemein > 0.15:
+                komp.gruende.append(Grund(
+                    text=f"erfüllt hier vor allem: {name}",
+                    positiv=True, staerke=0.5 + allgemein * 0.2,
+                ))
             if allgemein > 0.15:
                 treffer = [
                     (k, w) for k, w in wichtigste if w > 0.3 and b.wert(k) >= 0.6
