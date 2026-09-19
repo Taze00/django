@@ -93,8 +93,11 @@ class DatenstufenTest(DrafterTest):
         self.assertIsNone(erklaerung["rate"])
 
     def test_gemessener_brawler_wird_nur_aus_messwerten_bewertet(self):
+        # Mit einem eigenen Pick, damit der Teambedarf ueberhaupt eine
+        # Frage ist: im leeren Draft ist er fuer alle gleich unanwendbar
+        # (er waere sonst eine zweite Map-Passung, siehe team_need.py).
         self.messe(self.nori, 30)
-        e = self.empfehlung(self.engine(), "nori")
+        e = self.empfehlung(self.engine(eigene=["gale"]), "nori")
         self.assertIsNotNone(e)
         self.assertEqual(e.stufe, "gemessen")
         for key in PROFIL_KOMPONENTEN:

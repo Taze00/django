@@ -879,6 +879,14 @@ function erklaerungsTafel(x) {
         ? `${(cs.rate * 100).toFixed(1)} % aus ${cs.spiele} Partien `
           + `(effektiv ${cs.n_effektiv}) · ${cs.quelle}`
         : `${cs.hinweis}${cs.rate === null ? '' : ` (gepflegter Wert ${(cs.rate * 100).toFixed(1)} %)`}`],
+    ['Objective Fit', x.objective_fit ? punkte(x.objective_fit.punkte) : '–',
+      x.objective_fit
+        ? (x.objective_fit.differenz_pp !== null
+          ? `${x.objective_fit.differenz_pp > 0 ? '+' : ''}`
+            + `${x.objective_fit.differenz_pp} Punkte gegenüber seinem eigenen Schnitt `
+            + `(${x.objective_fit.modus_spiele} Partien im Modus)`
+          : x.objective_fit.text)
+        : 'keine Auskunft zum Modusziel'],
     ['Draft Fit', punkte(x.draft_fit.punkte),
       x.draft_fit.komponenten.map((k) => `${k.label} ${punkte(k.punkte)}`).join(' · ')
         || 'keine Komponente berechenbar'],

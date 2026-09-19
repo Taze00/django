@@ -174,7 +174,8 @@ class DraftEngine:
 
         # Feldweite Komponenten - brauchen alle Kandidaten gleichzeitig.
         map_komp = map_fit.komponenten_fuer_pool(
-            kandidaten, self.anforderungen, self.ctx.brawl_map
+            kandidaten, self.anforderungen, self.ctx.brawl_map,
+            raum=self.raum, patch=self.ctx.patch,
         )
         meta_komp = meta.komponenten_fuer_pool(kandidaten, self.raum, self.ctx.patch)
         bedarf_komp = team_need.komponenten_fuer_pool(

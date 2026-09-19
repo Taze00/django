@@ -549,24 +549,71 @@ STAERKE_BIAS_MAX_ABZUG = 0.40        # hoechstens so viel Sicherheit kostet das
 # =========================================================================
 # Was eine Draft-Rolle qualitativ adressiert (services/rollenwissen.py)
 # =========================================================================
-# Die sieben Rollen der Fachquelle, uebersetzt in die Eigenschaften, um
-# die es bei ihnen GEHT. Das ist eine Zuordnung, keine Bewertung: hier
-# steht, WOVON ein Thrower handelt, nicht wie gut er darin ist. Die
-# Betraege kommen immer von der anderen Seite - Map-Anforderung oder
-# Team-Luecke. Siehe den Kopf von services/rollenwissen.py.
+# Die sieben Rollen der Fachquelle, uebersetzt in die Eigenschaften, die
+# ihrer DEFINITION nach zu ihnen gehoeren. Das ist eine Zuordnung, keine
+# Bewertung: hier steht, WOVON ein Thrower handelt, nicht wie gut er
+# darin ist. Die Betraege kommen immer von der anderen Seite - Map-
+# Anforderung oder Team-Luecke. Siehe den Kopf von services/rollenwissen.py.
 #
-# Absichtlich kurz gehalten: drei bis fuenf Posten je Rolle, die im Draft
-# tatsaechlich entscheiden. Eine vollstaendige Matrix waere
-# Scheingenauigkeit - sie sieht praeziser aus, als die Quelle ist.
+# **Audit vom 2026-09-18.** Die erste Fassung enthielt Zuordnungen, die
+# nur plausibel klangen. Auf Safe Zone (Heist) hatte das eine sichtbare
+# Folge: `objective_damage` haengte allein an `thrower`, und weil
+# objective_damage dort 20 % des gesamten Anforderungsgewichts traegt,
+# liefen ALLE Thrower in den Deckel - WILLOW und SPROUT standen auf den
+# Plaetzen 4 und 5, ohne eine einzige gemessene Heist-Partie.
+#
+# Geprueft wurde jede Zeile nach einer Frage: folgt das aus der
+# Rollendefinition, oder ist es eine Beobachtung ueber einzelne Brawler?
+#
+#   behalten (logisch inhaerent)
+#     thrower     -> area_control, zone_control, safe_poke
+#                    (er wirft ueber Deckung in Flaechen - das IST die Rolle)
+#     tank        -> frontline, tankiness, engage
+#     space_maker -> engage, mobility, backline_pressure
+#     anti_tank   -> anti_tank            (definitorisch)
+#     support     -> support, peel
+#     sniper      -> long_range, poke, lane_control
+#     control     -> area_control, zone_control, mid_control
+#
+#   ENTFERNT (nur Heuristik oder fragwuerdig)
+#     thrower     -> objective_damage   Wurfschaden am Safe ist eine
+#                                       Eigenschaft einzelner Brawler,
+#                                       nicht der Rolle. Ursache des
+#                                       Safe-Zone-Fehlers.
+#     tank        -> peel               manche Tanks tauchen, statt zu schuetzen
+#     space_maker -> anti_assassin      beschreibt eine Antwort, keine Aufgabe
+#     anti_tank   -> burst_damage, poke COLETTE macht prozentualen
+#                                       Dauerschaden, COLT Dauerschaden -
+#                                       die Rolle sagt nichts ueber die Art
+#     support     -> healing            nicht jeder Support heilt
+#     support     -> survivability      Beobachtung, keine Aufgabe
+#     sniper      -> backline_pressure  Reichweite ist nicht Druck
+#
+# Was dadurch wegfaellt, ist nicht verloren: es kommt jetzt aus der
+# gemessenen Modus-Eignung (services/objective.py) oder aus gepflegten
+# Faehigkeiten - beides Belege statt Vermutungen.
 ROLLE_DECKT = {
-    "thrower":     ("area_control", "zone_control", "safe_damage", "objective_damage"),
-    "tank":        ("frontline", "tankiness", "engage", "peel"),
-    "space_maker": ("engage", "mobility", "backline_pressure", "anti_assassin"),
-    "anti_tank":   ("anti_tank", "burst_damage", "poke"),
-    "support":     ("healing", "support", "peel", "survivability"),
-    "sniper":      ("long_range", "poke", "lane_control", "backline_pressure"),
-    "control":     ("area_control", "mid_control", "crowd_control", "zone_control"),
+    "thrower":     ("area_control", "zone_control", "safe_poke"),
+    "tank":        ("frontline", "tankiness", "engage"),
+    "space_maker": ("engage", "mobility", "backline_pressure"),
+    "anti_tank":   ("anti_tank",),
+    "support":     ("support", "peel"),
+    "sniper":      ("long_range", "poke", "lane_control"),
+    "control":     ("area_control", "zone_control", "mid_control"),
 }
+
+# Die zwei Haelften der Komponente "Map & Modus" (services/map_fit.py):
+#
+#   allgemein  - passt sein Koennen zu dem, was hier gefordert ist
+#   objective  - ist er im ZIEL dieses Modus messbar besser als sonst
+#
+# Bewusst gleich stark. Die erste Haelfte ist gepflegtes Wissen, die
+# zweite Beleg; ein Profil soll einen Modus-Fit nicht mehr allein
+# behaupten koennen (BROCK: Profil sagte perfekt, 221 Partien auf der
+# Map sagten 40,7 %). Fehlt eine Haelfte, zaehlt sie 0 - nicht
+# hochgerechnet, dieselbe Regel wie im Gesamtscore.
+MAP_FIT_ANTEIL_ALLGEMEIN = 0.5
+MAP_FIT_ANTEIL_OBJECTIVE = 0.5
 
 # Wie weit eine rein qualitative Auskunft ausschlagen darf. Eine Rolle ist
 # eine Schublade, ein Profil eine Beschreibung - wer nur eingeordnet ist,

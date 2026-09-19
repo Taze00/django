@@ -56,8 +56,13 @@ _SCHADEN = [
     Eigenschaft("sustained_damage", "Dauerschaden", "Schaden"),
     Eigenschaft("objective_damage", "Schaden aufs Ziel", "Schaden",
                 beschreibung="Safe, Tresor, Ball, Heist-Objekte"),
-    Eigenschaft("safe_damage", "Sicherer Schaden", "Schaden",
-                beschreibung="Schaden ohne eigenes Risiko"),
+    # Hiess bis zum 2026-09-18 "safe_damage". Der Name war gefaehrlich:
+    # in einem Spiel mit einem Modus namens Heist las sich "safe damage"
+    # wie "Schaden am Safe" - gemeint war immer das Gegenteil, naemlich
+    # Schaden, den man selbst gefahrlos austeilt. Schaden am Heist-Safe
+    # heisst `objective_damage`.
+    Eigenschaft("safe_poke", "Sicherer Schaden", "Schaden",
+                beschreibung="Schaden aus sicherer Position, ohne eigenes Risiko"),
     Eigenschaft("poke", "Poke", "Schaden"),
 ]
 
@@ -249,6 +254,19 @@ def pruefe_map_traits(werte):
             fehler.append(f"traits.{key}: {zahl} liegt nicht zwischen 0 und {grenze}")
     return fehler
 ROLLEN_LABEL = dict(ROLLEN)
+
+
+# Alte Schluesselnamen -> heutige. Damit laesst sich eine Altdatei oder
+# eine alte Fixture einlesen, ohne dass jemand von Hand sucht und ersetzt.
+# Die Migration 0013 hat die Datenbank bereits umgestellt.
+ALTE_SCHLUESSEL = {"safe_damage": "safe_poke"}
+
+
+def umbenennen(werte):
+    """Alte Attributschluessel auf die heutigen abbilden."""
+    if not isinstance(werte, dict):
+        return werte
+    return {ALTE_SCHLUESSEL.get(k, k): v for k, v in werte.items()}
 
 
 def pruefe_attribute(werte, erlaubt=ATTRIBUT_KEYS, feldname="attributes"):

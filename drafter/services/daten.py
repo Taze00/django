@@ -297,6 +297,14 @@ class Datenraum:
             return messung
         return self._build_prior.get((brawler.id, art, slug)) or messung
 
+    def ebenen(self, brawler):
+        """Die gemessenen Zeilen je Ebene: {"global"|"modus"|"map": Zeile}.
+
+        Fuer alles, was die Ebenen einzeln braucht - etwa die Modus-Eignung
+        in services/objective.py, die Modus gegen global stellt.
+        """
+        return dict(self._ebenen.get(brawler.id, {}))
+
     def gemessene_spiele(self, brawler):
         return self._spiele.get(brawler.id, 0)
 

@@ -44,7 +44,7 @@ BRAWLER = [
         "name": "Belle", "slug": "belle", "role": "marksman", "tags": ["sniper"],
         "color": "#c86fd6",
         "attributes": {
-            "long_range": 88, "mid_range": 70, "safe_damage": 80, "poke": 85,
+            "long_range": 88, "mid_range": 70, "safe_poke": 80, "poke": 85,
             "sustained_damage": 60, "lane_control": 80, "mid_control": 78,
             "zone_control": 60, "slow": 40, "backline_pressure": 55,
             "anti_tank": 55, "survivability": 40, "mobility": 25, "vision": 40,
@@ -89,7 +89,7 @@ BRAWLER = [
         "name": "Gene", "slug": "gene", "role": "controller", "tags": ["support"],
         "color": "#8b5fd6",
         "attributes": {
-            "long_range": 65, "mid_range": 80, "safe_damage": 60, "poke": 65,
+            "long_range": 65, "mid_range": 80, "safe_poke": 60, "poke": 65,
             "area_control": 55, "mid_control": 70, "crowd_control": 85,
             "anti_tank": 40, "anti_assassin": 55, "backline_pressure": 70,
             "survivability": 45, "peel": 70, "healing": 35, "support": 85,
@@ -104,7 +104,7 @@ BRAWLER = [
         "name": "Tick", "slug": "tick", "role": "thrower", "tags": ["controller"],
         "color": "#7fb069",
         "attributes": {
-            "mid_range": 70, "safe_damage": 85, "poke": 80, "burst_damage": 55,
+            "mid_range": 70, "safe_poke": 85, "poke": 80, "burst_damage": 55,
             "area_control": 95, "zone_control": 90, "lane_control": 75,
             "objective_damage": 60, "bush_control": 70,
             "survivability": 20, "mobility": 20,
@@ -133,7 +133,7 @@ BRAWLER = [
         "name": "Piper", "slug": "piper", "role": "sniper", "tags": ["marksman"],
         "color": "#e8a0c0",
         "attributes": {
-            "long_range": 95, "burst_damage": 90, "safe_damage": 75, "poke": 80,
+            "long_range": 95, "burst_damage": 90, "safe_poke": 75, "poke": 80,
             "lane_control": 85, "mid_control": 60, "backline_pressure": 40,
             "survivability": 20, "disengage": 60, "mobility": 30,
         },
@@ -188,7 +188,7 @@ BRAWLER = [
         "name": "Sandy", "slug": "sandy", "role": "controller", "tags": ["support"],
         "color": "#d6c48f",
         "attributes": {
-            "mid_range": 75, "sustained_damage": 60, "poke": 60, "safe_damage": 55,
+            "mid_range": 75, "sustained_damage": 60, "poke": 60, "safe_poke": 55,
             "area_control": 88, "zone_control": 85, "mid_control": 80, "lane_control": 70,
             "slow": 60, "crowd_control": 55, "anti_assassin": 50,
             "survivability": 60, "peel": 65, "vision": 90, "bush_control": 75,
@@ -232,7 +232,7 @@ BRAWLER = [
         "name": "Poco", "slug": "poco", "role": "support", "tags": ["controller"],
         "color": "#d64a6f",
         "attributes": {
-            "mid_range": 78, "sustained_damage": 55, "poke": 65, "safe_damage": 60,
+            "mid_range": 78, "sustained_damage": 55, "poke": 65, "safe_poke": 60,
             "area_control": 65, "lane_control": 60,
             "anti_assassin": 60, "survivability": 65, "peel": 75,
             "healing": 95, "support": 95, "mobility": 35, "bush_control": 50,
@@ -246,7 +246,7 @@ BRAWLER = [
         "name": "Brock", "slug": "brock", "role": "marksman", "tags": ["sniper"],
         "color": "#e85a3a",
         "attributes": {
-            "long_range": 90, "burst_damage": 85, "safe_damage": 70, "poke": 75,
+            "long_range": 90, "burst_damage": 85, "safe_poke": 70, "poke": 75,
             "lane_control": 80, "area_control": 55, "objective_damage": 80,
             "zone_control": 60, "survivability": 25, "mobility": 30, "wallbreak": 95,
         },
@@ -288,7 +288,7 @@ BRAWLER = [
         "name": "Barley", "slug": "barley", "role": "thrower", "tags": ["controller"],
         "color": "#6fa8d6",
         "attributes": {
-            "mid_range": 72, "safe_damage": 88, "poke": 85, "sustained_damage": 70,
+            "mid_range": 72, "safe_poke": 88, "poke": 85, "sustained_damage": 70,
             "area_control": 92, "zone_control": 92, "lane_control": 80,
             "objective_damage": 55, "bush_control": 65,
             "survivability": 25, "mobility": 25,
@@ -342,7 +342,7 @@ MODI = [
         "description": "Kein Respawn - jeder Fehler zählt doppelt.",
         "win_condition": "Keinen Spieler verlieren und Vorteile ausspielen",
         "base_requirements": {
-            "long_range": 70, "safe_damage": 75, "poke": 70, "survivability": 65,
+            "long_range": 70, "safe_poke": 75, "poke": 70, "survivability": 65,
             "vision": 55, "bush_control": 50, "disengage": 55,
         },
     },
@@ -350,9 +350,16 @@ MODI = [
         "name": "Heist", "slug": "heist", "order": 4,
         "description": "Gegnerischen Safe knacken, eigenen halten.",
         "win_condition": "Druck auf den Safe erzeugen, ohne die Lane zu verlieren",
+        # Das Ziel des Modus, aus vorhandenen Begriffen zusammengesetzt:
+        # den Safe treffen (objective_damage), ihn auch halten koennen
+        # (sustained_damage - fehlte bis 2026-09-18 vollstaendig, obwohl
+        # ein Safe nicht von einem Burst faellt), an ihn herankommen
+        # (mobility, wallbreak, survivability) und den eigenen verteidigen
+        # (zone_control, lane_control).
         "base_requirements": {
-            "objective_damage": 90, "lane_control": 70, "burst_damage": 60,
-            "wallbreak": 55, "zone_control": 55, "mobility": 50,
+            "objective_damage": 90, "sustained_damage": 75, "lane_control": 70,
+            "zone_control": 60, "wallbreak": 55, "burst_damage": 55,
+            "survivability": 55, "mobility": 50,
         },
     },
     {
@@ -360,7 +367,7 @@ MODI = [
         "description": "Sterne sammeln, eigene nicht verschenken.",
         "win_condition": "Vorsprung halten statt Kills erzwingen",
         "base_requirements": {
-            "long_range": 85, "safe_damage": 80, "poke": 75, "survivability": 60,
+            "long_range": 85, "safe_poke": 80, "poke": 75, "survivability": 60,
             "bush_control": 60, "vision": 65, "disengage": 60,
         },
     },
@@ -421,7 +428,7 @@ MAPS = [
     {
         "name": "Belle's Rock", "slug": "belles-rock", "mode": "knockout",
         "requirements": {
-            "long_range": 90, "safe_damage": 80, "poke": 80, "survivability": 65,
+            "long_range": 90, "safe_poke": 80, "poke": 80, "survivability": 65,
             "disengage": 60, "vision": 55, "close_range": 25, "mobility": 45,
         },
         "traits": {"openness": 80, "wall_density": 35, "bush_density": 25,
@@ -440,9 +447,12 @@ MAPS = [
     },
     {
         "name": "Safe Zone", "slug": "safe-zone", "mode": "heist",
+        # Nur die ABWEICHUNGEN vom Heist-Grundprofil: zwei lange Lanes mit
+        # Waenden dazwischen. Was hier frueher stand (objective_damage 95,
+        # zone_control 55, burst 70), war eine Kopie des Modus - dadurch
+        # sah eine Modusfrage wie eine Mapfrage aus.
         "requirements": {
-            "objective_damage": 95, "burst_damage": 70, "lane_control": 75,
-            "mobility": 70, "wallbreak": 60, "zone_control": 55, "long_range": 45,
+            "lane_control": 75, "mobility": 70, "wallbreak": 60, "long_range": 45,
         },
         "traits": {"openness": 45, "wall_density": 60, "bush_density": 35,
                    "choke_points": 60, "lane_count": 2},
@@ -450,7 +460,7 @@ MAPS = [
     {
         "name": "Snake Prairie", "slug": "snake-prairie", "mode": "bounty",
         "requirements": {
-            "long_range": 80, "bush_control": 85, "vision": 80, "safe_damage": 70,
+            "long_range": 80, "bush_control": 85, "vision": 80, "safe_poke": 70,
             "survivability": 60, "poke": 65, "disengage": 60,
         },
         "traits": {"openness": 40, "wall_density": 30, "bush_density": 85,

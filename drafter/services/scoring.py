@@ -103,6 +103,8 @@ class Komponente:
     # Bezugsfeld der Staerke (services/staerke.Feld) - der Score-Wert ist
     # relativ zu ihm, also gehoert es in die Erklaerung.
     feld: object = None
+    # Nur bei Map & Modus: die Modus-Eignung (services/objective.Auskunft).
+    objective: object = None
 
     @property
     def beitrag(self):
@@ -141,6 +143,9 @@ class Komponente:
             # Nur CURRENT STRENGTH: worauf die Schaetzung beruht.
             "schaetzung": (self.staerke.als_dict(self.feld)
                            if self.staerke is not None else None),
+            # Nur Map & Modus: die gemessene Modus-Eignung.
+            "objective": (self.objective.als_dict()
+                          if self.objective is not None else None),
             # Begruendungen der Komponente, damit jede Zeile der Tabelle
             # aufklappbar ist und nicht nur eine Zahl bleibt.
             "gruende": [g.als_dict() for g in self.gruende],
@@ -311,6 +316,17 @@ class Empfehlung:
         gesammelt.sort(key=lambda g: -g.staerke)
         return gesammelt[: config.GRUENDE_MAX]
 
+    def _objective_dict(self):
+        """Die Modus-Eignung samt ihrem Anteil an der Map-&-Modus-Komponente."""
+        komp = self.komponenten.get(config.K_MAP_MODE)
+        auskunft = komp.objective if komp is not None else None
+        if auskunft is None or not auskunft.verfuegbar:
+            return None
+        daten = auskunft.als_dict()
+        daten["punkte"] = round(
+            config.MAP_FIT_ANTEIL_OBJECTIVE * auskunft.wert * komp.gewicht * 50, 1)
+        return daten
+
     def erklaerung(self):
         """Die fuenf Groessen einer Empfehlung, getrennt ausgewiesen.
 
@@ -345,6 +361,7 @@ class Empfehlung:
                 "n_effektiv": round(st.n_effektiv, 1) if st is not None else 0.0,
                 "quelle": st.quelle if st is not None else "Unknown",
             },
+            "objective_fit": self._objective_dict(),
             "draft_fit": {
                 "punkte": round(self.gruppen_beitrag(config.G_DRAFT_FIT), 1),
                 "komponenten": [

@@ -37,11 +37,42 @@ def _nutzen(analyse, kandidat):
 def komponenten_fuer_pool(kandidaten, analyse, ctx):
     """Bedarfs-Komponente fuer alle Kandidaten.
 
+    **Ohne eigenen Pick gibt es keinen Teambedarf.** Bis zum 2026-09-18
+    rechnete diese Komponente auch bei leerem Team - und dann ist
+    `bedarf` exakt der Anforderungsvektor der Map und `zuwachs` exakt das
+    Profil des Kandidaten. Das Ergebnis war dasselbe Skalarprodukt, das
+    Map & Modus ohnehin bildet: BUSTER bekam +10,36 aus Map & Modus und
+    +3,83 aus Teambedarf, beides aus denselben zwei Vektoren. 44 % des
+    Bewertungsgewichts aus einer einzigen gepflegten Zahlenreihe.
+    Jetzt beantwortet die Komponente wieder ihre eigene Frage: was fehlt
+    dem, was schon steht.
+
     Feldrelativ **und** absolut: der z-Wert sagt, wer von den
     Verfuegbaren am meisten hilft, der absolute Anteil verhindert, dass
     bei einem vollstaendig gedeckten Team trotzdem jemand als grosse
     Hilfe erscheint.
     """
+    if not ctx.own_picks and not ctx.enemy_picks:
+        # Nicht anwendbar - fuer jeden Kandidaten gleich, also Wert 0 und
+        # ohne Anspruch auf Sicherheit.
+        #
+        # Die Bedingung ist bewusst eng: schon ein GEGNERISCHER Pick
+        # erzeugt echten Bedarf (zwei Tanks verlangen Anti-Tank), und der
+        # steht nicht im Anforderungsvektor der Map. Doppelt gezaehlt wird
+        # nur im voellig leeren Draft - dort und nur dort sind
+        # Map-Anforderung und Teambedarf dieselbe Rechnung.
+        leer = {}
+        for b in kandidaten:
+            komp = Komponente(key=config.K_TEAM_NEED)
+            komp.anwendbar = False
+            komp.quelle = quellen.PROFILE if b.hat_profil else quellen.UNKNOWN
+            komp.gruende.append(Grund(
+                text="noch kein eigener Pick - Teambedarf entsteht erst danach",
+                positiv=True, staerke=0.2,
+            ))
+            leer[b.id] = komp
+        return leer
+
     roh = {}
     zuwaechse = {}
     for b in kandidaten:

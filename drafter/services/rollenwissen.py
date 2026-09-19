@@ -39,12 +39,32 @@ def rolle(brawler):
 
 
 def deckt(brawler):
-    """Die Eigenschaften, die diese Rolle qualitativ adressiert - als Menge."""
-    return set(config.ROLLE_DECKT.get(rolle(brawler), ()))
+    """Die Eigenschaften, die dieser Brawler qualitativ adressiert.
+
+    Rolle UND gepflegte Faehigkeiten, als Vereinigung. Die Faehigkeiten
+    ERSETZEN die Rolle nicht - sonst konnte ein gepflegtes `wallbreak`
+    den Wert sogar senken, weil die Rolle mehr Posten beruehrt als eine
+    einzelne Faehigkeit. Eine zusaetzlich belegte Faehigkeit darf nie
+    schlechter sein als keine.
+
+    Weiterhin entsteht kein Zahlenwert: hier steht nur, WELCHE Posten er
+    beruehrt. Wie schwer die wiegen, sagt der Modus.
+    """
+    keys = set(config.ROLLE_DECKT.get(rolle(brawler), ()))
+    return keys | faehigkeiten_keys(brawler)
+
+
+def faehigkeiten_keys(brawler):
+    """Eigenschaften, die aus gepflegten Faehigkeiten belegt sind."""
+    keys = set()
+    for faehigkeit in (getattr(brawler, "draft_faehigkeiten", None) or ()):
+        keys.update(config.FAEHIGKEIT_ATTRIBUTE.get(faehigkeit, ()))
+    return keys
 
 
 def hat_fachwissen(brawler):
-    return rolle(brawler) is not None and bool(deckt(brawler))
+    """Gibt es ueberhaupt gepflegtes Fachwissen - Rolle oder Faehigkeit?"""
+    return bool(deckt(brawler))
 
 
 def anforderungsdeckung(brawler, anforderungen):
