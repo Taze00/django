@@ -2,9 +2,12 @@
 """Provider: austauschbar, ehrlich in der Quelle, und die Engine merkt nichts."""
 
 import json
+from pathlib import Path
 
+from django.conf import settings
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
+from django.urls import reverse
 
 from drafter.models import BrawlerStat, Datenquelle
 from drafter.services.draft_engine import DraftEngine
@@ -178,3 +181,37 @@ class RegistryTest(DrafterTest):
         status = DatenbankStatProvider((Datenquelle.API,)).status()
         self.assertFalse(status.verfuegbar)
         self.assertIn("api", status.grund)
+
+
+class DatenhinweisTest(DrafterTest):
+    """Der Hinweis ueber dem Draft muss sagen, womit gerechnet wird.
+
+    Bis zum 2026-09-20 stand dort ein fest verdrahteter Demo-Satz. Er
+    blieb stehen, als die Seite laengst mit gemessenen Statistiken
+    rechnete - die Seite behauptete also das Gegenteil dessen, was sie
+    tat. Ein falscher Herkunftshinweis ist schlimmer als keiner: er
+    entwertet genau die Unterscheidung, fuer die `Datenquelle` da ist.
+    """
+
+    def seite(self):
+        return self.client.get(reverse("drafter:draft")).content.decode()
+
+    def test_ohne_messung_steht_dort_demo(self):
+        self.assertEqual(hole_stat_provider().name, "demo")
+        self.assertIn("Demo-Daten", self.seite())
+
+    def test_mit_messung_steht_dort_gemessen(self):
+        BrawlerStat.objects.create(
+            brawler=self.brawler("gale"), adjusted_rate=0.55, source=Datenquelle.API,
+        )
+        self.assertNotEqual(hole_stat_provider().name, "demo")
+        seite = self.seite()
+        self.assertIn("Gemessene Statistiken", seite)
+        self.assertNotIn("<strong>Demo-Daten</strong>", seite)
+
+    def test_der_hinweis_folgt_dem_provider_nicht_der_vorlage(self):
+        """Kein Satz in der Vorlage darf die Quelle behaupten."""
+        vorlage = Path(settings.BASE_DIR) / "templates" / "drafter" / "draft.html"
+        text = vorlage.read_text(encoding="utf-8")
+        hinweis = text.split('class="hinweis-demo"')[1].split("</p>")[0]
+        self.assertIn("datenlage.gemessen", hinweis)

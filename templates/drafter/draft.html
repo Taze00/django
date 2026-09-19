@@ -19,9 +19,19 @@ Aufbau von oben nach unten, nach Benutzungshaeufigkeit sortiert:
 {% endcomment %}
 
 {% block inhalt %}
+{# Der Hinweis kommt aus dem tatsaechlich aktiven Provider (views/pages.py),
+   nicht aus dieser Datei: ein fest verdrahteter Satz ueberlebt jede
+   Umstellung und behauptet irgendwann das Gegenteil. #}
 <p class="hinweis-demo" role="status">
-  <strong>Demo-Daten</strong> — gepflegte Einschätzungen, keine gemessenen
-  Statistiken. Die Empfehlungslogik ist echt, die Zahlenbasis noch nicht.
+  {% if datenlage.gemessen %}
+    <strong>Gemessene Statistiken</strong> — {{ datenlage.partien }} ausgewertete
+    Ranked-Partien. Die Brawler<em>profile</em> (Eigenschaften, Draft-Werte) sind
+    für {{ datenlage.demo_profile }} Brawler weiterhin gepflegte Einschätzungen
+    und werden mit wachsender Messung zurückgedrängt.
+  {% else %}
+    <strong>Demo-Daten</strong> — gepflegte Einschätzungen, keine gemessenen
+    Statistiken. Die Empfehlungslogik ist echt, die Zahlenbasis noch nicht.
+  {% endif %}
 </p>
 
 <!-- ─── Aktionsleiste ──────────────────────────────────────── -->
