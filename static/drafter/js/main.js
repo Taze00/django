@@ -192,7 +192,9 @@ function verdrahte() {
     if (e.key !== 'Enter') return;
     e.preventDefault();
     const erste = $('gitter').querySelector('.kachel:not([disabled])');
-    if (erste) waehle(erste.dataset.slug);
+    if (!erste) return;
+    if (analysemodus) zeigeAnalyse(erste.dataset.slug);
+    else waehle(erste.dataset.slug);
   });
 
   $('sortierung').addEventListener('change', (e) => {
@@ -218,10 +220,15 @@ function verdrahte() {
   });
 
   // --- Gitter ---
-  $('gitter').addEventListener('click', (e) => {
+  $('gitter').addEventListener('click', async (e) => {
     const kachel = e.target.closest('[data-slug]');
-    if (kachel && !kachel.disabled) waehle(kachel.dataset.slug);
+    if (!kachel || kachel.disabled) return;
+    if (analysemodus) { await zeigeAnalyse(kachel.dataset.slug); return; }
+    waehle(kachel.dataset.slug);
   });
+
+  // --- Analysemodus ---
+  $('analysemodus').addEventListener('click', () => analyseUmschalten(!analysemodus));
 
   // --- Brett: belegter Slot = zuruecknehmen, freier Slot = dorthin zielen ---
   document.querySelector('.brett').addEventListener('click', (e) => {
@@ -351,6 +358,30 @@ function waehle(slug) {
 }
 
 // ─── Zeichnen ───────────────────────────────────────────────
+// Analysemodus: der Klick auf eine Kachel erklaert, statt zu waehlen.
+// Bewusst NICHT gespeichert - ein Modus, der einen Tag spaeter noch
+// aktiv waere, laesst den naechsten Pick ins Leere gehen.
+let analysemodus = false;
+
+function analyseUmschalten(an) {
+  analysemodus = an;
+  $('analysemodus').setAttribute('aria-pressed', an ? 'true' : 'false');
+  $('gitter').classList.toggle('ist-analyse', an);
+}
+
+/** Vollstaendige Bewertung eines beliebigen Brawlers zeigen.
+ *
+ * Dieselbe Schnittstelle wie das Fragezeichen auf einer Empfehlungskarte -
+ * nur eben fuer jeden Kandidaten, auch wenn ihn niemand vorschlaegt.
+ */
+async function zeigeAnalyse(slug) {
+  try {
+    ui.zeigeDetail(await api.detail(zustand.fuerServer(), slug));
+  } catch (fehler) {
+    ui.panelFehler(fehler.message);
+  }
+}
+
 function zeichneNurGitter() {
   ui.zeichneGitter(brawlerListe, zustand.gesperrt(), bewertungen, persoenlich,
     filter, rollenrang);

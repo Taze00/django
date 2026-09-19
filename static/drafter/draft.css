@@ -436,6 +436,17 @@ kbd {
   padding: 9px 8px; font-size: 12.5px;
   background: var(--bg-3); border: 1px solid var(--rand-hell); border-radius: 5px;
 }
+/* Analysemodus - ein Schalter, kein Fragezeichen je Kachel. Aktiv
+   faerbt er sich und das Gitter bekommt einen Fragezeichen-Cursor, damit
+   der veraenderte Klick sichtbar ist, bevor man ihn ausprobiert. */
+.analyseschalter {
+  padding: 9px 11px; font-size: 12px; color: var(--text-sehr-leise);
+  background: var(--bg-3); border: 1px solid var(--rand-hell); border-radius: 5px;
+  white-space: nowrap; transition: color .12s, border-color .12s;
+}
+.analyseschalter:hover { color: var(--text-leise); }
+.analyseschalter[aria-pressed="true"] { color: var(--akzent); border-color: var(--akzent); }
+
 /* Die Rollenknoepfe baut JavaScript aus dem Katalog. Vorher stand der
    leere Container 0px hoch neben dem Suchfeld und sprang nach dem Laden
    in eine eigene Zeile - also gleich von Anfang an eigene Zeile und eine
@@ -507,6 +518,10 @@ kbd {
 .gitter.ist-banmodus .kachel.ist-empfohlen { border-color: rgba(154, 163, 176, .55); }
 .gitter.ist-banmodus .kachel.ist-bester { border-color: var(--ban-hell); }
 .gitter.ist-banmodus .kachel-rang { background: var(--ban-hell); color: #14161a; }
+
+/* Im Analysemodus erklaert der Klick, statt zu waehlen. */
+.gitter.ist-analyse .kachel { cursor: help; }
+.gitter.ist-analyse .kachel:hover:not(.ist-gesperrt) { border-color: var(--akzent); }
 
 /* Limited Data: kein gepflegtes Profil, keine Bewertung. Das Portrait
    bleibt voll sichtbar - erkennen und waehlen muss man sie genauso

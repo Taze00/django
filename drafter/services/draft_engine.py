@@ -31,6 +31,13 @@ from drafter.services.daten import Datenraum
 from drafter.services.scoring import Empfehlung, Komponente
 from drafter.services.team_coverage import Teamanalyse, anforderungen_mit_gegner
 
+# "Alle" statt einer Zahl: die Vorschlagsliste schneidet nach
+# EMPFEHLUNGEN_ANZAHL ab, die Einzelanalyse darf das nicht - sonst haette
+# ein Brawler auf Platz 90 keinen Rang. Der Katalog hat gut 100 aktive
+# Eintraege; die Grenze ist eine Sicherung gegen Endlosarbeit, keine
+# fachliche Aussage.
+ALLE_KANDIDATEN = 10_000
+
 
 class DraftEngine:
     """Bewertet einen Draftzustand."""
@@ -286,14 +293,21 @@ class DraftEngine:
         # ohne sie bleibt es exakt die regelbasierte Empfehlung.
         empfehlung.build = builds.empfehlung(b, self.ctx, self.katalog, raum=self.raum)
 
-    def detail(self, brawler):
-        """Vollstaendige Bewertung eines einzelnen Brawlers.
+    def analyse(self, brawler):
+        """Bewertung EINES Brawlers samt seinem Rang im ganzen Feld.
 
-        Fuer den Klick auf eine Karte: derselbe Rechenweg, aber mit
-        Coach-Texten und Build, auch wenn er nicht unter den ersten drei
-        steht.
+        Gibt `(empfehlung, rang, anzahl_kandidaten)` zurueck; rang ist
+        1-basiert, `(None, None, anzahl)` wenn der Brawler nicht bewertbar
+        ist (Datenstufe "katalog") oder gesperrt.
+
+        **Hier wird nichts zusaetzlich gerechnet.** Es ist derselbe Lauf
+        wie fuer die Vorschlagsliste, nur ohne Abschneiden nach den
+        ersten Plaetzen - der Rang faellt dabei als Listenindex ab. Genau
+        deshalb kann die Analyse nicht von der Empfehlung abweichen: es
+        gibt keinen zweiten Rechenweg, von dem sie abweichen koennte.
         """
-        for empfehlung in self.empfehlungen(anzahl=200, mit_details=0):
+        liste = self.empfehlungen(anzahl=ALLE_KANDIDATEN, mit_details=0)
+        for rang, empfehlung in enumerate(liste, 1):
             if empfehlung.brawler.id == brawler.id:
                 self._details_ergaenzen(empfehlung)
                 nachher = self.ctx.mit_pick(brawler, "own")
@@ -302,8 +316,18 @@ class DraftEngine:
                     Teamanalyse.bauen(list(nachher.own_picks), self.bedarfsanforderungen),
                     self.gegner_analyse,
                 )
-                return empfehlung
-        return None
+                return empfehlung, rang, len(liste)
+        return None, None, len(liste)
+
+    def detail(self, brawler):
+        """Vollstaendige Bewertung eines einzelnen Brawlers.
+
+        Fuer den Klick auf eine Karte: derselbe Rechenweg, aber mit
+        Coach-Texten und Build, auch wenn er nicht unter den ersten drei
+        steht.
+        """
+        empfehlung, _, _ = self.analyse(brawler)
+        return empfehlung
 
     # --- Gesamtbild -----------------------------------------------------
     def siegchance(self):

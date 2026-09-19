@@ -1015,6 +1015,57 @@ Pick- und Winrate, Confidence, Counter, Synergien — und für jede Map die Top 
 der Engine einmal mit Demo- und einmal mit gemessenen Daten. Erst wenn die
 Stichproben tragen, lohnt die Freigabe.
 
+## 19b. Einzelanalyse: jeden Kandidaten aufklappen
+
+Die Vorschlagsliste zeigt acht Namen. Für die Fehlersuche und den
+Praxistest ist aber oft der interessant, der **nicht** darin steht:
+*Warum steht EDGAR hier auf Platz 34?*
+
+Dafür gibt es die Einzelanalyse — in der Oberfläche über den Schalter
+**Analyse** neben der Sortierung (ein Klick auf eine Kachel erklärt dann,
+statt zu wählen), auf dem Terminal über:
+
+```
+python manage.py drafter_analyse --map belles-rock \
+    --eigene gus,gray --gegner belle,sandy,mortis --brawler edgar
+```
+
+Beides liefert dieselbe Antwort wie `/draft/api/detail/`: Rang im ganzen
+Feld, Score, alle Komponenten mit Wert, Gewicht, Beitrag und Quelle, die
+fünf Größen der `erklaerung`, Datenabdeckung, Confidence — und die
+Counter- und Synergiewerte **einzeln gegen jeden Gegner und jeden
+Mitspieler**. Die Komponente mittelt diese Paare; ohne sie sieht man
+„Counter −0,1" und weiß nicht, ob das drei laue Matchups sind oder zwei
+gute und ein katastrophales.
+
+**Es ist kein zweiter Rechenweg.** `DraftEngine.analyse()` ist derselbe
+Lauf wie für die Vorschlagsliste, nur ohne Abschneiden nach den ersten
+Plätzen — der Rang fällt als Listenindex ab. Die Paarwerte kommen aus
+`counters.vorteil()` und `synergies.paar()`, also aus genau den
+Funktionen, aus denen die Komponenten ihren Mittelwert bilden. Deshalb
+*kann* die Analyse nicht von der Empfehlung abweichen; `services/analyse.py`
+rechnet nichts Eigenes. `drafter/tests/test_analyse.py` hält beide Wege
+Komponente für Komponente gegeneinander.
+
+**Sie wirkt nicht zurück.** Kein Score, keine Reihenfolge, keine
+Komponente ändert sich dadurch, dass jemand hinsieht.
+
+Zwei Dinge, die dabei aufgefallen sind und mitrepariert wurden:
+
+* Der Detail-Endpunkt verlangte `is_active=True`. Katalogeinträge ohne
+  gepflegtes Profil sind aber `is_active=False`, stehen trotzdem im
+  Gitter und werden seit den Datenstufen (§13) bewertet, sobald
+  Messwerte vorliegen — ausgerechnet der Fall, für den die Analyse
+  gemacht ist, ließ sich also nicht aufklappen. Die Suche ist jetzt
+  dieselbe wie im Katalog-Endpunkt.
+* In der Oberfläche steht **ein** Schalter statt eines Fragezeichens auf
+  jeder der gut hundert Kacheln: das hätte die Tabreihenfolge verdoppelt
+  und jede Kachel zugestellt. Der Modus wird bewusst nicht gespeichert —
+  ein Analysemodus, der einen Tag später noch aktiv wäre, ließe den
+  nächsten Pick ins Leere gehen.
+
+---
+
 ## 20. Offene Datenfragen
 
 Bewusst **nicht** beantwortet, weil sie nur echte Antworten beantworten können:

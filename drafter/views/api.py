@@ -24,7 +24,7 @@ from drafter.models import Brawler, BrawlMap, GameMode
 from drafter.services.anfrage import context_aus_daten
 from drafter.services.context import DraftFehler
 from drafter.services.draft_engine import DraftEngine
-from drafter.services import personal
+from drafter.services import analyse, personal
 
 
 def _rumpf(request):
@@ -164,7 +164,15 @@ def detail(request):
         slug = daten.get("brawler")
         if not isinstance(slug, str):
             raise DraftFehler("'brawler' fehlt")
-        brawler = Brawler.objects.filter(slug=slug, is_active=True).first()
+        # Dieselbe Menge wie im Katalog, nicht nur die aktiven: ein
+        # Katalogeintrag ohne gepflegtes Profil steht im Gitter und wird
+        # von der Engine seit den Datenstufen (2026-09-18) auch bewertet,
+        # sobald Messwerte vorliegen. Waere hier weiter `is_active=True`
+        # gefordert, liesse sich ausgerechnet der Fall nicht aufklaeren,
+        # fuer den die Analyse gemacht ist - ein Brawler weit unten.
+        brawler = Brawler.objects.filter(
+            Q(is_active=True) | Q(external_id__isnull=False)
+        ).filter(slug=slug).first()
         if brawler is None:
             raise DraftFehler(f"Unbekannter Brawler '{slug}'")
 
@@ -172,10 +180,14 @@ def detail(request):
         if brawler.id in ctx.gesperrte_ids:
             raise DraftFehler(f"{brawler.name} ist bereits gepickt oder gebannt")
 
-        empfehlung = DraftEngine(ctx).detail(brawler)
+        engine = DraftEngine(ctx)
+        empfehlung, rang, anzahl = engine.analyse(brawler)
         if empfehlung is None:
             raise DraftFehler("Keine Bewertung möglich")
-        return JsonResponse(empfehlung.als_dict(ausfuehrlich=True))
+        # Rang, Feldgroesse und die Paarbeitraege kommen dazu - sie
+        # stammen aus demselben Lauf und kosten nichts extra. Fuer einen
+        # Brawler weit unten sind sie das eigentlich Interessante.
+        return JsonResponse(analyse.als_dict(empfehlung, rang, anzahl, ctx, engine.raum))
     except DraftFehler as fehler:
         return _fehler(fehler)
 

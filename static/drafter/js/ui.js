@@ -389,6 +389,51 @@ function aufschluesselung(komponenten) {
   return kasten;
 }
 
+/**
+ * Counter- oder Synergiewerte Paar fuer Paar.
+ *
+ * Gleiche Darstellung wie die Aufschluesselung, damit beide Tabellen
+ * ohne Umgewoehnung zu lesen sind: Name und Quelle links, Balken in der
+ * Mitte, der Wert rechts. Ein Paar ohne Datenlage steht ausdruecklich
+ * als unbekannt drin - es fehlt nicht.
+ */
+function paartabelle(zeilen) {
+  const kasten = el('div', 'komponenten');
+  const groesster = Math.max(...zeilen.map((z) => Math.abs(z.punkte)), 1);
+
+  zeilen.forEach((z) => {
+    const zeile = el('div', 'komponente');
+    if (!z.bekannt) {
+      zeile.classList.add('ist-ohne-wirkung', 'ist-unbekannt');
+      zeile.appendChild(el('span', 'komponente-label', z.name));
+      zeile.appendChild(el('span', 'komponente-unbekannt', 'nichts bekannt - zählt nicht mit'));
+      kasten.appendChild(zeile);
+      return;
+    }
+    if (Math.abs(z.punkte) < 0.05) zeile.classList.add('ist-ohne-wirkung');
+
+    const quelle = z.heuristisch ? `${z.quelle} (Heuristik)` : z.quelle;
+    const label = el('span', 'komponente-label', `${z.name} · ${quelle}`);
+    if (z.grund) label.title = z.grund;
+    zeile.appendChild(label);
+
+    const balken = el('div', 'komponente-balken');
+    const fuellung = el('div', `komponente-fuellung ${z.punkte >= 0 ? 'ist-plus' : 'ist-minus'}`);
+    fuellung.style.width = `${(Math.abs(z.punkte) / groesster) * 50}%`;
+    balken.appendChild(fuellung);
+    zeile.appendChild(balken);
+
+    zeile.appendChild(el('span', 'komponente-roh', `Sicherheit ${z.sicherheit.toFixed(2)}`));
+    // Drei Stellen, nicht zwei wie bei den Komponenten: gemessene
+    // Paarwerte liegen oft bei wenigen Tausendsteln, und "+0.00" neben
+    // einem sichtbaren Balken sieht aus wie ein Fehler.
+    zeile.appendChild(el('span', 'komponente-wert',
+      `${z.wert > 0 ? '+' : ''}${z.wert.toFixed(3)}`));
+    kasten.appendChild(zeile);
+  });
+  return kasten;
+}
+
 // ─── Empfehlungspanel ───────────────────────────────────────
 /**
  * Zeigt an, dass eine Antwort unterwegs ist - **ohne** die alte zu
@@ -935,8 +980,11 @@ export function zeigeDetail(e) {
   const inhalt = $('modal-inhalt');
   inhalt.replaceChildren();
 
+  // Der Rang steht vorn: bei einem Brawler, den niemand vorschlaegt, ist
+  // er die erste Frage ("wo steht er ueberhaupt?").
+  const rangtext = e.rang ? `Rang ${e.rang} von ${e.kandidaten} · ` : '';
   inhalt.appendChild(detailKopf(e,
-    `${e.rolle} · Score ${e.score}/100 · ~${e.win_probability}% Siegchance · `
+    `${rangtext}${e.rolle} · Score ${e.score}/100 · ~${e.win_probability}% Siegchance · `
     + `Confidence: ${e.confidence_label} · `
     + `Datenabdeckung ${e.datenabdeckung} % · ${e.datenabdeckung_label}`));
 
@@ -953,6 +1001,21 @@ export function zeigeDetail(e) {
     inhalt.appendChild(el('p', 'komponenten-fuss',
       `Beitrag = Wert × Gewicht. Summe ${(e.score - 50) > 0 ? '+' : ''}`
       + `${e.score - 50} auf den Anker 50 ergibt Score ${e.score}.`));
+  }
+
+  const m = e.matchups;
+  if (m && (m.counter.length || m.synergie.length)) {
+    // Die Komponente mittelt diese Werte - hier stehen sie einzeln.
+    // Ohne sie sieht man "Counter -0,1" und weiss nicht, ob das drei
+    // laue Matchups sind oder zwei gute und ein katastrophales.
+    if (m.counter.length) {
+      inhalt.appendChild(el('h3', null, 'Counter gegen jeden Gegner'));
+      inhalt.appendChild(paartabelle(m.counter));
+    }
+    if (m.synergie.length) {
+      inhalt.appendChild(el('h3', null, 'Synergie mit jedem Mitspieler'));
+      inhalt.appendChild(paartabelle(m.synergie));
+    }
   }
 
   if (e.bevorzugtes_matchup || e.zu_vermeidendes_matchup) {
