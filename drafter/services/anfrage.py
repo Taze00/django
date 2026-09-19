@@ -57,7 +57,7 @@ def context_aus_daten(daten, request=None):
     karte = None
     modus = None
     if map_slug:
-        karte = BrawlMap.objects.filter(slug=map_slug, is_active=True).select_related(
+        karte = BrawlMap.objects.waehlbare().filter(slug=map_slug).select_related(
             "game_mode"
         ).first()
         if karte is None:

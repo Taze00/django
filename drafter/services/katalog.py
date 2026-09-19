@@ -276,17 +276,22 @@ class KatalogErgaenzer:
         )
         if karte is not None:
             if karte.external_id:
+                # Gleicher Name, andere ID: zwei verschiedene Maps. Die ID
+                # ist die Identitaet, also wird die zweite angelegt statt
+                # verworfen - gemeldet wird es trotzdem, weil ein doppelter
+                # Name im Katalog sonst niemandem auffaellt.
                 bericht.id_widersprueche.append(
-                    f"Map '{record.map}' (ID {ext}): Katalog '{karte.name}' "
-                    f"trägt schon ID {karte.external_id}"
+                    f"Map '{record.map}' (ID {ext}): '{karte.name}' trägt schon "
+                    f"ID {karte.external_id} - zweite Map gleichen Namens angelegt"
                 )
+                karte = None
+            else:
+                karte.external_id = ext
+                karte.save(update_fields=["external_id", "updated_at"])
+                self._maps_ext[ext] = karte
+                bericht.katalog_verknuepft.append(
+                    f"Map {karte.name} ({modus.name}) → {ext}")
                 return
-            karte.external_id = ext
-            karte.save(update_fields=["external_id", "updated_at"])
-            self._maps_ext[ext] = karte
-            bericht.katalog_verknuepft.append(f"Map {karte.name} ({modus.name}) → {ext}")
-            return
-
         karte = _anlegen(
             BrawlMap, ext, bericht,
             name=record.map[:80], slug=freier_slug(BrawlMap, schluessel, modus.slug),

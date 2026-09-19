@@ -181,6 +181,10 @@ class DraftEngine:
         bedarf_komp = team_need.komponenten_fuer_pool(
             kandidaten, self.eigene_analyse, self.ctx
         )
+        position_komp = draft_position.komponenten_fuer_pool(
+            kandidaten, self.ctx, self.raum)
+        flex_komp = draft_position.flexibilitaet_fuer_pool(
+            kandidaten, self.ctx, self.raum)
 
         ergebnisse = []
         for kandidat in kandidaten:
@@ -190,8 +194,8 @@ class DraftEngine:
                 config.K_TEAM_NEED: bedarf_komp[kandidat.id],
                 config.K_COUNTER: counters.komponente(kandidat, self.ctx, self.raum),
                 config.K_SYNERGY: synergies.komponente(kandidat, self.ctx, self.raum),
-                config.K_DRAFT_POSITION: draft_position.komponente(kandidat, self.ctx),
-                config.K_FLEXIBILITY: draft_position.flexibilitaet(kandidat, self.ctx),
+                config.K_DRAFT_POSITION: position_komp[kandidat.id],
+                config.K_FLEXIBILITY: flex_komp[kandidat.id],
                 config.K_PERSONAL: personal.komponente(kandidat, self.ctx),
                 config.K_REDUNDANCY: team_need.redundanz(
                     kandidat, self.eigene_analyse, self.ctx

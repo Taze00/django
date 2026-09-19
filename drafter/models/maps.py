@@ -9,9 +9,12 @@ steht.
 """
 
 from django.core.exceptions import ValidationError
+from datetime import timedelta
+
 from django.db import models
 
 from drafter import attributes as attr
+from drafter import config
 from drafter.models.base import BildUrlFeld, Datenquelle, Zeitstempel
 
 
@@ -63,6 +66,23 @@ class GameMode(Zeitstempel):
             raise ValidationError(fehler)
 
 
+class BrawlMapQuerySet(models.QuerySet):
+    def waehlbare(self):
+        """Gepflegte ODER aktuell in Ranked beobachtete Maps.
+
+        Eine Abfrage statt einer Schleife ueber `waehlbar`, damit Views
+        und Kommandos dieselbe Menge bekommen - die Definition steht nur
+        hier. Siehe config.RANKED_MAP_FENSTER_TAGE.
+        """
+        from django.utils import timezone
+        grenze = timezone.now() - timedelta(days=config.RANKED_MAP_FENSTER_TAGE)
+        return self.filter(
+            models.Q(is_active=True)
+            | (models.Q(last_seen_ranked__gte=grenze)
+               & models.Q(observed_ranked_games__gte=config.RANKED_MAP_MIN_PARTIEN))
+        )
+
+
 class BrawlMap(Zeitstempel):
     """Eine Map.
 
@@ -106,11 +126,35 @@ class BrawlMap(Zeitstempel):
     source = models.CharField(
         max_length=20, choices=Datenquelle.choices, default=Datenquelle.DEMO
     )
+    # Von Hand freigeschaltet. Bleibt bestehen - eine Map, die jemand
+    # bewusst gepflegt hat, verschwindet nicht, weil die Rotation sie
+    # gerade nicht spielt.
     is_active = models.BooleanField(default=True)
+
+    objects = BrawlMapQuerySet.as_manager()
+
+    # Beobachtung statt Pflege: was in gezaehlten soloRanked-Partien
+    # tatsaechlich vorkam. Wird aus den importierten Partien gerechnet
+    # (`aktualisiere_ranked_maps`), nie von Hand gesetzt.
+    #
+    # Warum das ueberhaupt noetig ist: am 2026-09-19 lagen 10 188 gezaehlte
+    # Partien auf 30 Maps - der Drafter bot 8 an, aus dem Demo-Seed, und
+    # nur 1 966 Partien (20 %) lagen darauf. Bounty und Hot Zone hatten
+    # keine einzige anwaehlbare Map, obwohl Hot Zone mit 2 240 Partien der
+    # meistgespielte Modus ist.
+    observed_ranked_games = models.PositiveIntegerField(default=0)
+    last_seen_ranked = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         ordering = ["game_mode__order", "name"]
-        unique_together = [("name", "game_mode")]
+        # KEINE Eindeutigkeit ueber den Namen: Supercell vergibt denselben
+        # Mapnamen mehrfach mit verschiedenen IDs (beobachtet bei
+        # 'Siberian Stand Off', 'Stockpile Stadium', 'Insane Streamer').
+        # Bis zum 2026-09-19 stand hier unique_together("name",
+        # "game_mode") - die zweite Map liess sich dadurch nicht anlegen,
+        # der Import meldete einen Widerspruch und verwarf sie. Zusammen-
+        # gefuehrt wurden sie nie, aber verloren gingen sie eben doch.
+        # Eindeutig ist `external_id`; der Name ist eine Beschriftung.
         verbose_name = "Map"
         verbose_name_plural = "Maps"
 
@@ -133,6 +177,28 @@ class BrawlMap(Zeitstempel):
         werte = dict(self.game_mode.base_requirements or {})
         werte.update(self.requirements or {})
         return werte
+
+    @property
+    def ranked_aktuell(self):
+        """Kam diese Map zuletzt in gezaehlten Ranked-Partien vor?
+
+        Die Identitaet ist die `external_id`, nie der Name: zwei Maps
+        koennen gleich heissen und verschiedene IDs tragen (beobachtet bei
+        'Siberian Stand Off' und 'Stockpile Stadium'). Sie bleiben zwei
+        Maps, auch wenn eine Zusammenfuehrung bequemer waere.
+        """
+        if self.last_seen_ranked is None:
+            return False
+        if self.observed_ranked_games < config.RANKED_MAP_MIN_PARTIEN:
+            return False
+        from django.utils import timezone
+        alter = timezone.now() - self.last_seen_ranked
+        return alter.days <= config.RANKED_MAP_FENSTER_TAGE
+
+    @property
+    def waehlbar(self):
+        """Darf der Drafter sie anbieten? Gepflegt ODER aktuell beobachtet."""
+        return bool(self.is_active or self.ranked_aktuell)
 
     def anforderungs_vektor(self):
         """Anforderungen als {key: 0-1} ueber das volle Vokabular."""

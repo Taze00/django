@@ -100,6 +100,10 @@ class Command(BaseCommand):
                     "win_condition": eintrag.get("win_condition", ""),
                     "base_requirements": eintrag["base_requirements"],
                     "order": eintrag.get("order", 0),
+                    # Ein Modus mit gepflegtem Zielprofil ist draftbar.
+                    # Hot Zone stand bis 2026-09-19 auf inaktiv, obwohl er
+                    # der meistgespielte war - er hatte nur kein Profil.
+                    "is_active": True,
                 },
             )
             modi[eintrag["slug"]] = modus

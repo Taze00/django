@@ -126,11 +126,17 @@ class KatalogErgaenzenTest(FixtureMixin, DrafterTest):
         self.assertEqual(GameMode.objects.filter(slug="brawl-ball").count(), 1)
 
     def test_neue_modi_und_maps_sind_inaktiv_und_ohne_anforderungen(self):
+        """Was neu aus der API kommt, behauptet nichts.
+
+        Frueher stand hier, der Battlelog MUESSE Modi ausserhalb des
+        Katalogs enthalten. Das war eine Aussage ueber die Testdatei, nicht
+        ueber das Verhalten - seit Hot Zone gepflegt ist (2026-09-19), kann
+        sie auch leer ausfallen. Geprueft wird jetzt die Regel selbst.
+        """
         self.importiere(katalog_ergaenzen=True)
-        neue_modi = GameMode.objects.exclude(external_id=None).filter(is_active=False)
-        self.assertTrue(neue_modi.exists(), "Der Battlelog enthält Modi ausserhalb des Demo-Katalogs")
-        for modus in neue_modi:
-            self.assertEqual(modus.base_requirements, {})
+        for modus in GameMode.objects.exclude(external_id=None).filter(is_active=False):
+            self.assertEqual(modus.base_requirements, {},
+                             f"{modus.slug}: inaktiv, also ohne Anforderungen")
         for karte in BrawlMap.objects.filter(source=Datenquelle.API):
             self.assertFalse(karte.is_active)
             self.assertEqual(karte.requirements, {})

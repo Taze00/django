@@ -11,15 +11,17 @@ Platz 1 mit +17 Map-Fit-Punkten aus seinem gepflegten Profil - waehrend
 624 Heist-Partien 43,3 %. Ein Profil behauptete einen Modus-Fit, den
 hunderte Partien widerlegten, und nichts im Modell konnte widersprechen.
 
-**Quellenprioritaet, streng von oben nach unten:**
+**Quellen, stetig gestaffelt statt hart priorisiert:**
 
-    1. gemessene Modus-Eignung      (Belege)
-    2. gepflegte Faehigkeiten       (Fachquelle, qualitativ)
-    3. Draft-Rolle                  (Fachquelle, noch groeber)
-    4. Unknown                      (nicht verfuegbar)
+    Messung (Modus-Eignung)  mit Gewicht  w = n / (n + K)
+    Fachwissen (Rolle, Faehigkeiten)  mit  (1 - w) * Daempfung
+    keines von beidem                     ->  Unknown, neutral
 
-Eine Stufe wird nur benutzt, wenn die darueber nichts liefert. Gemessene
-Evidenz schlaegt gepflegtes Wissen - das ist der ganze Punkt.
+Die harte Prioritaet von vorher hatte eine Kante: die qualitative
+Obergrenze war groesser als fast jedes gemessene Signal, und MR. P stand
+auf Gem Grab mit NULL Modus-Partien vor AMBER mit 313. Jetzt zieht sich
+das Fachwissen mit wachsender Stichprobe von selbst zurueck, ohne
+Schwellenwert. Zahlen und Begruendung: config.OBJECTIVE_EVIDENZ_K.
 
 **Stufe 1: die Modus-Eignung ist eine DIFFERENZ.**
 
@@ -75,6 +77,10 @@ class Auskunft:
     global_rate: float = None
     modus_spiele: int = 0
     faehigkeiten: tuple = ()
+    # Anteil, mit dem die Messung in den Wert eingeht (0-1). Der Rest ist
+    # gedaempftes Fachwissen - siehe config.OBJECTIVE_EVIDENZ_K.
+    mess_anteil: float = 0.0
+    qualitativ: float = None
     text: str = ""
 
     def als_dict(self):
@@ -88,6 +94,9 @@ class Auskunft:
             "global_rate": round(self.global_rate, 4) if self.global_rate else None,
             "modus_spiele": self.modus_spiele,
             "faehigkeiten": list(self.faehigkeiten),
+            "mess_anteil": round(self.mess_anteil, 3),
+            "qualitativ": (round(self.qualitativ, 3)
+                           if self.qualitativ is not None else None),
             "text": self.text,
         }
 
@@ -190,10 +199,10 @@ def fuer_pool(kandidaten, raum, anforderungen, patch=None):
     # Die qualitativen Stufen zuerst sammeln: sie werden im Feld ihrer
     # eigenen Gruppe zentriert, nicht an einer festen Marke. Sonst haengt
     # ihr Vorzeichen daran, wie viele Posten ein Modus zufaellig auflistet.
+    # Das Fachwissen wird fuer ALLE gerechnet, nicht nur fuer die ohne
+    # Messung: es ist der Prior, zu dem eine duenne Messung zurueckfaellt.
     roh_qualitativ, faehigkeiten_je_id = {}, {}
     for b in kandidaten:
-        if b.id in messungen:
-            continue
         anteil, faehigkeiten = _qualitativ(b, anforderungen)
         if anteil is not None:
             roh_qualitativ[b.id] = anteil
@@ -203,30 +212,48 @@ def fuer_pool(kandidaten, raum, anforderungen, patch=None):
     ergebnis = {}
     for b in kandidaten:
         m = messungen.get(b.id)
+        qual = z_qualitativ.get(b.id)
+        if m is None and qual is None:
+            ergebnis[b.id] = Auskunft()
+            continue
+
         if m is not None:
             nenner = config.STAERKE_FELD_K * (streuung ** 2 + m["sd"] ** 2) ** 0.5
-            wert = klemme(m["differenz"] / nenner) if nenner > 0 else 0.0
-            richtung = "besser" if wert >= 0 else "schlechter"
-            ergebnis[b.id] = Auskunft(
-                wert=wert, quelle=MESSUNG, verfuegbar=True,
-                differenz=m["differenz"], modus_rate=m["modus_rate"],
-                global_rate=m["global_rate"], modus_spiele=m["spiele"],
-                text=(f"läuft in diesem Modus {richtung} als sonst "
-                      f"({m['modus_rate']:.0%} gegen {m['global_rate']:.0%} "
-                      f"insgesamt, {m['spiele']} Partien)"),
-            )
-        elif b.id in z_qualitativ:
-            faehigkeiten = faehigkeiten_je_id.get(b.id, ())
+            mess_wert = klemme(m["differenz"] / nenner) if nenner > 0 else 0.0
+            w = m["spiele"] / (m["spiele"] + config.OBJECTIVE_EVIDENZ_K)
+        else:
+            mess_wert, w = 0.0, 0.0
+
+        qual_anteil = (1.0 - w) * config.OBJECTIVE_FACHWISSEN_DAEMPFUNG
+        wert = klemme(w * mess_wert + qual_anteil * (qual or 0.0))
+
+        faehigkeiten = faehigkeiten_je_id.get(b.id, ())
+        if m is not None and w >= 0.5:
+            quelle = MESSUNG
+            richtung = "besser" if m["differenz"] >= 0 else "schlechter"
+            text = (f"läuft in diesem Modus {richtung} als sonst "
+                    f"({m['modus_rate']:.0%} gegen {m['global_rate']:.0%} insgesamt, "
+                    f"{m['spiele']} Partien)")
+        elif m is not None:
+            quelle = quellen.schwaechste([MESSUNG, quellen.FACHWISSEN])
+            text = (f"{m['spiele']} Partien in diesem Modus - zu wenig für eine "
+                    f"eigene Aussage, mit dem Fachwissen gemischt")
+        else:
+            quelle = quellen.FACHWISSEN
             text = (f"{b.draft_rolle_label} berührt das Ziel dieses Modus"
                     if b.draft_rolle_label else "gepflegtes Fachwissen zum Ziel")
             if faehigkeiten:
                 text += f"; gepflegt: {', '.join(faehigkeiten)}"
-            ergebnis[b.id] = Auskunft(
-                wert=z_qualitativ[b.id], quelle=quellen.FACHWISSEN, verfuegbar=True,
-                faehigkeiten=faehigkeiten, text=text,
-            )
-        else:
-            ergebnis[b.id] = Auskunft()
+
+        ergebnis[b.id] = Auskunft(
+            wert=wert, quelle=quelle, verfuegbar=True,
+            differenz=m["differenz"] if m else None,
+            modus_rate=m["modus_rate"] if m else None,
+            global_rate=m["global_rate"] if m else None,
+            modus_spiele=m["spiele"] if m else 0,
+            faehigkeiten=faehigkeiten, mess_anteil=w, qualitativ=qual,
+            text=text,
+        )
     return ergebnis
 
 

@@ -73,6 +73,10 @@ def katalog(request):
             Q(is_active=True) | Q(external_id__isnull=False)
         ).order_by("name")
     ]
+    # Nur Modi, die auch eine waehlbare Map haben. Ein Modus ohne Map ist
+    # ein Knopf, der ins Leere fuehrt - das kann passieren, wenn eine
+    # Rotation laenger als RANKED_MAP_FENSTER_TAGE aussetzt und niemand
+    # eine Map von Hand gepflegt hat.
     modi = [
         {
             "slug": m.slug,
@@ -81,10 +85,13 @@ def katalog(request):
             "maps": [
                 {"slug": k.slug, "name": k.name, "notiz": k.notes,
                  "image_url": k.image_url}
-                for k in m.maps.filter(is_active=True)
+                # Gepflegt ODER aktuell in Ranked beobachtet - siehe
+                # BrawlMapQuerySet.waehlbare().
+                for k in m.maps.waehlbare().order_by("-observed_ranked_games", "name")
             ],
         }
         for m in GameMode.objects.filter(is_active=True).prefetch_related("maps")
+        if m.maps.waehlbare().exists()
     ]
     return JsonResponse({
         "brawler": brawler,

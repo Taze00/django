@@ -682,6 +682,61 @@ WANDABHAENGIGKEIT_ATTRIBUTE = {
 # (CONFIDENCE_VOLL_AB, CONFIDENCE_STUFEN) bleiben davon unberuehrt.
 
 # Zielstichprobe je Einheit - vorlaeufig, nur fuer die Priorisierung.
+# Wie sich Messung und Fachwissen im OBJECTIVE FIT mischen
+# (services/objective.py).
+#
+# Bis zum 2026-09-19 galt eine harte Prioritaet: gibt es eine Messung,
+# zaehlt nur sie; sonst nur das Fachwissen. Das hatte eine unangenehme
+# Folge - die qualitative Obergrenze (+-0.5 -> +-4.25 Punkte) war GROESSER
+# als fast jedes gemessene Signal. MR. P stand auf Gem Grab mit null
+# Modus-Partien auf Rang 5 (+4.2), waehrend AMBER mit 313 gemessenen
+# Partien -1.2 bekam. "Keine Daten" schlug "gemessen".
+#
+# Jetzt mischt es stetig mit der Stichprobe:
+#
+#     w    = n / (n + K)
+#     wert = w * Messung + (1 - w) * Daempfung * Fachwissen
+#
+# K = 120 ist dieselbe Groessenordnung wie der Prior der Staerke: bei 20
+# Partien traegt die Messung 14 %, bei 200 63 %, bei 1000 89 %. Eine
+# harte Mindestzahl braucht es nicht - das Fachwissen zieht sich von
+# selbst zurueck. Die Daempfung haelt die rein qualitative Aussage
+# bewusst konservativ: ohne jede Partie sind hoechstens +-2.1 Punkte
+# erreichbar statt +-4.25.
+#
+# Die Messung selbst ist zusaetzlich schon in sich geschrumpft (die
+# Differenz laeuft bei kleiner Stichprobe gegen null) - beides zusammen
+# ergibt genau die gewuenschte Staffelung.
+OBJECTIVE_EVIDENZ_K = 120
+OBJECTIVE_FACHWISSEN_DAEMPFUNG = 0.5
+
+# Gemessene Ableitung fuer Draft-Position und Flexibilitaet
+# (services/draft_position.py). Beides sind Rauschgrenzen, keine
+# Qualitaetsaussagen: unterhalb davon gibt es keine Auskunft statt einer
+# geratenen. Der Betrag selbst kommt aus der Streuung, nicht aus einer
+# Schwelle.
+DRAFTLAGE_MIN_PAARE = 8            # gemessene Matchups fuer eine Streuungsaussage
+DRAFTLAGE_MIN_MODUS_PARTIEN = 30   # je Modus, damit eine Modus-Rate zaehlt
+
+
+# =========================================================================
+# Welche Maps der Drafter anbietet
+# =========================================================================
+# Nicht mehr allein die von Hand freigeschalteten: am 2026-09-19 lagen
+# 10 188 gezaehlte Ranked-Partien auf 30 Maps, angeboten wurden 8 aus dem
+# Demo-Seed - 20 % Deckung, bei Bounty und Hot Zone null. Eine Map, die in
+# aktuellen Ranked-Partien vorkommt, ist Teil der Rotation, ob jemand sie
+# gepflegt hat oder nicht.
+#
+# `is_active` bleibt daneben bestehen und wird nie automatisch geloescht:
+# gepflegte Maps sollen nicht verschwinden, nur weil die Rotation sie
+# gerade aussetzt. Historie bleibt vollstaendig erhalten.
+RANKED_MAP_FENSTER_TAGE = 14
+# Rauschgrenze, keine Qualitaetsaussage: eine einzelne falsch zugeordnete
+# Partie soll keine Map in die Auswahl heben. Alle 30 beobachteten Maps
+# liegen deutlich darueber (kleinste: 44 Partien).
+RANKED_MAP_MIN_PARTIEN = 10
+
 # Ab wann gilt ein Brawler dem COLLECTOR als datenarm? Das ist eine
 # Reihenfolge fuer Abfragen, keine Aussage ueber seine Bewertung - hier
 # darf eine runde Zahl stehen, weil sie nur bestimmt, wen wir als

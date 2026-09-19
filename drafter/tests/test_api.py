@@ -19,8 +19,17 @@ class ApiTest(DrafterTest):
     # --- Katalog --------------------------------------------------------
     def test_katalog_liefert_alles_fuer_die_oberflaeche(self):
         daten = self.client.get(reverse("drafter:api_katalog")).json()
+        from drafter.models import GameMode
         self.assertEqual(len(daten["brawler"]), 20)
-        self.assertEqual(len(daten["modi"]), 5)
+        # So viele Modi, wie ein Zielprofil UND eine wählbare Map haben -
+        # keine feste Zahl. Hot Zone kam am 2026-09-19 als Modus dazu,
+        # seine Maps stammen aber aus der Beobachtung und fehlen im
+        # reinen Demo-Datensatz; angeboten wird er dann nicht.
+        erwartet = sum(1 for m in GameMode.objects.filter(is_active=True)
+                       if m.maps.waehlbare().exists())
+        self.assertEqual(len(daten["modi"]), erwartet)
+        self.assertTrue(all(m["maps"] for m in daten["modi"]),
+                        "jeder angebotene Modus braucht eine wählbare Map")
         self.assertFalse(daten["angemeldet"])
         self.assertTrue(all("initialen" in b for b in daten["brawler"]))
 

@@ -97,6 +97,9 @@ class Datenraum:
         # aufeinander (grob ist Prior fuer fein) und braucht sie deshalb
         # alle drei.
         self._ebenen = {}     # brawler_id -> {"global"|"modus"|"map": StatRecord}
+        # Modus-Zeilen ueber ALLE Modi - nur fuer die Flexibilitaet, die
+        # gerade den Vergleich zwischen Modi braucht. Lazy, siehe unten.
+        self._modus_zeilen = None
         # Gepflegte Werte (demo/manual) GETRENNT von den gemessenen. Sie
         # sind der Prior je Komponente - siehe `quellen.py`. Leer, wenn der
         # Provider keine getrennte Prior-Quelle mitbringt.
@@ -304,6 +307,27 @@ class Datenraum:
         in services/objective.py, die Modus gegen global stellt.
         """
         return dict(self._ebenen.get(brawler.id, {}))
+
+    def modus_zeilen(self, brawler):
+        """Gemessene Zeilen je MODUS - ueber alle Modi, nicht nur diesen.
+
+        Der Datenraum filtert sonst auf den aktuellen Kontext; fuer die
+        Frage "laeuft er ueberall aehnlich" braucht es aber gerade den
+        Vergleich zwischen den Modi. Deshalb eine eigene Abfrage, einmal
+        je Draft gecacht.
+        """
+        if self._modus_zeilen is None:
+            from drafter.models import BrawlerStat
+            from drafter.models.base import NICHT_GEMESSEN
+            self._modus_zeilen = {}
+            zeilen = (BrawlerStat.objects
+                      .filter(brawl_map__isnull=True, game_mode__isnull=False)
+                      .exclude(source__in=NICHT_GEMESSEN)
+                      .only("brawler_id", "game_mode_id", "games", "raw_rate",
+                            "adjusted_rate", "window_label", "source"))
+            for zeile in zeilen:
+                self._modus_zeilen.setdefault(zeile.brawler_id, []).append(zeile)
+        return self._modus_zeilen.get(brawler.id, [])
 
     def gemessene_spiele(self, brawler):
         return self._spiele.get(brawler.id, 0)

@@ -363,6 +363,27 @@ MODI = [
         },
     },
     {
+        "name": "Hot Zone", "slug": "hot-zone", "order": 6,
+        "description": "Zonen besetzen und halten.",
+        "win_condition": "Laenger auf der Zone stehen als der Gegner",
+        # Das Ziel ist Zeit auf der Zone, nicht Kills. Aus vorhandenem
+        # Vokabular zusammengesetzt: die Zone verweigern (zone_control,
+        # area_control), darauf bleiben koennen (survivability, frontline,
+        # healing), Gegner herunterdruecken (crowd_control), sie erreichen
+        # (mobility) und Tanks beantworten, die sich daraufstellen
+        # (anti_tank). "zone_time" und "sustain" entstehen daraus als
+        # Kombination - keine eigenen Felder.
+        #
+        # Aufgenommen am 2026-09-19: Hot Zone war mit 2 240 gezaehlten
+        # Partien der meistgespielte Modus und hatte keine einzige
+        # Anforderung, keine aktive Map und keinen Draft.
+        "base_requirements": {
+            "zone_control": 85, "survivability": 80, "area_control": 70,
+            "frontline": 60, "healing": 60, "crowd_control": 55,
+            "anti_tank": 50, "mobility": 45,
+        },
+    },
+    {
         "name": "Bounty", "slug": "bounty", "order": 5,
         "description": "Sterne sammeln, eigene nicht verschenken.",
         "win_condition": "Vorsprung halten statt Kills erzwingen",

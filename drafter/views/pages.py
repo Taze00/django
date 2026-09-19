@@ -16,11 +16,13 @@ from drafter.services import personal
 def draft(request):
     """Die Draft-Oberflaeche unter /draft/."""
     return render(request, "drafter/draft.html", {
-        "modi": GameMode.objects.filter(is_active=True).prefetch_related("maps"),
+        # Nur Modi mit waehlbarer Map - siehe views/api.py.
+        "modi": [m for m in GameMode.objects.filter(is_active=True)
+                 .prefetch_related("maps") if m.maps.waehlbare().exists()],
         # Ob der Map-Knopf Platz fuer ein Vorschaubild reservieren muss.
         # Steht schon im HTML, damit der Knopftext nicht nach dem Laden
         # des Katalogs um die Bildbreite nach rechts springt.
-        "karten_mit_bild": BrawlMap.objects.filter(is_active=True).exclude(image_url="").exists(),
+        "karten_mit_bild": BrawlMap.objects.waehlbare().exclude(image_url="").exists(),
     })
 
 
