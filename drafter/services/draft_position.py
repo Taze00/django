@@ -146,6 +146,18 @@ def modusbreite(kandidat, raum):
     return varianz ** 0.5, gesamt, len(raten)
 
 
+def prior_verlaesslichkeit(brawler):
+    """Wie sehr darf ein gepflegter Wert dieses Brawlers behaupten? (0-1)
+
+    Haengt an der Herkunft des Profils, nicht am Brawler: ein Demo-Seed
+    ist ein Anhaltspunkt, ein von Hand gepflegtes Profil eine gepruefte
+    Aussage. Siehe config.PRIOR_VERLAESSLICHKEIT.
+    """
+    quelle = getattr(brawler, "source", "") or ""
+    return config.PRIOR_VERLAESSLICHKEIT.get(
+        quelle, config.PRIOR_VERLAESSLICHKEIT_UNBEKANNT)
+
+
 def evidenzgewicht(menge, k, modi=None):
     """0-1: wie sehr die Messung den Profil-Prior verdraengen darf.
 
@@ -204,8 +216,11 @@ def komponenten_fuer_pool(kandidaten, ctx, raum):
         if gemessen is not None:
             _, n, paare = belege[b.id]
             w = evidenzgewicht(n, config.DRAFTLAGE_EVIDENZ_K)
-        komp.wert = klemme(w * (gemessen or 0.0) + (1.0 - w) * (prior or 0.0))
+        zuverlaessig = prior_verlaesslichkeit(b) if prior is not None else 0.0
+        komp.wert = klemme(w * (gemessen or 0.0)
+                           + (1.0 - w) * (prior or 0.0) * zuverlaessig)
         komp.mess_anteil = w
+        komp.prior_verlaesslichkeit = zuverlaessig if prior is not None else None
         komp.quelle = _quelle(w, prior is not None)
         if gemessen is not None and w > 0.3 and abs(komp.wert) > 0.3:
             _, n, paare = belege[b.id]
@@ -261,8 +276,11 @@ def flexibilitaet_fuer_pool(kandidaten, ctx, raum):
         if gemessen is not None:
             _, n, modi = belege[b.id]
             w = evidenzgewicht(n, config.FLEX_EVIDENZ_K, modi=modi)
-        komp.wert = klemme(w * (gemessen or 0.0) + (1.0 - w) * (prior or 0.0))
+        zuverlaessig = prior_verlaesslichkeit(b) if prior is not None else 0.0
+        komp.wert = klemme(w * (gemessen or 0.0)
+                           + (1.0 - w) * (prior or 0.0) * zuverlaessig)
         komp.mess_anteil = w
+        komp.prior_verlaesslichkeit = zuverlaessig if prior is not None else None
         komp.quelle = _quelle(w, prior is not None)
         if gemessen is not None and w > 0.3 and komp.wert > 0.35:
             _, _, modi = belege[b.id]

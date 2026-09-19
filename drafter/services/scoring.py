@@ -109,6 +109,8 @@ class Komponente:
     # ein gepflegter Prior. Nur dort gesetzt, wo beides gemischt wird -
     # Flexibilitaet und Draft-Position.
     mess_anteil: float = None
+    # Wie verlaesslich der gepflegte Prior ist (0-1, nach Herkunft).
+    prior_verlaesslichkeit: float = None
 
     @property
     def beitrag(self):
@@ -148,6 +150,8 @@ class Komponente:
                                 if self.mess_anteil is not None else None),
             "prior_weight": (round(1.0 - self.mess_anteil, 3)
                              if self.mess_anteil is not None else None),
+            "prior_reliability": (round(self.prior_verlaesslichkeit, 3)
+                                  if self.prior_verlaesslichkeit is not None else None),
             # Nur CURRENT STRENGTH: worauf die Schaetzung beruht.
             "schaetzung": (self.staerke.als_dict(self.feld)
                            if self.staerke is not None else None),

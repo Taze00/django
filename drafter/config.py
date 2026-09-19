@@ -781,6 +781,36 @@ DRAFTLAGE_MIN_PAARE = 8            # gemessene Matchups fuer eine Streuungsaussa
 FLEX_EVIDENZ_K = 1500          # Partien ueber alle Modi
 DRAFTLAGE_EVIDENZ_K = 1200     # Partien ueber alle gemessenen Matchups
 
+# Wie verlaesslich ist ein PRIOR - je nachdem, woher er stammt?
+#
+# Die Mischung oben behandelt jeden gepflegten Wert gleich. Der Audit vom
+# 2026-09-19 zeigt, dass das zu grosszuegig ist: ALLE zwanzig Profile
+# tragen `source="demo"`, alle draft_values stehen unveraendert so im
+# Seed, und die Fachquelle (Role-&-Ability-Map) hat sie nie angefasst.
+# Es sind Setzungen aus der Aufbauphase, keine geprueften Aussagen -
+# SANDY traegt mit flexibility_value 82 und blind_pick_value 75 die
+# hoechsten Werte des ganzen Satzes, ohne dass eine Partie dahintersteht.
+#
+#     effektiver Prior = Prior-Wert * Verlaesslichkeit
+#
+# Die Verlaesslichkeit multipliziert den feldrelativen z-Wert und
+# schrumpft ihn damit Richtung neutral - der Wert verschwindet nicht, er
+# behauptet nur weniger. Ein von Hand gepflegtes Profil (MANUAL) gilt als
+# geprueft und behaelt volles Gewicht; was aus dem Demo-Seed stammt, gilt
+# als Anhaltspunkt; eine unbekannte Herkunft am wenigsten.
+#
+# Der Demo-Wert ist nicht geraten, sondern gemessen: siehe den Bericht
+# zum 2026-09-19 - ab etwa 0.5 traegt ein unbelegtes Demo-Profil keine
+# Map mehr allein an die Spitze, darunter verliert das Demo-Wissen seine
+# unterscheidende Wirkung, ohne dass sich an den Raengen noch etwas
+# aendert.
+PRIOR_VERLAESSLICHKEIT = {
+    "manual": 1.0,     # von Hand gepflegt und geprueft
+    "demo": 0.5,       # Setzung aus der Aufbauphase
+    "api": 0.5,        # aus einer Quelle uebernommen, nicht geprueft
+}
+PRIOR_VERLAESSLICHKEIT_UNBEKANNT = 0.25
+
 
 # =========================================================================
 # Welche Maps der Drafter anbietet
