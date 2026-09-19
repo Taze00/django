@@ -867,6 +867,30 @@ export function zeichneMatchplan(analyse) {
 // Die fuenf Groessen einer Empfehlung nebeneinander. Bewusst schlicht und
 // ohne eigenes Layout: das ist eine Debug-Ansicht, kein Umbau der Oberflaeche.
 // Sie beantworten verschiedene Fragen und werden deshalb nie verrechnet.
+// Der Objective Fit mischt Messung und Fachwissen. Beide Anteile muessen
+// dastehen, sonst liest sich ein negativer Gesamtwert neben einer positiv
+// gemessenen Differenz wie ein Widerspruch.
+function objectiveHinweis(o) {
+  if (!o) return 'keine Auskunft zum Modusziel';
+  const teile = [];
+  if (o.differenz_pp !== null) {
+    const vz = o.differenz_pp > 0 ? '+' : '';
+    teile.push(`Messung ${vz}${o.differenz_pp} pp gegenüber seinem eigenen Schnitt `
+      + `(${o.modus_spiele} Partien, ${Math.round(o.mess_anteil * 100)} %)`);
+    if (o.map_spiele) {
+      const mvz = o.map_diff_pp > 0 ? '+' : '';
+      teile.push(`auf dieser Map ${mvz}${o.map_diff_pp} pp (${o.map_spiele} Partien)`);
+    }
+  }
+  if (o.qualitativ !== null && o.mess_anteil < 1) {
+    const qvz = o.qualitativ > 0 ? '+' : '';
+    teile.push(`Fachwissen ${qvz}${o.qualitativ.toFixed(2)}`
+      + (o.aspekt ? ` (${o.aspekt})` : '')
+      + ` · ${Math.round((1 - o.mess_anteil) * 100)} %`);
+  }
+  return teile.join(' · ') || o.text;
+}
+
 function erklaerungsTafel(x) {
   const abschnitt = el('div', 'erklaerung');
   abschnitt.appendChild(el('h3', null, 'Die fünf Größen'));
@@ -880,13 +904,7 @@ function erklaerungsTafel(x) {
           + `(effektiv ${cs.n_effektiv}) · ${cs.quelle}`
         : `${cs.hinweis}${cs.rate === null ? '' : ` (gepflegter Wert ${(cs.rate * 100).toFixed(1)} %)`}`],
     ['Objective Fit', x.objective_fit ? punkte(x.objective_fit.punkte) : '–',
-      x.objective_fit
-        ? (x.objective_fit.differenz_pp !== null
-          ? `${x.objective_fit.differenz_pp > 0 ? '+' : ''}`
-            + `${x.objective_fit.differenz_pp} Punkte gegenüber seinem eigenen Schnitt `
-            + `(${x.objective_fit.modus_spiele} Partien im Modus)`
-          : x.objective_fit.text)
-        : 'keine Auskunft zum Modusziel'],
+      objectiveHinweis(x.objective_fit)],
     ['Draft Fit', punkte(x.draft_fit.punkte),
       x.draft_fit.komponenten.map((k) => `${k.label} ${punkte(k.punkte)}`).join(' · ')
         || 'keine Komponente berechenbar'],
