@@ -149,6 +149,8 @@ docker compose restart django-dev
 
 **Paarwerte hängen über die Ebenen zusammen (seit 2026-09-20).** Counter und Synergie kennen nur `global` und `modus` — keine Map-Ebene. Die Modus-Zeile ist ein **Update auf global**, keine Alternative dazu: ihr Prior ist die Abweichung der **Differenzmenge global minus Modus**, ihr eigenes Gewicht `n/(n+60)`. Sechs Modusspiele bewegen damit wenig, sechshundert bestimmen. Die Differenzmenge ist der Punkt — die Globalzeile als Prior zu nehmen, würde dieselben Partien zweimal zählen. `_spezifitaet()` bleibt unverändert und darf weiter die Modus-Zeile nehmen, weil global jetzt darin steckt. Details: `DRAFTER_DOKUMENTATION.md` §18b.
 
+**Counter rechnet feldrelativ (seit 2026-09-20).** Ein Paarwert ist eine **absolute** Abweichung von der log5-Erwartung, Teambedarf und Map-Fit sind **feldrelativ** — beides wurde addiert, als wäre es dieselbe Einheit. Über 30 Last-Pick-Lagen gemessen: Counter-Rohwerte lagen fast vollständig zwischen −0.05 und +0.04, der p90-Kandidat zog aus einer Komponente mit Gewicht 0.29 (±14.5 Punkte) ganze **0.5 Punkte**; GENE war auf Bridge Too Far der beste Counter des ganzen Feldes und stand auf Platz 87. Seitdem: `wert = 0.6 · Position im Feld + 0.4 · Rohwert`, die Position robust über Median und MAD (`scoring.robuste_z_werte`, Untergrenze `COUNTER_SPUERBAR = 0.05` — dieselbe Schwelle, ab der ein Matchup überhaupt benannt wird). **Nicht angefasst:** Paar-Bayes, Hierarchie global→Modus, Stichproben, Confidence und alle Gewichte. Die Skalierung sitzt vollständig hinter `counters.komponente`, deren Ergebnis unverändert als `Komponente.rohwert` in der Aufschlüsselung steht — wer vorn im Feld steht, kann weiterhin dünn belegt sein, und das soll man sehen. Der First Pick bleibt bitgleich (ohne Gegner gibt es nichts zu skalieren), Teambedarf in allen 9 300 geprüften Paaren ebenfalls. Details: `DRAFTER_DOKUMENTATION.md` §7.
+
 **Sampling-Bias ist gemessen, nicht korrigiert.** Der abgefragte Spieler gewinnt 57,8 % (er wurde dafür ausgewählt); median 13,4 pp Spreizung je Brawler, je nachdem auf welcher Seite er stand. `python manage.py brawl_sampling_bias` misst das read-only. **Keine Korrekturformel ohne Herleitung** — §18c und §21.
 
 **Einzelanalyse für die Fehlersuche:** Schalter „Analyse" neben der Sortierung (Klick auf eine Kachel erklärt, statt zu wählen) oder
@@ -218,7 +220,7 @@ docker compose run --rm --no-deps -T django-dev python manage.py test fitness --
 ```
 docker compose run --rm --no-deps -T django-dev python manage.py test drafter --settings=meinprojekt.settings_test
 ```
-351 Tests, ~3 min. **Vor jedem Dependency- oder Django-Upgrade beide laufen lassen** (zusammen 530). Nie zwei Testläufe gleichzeitig — beide legen `test_postgres` an.
+680 Tests, ~4 min. **Vor jedem Dependency- oder Django-Upgrade beide laufen lassen** (zusammen 933). Nie zwei Testläufe gleichzeitig — beide legen `test_postgres` an.
 
 > Frühere Fassungen dieser Datei nannten 134 Tests und „SQLite im Speicher". Beides stimmt nicht mehr bzw. stimmte nie: `settings_test` unterscheidet sich von `settings` **nur** im Passwort-Hasher, die Testdatenbank ist dieselbe Postgres-Instanz.
 

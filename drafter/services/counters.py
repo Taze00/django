@@ -20,7 +20,7 @@ entsteht, ist Sache des Aggregators, nicht dieser Datei.
 
 from drafter import config
 from drafter.services import quellen, staerke
-from drafter.services.scoring import Grund, Komponente, klemme
+from drafter.services.scoring import Grund, Komponente, klemme, robuste_z_werte
 
 # Ab welchem Attributwert eine Eigenschaft ueberhaupt als Antwort zaehlt.
 # Darunter ist "ein bisschen Anti-Tank" kein Vorteil, sondern Zufall.
@@ -287,6 +287,65 @@ def komponente(kandidat, ctx, raum):
     return komp
 
 
+def komponenten_fuer_pool(kandidaten, ctx, raum):
+    """Counter fuer alle Kandidaten - feldrelativ UND absolut.
+
+    `komponente()` darueber liefert den **Rohwert**: die absolute
+    Paar-Abweichung, gemittelt ueber die bekannten Gegner, mit Zuschlag
+    fuer das schlechteste Matchup. An dieser Rechnung aendert sich hier
+    nichts - kein Paarwert, keine Hierarchie, keine Stichprobe, keine
+    Confidence. Was sich aendert, ist allein die **Skala**, auf der das
+    Ergebnis in den Score geht.
+
+    Der Grund steht ausfuehrlich in config (COUNTER_ANTEIL_FELD), kurz:
+    die Rohwerte liegen fast vollstaendig zwischen -0.05 und +0.04,
+    waehrend Teambedarf und Map-Fit feldrelativ standardisiert sind und
+    den vollen Bereich [-1, +1] ausschoepfen. Beide wurden danach
+    addiert, als waeren sie dieselbe Einheit. Counter erreichte dadurch
+    einen Bruchteil der Wirkung, die sein Gewicht verspricht.
+
+        wert = 0.6 * Position im Feld + 0.4 * Rohwert
+
+    Die Position im Feld ist robust bestimmt (Median und MAD ueber den
+    aktuellen Kandidatenpool derselben Lage, `scoring.robuste_z_werte`)
+    - nicht ueber Mittelwert und Standardabweichung. Ein einzelner
+    harter Counter ist im Counter-Feld die Regel, nicht die Ausnahme;
+    er wuerde den Bezugspunkt fuer alle uebrigen mitziehen.
+
+    **Der absolute Anteil bleibt, und er ist der Rohwert selbst.** Ohne
+    ihn waere der beste Kandidat eines Feldes, in dem niemand etwas
+    reisst, ein Hardcounter, nur weil die anderen noch weniger
+    ausrichten. Er braucht keine Umrechnung: der Rohwert steht schon auf
+    der Komponentenskala.
+
+    **Die Sicherheit wird nicht mitskaliert.** `komp.confidence` bleibt,
+    was die Paar-Stichproben hergeben - ein Kandidat kann jetzt vorn im
+    Feld stehen und trotzdem duenn belegt sein, und genau das soll man
+    ihm ansehen. Score-Skala und statistische Sicherheit beantworten
+    verschiedene Fragen.
+    """
+    komponenten = {b.id: komponente(b, ctx, raum) for b in kandidaten}
+
+    # Nur Kandidaten, fuer die ueberhaupt etwas gerechnet wurde. "Nicht
+    # verfuegbar" (kein bekanntes Matchup) bleibt unbekannt und darf das
+    # Feld nicht mit einer Null beschweren; "nicht anwendbar" (keine
+    # Gegner) gilt fuer alle gleich - dort gibt es nichts zu ordnen.
+    roh = {b_id: k.wert for b_id, k in komponenten.items()
+           if k.verfuegbar and k.anwendbar}
+    if not roh:
+        return komponenten
+
+    feld = robuste_z_werte(roh, config.COUNTER_SPUERBAR)
+    for b_id, rohwert in roh.items():
+        komp = komponenten[b_id]
+        komp.rohwert = rohwert
+        komp.wert = klemme(
+            config.COUNTER_ANTEIL_FELD * feld.get(b_id, 0.0)
+            + config.COUNTER_ANTEIL_ABSOLUT * rohwert
+        )
+    return komponenten
+
+
 def _bekannte_matchups(kandidat, gegner_liste, raum):
     ergebnis = []
     for g in gegner_liste or ():
@@ -302,7 +361,8 @@ def bestes_matchup(kandidat, gegner_liste, raum):
     if not bewertet:
         return None
     wert, gegner = max(bewertet, key=lambda p: p[0])
-    return {"gegner": gegner.name, "vorteil": round(wert, 2)} if wert > 0.05 else None
+    return ({"gegner": gegner.name, "vorteil": round(wert, 2)}
+            if wert > config.COUNTER_SPUERBAR else None)
 
 
 def schlechtestes_matchup(kandidat, gegner_liste, raum):
@@ -310,4 +370,5 @@ def schlechtestes_matchup(kandidat, gegner_liste, raum):
     if not bewertet:
         return None
     wert, gegner = min(bewertet, key=lambda p: p[0])
-    return {"gegner": gegner.name, "vorteil": round(wert, 2)} if wert < -0.05 else None
+    return ({"gegner": gegner.name, "vorteil": round(wert, 2)}
+            if wert < -config.COUNTER_SPUERBAR else None)

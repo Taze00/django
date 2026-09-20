@@ -14,7 +14,7 @@ Ende, in `Empfehlung.anzeige_score`.
 """
 
 from dataclasses import dataclass, field
-from statistics import fmean, pstdev
+from statistics import fmean, median, pstdev
 
 from drafter import config
 from drafter.services import quellen
@@ -49,6 +49,40 @@ def z_werte(werte):
     if streuung < 1e-9:
         return {k: 0.0 for k in werte}
     return {k: klemme((v - mittel) / (2 * streuung)) for k, v in werte.items()}
+
+
+def robuste_z_werte(werte, min_streuung):
+    """Wie `z_werte`, aber robust: Median und MAD statt Mittelwert und sd.
+
+    Dieselbe Aussage ("wie steht er zum Feld"), dieselbe Konvention
+    (zwei Streuungen sind Vollausschlag, gedeckelt auf [-1, +1]) - nur
+    unempfindlich gegen Ausreisser. Gebraucht ueberall dort, wo einzelne
+    Kandidaten weit vom Feld wegliegen: Mittelwert und sd wuerden dort
+    den Bezugspunkt fuer ALLE anderen mitziehen, und ein einziger harter
+    Counter im Feld verschoebe die Mitte, an der sich die uebrigen 100
+    messen. Dieselbe Begruendung wie bei `staerke.Feld` (Median, MAD x
+    1.4826), die fuer Siegquoten schon so rechnet.
+
+    `min_streuung` ist eine **Untergrenze fuer den Nenner**, keine
+    zweite Schwelle mit eigenem Verhalten: streut das Feld weniger als
+    das, wird weiter durch `min_streuung` geteilt statt durch fast
+    nichts. Das Ergebnis geht dadurch von selbst gegen 0 - ein Feld, in
+    dem sich alle praktisch gleichen, unterscheidet niemanden mehr, und
+    es gibt keinen Sprung, an dem das Verhalten umschlaegt. Ohne die
+    Untergrenze wuerde ein Feld aus lauter Rauschen zu lauter
+    Vollausschlaegen, weil der Nenner mitschrumpft.
+    """
+    if not werte:
+        return {}
+    zahlen = list(werte.values())
+    zentrum = median(zahlen)
+    # MAD auf die Normalverteilung geeicht (x 1.4826), damit "Streuung"
+    # dasselbe bedeutet wie eine Standardabweichung - wie in staerke.Feld.
+    streuung = max(median([abs(v - zentrum) for v in zahlen]) * 1.4826,
+                   min_streuung)
+    if streuung <= 0:
+        return {k: 0.0 for k in werte}
+    return {k: klemme((v - zentrum) / (2 * streuung)) for k, v in werte.items()}
 
 
 @dataclass
@@ -111,6 +145,12 @@ class Komponente:
     mess_anteil: float = None
     # Wie verlaesslich der gepflegte Prior ist (0-1, nach Herkunft).
     prior_verlaesslichkeit: float = None
+    # Nur bei Counter: der Wert VOR der Feldskalierung - die absolute
+    # Paar-Abweichung. Steht mit dabei, weil `wert` danach zwei Dinge
+    # mischt (Position im Feld und Betrag); ohne den Rohwert liesse sich
+    # "gegen genau diese drei gut" nicht mehr von "besser als die
+    # anderen Kandidaten" unterscheiden.
+    rohwert: float = None
 
     @property
     def beitrag(self):
@@ -152,6 +192,9 @@ class Komponente:
                              if self.mess_anteil is not None else None),
             "prior_reliability": (round(self.prior_verlaesslichkeit, 3)
                                   if self.prior_verlaesslichkeit is not None else None),
+            # Vor der Feldskalierung (nur Counter) - siehe `rohwert`.
+            "rohwert": (round(self.rohwert, 3)
+                        if self.rohwert is not None else None),
             # Nur CURRENT STRENGTH: worauf die Schaetzung beruht.
             "schaetzung": (self.staerke.als_dict(self.feld)
                            if self.staerke is not None else None),

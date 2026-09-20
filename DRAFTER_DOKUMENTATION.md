@@ -121,7 +121,7 @@ Vorschlag auch dann 95 gäbe, wenn alle schlecht sind.
 |---|---|
 | Map & Modus | Skalarprodukt Brawlerprofil × Mapanforderung, feldrelativ normalisiert |
 | Current Strength | Beta-Binomial-Posterior über `BrawlerStat`, **am Feld gemessen** |
-| Counter | `CounterStat`, sonst Heuristik aus sechs Attributsignalen |
+| Counter | `CounterStat`, sonst Heuristik aus sechs Attributsignalen; feldrelativ normalisiert (§7) |
 | Synergie | `SynergyStat`, sonst Heuristik (Ergänzung, nicht Summe) |
 | Teambedarf | Dringlichkeit × **Zuwachs am Teamprofil** |
 | Draft-Position | `draft_values` je nach Phase + Konterbarkeit |
@@ -273,6 +273,118 @@ identisch — nachgeprüft an 18 Draft-Lagen vor und nach dem Umbau.
 Getrennt wird über zwei benannte Zugriffe auf denselben Wert, **nicht** über zwei
 Spalten: zwei Spalten, von denen je nach Quelle genau eine gefüllt sein dürfte,
 erlaubten einen ungültigen Zustand (beide gefüllt), den `source` ohnehin ausschließt.
+
+### Die Skala der Counter-Komponente (seit 2026-09-20)
+
+Ein Paarwert ist eine **absolute** Größe: „gewinnt 4 Prozentpunkte
+häufiger als die log5-Erwartung" heißt +0.04, egal wer sonst zur Wahl
+steht. Teambedarf und Map-Fit sind dagegen **feldrelativ** — sie fragen
+„wer von den Verfügbaren hilft am meisten" und schöpfen [-1, +1]
+routinemäßig aus. Beides wurde addiert, als wäre es dieselbe Einheit.
+
+Nachgemessen über 30 Last-Pick-Lagen (je ~100 Kandidaten):
+
+| | Counter (vorher) | Team Need |
+|---|---|---|
+| Gewicht Last Pick | 0.29 | 0.24 |
+| möglicher Ausschlag | ±14.5 Punkte | ±12.0 Punkte |
+| Median im Feld | −0.009 → **−0.13 Punkte** | ~0 |
+| p90 im Feld | +0.034 → **+0.49 Punkte** | ~+6 Punkte |
+| Maximum im Feld | +0.219 → **+3.17 Punkte** | ~+12 Punkte |
+
+Auf Bridge Too Far war GENE mit +0.21 der **beste Counter des ganzen
+Feldes**, bekam dafür +3.1 Punkte und stand auf Platz 87 von 101. Nicht
+das Gewicht war falsch — die Einheit war es.
+
+Counter rechnet deshalb jetzt wie die anderen feldbezogenen
+Komponenten, in `counters.komponenten_fuer_pool`:
+
+    wert = 0.6 · Position im Feld + 0.4 · Rohwert
+
+**Die Position im Feld ist robust bestimmt** (Median und MAD ×1.4826,
+`scoring.robuste_z_werte`) — nicht über Mittelwert und
+Standardabweichung. Im Counter-Feld ist ein einzelner harter Counter
+die Regel, nicht die Ausnahme; er würde sonst den Bezugspunkt für alle
+übrigen hundert mitziehen. Dieselbe Begründung und dieselbe Konvention
+(zwei Streuungen = Vollausschlag) wie bei `staerke.Feld`, das für
+Siegquoten schon so rechnet.
+
+**Der absolute Anteil ist der Rohwert selbst**, ohne Umrechnung — er
+steht bereits auf der Komponentenskala. Ohne ihn wäre der beste
+Kandidat eines Feldes, in dem niemand etwas ausrichtet, ein
+Hardcounter, nur weil die anderen noch weniger können: ein reiner
+z-Wert beantwortet „wer ist hier der beste", nie „ist das überhaupt
+etwas".
+
+**Die Untergrenze der Feldstreuung ist `COUNTER_SPUERBAR = 0.05`** —
+keine neue Schwelle, sondern die, ab der die App ein Matchup schon
+immer überhaupt benennt (`bestes_matchup`/`schlechtestes_matchup`, wo
+die Zahl vorher zweimal im Code stand). Gemessen über 60 Felder liegt
+der MAD zwischen 0.020 und 0.055 (Median 0.033); die Untergrenze bindet
+also meistens — **und das ist beabsichtigt**. Dieser MAD misst den
+*toten Kern* des Feldes: die große Mehrheit der Kandidaten hat zu genau
+diesen drei Gegnern keine belastbare Paar-Evidenz und drängt sich dicht
+um 0. Wer durch ihn teilt, macht aus Abständen von Hundertsteln
+Vollausschläge. Mit der Untergrenze heißt Vollausschlag: 0.10 Vorteil
+über dem Feldmedian. Der MAD übernimmt erst dort, wo ein Feld wirklich
+breiter streut — er ist die Obergrenze der Empfindlichkeit, nicht ihr
+Maß.
+
+**Was die Skalierung NICHT anfasst.** Paar-Bayes, die Hierarchie
+global→Modus, die Stichprobengrößen und die Confidence bleiben, wie sie
+waren; die Rechnung sitzt vollständig *hinter* `counters.komponente`,
+deren Ergebnis unverändert als `Komponente.rohwert` in der
+Aufschlüsselung steht. Ein Kandidat kann jetzt vorn im Feld stehen und
+trotzdem dünn belegt sein — genau das soll man ihm ansehen. Score-Skala
+und statistische Sicherheit beantworten verschiedene Fragen und werden
+nie zu einer Zahl verrechnet. Auch die Phasengewichte sind unverändert
+(0.02 → 0.20 → 0.29): dass Counter beim First Pick praktisch nichts und
+beim Last Pick am meisten bewegt, entsteht allein aus ihnen, nicht aus
+einer Sonderregel in der Skalierung.
+
+**Was sich dadurch ändert** — dieselben 30 Lagen, je Kennzahl der
+Median über die Lagen:
+
+| Counter-Punkte im Feld | First | Mid | Last |
+|---|---|---|---|
+| Median | 0 → 0 | −0.06 → −0.03 | −0.12 → −0.05 |
+| p90 | 0 → 0 | +0.45 → **+3.47** | +0.49 → **+3.95** |
+| Maximum | 0 → 0 | +2.67 → +7.07 | +3.17 → **+9.97** |
+| Minimum | 0 → 0 | −5.24 → −8.09 | −6.77 → −11.41 |
+
+Der **First Pick bleibt Ziffer für Ziffer unverändert** — ohne Gegner
+gibt es kein Matchup, also auch nichts zu skalieren. Der Verlauf
+Mid < Last entsteht allein aus den Phasengewichten (0.20 und 0.29); in
+der Skalierung steht keine Phase. **Teambedarf ist in allen 9 300
+geprüften Kandidat/Lage-Paaren bitgleich geblieben.**
+
+Einzelfälle: GENE auf Flaring Phoenix von Platz 21 auf 5, auf Bridge Too
+Far von 87 auf 65 (Counter allein trägt ihn nicht — die übrigen
+Komponenten halten ihn unten, und das ist richtig so). STU auf Ring of
+Fire, dessen Counter-Profil wirklich schlecht ist, von 94 auf 96. PAM
+auf Dueling Beetles von 6 auf 31: ihre −0.63 gegen COLETTE kosten jetzt
+−10.7 statt −4.9 Punkte.
+
+**Counter differenziert — und übernimmt das Ranking nicht.** In den 30
+Last-Pick-Lagen wechseln im Median 3,5 von 10 Namen in den Top 10 —
+knapp zwei Drittel der Spitze stehen weiterhin dort. Die Gegenprobe: Kandidaten, die
+*trotz* stark negativem Counter (< −0.25) in den Top 3 standen, gehen
+von 1 auf 0 zurück.
+
+> **Die Kennzahl „Counter > +0.25 außerhalb der Top 10" muss auf dem
+> Rohwert gelesen werden.** Sie stammt aus dem Audit und war auf der
+> alten Skala definiert, wo +0.25 fast das Feldmaximum war; auf der
+> neuen ist es etwa das 90. Perzentil. Auf dem Komponentenwert gelesen
+> steigt sie von 15 auf 216 — das misst die geänderte Einheit, nicht
+> das Verhalten.
+>
+> Auf dem **Rohwert**, der sich nicht geändert hat, sind es in den 30
+> Last-Pick-Lagen 21 Kandidaten mit einem Counter über +0.25. Davon
+> standen vorher **15** außerhalb der Top 10, nachher **10**. Beispiele:
+> GENE von Platz 95 auf 83 und von 34 auf 13, COLETTE von 49 auf 22.
+> Kandidaten mit einem Rohwert unter −0.25 in den Top 3: **1 → 0**.
+
+---
 
 **Synergie ist nicht gemeinsame Winrate.** Sonst gälten zwei ohnehin
 starke Brawler automatisch als gute Synergie. `SynergyStat.synergy` ist

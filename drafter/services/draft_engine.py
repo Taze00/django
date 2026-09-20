@@ -188,6 +188,11 @@ class DraftEngine:
         bedarf_komp = team_need.komponenten_fuer_pool(
             kandidaten, self.eigene_analyse, self.ctx
         )
+        # Counter braucht das Feld ebenfalls: sein Rohwert ist eine
+        # absolute Paar-Abweichung und muss auf dieselbe Skala gebracht
+        # werden wie Teambedarf und Map-Fit (services/counters.py).
+        counter_komp = counters.komponenten_fuer_pool(
+            kandidaten, self.ctx, self.raum)
         position_komp = draft_position.komponenten_fuer_pool(
             kandidaten, self.ctx, self.raum)
         flex_komp = draft_position.flexibilitaet_fuer_pool(
@@ -199,7 +204,7 @@ class DraftEngine:
                 config.K_MAP_MODE: map_komp[kandidat.id],
                 config.K_META: meta_komp[kandidat.id],
                 config.K_TEAM_NEED: bedarf_komp[kandidat.id],
-                config.K_COUNTER: counters.komponente(kandidat, self.ctx, self.raum),
+                config.K_COUNTER: counter_komp[kandidat.id],
                 config.K_SYNERGY: synergies.komponente(kandidat, self.ctx, self.raum),
                 config.K_DRAFT_POSITION: position_komp[kandidat.id],
                 config.K_FLEXIBILITY: flex_komp[kandidat.id],

@@ -965,6 +965,59 @@ COLLECTOR_ABBRUCH_NACH_FEHLERN = 3
 GEPFLEGTER_COUNTER_GEGENRICHTUNG = 0.8
 HEURISTISCHER_COUNTER_GEGENRICHTUNG = 0.8
 
+# --- Die Skala der Counter-Komponente ------------------------------------
+# Der Rohwert (Mittel und schlechtestes Matchup ueber die bekannten
+# Gegner) ist eine ABSOLUTE Paar-Abweichung. Gemessen ueber 30 Last-Pick-
+# Lagen liegt das Feld fast vollstaendig zwischen -0.05 und +0.04:
+# Median -0.009, p90 +0.034, Maximum +0.22. Bei Gewicht 0.29 heisst das,
+# dass der 90.-Perzentil-Kandidat aus einer Komponente, die 14.5 Punkte
+# vergeben darf, ganze 0.5 Punkte zieht - waehrend Teambedarf (Gewicht
+# 0.24) feldrelativ standardisiert ist und routinemaessig 9 bis 12
+# Punkte verteilt. Nicht das Gewicht war falsch, sondern die Skala: die
+# beiden Komponenten rechneten in verschiedenen Einheiten und wurden
+# trotzdem addiert. Auf Bridge Too Far war GENE mit +0.21 der BESTE
+# Counter des ganzen Feldes, bekam dafuer +3.1 Punkte und stand auf
+# Platz 87 von 101.
+#
+# Counter rechnet deshalb jetzt wie Teambedarf und Map-Fit: feldrelativ,
+# plus ein absoluter Anteil.
+#
+#     wert = 0.6 * (Position im Feld) + 0.4 * (Rohwert)
+#
+# Warum nicht rein feldrelativ: ein z-Wert beantwortet nur "wer ist hier
+# der beste", nie "ist das ueberhaupt etwas". Ist der beste Counter des
+# Feldes +0.015, waere er als reiner z-Wert ein Hardcounter. Der
+# absolute Anteil haelt dagegen - er ist der Rohwert selbst, unveraendert
+# und ohne neue Umrechnung, denn er steht bereits auf der
+# Komponentenskala [-1, +1] (es IST der bisherige Komponentenwert).
+COUNTER_ANTEIL_FELD = 0.6
+COUNTER_ANTEIL_ABSOLUT = 0.4
+
+# Ab welchem Betrag ein Paar-Vorteil ueberhaupt eine Aussage ist.
+# Darunter nennt die App ein Matchup schon bisher weder bevorzugt noch
+# zu vermeiden (`bestes_matchup`/`schlechtestes_matchup`, wo die Zahl
+# frueher zweimal im Code stand). Genau dieselbe Bedeutung hat sie als
+# Untergrenze der Feldstreuung: streut ein Feld weniger als den
+# kleinsten Vorteil, den wir zu benennen bereit sind, ist seine
+# Rangfolge Rauschen - der feldrelative Anteil geht dann von selbst
+# gegen 0 (siehe scoring.robuste_z_werte). Keine neue Schwelle, sondern
+# die vorhandene an ihrer zweiten Stelle.
+#
+# **Nachgemessen am 2026-09-20 ueber 60 echte Felder** (30 Lagen x Mid
+# und Last): der MAD des Counter-Feldes liegt zwischen 0.020 und 0.055,
+# Median 0.033. Die Untergrenze bindet damit in den meisten Feldern -
+# und genau das ist beabsichtigt. Dieser MAD misst den TOTEN KERN des
+# Feldes: die grosse Mehrheit der Kandidaten hat zu diesen drei Gegnern
+# keine belastbare Paar-Evidenz und draengt sich dicht um 0. Wer durch
+# ihn teilt, macht aus Abstaenden von Hundertsteln Vollausschlaege -
+# dann waeren +0.015 und +0.21 nicht mehr zu unterscheiden.
+#
+# Mit der Untergrenze heisst Vollausschlag: 2 x 0.05 = 0.10 Vorteil ueber
+# dem Feldmedian. Der MAD uebernimmt erst, wo ein Feld wirklich breiter
+# streut als das - dort verhindert er, dass die halbe Spitze am Anschlag
+# klebt. Er ist also die Obergrenze der Empfindlichkeit, nicht ihr Mass.
+COUNTER_SPUERBAR = 0.05
+
 
 # =========================================================================
 # Win-Wahrscheinlichkeit (Heuristik)
