@@ -139,6 +139,10 @@ docker compose restart django-dev
 
 11. **Das Scoring-Modell ist seit 2026-09-18 eingefroren** (Commit `5c47b72` + Wegfall der Mindestpartien). Drei getrennte Aussagen je Empfehlung — CURRENT STRENGTH (Beta-Binomial-Posterior über global/Modus/Map, am Feld skaliert), DRAFT FIT (Map, Counter, Synergie, Teambedarf, Position; gespeist aus Profil **oder** qualitativer Draft-Rolle) und PERSÖNLICH — dazu Datenabdeckung und statistische Sicherheit, alles unter `erklaerung` in der API. Wissen zählt nie als Stärke. **An den Gewichten wird nicht weiter gedreht, bevor nicht deutlich mehr echte Partien vorliegen**: die Zahlen der letzten Runden stammen aus 6–1131 Partien je Brawler, jede Optimierung darauf wäre Kurvenanpassung an Rauschen. Details: `DRAFTER_DOKUMENTATION.md` §5 und §9.
 
+**Paarwerte hängen über die Ebenen zusammen (seit 2026-09-20).** Counter und Synergie kennen nur `global` und `modus` — keine Map-Ebene. Die Modus-Zeile ist ein **Update auf global**, keine Alternative dazu: ihr Prior ist die Abweichung der **Differenzmenge global minus Modus**, ihr eigenes Gewicht `n/(n+60)`. Sechs Modusspiele bewegen damit wenig, sechshundert bestimmen. Die Differenzmenge ist der Punkt — die Globalzeile als Prior zu nehmen, würde dieselben Partien zweimal zählen. `_spezifitaet()` bleibt unverändert und darf weiter die Modus-Zeile nehmen, weil global jetzt darin steckt. Details: `DRAFTER_DOKUMENTATION.md` §18b.
+
+**Sampling-Bias ist gemessen, nicht korrigiert.** Der abgefragte Spieler gewinnt 57,8 % (er wurde dafür ausgewählt); median 13,4 pp Spreizung je Brawler, je nachdem auf welcher Seite er stand. `python manage.py brawl_sampling_bias` misst das read-only. **Keine Korrekturformel ohne Herleitung** — §18c und §21.
+
 **Einzelanalyse für die Fehlersuche:** Schalter „Analyse" neben der Sortierung (Klick auf eine Kachel erklärt, statt zu wählen) oder
 ```
 python manage.py drafter_analyse --map belles-rock --eigene gus,gray --gegner belle,sandy,mortis --brawler edgar

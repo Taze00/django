@@ -33,7 +33,8 @@ from drafter.models import (
 )
 from drafter.models.matches import Match
 from drafter.services.aggregation.rechnung import (
-    Zaehler, erwartet_gegeneinander, erwartet_miteinander, vorteil,
+    Zaehler, erwartet_gegeneinander, erwartet_miteinander, rest_zaehler,
+    uebertragener_prior, vorteil,
 )
 from drafter.services.confidence import stichproben_confidence
 from drafter.services.patch_weighting import patch_gewicht, zeit_gewicht
@@ -335,31 +336,35 @@ class Aggregator:
             ))
         self._schreibe(BrawlerStat, zeilen, bericht, "brawler")
 
-        # --- Counter: Abweichung von der log5-Erwartung, eine Zeile je Paar
-        # (a < b). Der Datenbank-Constraint laesst die Gegenrichtung fuer
-        # berechnete Quellen gar nicht zu.
-        zeilen = []
-        for (ebene, a, b), z in counter_z.items():
-            erwartet = erwartet_gegeneinander(self._rate(raten, ebene, a),
-                                              self._rate(raten, ebene, b))
-            geglaettet = z.geglaettet(erwartet, config.PAAR_PRIOR_STAERKE)
-            zeilen.append(CounterStat(
-                brawler_id=a, enemy_id=b, advantage=round(vorteil(geglaettet, erwartet), 4),
-                **gemeinsam(ebene), **stichprobe(z, geglaettet),
-            ))
-        self._schreibe(CounterStat, zeilen, bericht, "counter")
+        # --- Paare: global ist die Basis, der Modus ein Update darauf.
+        #
+        # Frueher schrumpfte jede Ebene fuer sich gegen die nackte
+        # log5-Erwartung, und die Engine nahm anschliessend IMMER die
+        # spezifischste Zeile. Sechs Knockout-Partien verdraengten damit
+        # dreiundzwanzig globale vollstaendig - bis hin zum Vorzeichen.
+        #
+        # Jetzt traegt die Modus-Zeile mit, was ausserhalb des Modus
+        # bekannt ist: ihr Prior ist die Abweichung der Differenzmenge
+        # global-minus-Modus (siehe rechnung.rest_zaehler). Das Gewicht
+        # der eigenen Beobachtung ist n/(n+PAAR_PRIOR_STAERKE) - stetig,
+        # ohne Schwelle: 6 Partien zaehlen 9 %, 60 die Haelfte, 600 zu
+        # 91 %. Die Auswahlregel der Engine bleibt unangetastet; sie darf
+        # die Modus-Zeile nehmen, weil darin die globale Information
+        # bereits steckt.
+        #
+        # Counter: eine Zeile je Paar (a < b); die Gegenrichtung ist das
+        # Negativ und laesst der DB-Constraint fuer berechnete Quellen
+        # gar nicht erst zu.
+        self._schreibe(CounterStat, self._paar_zeilen(
+            CounterStat, counter_z, raten, gemeinsam, stichprobe, erwartet_gegeneinander,
+            lambda a, b: dict(brawler_id=a, enemy_id=b), "advantage",
+        ), bericht, "counter")
 
-        # --- Synergie: Abweichung von additiven Log-Odds
-        zeilen = []
-        for (ebene, x, y), z in synergie_z.items():
-            erwartet = erwartet_miteinander(self._rate(raten, ebene, x),
-                                            self._rate(raten, ebene, y))
-            geglaettet = z.geglaettet(erwartet, config.PAAR_PRIOR_STAERKE)
-            zeilen.append(SynergyStat(
-                brawler_a_id=x, brawler_b_id=y, synergy=round(vorteil(geglaettet, erwartet), 4),
-                **gemeinsam(ebene), **stichprobe(z, geglaettet),
-            ))
-        self._schreibe(SynergyStat, zeilen, bericht, "synergy")
+        # Synergie: Abweichung von additiven Log-Odds, gleiche Hierarchie.
+        self._schreibe(SynergyStat, self._paar_zeilen(
+            SynergyStat, synergie_z, raten, gemeinsam, stichprobe, erwartet_miteinander,
+            lambda a, b: dict(brawler_a_id=a, brawler_b_id=b), "synergy",
+        ), bericht, "synergy")
 
         # --- Builds: Abweichung von der Grundleistung des Brawlers
         zeilen = []
@@ -383,6 +388,55 @@ class Aggregator:
             return raten.get(((GLOBAL, None, None), bid), config.PRIOR_RATE)
         return raten.get(((MODUS, ebene[1], None), bid),
                          raten.get(((GLOBAL, None, None), bid), config.PRIOR_RATE))
+
+    def _paar_zeilen(self, modell, zaehler, raten, gemeinsam, stichprobe, erwartung,
+                     schluesselfelder, wertfeld):
+        """Counter- oder Synergiezeilen fuer alle Ebenen - grob vor fein.
+
+        Reihenfolge ist hier nicht Geschmack: die Modus-Zeile braucht die
+        GLOBALEN Zaehler desselben Paares, um ihren Prior zu bilden.
+        Deshalb erst GLOBAL, dabei Zaehler und Erwartung merken, dann
+        MODUS.
+        """
+        global_stand = {}   # (a, b) -> (Zaehler, Erwartung auf globaler Ebene)
+        zeilen = []
+
+        for stufe in (GLOBAL, MODUS):
+            for (ebene, a, b), z in zaehler.items():
+                if ebene[0] != stufe:
+                    continue
+                erwartet = erwartung(self._rate(raten, ebene, a),
+                                     self._rate(raten, ebene, b))
+                if stufe == GLOBAL:
+                    global_stand[(a, b)] = (z, erwartet)
+                    prior_rate = erwartet
+                else:
+                    prior_rate = self._paar_prior(global_stand.get((a, b)), z, erwartet)
+                geglaettet = z.geglaettet(prior_rate, config.PAAR_PRIOR_STAERKE)
+                zeilen.append(modell(
+                    **schluesselfelder(a, b),
+                    **{wertfeld: round(vorteil(geglaettet, erwartet), 4)},
+                    **gemeinsam(ebene), **stichprobe(z, geglaettet),
+                ))
+        return zeilen
+
+    @staticmethod
+    def _paar_prior(global_eintrag, z_fein, erwartet_fein):
+        """Prior der feineren Ebene: was ausserhalb von ihr gemessen wurde.
+
+        Ohne globale Zeile (sollte nicht vorkommen - global enthaelt jede
+        Partie) bleibt die log5-Erwartung stehen, also das Verhalten von
+        vorher. Ist der Rest leer, weil das Paar ausschliesslich in
+        diesem Modus vorkam, liefert `geglaettet` den Prior unveraendert
+        zurueck - dann gilt wieder genau die Erwartung, und nichts wird
+        erfunden.
+        """
+        if global_eintrag is None:
+            return erwartet_fein
+        z_global, erwartet_global = global_eintrag
+        rest = rest_zaehler(z_global, z_fein)
+        rest_rate = rest.geglaettet(erwartet_global, config.PAAR_PRIOR_STAERKE)
+        return uebertragener_prior(rest_rate, erwartet_global, erwartet_fein)
 
     @staticmethod
     def _rate(raten, ebene, bid):

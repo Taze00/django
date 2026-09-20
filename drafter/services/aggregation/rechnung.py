@@ -23,6 +23,20 @@ Staerken additiv auf der Log-Odds-Skala verhalten:
 logit(P) = logit(pA) + logit(pB). Synergie ist, was darueber hinausgeht.
 Das ist eine Naeherung - aber eine, die "zwei starke Brawler" nicht mit
 "zwei Brawler, die sich ergaenzen" verwechselt.
+
+**Und was, wenn ein Paar in EINEM Modus nur sechs Mal vorkam?**
+Dann traegt, was ausserhalb dieses Modus bekannt ist. Die Modus-Zeile
+schrumpft nicht mehr gegen die nackte log5-Erwartung, sondern gegen die
+Abweichung, die dasselbe Paar in allen ANDEREN Modi gezeigt hat
+(`rest_zaehler` + `uebertragener_prior`). Sechs Partien bewegen den Wert
+dann kaum, sechshundert bestimmen ihn.
+
+Entscheidend fuer die Sauberkeit: der Prior ist die **Differenzmenge**
+global minus Modus, nicht die Globalzeile selbst. Die Globalzeile
+enthaelt die Modus-Partien bereits - sie als Prior zu nehmen, wuerde
+dieselben Partien ein zweites Mal in die Schaetzung ziehen, einmal als
+Prior und einmal als Beobachtung. So zaehlt jede Partie in jeder
+einzelnen Schaetzung genau einmal.
 """
 
 import math
@@ -62,6 +76,46 @@ def erwartet_miteinander(pa, pb):
 def vorteil(geglaettet, erwartet):
     """Abweichung von der Erwartung auf [-1, +1] - der Score-Vertrag der Engine."""
     return max(-1.0, min(1.0, 2.0 * (geglaettet - erwartet)))
+
+
+def rest_zaehler(grob, fein):
+    """Was die groebere Ebene weiss, OHNE die feinere: grob minus fein.
+
+    Die Globalzeile eines Paares enthaelt seine Knockout-Partien mit. Wer
+    sie als Prior fuer Knockout benutzt, zaehlt dieselben Partien zweimal
+    - erst als Vorannahme, dann als Beobachtung. Gezaehlt wird hier
+    deshalb die Differenzmenge: alle Partien des Paares ausserhalb dieses
+    Modus.
+
+    Die Subtraktion ist exakt, weil beide Zaehler aus demselben Lauf
+    ueber dieselben Partien stammen: jede Partie der feineren Ebene ist
+    in der groeberen enthalten. `max(0, ...)` ist nur eine Sicherung
+    gegen Aufrufe, die das verletzen - dann bleibt der Rest leer und der
+    Prior faellt auf die Erwartung zurueck.
+    """
+    return Zaehler(
+        games=max(0, grob.games - fein.games),
+        wins=max(0, grob.wins - fein.wins),
+        gewicht=max(0.0, grob.gewicht - fein.gewicht),
+        gewicht_siege=max(0.0, grob.gewicht_siege - fein.gewicht_siege),
+    )
+
+
+def uebertragener_prior(rest_rate, erwartet_grob, erwartet_fein):
+    """Die ausserhalb gemessene ABWEICHUNG auf die feinere Ebene uebertragen.
+
+    Nicht die Rate wandert, sondern der Vorsprung. Beide Ebenen haben
+    eigene Erwartungen - global kann ein Paar 53 % erwarten lassen und im
+    Modus 47 %, weil dort andere Einzelstaerken gelten. Uebertragbar ist
+    nur, was ueber die jeweilige Erwartung hinausgeht:
+
+        prior_fein = erwartet_fein + (rest_rate - erwartet_grob)
+
+    Damit heisst "ausserhalb dieses Modus 2 Punkte besser als erwartet"
+    auch im Modus "2 Punkte besser als dort erwartet" - und nicht
+    versehentlich "53 %", wo 53 % schon ueberdurchschnittlich waeren.
+    """
+    return begrenze(erwartet_fein + (rest_rate - erwartet_grob))
 
 
 @dataclass

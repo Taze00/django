@@ -1015,6 +1015,114 @@ Pick- und Winrate, Confidence, Counter, Synergien — und für jede Map die Top 
 der Engine einmal mit Demo- und einmal mit gemessenen Daten. Erst wenn die
 Stichproben tragen, lohnt die Freigabe.
 
+## 18b. Paarwerte über Ebenen: global ist die Basis
+
+Counter und Synergien werden auf zwei Ebenen aggregiert, **global** und
+**Modus** — eine Map-Ebene gibt es für Paare nicht (`AGGREGATIONS_EBENEN`).
+Bis zum 2026-09-20 schrumpfte jede Ebene für sich gegen die nackte
+log5-Erwartung, und die Engine nahm anschließend über `_spezifitaet()`
+**immer** die spezifischste Zeile. Der Stichprobenterm dieser Regel ist
+`min(0.1, games/1_000_000)` und kann den Modus-Bonus von 2.0 nie
+aufwiegen: sechs Knockout-Partien verdrängten dreiundzwanzig globale
+vollständig. Im Praxisfall #7 kippte damit ein Vorzeichen — EDGAR+GRAY
+stand global bei +0.003 und im Modus bei −0.031.
+
+### Die Kette
+
+Dieselbe Grundidee wie bei `BrawlerStat` (Map schrumpft zum Modus, Modus
+zum globalen Wert), aber ohne deren Doppelzählung:
+
+```
+global:  Prior = log5-Erwartung aus den Einzelstärken
+         Posterior = bayes(n_global, Siege, Prior, PAAR_PRIOR_STAERKE)
+
+Modus:   Rest      = global MINUS Modus          (rechnung.rest_zaehler)
+         Restrate  = bayes(n_rest, Siege_rest, log5_global, k)
+         Prior     = log5_modus + (Restrate - log5_global)
+         Posterior = bayes(n_modus, Siege_modus, Prior, k)
+```
+
+Das Gewicht der eigenen Beobachtung ist `n/(n + PAAR_PRIOR_STAERKE)`,
+also `n/(n+60)` — stetig und ohne Schwelle: 6 Partien zählen 9 %, 60 die
+Hälfte, 600 zu 91 %.
+
+**Übertragen wird die Abweichung, nicht die Rate.** Beide Ebenen haben
+eigene Erwartungen: global kann für ein Paar 51,2 % erwarten lassen, im
+Knockout 49,9 %, weil dort andere Einzelstärken gelten. Wanderte die
+Rate, hieße „außerhalb 51 %" im Modus fälschlich „überdurchschnittlich".
+Wandert der Vorsprung, heißt „außerhalb 1,1 Punkte unter Erwartung" auch
+im Modus „1,1 Punkte unter der dortigen Erwartung".
+
+### Keine Partie zählt zweimal
+
+Der Prior ist die **Differenzmenge**, nicht die Globalzeile. Die
+Globalzeile enthält die Modus-Partien bereits; sie als Prior zu nehmen,
+zöge dieselben Partien ein zweites Mal in die Schätzung — einmal als
+Vorannahme, einmal als Beobachtung. Mit dem Rest gilt für jede einzelne
+Schätzung:
+
+* Partien **in** diesem Modus → gehen in die Likelihood ein, genau einmal.
+* Partien **außerhalb** → gehen in den Prior ein, genau einmal.
+* Summe: `rest.games + modus.games == global.games` (ein Test hält das fest).
+
+Der Rest wird mit Stärke `k` gegen die log5-Erwartung geglättet und geht
+als Punkt-Prior mit derselben Stärke `k` ein — nicht mit seiner eigenen
+Stichprobe. Bewusst konservativ: auch 2000 Partien außerhalb eines Modus
+können die dortige Messung nicht überstimmen, sie ersetzen nur die
+Annahme „kein Vorteil".
+
+Kam ein Paar ausschließlich in einem Modus vor, ist der Rest leer, der
+Prior bleibt die reine Erwartung — genau das Verhalten von vorher.
+
+> **Was NICHT geändert wurde:** die Auswahlregel der Engine
+> (`_spezifitaet`) ist unangetastet. Sie darf weiter die Modus-Zeile
+> nehmen, weil die globale Information jetzt darin steckt. Ebenso
+> unverändert: Current Strength, Objective Fit, Map Fit, Flexibilität,
+> Draft-Position, Personal und alle Gewichte.
+
+### Wirkung auf den Bestand (2026-09-20, 10 190 Ranked-Partien)
+
+| Modus-Stichprobe | Zeilen | näher an global | Vorzeichenwechsel | davon \|vorher\| > 0,05 |
+|---|---|---|---|---|
+| n < 10 | 45 741 | 87,0 % | 11 222 | 280 |
+| n 10–49 | 9 850 | 78,8 % | 2 089 | 193 |
+| n 50–199 | 1 414 | 72,3 % | 230 | 10 |
+| n ≥ 200 | 15 | 60,0 % | 0 | 0 |
+
+Median der Änderung 0,0216, p90 0,0669, Maximum 0,2146. Der mediane
+Abstand einer Modus-Zeile zu ihrer Globalzeile fiel von 0,0227 auf
+0,0027. Globale Zeilen änderten sich um höchstens 0,0067 (reine
+Stichtagsdrift) — sie sind die Kontrollgruppe, ihr Rechenweg ist
+unverändert.
+
+---
+
+## 18c. Sampling-Bias: gemessen, nicht korrigiert
+
+Der Collector lädt Battlelogs hochrangiger Spieler. Der jeweils
+**abgefragte** Spieler gewinnt 57,8 % seiner Partien — er wurde dafür
+ausgesucht. Damit hängt jede gemessene Quote daran, auf welcher Seite er
+stand. Über 100 Brawler mit mindestens 50 Partien:
+
+* `sampled_side_winrate` gesamt: **0,578**
+* Median |Spreizung| (Siegquote mit ihm minus gegen ihn): **0,134**
+* `queried_side_balance`: median 0,514, min 0,304, max 0,649
+
+EDGAR: 54,9 % mit ihm im Team (505 Partien), 44,4 % gegen ihn (610) —
+10,5 Punkte, die nichts mit EDGAR zu tun haben.
+
+Messbar ist das über `python manage.py brawl_sampling_bias`
+(read-only, `--brawler`, `--paar`, `--top`). **Korrigiert wird nichts.**
+Eine Korrekturformel ohne saubere Herleitung würde einen bekannten Bias
+durch einen unbekannten ersetzen; die Optionen stehen in §21.
+
+Warum als Kommando und nicht in der API: die Engine liest grundsätzlich
+keine Rohmatches (§16). Wer die Zahlen im Draft sehen will, braucht sie
+als Feld auf der Statistikzeile, geschrieben beim Aggregieren — das ist
+erst sinnvoll, wenn entschieden ist, was damit geschehen soll.
+
+---
+
 ## 19b. Einzelanalyse: jeden Kandidaten aufklappen
 
 Die Vorschlagsliste zeigt acht Namen. Für die Fehlersuche und den
