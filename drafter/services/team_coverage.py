@@ -55,7 +55,29 @@ def teamprofil(brawler_liste):
 
 
 def _bekannte_teamwerte(brawler_liste, key):
-    """Die Werte der Teammitglieder, die zu `key` wirklich etwas sagen."""
+    """Die Werte der Teammitglieder, die zu `key` etwas aussagen.
+
+    Zwei Faelle, die man auseinanderhalten muss, und der Unterschied
+    entscheidet ueber jede Luecke:
+
+    * **Kein Profil** (AMBER): niemand hat diesen Brawler je beschrieben.
+      Er sagt zu gar nichts etwas - und erzeugt deshalb auch keine
+      Luecke. Das war der Fehler vom 2026-09-20.
+    * **Profil vorhanden, Schluessel fehlt** (GALE ohne `healing`):
+      jemand hat ihn beschrieben und diese Eigenschaft nicht genannt.
+      Der Demo-Datensatz sagt das ausdruecklich ueber sich selbst -
+      "eingetragen wird, was den Brawler ausmacht". Eine Auslassung
+      INNERHALB einer Beschreibung ist eine schwache Aussage ueber
+      Abwesenheit, kein Nichtwissen.
+
+    Ohne diese Unterscheidung wuerde jedes duenne Profil zum blinden
+    Fleck: drei beschriebene Brawler ohne Anti-Tank saehen aus wie drei
+    Unbekannte, und die Luecke verschwaende - obwohl sie real ist.
+
+    `Brawler.wert()` bleibt davon unberuehrt: dort heisst "nicht
+    eingetragen" weiter `None`. Die Frage ist hier eine andere - nicht
+    "wie stark ist er darin", sondern "haben wir das im Team".
+    """
     from drafter.services import vertrauen
 
     werte = []
@@ -63,6 +85,9 @@ def _bekannte_teamwerte(brawler_liste, key):
         wert, stufe = vertrauen.wert_mit_stufe(b, key)
         if wert is not None:
             werte.append(wert)
+        elif b.hat_profil:
+            # Beschrieben, aber nicht genannt: zaehlt als bekannt-abwesend.
+            werte.append(0.0)
     return werte
 
 
@@ -138,6 +163,28 @@ def anforderungen_mit_gegner(basis, gegner_picks):
 def bekannt_je_eigenschaft(brawler_liste):
     """{key: (bekannt, gesamt)} fuer das ganze Vokabular."""
     return {key: bekannt_anteil(brawler_liste, key) for key in attr.ATTRIBUT_KEYS}
+
+
+def abdeckung_je_eigenschaft(bekannt):
+    """{key: 0-1} - von welchem Anteil des Teams wir etwas wissen.
+
+    Ein leeres Team ist vollstaendig bekannt (1.0): es gibt nichts, was
+    uns entgehen koennte. Sonst schlicht bekannt/gesamt - keine Formel,
+    keine Konstante, nur die Zaehlung.
+    """
+    return {key: (treffer / gesamt if gesamt else 1.0)
+            for key, (treffer, gesamt) in bekannt.items()}
+
+
+def gesicherter_bedarf(bedarf, abdeckung):
+    """Der Bedarf, so weit er BELEGT ist.
+
+    Eine Luecke, die wir nur bei der Haelfte des Teams sehen koennen,
+    ist eine halbe Aussage. `bedarf` bleibt daneben als das, was die
+    Luecke waere, WENN die Unbekannten nichts beitruegen - beides wird
+    gebraucht, siehe `team_need._nutzen`.
+    """
+    return {key: wert * abdeckung.get(key, 1.0) for key, wert in bedarf.items()}
 
 
 def bedarf(profil, anforderungen):
@@ -220,7 +267,12 @@ class Teamanalyse:
     # nicht lesbar: er kann "niemand kann das" oder "wir wissen nichts"
     # heissen.
     bekannt: dict = field(default_factory=dict)
+    # {key: 0-1} - bekannt/gesamt, siehe `abdeckung_je_eigenschaft`.
+    abdeckung: dict = field(default_factory=dict)
     bedarf: dict = field(default_factory=dict)
+    # Der Bedarf mal seiner Abdeckung: was wir von der Luecke wirklich
+    # BELEGEN koennen. Unbekannt heisst nicht "fehlt".
+    bedarf_gesichert: dict = field(default_factory=dict)
     ueberschuss: dict = field(default_factory=dict)
     rollen: dict = field(default_factory=dict)
     rollen_ueberhang: dict = field(default_factory=dict)
@@ -231,13 +283,18 @@ class Teamanalyse:
     @classmethod
     def bauen(cls, brawler_liste, anforderungen):
         profil = teamprofil(brawler_liste)
+        bekannt = bekannt_je_eigenschaft(brawler_liste)
+        abdeckung = abdeckung_je_eigenschaft(bekannt)
+        offener_bedarf = bedarf(profil, anforderungen)
         return cls(
             unbekannt=[b for b in brawler_liste if not b.hat_profil],
             brawler=list(brawler_liste),
             anforderungen=anforderungen,
             profil=profil,
-            bekannt=bekannt_je_eigenschaft(brawler_liste),
-            bedarf=bedarf(profil, anforderungen),
+            bekannt=bekannt,
+            abdeckung=abdeckung,
+            bedarf=offener_bedarf,
+            bedarf_gesichert=gesicherter_bedarf(offener_bedarf, abdeckung),
             ueberschuss=ueberschuss(profil, anforderungen),
             rollen=rollenzaehlung(brawler_liste),
             rollen_ueberhang=rollen_ueberhang(brawler_liste),
@@ -245,8 +302,15 @@ class Teamanalyse:
 
     # --- Auswertung -----------------------------------------------------
     def groesste_luecken(self, anzahl=4, mindestens=0.15):
-        """Die dringendsten offenen Eigenschaften, wichtigste zuerst."""
-        sortiert = sorted(self.bedarf.items(), key=lambda p: -p[1])
+        """Die dringendsten BELEGTEN Luecken, wichtigste zuerst.
+
+        Ueber `bedarf_gesichert`, nicht ueber `bedarf`: was wir bei
+        niemandem sehen koennen, ist keine Luecke, sondern eine
+        Wissensluecke. Vorher stand AMBER ohne Profil fuer "das Team hat
+        kein Frontline" - dabei war nur unbekannt, ob sie welches hat.
+        """
+        quelle = self.bedarf_gesichert or self.bedarf
+        sortiert = sorted(quelle.items(), key=lambda p: -p[1])
         return [
             (attr.EIGENSCHAFT_NACH_KEY[k], wert)
             for k, wert in sortiert[:anzahl]
@@ -257,7 +321,8 @@ class Teamanalyse:
         """Offene Luecken bei Eigenschaften, deren Fehlen richtig weh tut."""
         return [
             (attr.EIGENSCHAFT_NACH_KEY[k], wert)
-            for k, wert in sorted(self.bedarf.items(), key=lambda p: -p[1])
+            for k, wert in sorted((self.bedarf_gesichert or self.bedarf).items(),
+                                  key=lambda p: -p[1])
             if k in attr.KNAPPE_KEYS and wert >= mindestens
         ]
 

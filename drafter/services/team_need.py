@@ -25,12 +25,29 @@ def _nutzen(analyse, kandidat):
     mit dem Eigenwert des Kandidaten. Das ist der ganze Unterschied:
     ein zweiter Anti-Tank hat denselben Eigenwert wie der erste, aber
     fast keinen Zuwachs.
+
+    **Zaehler gesichert, Nenner nicht** - und das ist die ganze
+    Wissensabdeckung in einer Zeile:
+
+        nutzen = Σ (abdeckung[k] · bedarf[k] · zuwachs[k]) / Σ bedarf[k]
+
+    Waeren beide Seiten gedaempft, kuerzte sich die Abdeckung bei
+    gleichmaessigem Unwissen exakt weg - ein Team, von dem wir gar
+    nichts wissen, haette denselben Teambedarf wie ein vollstaendig
+    bekanntes, nur anders verteilt. So dagegen geschieht zweierlei
+    zugleich: schlecht belegte Luecken verlieren Gewicht **gegenueber**
+    gut belegten (die Verteilung), und ein insgesamt wenig bekanntes
+    Team erzeugt **weniger** Bedarf (die Hoehe). Bei voller Abdeckung
+    sind beide Formeln identisch - es gibt keinen Bruch und keine neue
+    Konstante.
     """
     gesamt_bedarf = sum(analyse.bedarf.values())
     if gesamt_bedarf <= 0:
         return 0.0, {}
     zuwachs = analyse.zuwachs(kandidat)
-    nutzen = sum(analyse.bedarf[k] * zuwachs.get(k, 0.0) for k in attr.ATTRIBUT_KEYS)
+    gesichert = analyse.bedarf_gesichert or analyse.bedarf
+    nutzen = sum(gesichert.get(k, 0.0) * zuwachs.get(k, 0.0)
+                 for k in attr.ATTRIBUT_KEYS)
     return nutzen / gesamt_bedarf, zuwachs
 
 
@@ -158,7 +175,18 @@ def komponenten_fuer_pool(kandidaten, analyse, ctx):
 
 
 def redundanz(kandidat, analyse, ctx):
-    """Strafkomponente: wovon wir schon genug haben. Immer <= 0."""
+    """Strafkomponente: wovon wir schon genug haben. Immer <= 0.
+
+    **Hier wird bewusst NICHT nach Abdeckung gedaempft.** Teambedarf und
+    Angreifbarkeit behaupten, dass etwas FEHLT - und das kann an
+    Unwissen liegen. Redundanz behauptet das Gegenteil: dass etwas
+    SCHON DA ist. Diese Aussage stuetzt sich allein auf die bekannten
+    Mitglieder, und das Teamprofil kann durch einen weiteren bekannten
+    Pick nur steigen (bester + 0.45 zweiter + 0.20 dritter). Wer 0.9
+    Anti-Tank gemessen hat, hat mindestens 0.9 - egal, was die
+    Unbekannten noch koennen. Eine Daempfung wuerde eine belegte
+    Aussage schwaechen, statt eine unbelegte zu verhindern.
+    """
     komp = Komponente(key=config.K_REDUNDANCY)
     if not kandidat.hat_profil:
         # Ohne Eigenschaften laesst sich nicht sagen, WOVON wir zu viel
@@ -258,6 +286,12 @@ def angreifbarkeit(kandidat, analyse, ctx):
     strafe = 0.0
     for key, bedrohung, bezeichnung in paarungen:
         offen = max(0.0, config.COVERAGE_ZIEL - nach_pick.profil.get(key, 0.0))
+        # Dieselbe Frage wie beim Teambedarf: ist die Luecke belegt oder
+        # nur unbeobachtet? Eine Restluecke, die wir bei der Haelfte des
+        # Teams gar nicht sehen koennen, ist keine belegbare Gefahr -
+        # und "der Gegner bestraft das" waere dann eine Behauptung ueber
+        # etwas, das wir nicht wissen.
+        offen *= nach_pick.abdeckung.get(key, 1.0)
         if offen <= 0.05:
             continue
         # Nur Gegner mit Profil: eine unbekannte Bedrohung ist keine 0,

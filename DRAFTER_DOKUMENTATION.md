@@ -1136,6 +1136,82 @@ bleibt in der API erhalten.
 
 ---
 
+## 17c. Teambedarf folgt der Wissensabdeckung
+
+Aus `Teamanalyse.bekannt[key] = (bekannt, gesamt)` wird jetzt gerechnet,
+nicht nur berichtet. Die Rechnung steht in einer Zeile:
+
+```
+nutzen = Σ (abdeckung[k] · bedarf[k] · zuwachs[k]) / Σ bedarf[k]
+```
+
+**Zähler gesichert, Nenner nicht** — und das ist der ganze Punkt. Wären
+beide gedämpft, kürzte sich die Abdeckung bei gleichmäßigem Unwissen
+exakt weg: ein Team, von dem wir nichts wissen, hätte denselben
+Teambedarf wie ein vollständig bekanntes, nur anders verteilt. So
+geschieht zweierlei zugleich — schlecht belegte Lücken verlieren Gewicht
+**gegenüber** gut belegten (die Verteilung), und ein insgesamt wenig
+bekanntes Team erzeugt **weniger** Bedarf (die Höhe). Bei voller
+Abdeckung sind alte und neue Formel identisch; es gibt keinen Bruch und
+keine neue Konstante.
+
+### Warum nicht anders
+
+| Variante | Warum nicht |
+|---|---|
+| `raw_need × coverage` (ein Skalar) | Abdeckung ist **je Eigenschaft** verschieden. Ein Skalar behandelt eine belegte und eine unbelegte Lücke gleich — genau die Verwechslung, um die es geht. |
+| `final_component × coverage` | Der Komponentenwert ist feldrelativ (z-Wert). Nachträglich zu skalieren verzerrt den Vergleich *nach* der Einordnung und dämpft auch die negative Seite — dabei heißt ein niedriger Teambedarf „er hilft nicht", was keine Unsicherheitsaussage ist. |
+| **beim Gap (gewählt)** | `bedarf[k]` ist genau die Stelle, an der aus *unbekannt* ein *fehlt* wird. Die Korrektur wirkt dort, wo der Fehler entsteht, und fließt von allein in Lücken, Coach-Sätze und den Rollenpfad. |
+
+### Beschrieben ist nicht dasselbe wie bekannt
+
+Zwei Fälle, die man auseinanderhalten muss:
+
+* **Kein Profil** (AMBER): nie beschrieben, sagt zu nichts etwas → zählt
+  nicht als bekannt.
+* **Profil vorhanden, Schlüssel fehlt** (GALE ohne `healing`): jemand hat
+  ihn beschrieben und diese Eigenschaft nicht genannt. Der Demo-Datensatz
+  sagt das über sich selbst — *„eingetragen wird, was den Brawler
+  ausmacht"*. Eine Auslassung **innerhalb** einer Beschreibung ist eine
+  schwache Aussage über Abwesenheit, kein Nichtwissen → zählt als
+  bekannt-abwesend.
+
+Ohne diese Unterscheidung würde jedes dünne Profil zum blinden Fleck:
+drei beschriebene Brawler ohne Anti-Tank sähen aus wie drei Unbekannte,
+und eine reale Lücke verschwände. Vier Verhaltenstests haben genau das
+gefunden. `Brawler.wert()` bleibt davon unberührt — dort heißt „nicht
+eingetragen" weiter `None`; die Frage ist hier eine andere: nicht *wie
+stark ist er darin*, sondern *haben wir das im Team*.
+
+### Angreifbarkeit ja, Redundanz nein
+
+`angreifbarkeit` behauptet, dass etwas **fehlt** und der Gegner es
+bestraft — dieselbe Unknown-Problematik, also dieselbe Dämpfung.
+
+`redundanz` behauptet das Gegenteil: dass etwas **schon da ist**. Diese
+Aussage stützt sich allein auf die bekannten Mitglieder, und das
+Teamprofil kann durch einen weiteren bekannten Pick nur steigen
+(bester + 0.45·zweiter + 0.20·dritter). Wer 0.9 Anti-Tank gemessen hat,
+hat mindestens 0.9 — egal, was die Unbekannten noch können. Eine
+Dämpfung würde hier eine belegte Aussage schwächen, statt eine unbelegte
+zu verhindern. Ein Test hält das fest.
+
+### Wirkung (30 Lagen je Phase)
+
+| Kennzahl (Last Pick) | vorher | nachher |
+|---|---|---|
+| **Teambedarf > +8 bei Teilwissen** | **29** | **10** |
+| saturiert (\|Wert\| ≥ 0.999) | 8 | 7 |
+| p90 | +0.806 | +0.774 |
+| Full-Profile Top 1 | 17/30 | 15/30 |
+| Full-Profile Ø Rang | 3.63 | 3.82 |
+
+Mid Draft: verdächtige Fälle **4 → 0**, p90 +0.823 → +0.701. First Pick
+unverändert (dort greift Teambedarf ohnehin nicht). Counter über alle
+Phasen unverändert.
+
+---
+
 ## 18a. Das Patchdatum ist externe Information
 
 `Patch.released_on` schneidet das Fenster `seit_patch` — das Fenster mit
