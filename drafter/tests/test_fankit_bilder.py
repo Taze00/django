@@ -83,6 +83,7 @@ class ImportTest(DrafterTest):
         dabei nur proportional verkleinert, nie gestreckt und nie
         beschnitten: die sichtbare Flaeche behaelt ihr Verhaeltnis.
         """
+        from drafter.management.commands.import_fankit_bilder import MOTIV_KANTE
         bild_schreiben(self.quelle / "Gale.png", groesse=(400, 800))
         self.importieren(brawler=str(self.quelle))
         with Image.open(self.ziel / "brawler" / "gale.png") as bild:
@@ -90,7 +91,11 @@ class ImportTest(DrafterTest):
             sichtbar = bild.convert("RGBA").split()[3].getbbox()
             breite = sichtbar[2] - sichtbar[0]
             hoehe = sichtbar[3] - sichtbar[1]
-            self.assertEqual((breite, hoehe), (80, 160))
+            # Seit dem 2026-09-20 wird auf das MOTIV normalisiert, nicht
+            # auf die Datei: die laengere sichtbare Seite trifft die
+            # Zielkante, das Verhaeltnis bleibt 1:2.
+            self.assertEqual(hoehe, MOTIV_KANTE)
+            self.assertAlmostEqual(hoehe / breite, 2.0, delta=0.05)
 
     def test_mehrdeutige_dateien_werden_nicht_geraten(self):
         bild_schreiben(self.quelle / "gale_portrait_1.png")

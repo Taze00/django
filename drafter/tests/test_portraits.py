@@ -25,38 +25,71 @@ class QuadratTest(DrafterTest):
         from drafter.management.commands.import_fankit_bilder import Command
         return Command()
 
-    def bild(self, breite, hoehe, farbe=(255, 0, 0, 255)):
+    def bild(self, breite, hoehe, farbe=(255, 0, 0, 255), rand=0):
+        """Ein Motiv, optional mit transparentem Rand ringsum."""
         from PIL import Image
-        return Image.new("RGBA", (breite, hoehe), farbe)
+        leinwand = Image.new("RGBA", (breite + 2 * rand, hoehe + 2 * rand), (0, 0, 0, 0))
+        leinwand.paste(Image.new("RGBA", (breite, hoehe), farbe), (rand, rand))
+        return leinwand
 
-    def test_breites_bild_wird_quadratisch_ohne_verzerrung(self):
+    def sichtbar(self, bild):
+        kasten = bild.split()[3].getbbox()
+        return kasten[2] - kasten[0], kasten[3] - kasten[1]
+
+    def test_motiv_wird_freigestellt_und_normalisiert(self):
+        """Transparenter Rand darf die sichtbare Groesse nicht bestimmen.
+
+        Genau daran lag es: COLT lag als 1472x1531-Motiv auf einer
+        2400x1602-Leinwand und kam mit 99x104 sichtbaren Pixeln an,
+        BYRON fuellte seine 401x401 ganz aus und kam mit 160x160.
+        """
         from PIL import Image
-        quelle = self.bild(160, 108)
-        fertig = self.kommando()._auf_quadrat(quelle, 160, Image)
-        self.assertEqual(fertig.size, (160, 160))
-        sichtbar = fertig.split()[3].getbbox()
-        self.assertEqual((sichtbar[2] - sichtbar[0], sichtbar[3] - sichtbar[1]),
-                         (160, 108), "das Motiv darf nicht gestreckt werden")
+        from drafter.management.commands.import_fankit_bilder import MOTIV_KANTE
+        eng = self.kommando()._auf_quadrat(self.bild(400, 400), 160, Image, MOTIV_KANTE)
+        weit = self.kommando()._auf_quadrat(self.bild(400, 400, rand=600), 160, Image,
+                                            MOTIV_KANTE)
+        self.assertEqual(self.sichtbar(eng), self.sichtbar(weit),
+                         "derselbe Motivinhalt muss gleich gross ankommen")
+        self.assertEqual(self.sichtbar(eng), (MOTIV_KANTE, MOTIV_KANTE))
+
+    def test_laengere_seite_trifft_die_zielkante(self):
+        from PIL import Image
+        from drafter.management.commands.import_fankit_bilder import MOTIV_KANTE
+        for breite, hoehe in ((400, 200), (200, 400), (300, 300)):
+            fertig = self.kommando()._auf_quadrat(self.bild(breite, hoehe), 160, Image,
+                                                  MOTIV_KANTE)
+            self.assertEqual(fertig.size, (160, 160))
+            self.assertEqual(max(self.sichtbar(fertig)), MOTIV_KANTE,
+                             f"{breite}x{hoehe}")
+
+    def test_seitenverhaeltnis_bleibt_erhalten(self):
+        from PIL import Image
+        from drafter.management.commands.import_fankit_bilder import MOTIV_KANTE
+        fertig = self.kommando()._auf_quadrat(self.bild(800, 400), 160, Image, MOTIV_KANTE)
+        breite, hoehe = self.sichtbar(fertig)
+        self.assertEqual(breite, MOTIV_KANTE)
+        self.assertAlmostEqual(breite / hoehe, 2.0, delta=0.05,
+                               msg="proportional verkleinert, nie gestreckt")
 
     def test_motiv_wird_zentriert(self):
         from PIL import Image
-        fertig = self.kommando()._auf_quadrat(self.bild(160, 100), 160, Image)
-        oben = fertig.split()[3].getbbox()[1]
-        unten = 160 - fertig.split()[3].getbbox()[3]
+        fertig = self.kommando()._auf_quadrat(self.bild(160, 100), 160, Image, 148)
+        kasten = fertig.split()[3].getbbox()
+        oben, unten = kasten[1], 160 - kasten[3]
+        links, rechts = kasten[0], 160 - kasten[2]
         self.assertLessEqual(abs(oben - unten), 1)
+        self.assertLessEqual(abs(links - rechts), 1)
 
-    def test_zu_grosses_bild_wird_proportional_verkleinert(self):
+    def test_nie_vergroessern(self):
+        """Ein kleines Motiv wird nicht hochskaliert - das waere nur unschaerfer."""
         from PIL import Image
-        fertig = self.kommando()._auf_quadrat(self.bild(800, 400), 160, Image)
-        self.assertEqual(fertig.size, (160, 160))
-        sichtbar = fertig.split()[3].getbbox()
-        breite, hoehe = sichtbar[2] - sichtbar[0], sichtbar[3] - sichtbar[1]
-        self.assertEqual(breite, 160)
-        self.assertAlmostEqual(breite / hoehe, 2.0, delta=0.05)
+        fertig = self.kommando()._auf_quadrat(self.bild(40, 30), 160, Image, 148)
+        self.assertEqual(self.sichtbar(fertig), (40, 30))
 
-    def test_bereits_quadratisch_bleibt_unangetastet(self):
+    def test_vollstaendig_transparent_ergibt_nichts(self):
         from PIL import Image
-        self.assertIsNone(self.kommando()._auf_quadrat(self.bild(160, 160), 160, Image))
+        leer = Image.new("RGBA", (100, 100), (0, 0, 0, 0))
+        self.assertIsNone(self.kommando()._auf_quadrat(leer, 160, Image, 148))
 
 
 class RueckfallTest(DrafterTest):

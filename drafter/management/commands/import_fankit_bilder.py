@@ -50,6 +50,11 @@ BILDENDUNGEN = {".png", ".webp", ".jpg", ".jpeg"}
 # Laengste Kante nach dem Verkleinern. Brawler: groesste Anzeige ist die
 # 54px-Kachel, auf 2x-Bildschirmen also 108px - 160 laesst Luft. Maps
 # zeigen 34px-Vorschauen, sind im Original aber hochkant und detailreich.
+# Auf welche Kante die LAENGERE Motivseite normalisiert wird. Kleiner als
+# die Leinwand, damit jedes Portrait denselben schmalen Rand bekommt und
+# nichts an der Kachelkante klebt.
+MOTIV_KANTE = 148
+
 MAX_KANTE = {"brawler": 160, "maps": 240}
 
 # Woerter, die in Fan-Kit-Dateinamen neben dem eigentlichen Namen stehen.
@@ -211,31 +216,43 @@ class Command(BaseCommand):
         return geschrieben
 
     @staticmethod
-    def _auf_quadrat(bild, kante, Image):
-        """Proportional verkleinern und auf eine quadratische Flaeche legen.
+    def _auf_quadrat(bild, kante, Image, ziel_kante=None):
+        """Motiv freistellen, proportional skalieren, mittig auf die Leinwand.
 
-        Die Fan-Kit-Portraits haben sehr verschiedene Seitenverhaeltnisse -
-        gemessen am 2026-09-20 von 160x108 (GUS) bis 160x160 (BYRON).
-        Im quadratischen Rahmen der Oberflaeche wirken sie dadurch
-        unterschiedlich gross, obwohl an keinem etwas falsch ist.
+        Drei Schritte, und der erste ist der entscheidende:
 
-        Was hier passiert, ist ausschliesslich **proportionales
-        Verkleinern und transparentes Auffuellen**: kein Zuschnitt, keine
-        Verzerrung, keine Farbaenderung. Das Motiv selbst bleibt
-        unveraendert - nur die Leinwand ist fuer alle gleich. Die
-        Originale in `fankit_download/` werden nie angefasst.
+        1. **Auf den sichtbaren Bereich zuschneiden.** Die Fan-Kit-Dateien
+           haben sehr verschieden viel transparenten Rand - COLT liegt als
+           1472x1531-Motiv auf einer 2400x1602-Leinwand, BYRON fuellt seine
+           401x401 ganz aus. Wer nur die Datei skaliert, skaliert den Rand
+           mit: COLT kam dadurch mit 99x104 sichtbaren Pixeln an, BYRON mit
+           160x160. Im gleich grossen Rahmen sieht das aus wie zwei
+           Groessen, obwohl an keinem der beiden etwas falsch ist.
+        2. **Die laengere Motivseite auf `ziel_kante` bringen.** Danach hat
+           jedes Portrait dieselbe sichtbare Ausdehnung. Skaliert wird
+           proportional, also ohne Verzerrung.
+        3. **Mittig auf eine quadratische, transparente Leinwand legen.**
 
-        Gibt None zurueck, wenn nichts zu tun ist (schon quadratisch und
-        klein genug) - dann wird die Datei unveraendert kopiert.
+        Geschnitten wird ausschliesslich **durchsichtiger Rand** - am Motiv
+        selbst nie. Ein absichtlich weit ausladendes Motiv wird dadurch
+        konservativ kleiner, statt beschnitten zu werden.
         """
-        breite, hoehe = bild.size
-        if breite == hoehe == kante:
-            return None
+        ziel_kante = ziel_kante or kante
         quelle = bild.convert("RGBA")
-        faktor = min(kante / breite, kante / hoehe, 1.0)
+        sichtbar = quelle.split()[3].getbbox()
+        if sichtbar is None:
+            # Vollstaendig transparent - nichts zu normalisieren.
+            return None
+        quelle = quelle.crop(sichtbar)
+
+        breite, hoehe = quelle.size
+        # Nie vergroessern: ein hochskaliertes Motiv ist unschaerfer als
+        # ein kleines, und das Fan Kit erlaubt ohnehin nur Verkleinern.
+        faktor = min(ziel_kante / max(breite, hoehe), 1.0)
         neu_groesse = (max(1, round(breite * faktor)), max(1, round(hoehe * faktor)))
         if neu_groesse != quelle.size:
             quelle = quelle.resize(neu_groesse, Image.LANCZOS)
+
         leinwand = Image.new("RGBA", (kante, kante), (0, 0, 0, 0))
         leinwand.paste(
             quelle,
@@ -256,7 +273,8 @@ class Command(BaseCommand):
             # Quadratisch wird nur das PORTRAIT. Eine Map ist ein
             # Spielfeld - sie hat ihr Seitenverhaeltnis aus gutem Grund
             # und steht auf der Seite auch nicht neben ihresgleichen.
-            fertig = (self._auf_quadrat(bild, MAX_KANTE[art], Image)
+            fertig = (self._auf_quadrat(bild, MAX_KANTE[art], Image,
+                                        ziel_kante=MOTIV_KANTE)
                       if art == "brawler" else None)
             if fertig is not None:
                 fertig.save(datei, optimize=True)
