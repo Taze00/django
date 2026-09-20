@@ -26,6 +26,7 @@ from datetime import date
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
+from drafter import config
 from drafter.models import Patch
 from drafter.models.matches import Match
 
@@ -111,15 +112,22 @@ class Command(BaseCommand):
         juengste = Match.objects.order_by("-played_at").values_list("played_at", flat=True).first()
         if juengste is None:
             return
-        danach = Match.objects.filter(played_at__date__gte=datum).count()
+        danach = Match.objects.filter(played_at__date__gte=datum)
+        alle = danach.count()
+        # Fuer die Draft-Statistik zaehlt nur soloRanked - die Gesamtzahl
+        # allein taeuscht: sie enthaelt Trophaeenpartien, die nie in eine
+        # Statistikzeile eingehen.
+        ranked = danach.filter(
+            is_ranked=True, battle_type__in=config.DRAFT_STATISTIK_BATTLE_TYPEN).count()
         self.stdout.write(f"Jüngste gespeicherte Partie: {juengste:%Y-%m-%d}")
-        if danach == 0:
+        if ranked == 0:
             self.stdout.write(self.style.WARNING(
-                f"  Achtung: keine einzige Partie am oder nach dem {datum}. "
-                f"Das Fenster 'seit Patch' bliebe leer, die Engine fiele auf ein "
-                f"anderes Fenster zurück."))
+                f"  Achtung: keine einzige Ranked-Partie am oder nach dem {datum} "
+                f"(Partien gesamt: {alle}). Das Fenster 'seit Patch' bliebe leer, "
+                f"die Engine fiele auf ein anderes Fenster zurück."))
         else:
-            self.stdout.write(f"  Partien am oder nach dem {datum}: {danach}")
+            self.stdout.write(f"  Partien am oder nach dem {datum}: "
+                              f"{ranked} Ranked von {alle} gesamt")
 
     def _liste(self):
         patches = Patch.objects.all()

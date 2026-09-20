@@ -104,6 +104,23 @@ class PatchSetzenTest(DrafterTest):
         with self.assertRaises(CommandError):
             self.laufen(name="Herbst", datum="irgendwann")
 
+    def test_warnung_zaehlt_ranked_nicht_alle_partien(self):
+        """In die Statistik gehen nur soloRanked-Partien - die Warnung auch.
+
+        Die Gesamtzahl allein taeuscht: sie enthaelt Trophaeenpartien,
+        die nie in einer Statistikzeile landen.
+        """
+        from drafter.models.matches import Match
+        from drafter.models import BrawlMap
+        karte = self.karte()
+        Match.objects.create(
+            fingerprint="trophaeen-1", source=Datenquelle.API,
+            played_at=timezone.now(), game_mode=karte.game_mode, brawl_map=karte,
+            winner_side="a", is_ranked=False, battle_type="ranked")
+        text = self.laufen(name="Herbst", datum=str(timezone.now().date()), trocken=True)
+        self.assertIn("keine einzige Ranked-Partie", text)
+        self.assertIn("Partien gesamt: 1", text)
+
     def test_trockenlauf_schreibt_nichts(self):
         text = self.laufen(name="Herbst", datum="2026-09-17", trocken=True)
         self.assertIn("[trocken]", text)
@@ -152,6 +169,33 @@ class PatchwechselTest(DrafterTest):
         agg = Aggregator((Datenquelle.SYNTHETIC,), stichtag=date(2026, 9, 20))
         self.assertEqual(agg._zeitraum("seit_patch"),
                          (date(2026, 9, 17), date(2026, 9, 20)))
+
+    def test_bestaetigtes_datum_schlaegt_einen_juengeren_platzhalter(self):
+        """Ein Platzhalter darf die Patchgrenze nicht an sich ziehen.
+
+        Am 2026-09-20 stand der Demo-Platzhalter auf dem 19., das
+        bestaetigte Datum aus den Release Notes auf dem 16. Der
+        Aggregator waehlt nach `released_on <= Stichtag` - ohne diese
+        Regel haette der Platzhalter gewonnen und `--aktivieren` waere
+        folgenlos geblieben.
+        """
+        from drafter.services.aggregation.aggregator import Aggregator
+        self.alt.released_on = date(2026, 9, 19)      # Platzhalter, unbestaetigt
+        self.alt.save(update_fields=["released_on"])
+        call_command("patch_setzen", name="Balance", datum="2026-09-16",
+                     quelle="Release Notes", aktivieren=True, stdout=io.StringIO())
+
+        agg = Aggregator((Datenquelle.SYNTHETIC,), stichtag=date(2026, 9, 20))
+        self.assertEqual(agg.aktueller_patch.name, "Balance")
+        self.assertEqual(agg._zeitraum("seit_patch"),
+                         (date(2026, 9, 16), date(2026, 9, 20)))
+
+    def test_ohne_bestaetigtes_datum_zaehlt_wieder_das_juengste(self):
+        from drafter.services.aggregation.aggregator import Aggregator
+        call_command("patch_setzen", name="Ohne Quelle", datum="2026-09-18",
+                     stdout=io.StringIO())
+        agg = Aggregator((Datenquelle.SYNTHETIC,), stichtag=date(2026, 9, 20))
+        self.assertEqual(agg.aktueller_patch.name, "Ohne Quelle")
 
     def test_ohne_patch_gibt_es_kein_patchfenster(self):
         from drafter.services.aggregation.aggregator import Aggregator

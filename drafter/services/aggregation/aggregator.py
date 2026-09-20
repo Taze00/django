@@ -128,9 +128,19 @@ class Aggregator:
 
         # "Aktuell" relativ zum Stichtag, nicht zu heute - so laesst sich
         # spaeter auch rueckwirkend aggregieren (Backtesting).
-        self.aktueller_patch = (
-            Patch.objects.filter(released_on__lte=self.stichtag).order_by("-released_on").first()
-        )
+        #
+        # Unter mehreren kommt der juengste BESTAETIGTE zuerst. Grund: ein
+        # unbestaetigter Platzhalter kann faelschlich spaeter datiert sein
+        # als der echte Patch und wuerde die Grenze dann an sich ziehen.
+        # Genau das war am 2026-09-20 der Fall - der Demo-Platzhalter
+        # (19.09., aus einem Seed-Lauf) haette das bestaetigte Datum
+        # (16.09., Release Notes) verdraengt, und `--aktivieren` waere
+        # folgenlos geblieben. Nur wenn gar kein bestaetigtes Datum
+        # vorliegt, zaehlt wieder das juengste ueberhaupt.
+        kandidaten = Patch.objects.filter(
+            released_on__lte=self.stichtag).order_by("-released_on")
+        self.aktueller_patch = (kandidaten.filter(datum_bestaetigt=True).first()
+                                or kandidaten.first())
         self._brawler = {
             b.id: b for b in Brawler.objects.prefetch_related("balance_changes__patch")
         }
