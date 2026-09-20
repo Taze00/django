@@ -19,10 +19,10 @@ from drafter.services.scoring import Grund, Komponente, klemme
 
 def _beschuetzt(schuetzer, empfindlich):
     """Deckt `schuetzer` genau die Schwaeche von `empfindlich`?"""
-    bedarf = empfindlich.wert("long_range") * (
-        1.0 - max(empfindlich.wert("survivability"), empfindlich.wert("mobility"))
+    bedarf = empfindlich.wert_oder("long_range") * (
+        1.0 - max(empfindlich.wert_oder("survivability"), empfindlich.wert_oder("mobility"))
     )
-    schutz = max(schuetzer.wert("peel"), schuetzer.wert("anti_assassin"))
+    schutz = max(schuetzer.wert_oder("peel"), schuetzer.wert_oder("anti_assassin"))
     return bedarf * schutz
 
 
@@ -41,8 +41,8 @@ def heuristische_synergie(a, b):
 
     # 2. Kontrolle plus Schaden: wer festhaelt, braucht jemanden, der trifft.
     for halter, treffer in ((a, b), (b, a)):
-        halten = max(halter.wert("crowd_control"), halter.wert("stun"), halter.wert("slow"))
-        schaden = max(treffer.wert("burst_damage"), treffer.wert("objective_damage"))
+        halten = max(halter.wert_oder("crowd_control"), halter.wert_oder("stun"), halter.wert_oder("slow"))
+        schaden = max(treffer.wert_oder("burst_damage"), treffer.wert_oder("objective_damage"))
         if halten > 0.5 and schaden > 0.6:
             signale.append((
                 halten * schaden * 0.55,
@@ -51,17 +51,17 @@ def heuristische_synergie(a, b):
 
     # 3. Frontline plus Backline: einer bindet, der andere wirkt aus der Distanz.
     for vorn, hinten in ((a, b), (b, a)):
-        if vorn.wert("frontline") > 0.6 and hinten.wert("long_range") > 0.6:
+        if vorn.wert_oder("frontline") > 0.6 and hinten.wert_oder("long_range") > 0.6:
             signale.append((
-                vorn.wert("frontline") * hinten.wert("long_range") * 0.45,
+                vorn.wert_oder("frontline") * hinten.wert_oder("long_range") * 0.45,
                 f"{vorn.name} bindet vorn, {hinten.name} wirkt aus der Distanz",
             ))
 
     # 4. Sicht und Buschkontrolle fuer jemanden, der davon lebt.
     for seher, nutzer in ((a, b), (b, a)):
-        if seher.wert("vision") > 0.55 and nutzer.wert("long_range") > 0.6:
+        if seher.wert_oder("vision") > 0.55 and nutzer.wert_oder("long_range") > 0.6:
             signale.append((
-                seher.wert("vision") * nutzer.wert("long_range") * 0.35,
+                seher.wert_oder("vision") * nutzer.wert_oder("long_range") * 0.35,
                 f"{seher.name} schafft Sicht für {nutzer.name}",
             ))
 

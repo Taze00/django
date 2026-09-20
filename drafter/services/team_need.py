@@ -182,7 +182,7 @@ def redundanz(kandidat, analyse, ctx):
 
     # 1. Eigenschaften, die das Team bereits ueberdeckt.
     ueberdeckt = sum(
-        analyse.ueberschuss.get(k, 0.0) * kandidat.wert(k) for k in attr.ATTRIBUT_KEYS
+        analyse.ueberschuss.get(k, 0.0) * kandidat.wert_oder(k) for k in attr.ATTRIBUT_KEYS
     )
     teiler = max(1.0, sum(1 for v in analyse.ueberschuss.values() if v > 0))
     strafe += min(0.5, ueberdeckt / teiler * 2.0)
@@ -248,11 +248,11 @@ def angreifbarkeit(kandidat, analyse, ctx):
 
     # Luecke -> was beim Gegner sie ausnutzt
     paarungen = [
-        ("anti_tank", lambda g: g.wert("tankiness"), "Tanks"),
-        ("anti_assassin", lambda g: max(g.wert("engage"), g.wert("mobility"))
+        ("anti_tank", lambda g: g.wert_oder("tankiness"), "Tanks"),
+        ("anti_assassin", lambda g: max(g.wert_oder("engage"), g.wert_oder("mobility"))
             if "assassin" in g.alle_rollen or "aggro" in g.alle_rollen else 0.0, "Aggro"),
         ("anti_thrower", lambda g: 1.0 if "thrower" in g.alle_rollen else 0.0, "Thrower"),
-        ("long_range", lambda g: g.wert("long_range"), "Reichweite"),
+        ("long_range", lambda g: g.wert_oder("long_range"), "Reichweite"),
     ]
 
     strafe = 0.0

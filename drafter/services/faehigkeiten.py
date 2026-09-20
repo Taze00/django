@@ -54,7 +54,7 @@ def auskunft(brawler, faehigkeit):
 
     # 1. Profil: die Zahl gewinnt, sie sagt auch WIE stark.
     if brawler.hat_profil and attribute:
-        wert = max(brawler.wert(key) for key in attribute)
+        wert = max(brawler.wert_oder(key) for key in attribute)
         return Auskunft(wert=wert, vorhanden=wert > 0.0, quelle=PROFILE)
 
     # 2. Fachquelle: qualitativ. Auch das Fehlen des Markers ist eine
@@ -90,7 +90,7 @@ def wandabhaengigkeit(brawler):
 
     if brawler.hat_profil:
         roh = 0.5 + sum(
-            gewicht * brawler.wert(key)
+            gewicht * brawler.wert_oder(key)
             for key, gewicht in config.WANDABHAENGIGKEIT_ATTRIBUTE.items()
         )
         teile.append(max(0.0, min(1.0, roh)))

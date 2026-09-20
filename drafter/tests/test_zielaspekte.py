@@ -103,8 +103,9 @@ class AspektTest(DrafterTest):
         beruehrung = objective.aspekt_beruehrung(ohne, self.tabelle())
         self.assertTrue(beruehrung)
         self.assertLessEqual(max(beruehrung.values()), 1.0)
-        # Es entsteht weiterhin kein Attributwert.
-        self.assertEqual(ohne.wert("survivability"), 0.0)
+        # Es entsteht weiterhin kein Attributwert - und seit dem
+        # 2026-09-20 ist "kein Wert" None statt 0.
+        self.assertIsNone(ohne.wert("survivability"))
 
     def test_brawl_ball_aspekte_trennen_abschluss_von_raum(self):
         tabelle = self.tabelle("brawl-ball")

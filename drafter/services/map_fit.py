@@ -24,7 +24,7 @@ def roh_passung(brawler, anforderungen):
     gewicht = sum(anforderungen.values())
     if gewicht <= 0:
         return 0.5
-    erfuellt = sum(w * brawler.wert(k) for k, w in anforderungen.items())
+    erfuellt = sum(w * brawler.wert_oder(k) for k, w in anforderungen.items())
     return erfuellt / gewicht
 
 
@@ -141,7 +141,8 @@ def komponenten_fuer_pool(kandidaten, anforderungen, brawl_map=None,
                 ))
             if allgemein > 0.15:
                 treffer = [
-                    (k, w) for k, w in wichtigste if w > 0.3 and b.wert(k) >= 0.6
+                    (k, w) for k, w in wichtigste
+                    if w > 0.3 and b.bekannt(k) and b.wert(k) >= 0.6
                 ]
                 for k, w in treffer[:2]:
                     label = attr.EIGENSCHAFT_NACH_KEY[k].label
@@ -152,7 +153,10 @@ def komponenten_fuer_pool(kandidaten, anforderungen, brawl_map=None,
                     ))
             elif allgemein < -0.25:
                 fehlend = [
-                    (k, w) for k, w in wichtigste if w > 0.4 and b.wert(k) < 0.35
+                    (k, w) for k, w in wichtigste
+                    # Unbekannt ist keine Schwaeche - nur ein ausdruecklich
+                    # niedriger Wert begruendet den Satz.
+                    if w > 0.4 and b.bekannt(k) and b.wert(k) < 0.35
                 ]
                 for k, w in fehlend[:1]:
                     komp.gruende.append(Grund(

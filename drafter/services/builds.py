@@ -85,7 +85,7 @@ def _erfuellt(bedingung, kandidat, ctx):
 
         elif schluessel == "enemy_attr_min":
             for key, schwelle in wert.items():
-                if max((g.wert(key) for g in gegner), default=0.0) < schwelle:
+                if max((g.wert_oder(key) for g in gegner), default=0.0) < schwelle:
                     return False
 
         elif schluessel == "own_has_role":

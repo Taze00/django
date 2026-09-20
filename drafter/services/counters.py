@@ -42,42 +42,42 @@ def heuristischer_vorteil(a, b):
     signale = []
 
     # 1. Antwort auf Robustheit. Nur relevant, wenn b ueberhaupt robust ist.
-    if b.wert("tankiness") > 0.5:
-        w = (a.wert("anti_tank") - _SCHWELLE) * b.wert("tankiness") * 1.3
+    if b.wert_oder("tankiness") > 0.5:
+        w = (a.wert_oder("anti_tank") - _SCHWELLE) * b.wert_oder("tankiness") * 1.3
         signale.append((w, f"hat Anti-Tank-Werkzeuge gegen {b.name}"))
 
     # 2. Antwort auf Angreifer. Wer schnell an dich herankommt, ist nur
     #    dann ein Problem, wenn du ihn nicht wegschieben kannst.
-    angriff = max(b.wert("engage"), b.wert("mobility")) if _ist(b, "assassin", "aggro") \
-        else b.wert("engage") * 0.5
+    angriff = max(b.wert_oder("engage"), b.wert_oder("mobility")) if _ist(b, "assassin", "aggro") \
+        else b.wert_oder("engage") * 0.5
     if angriff > 0.45:
-        w = (a.wert("anti_assassin") - _SCHWELLE) * angriff * 1.2
+        w = (a.wert_oder("anti_assassin") - _SCHWELLE) * angriff * 1.2
         signale.append((w, f"kann {b.name} auf Abstand halten"))
 
     # 3. Antwort auf Flaechenverweigerung.
-    wurf = 1.0 if _ist(b, "thrower") else b.wert("area_control") * 0.5
+    wurf = 1.0 if _ist(b, "thrower") else b.wert_oder("area_control") * 0.5
     if wurf > 0.4:
-        w = (a.wert("anti_thrower") - _SCHWELLE) * wurf * 1.1
+        w = (a.wert_oder("anti_thrower") - _SCHWELLE) * wurf * 1.1
         signale.append((w, f"kommt an {b.name} heran, statt die Fläche zu meiden"))
 
     # 4. Reichweite. Der Vorteil verpufft, wenn b die Distanz schliessen kann.
-    diff = a.wert("long_range") - b.wert("long_range")
+    diff = a.wert_oder("long_range") - b.wert_oder("long_range")
     if abs(diff) > 0.2:
-        w = diff * (1.0 - b.wert("mobility") * 0.7) * 0.55
+        w = diff * (1.0 - b.wert_oder("mobility") * 0.7) * 0.55
         signale.append((
             w,
             f"schießt weiter als {b.name}" if diff > 0 else f"wird von {b.name} überschossen",
         ))
 
     # 5. Druck auf empfindliche Ziele: viel Reichweite, wenig Eigenschutz.
-    weich = b.wert("long_range") * (1.0 - max(b.wert("survivability"), b.wert("peel")))
+    weich = b.wert_oder("long_range") * (1.0 - max(b.wert_oder("survivability"), b.wert_oder("peel")))
     if weich > 0.3:
-        w = a.wert("backline_pressure") * weich * 0.8
+        w = a.wert_oder("backline_pressure") * weich * 0.8
         signale.append((w, f"kommt an {b.name} in der Backline heran"))
 
     # 6. Kontrolle gegen Nahkampf.
-    kontrolle = max(a.wert("knockback"), a.wert("crowd_control"), a.wert("stun"))
-    naehe = max(b.wert("close_range"), b.wert("engage"))
+    kontrolle = max(a.wert_oder("knockback"), a.wert_oder("crowd_control"), a.wert_oder("stun"))
+    naehe = max(b.wert_oder("close_range"), b.wert_oder("engage"))
     if kontrolle > 0.5 and naehe > 0.55:
         signale.append((kontrolle * naehe * 0.45, f"unterbricht {b.name} beim Herankommen"))
 

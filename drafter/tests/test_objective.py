@@ -147,8 +147,11 @@ class QuellenprioritaetTest(DrafterTest):
         self.assertEqual(a_mit.quelle, "Fachquelle")
         self.assertIn("wallbreak", a_mit.faehigkeiten)
         self.assertGreater(a_mit.wert, a_ohne.wert)
-        # ... und es entsteht KEIN Attributwert.
-        self.assertEqual(mit.wert("wallbreak"), 0.0)
+        # ... und es entsteht KEIN Attributwert. Seit dem 2026-09-20 ist
+        # das None statt 0: die Rolle sagt nichts ueber die Hoehe, und
+        # eine 0 waere die Behauptung "kann das nicht".
+        self.assertIsNone(mit.wert("wallbreak"))
+        self.assertFalse(mit.bekannt("wallbreak"))
         self.assertFalse(mit.hat_profil)
 
     def test_messung_verdraengt_das_fachwissen(self):
@@ -252,8 +255,8 @@ class AbgeleiteteGroessenTest(DrafterTest):
         sustain = objective.objective_sustain(b)
         verteidigung = objective.objective_defense(b)
         self.assertIsNotNone(sustain)
-        self.assertLessEqual(sustain, b.wert("objective_damage"))
-        self.assertLessEqual(sustain, b.wert("sustained_damage"))
+        self.assertLessEqual(sustain, b.wert_oder("objective_damage"))
+        self.assertLessEqual(sustain, b.wert_oder("sustained_damage"))
         self.assertGreaterEqual(verteidigung, 0.0)
         self.assertLessEqual(verteidigung, 1.0)
 

@@ -50,11 +50,11 @@ class Brawler(Zeitstempel):
 
     attributes = models.JSONField(
         default=dict, blank=True,
-        help_text="Schlüssel aus drafter.attributes, Werte 0-100. Fehlend = 0.",
+        help_text="Schlüssel aus drafter.attributes, Werte 0-100. Fehlender Schlüssel = UNBEKANNT, eingetragene 0 = kann es wirklich nicht.",
     )
     draft_values = models.JSONField(
         default=dict, blank=True,
-        help_text="blind_pick_value, last_pick_value, ... Werte 0-100. Fehlend = 50.",
+        help_text="Historisch. Seit 2026-09-20 nicht mehr im Scoring - Flexibilität und Draft-Position kommen aus Messung.",
     )
 
     # Bilder liegen NICHT im Repository: die Brawler-Artworks gehoeren
@@ -74,6 +74,15 @@ class Brawler(Zeitstempel):
     draft_rolle = models.CharField(
         max_length=20, choices=attr.DRAFT_ROLLEN, blank=True,
         help_text="Aufgabe im Draft laut Role-&-Ability-Map (nicht die Katalogrolle)",
+    )
+    # Die Mechanikschicht: was ein Brawler objektiv HAT, nicht wie gut er
+    # darin ist. Heute leer - gefuellt wird sie aus der Fachquelle
+    # (services/mechanik.py), und dieses Feld ist der Platz fuer das, was
+    # spaeter von Hand nachgetragen wird. Schluessel: mechanik.SCHLUESSEL.
+    mechanik = models.JSONField(
+        default=dict, blank=True,
+        help_text="has_healing, has_wallbreak, range_category, … - Tatsachen, "
+                  "keine Bewertungen. Fehlender Schlüssel = unbekannt.",
     )
     draft_faehigkeiten = models.JSONField(
         default=list, blank=True,
@@ -145,9 +154,10 @@ class Brawler(Zeitstempel):
     def hat_profil(self):
         """Gibt es ein gepflegtes Eigenschaftsprofil?
 
-        Ohne Profil liefert `wert()` fuer alles 0 - das heisst dann
-        "unbekannt", nicht "kann nichts". Jede Rechnung, die Eigenschaften
-        liest, muss vorher hier fragen, statt die 0 zu verrechnen.
+        Seit dem 2026-09-20 liefert `wert()` bei Unbekanntem `None`, die
+        Unterscheidung steckt also im Zugriff selbst. `hat_profil` bleibt
+        die grobe Frage "gibt es ueberhaupt gepflegte Eigenschaften" -
+        fuer einzelne Schluessel fragt man `bekannt(key)`.
         """
         return bool(self.attributes)
 
@@ -158,18 +168,61 @@ class Brawler(Zeitstempel):
         return bool(self.draft_values)
 
     # --- Zugriff --------------------------------------------------------
+    def bekannt(self, key):
+        """Steht zu dieser Eigenschaft ueberhaupt etwas?
+
+        Der Unterschied, um den es geht: **nicht eingetragen** heisst
+        "wir wissen es nicht", **eingetragen mit 0** heisst "er kann das
+        wirklich nicht". Bis zum 2026-09-20 war beides dasselbe, und
+        daraus entstanden Phantomluecken - PAM mit 14 gepflegten
+        Eigenschaften galt in den uebrigen 18 als nachweislich
+        unfaehig, AMBER ohne Profil in allen 32.
+        """
+        return self.attributes is not None and key in self.attributes
+
     def wert(self, key):
-        """Eigenschaft als 0-1. Unbekannt oder fehlend = 0."""
-        return float(self.attributes.get(key, 0)) / 100.0
+        """Eigenschaft als 0-1 - oder **None**, wenn nichts bekannt ist.
+
+        Wer eine Zahl braucht, nimmt `wert_oder()` und sagt damit
+        ausdruecklich, welcher Ersatz gemeint ist. Eine stille 0 ist
+        keine Antwort, sondern eine Behauptung.
+        """
+        if not self.bekannt(key):
+            return None
+        return float(self.attributes.get(key) or 0) / 100.0
+
+    def wert_oder(self, key, standard=0.0):
+        """Eigenschaft als 0-1, mit ausdruecklichem Ersatz bei Unbekannt.
+
+        Nur dort benutzen, wo der Ersatz wirklich gemeint ist - etwa in
+        einer Summe, die ohne den Term genauso weiterlaeuft. Nie dort,
+        wo aus dem Ersatz eine Aussage ueber den Brawler wuerde.
+        """
+        wert = self.wert(key)
+        return standard if wert is None else wert
+
+    def bekannte_werte(self):
+        """{key: 0-1} nur fuer das, was wirklich eingetragen ist."""
+        return {k: self.wert(k) for k in (self.attributes or {})
+                if k in attr.ATTRIBUT_KEYS}
 
     def vektor(self):
         """Vollstaendiges Eigenschaftsprofil als {key: 0-1}."""
         return attr.als_vektor(self.attributes)
 
     def draftwert(self, key):
-        """Draft-Wert als 0-1. Fehlend = 0.5 (durchschnittlich)."""
-        roh = self.draft_values.get(key, attr.DRAFTWERT_STANDARD)
-        return float(roh) / 100.0
+        """Gepflegter Draft-Wert als 0-1 - oder None.
+
+        **Nicht mehr im aktiven Scoring.** Die sechs Draftwerte stammen
+        vollstaendig aus der Demo-Handarbeit vom 2026-09-14 und sagen
+        ueber die heutige Meta nichts; Flexibilitaet und Draft-Position
+        kommen inzwischen aus gemessenen Ableitungen. Das Feld bleibt
+        fuer Historie und Debug lesbar, und `None` macht sichtbar, dass
+        nichts dasteht - statt einen erfundenen Durchschnitt zu liefern.
+        """
+        if not self.draft_values or key not in self.draft_values:
+            return None
+        return float(self.draft_values.get(key) or 0) / 100.0
 
     @property
     def alle_rollen(self):

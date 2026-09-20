@@ -28,14 +28,20 @@ from drafter import config
 def teamprofil(brawler_liste):
     """Was das Team in jeder Eigenschaft leistet, je 0-1.
 
-    Nur ueber Mitglieder MIT Profil. Ein Brawler ohne Profil ist
-    unbekannt - als 0 mitgerechnet, erzeugte er Luecken, die es vielleicht
-    gar nicht gibt. `Teamanalyse.unbekannt` haelt fest, wer fehlt.
+    Gerechnet wird ueber **jeden** Pick, der zu dieser Eigenschaft etwas
+    beitraegt - egal aus welcher Quelle. Bis zum 2026-09-20 zaehlten nur
+    Mitglieder mit gepflegtem `attributes`-Profil, also zwanzig von 106.
+    AMBER, ein eigener Pick mit Rolle, Faehigkeiten und 2044 gemessenen
+    Partien, trug damit nichts bei: das Profil eines Zweierteams stammte
+    von einem Brawler, und fast jede Eigenschaft sah aus wie eine Luecke.
+
+    Wer zu einer Eigenschaft nichts sagt, zaehlt weiterhin nicht mit -
+    aber er zaehlt auch nicht als Null. Wie viel des Teams ueberhaupt
+    bekannt ist, steht in `bekannt_anteil()` daneben.
     """
-    bekannt = [b for b in brawler_liste if b.hat_profil]
     profil = {}
     for key in attr.ATTRIBUT_KEYS:
-        werte = sorted((b.wert(key) for b in bekannt), reverse=True)
+        werte = sorted(_bekannte_teamwerte(brawler_liste, key), reverse=True)
         gesamt = 0.0
         for rang, wert in enumerate(werte[:3]):
             anteil = (
@@ -46,6 +52,29 @@ def teamprofil(brawler_liste):
             gesamt += wert * anteil
         profil[key] = min(1.0, gesamt)
     return profil
+
+
+def _bekannte_teamwerte(brawler_liste, key):
+    """Die Werte der Teammitglieder, die zu `key` wirklich etwas sagen."""
+    from drafter.services import vertrauen
+
+    werte = []
+    for b in brawler_liste:
+        wert, stufe = vertrauen.wert_mit_stufe(b, key)
+        if wert is not None:
+            werte.append(wert)
+    return werte
+
+
+def bekannt_anteil(brawler_liste, key):
+    """Von wie vielen Picks wissen wir etwas ueber diese Eigenschaft?
+
+    (bekannt, gesamt) - die Zahl, die aus "Frontline 0.00" entweder
+    "niemand kann das" oder "wir wissen es von keinem" macht. Zwei sehr
+    verschiedene Saetze, die bisher gleich aussahen.
+    """
+    gesamt = len(brawler_liste)
+    return len(_bekannte_teamwerte(brawler_liste, key)), gesamt
 
 
 def anforderungen_mit_gegner(basis, gegner_picks):
@@ -76,34 +105,39 @@ def anforderungen_mit_gegner(basis, gegner_picks):
     # Bewusst kurz und explizit - das sind die Paarungen, die im Spiel
     # tatsaechlich ueber Siege entscheiden.
     erzwungen = {
-        "anti_tank": hoechster(lambda g: g.wert("tankiness")) * 0.95,
+        "anti_tank": hoechster(lambda g: g.wert_oder("tankiness")) * 0.95,
         "anti_assassin": hoechster(
-            lambda g: max(g.wert("engage"), g.wert("mobility"))
+            lambda g: max(g.wert_oder("engage"), g.wert_oder("mobility"))
             if {"assassin", "aggro"} & set(g.alle_rollen) else 0.0
         ) * 0.90,
         "anti_thrower": hoechster(
-            lambda g: 0.95 if "thrower" in g.alle_rollen else g.wert("area_control") * 0.5
+            lambda g: 0.95 if "thrower" in g.alle_rollen else g.wert_oder("area_control") * 0.5
         ),
         # Gegen viel Reichweite braucht man entweder eigene Reichweite
         # oder jemanden, der hinkommt.
-        "long_range": hoechster(lambda g: g.wert("long_range")) * 0.65,
+        "long_range": hoechster(lambda g: g.wert_oder("long_range")) * 0.65,
         "backline_pressure": hoechster(
-            lambda g: g.wert("long_range") * (1.0 - g.wert("survivability"))
+            lambda g: g.wert_oder("long_range") * (1.0 - g.wert_oder("survivability"))
         ) * 0.85,
         # Wer Flaechen verweigert, zwingt uns zu Beweglichkeit.
-        "mobility": hoechster(lambda g: g.wert("area_control")) * 0.6,
+        "mobility": hoechster(lambda g: g.wert_oder("area_control")) * 0.6,
         # Eine gegnerische Frontlinie erzeugt den schwaechsten Zwang der
         # Liste: sie laesst sich auch mit Kontrolle beantworten, nicht nur
         # mit einer eigenen Frontlinie. Waere der Faktor hoch, wuerde aus
         # "der Gegner hat einen Tank" reflexhaft "wir brauchen einen Tank" -
         # genau die Denkfalle, die dieses Werkzeug vermeiden soll.
-        "frontline": hoechster(lambda g: g.wert("frontline")) * 0.35,
+        "frontline": hoechster(lambda g: g.wert_oder("frontline")) * 0.35,
     }
 
     for key, wert in erzwungen.items():
         if wert > 0:
             erweitert[key] = max(erweitert.get(key, 0.0), wert)
     return erweitert
+
+
+def bekannt_je_eigenschaft(brawler_liste):
+    """{key: (bekannt, gesamt)} fuer das ganze Vokabular."""
+    return {key: bekannt_anteil(brawler_liste, key) for key in attr.ATTRIBUT_KEYS}
 
 
 def bedarf(profil, anforderungen):
@@ -181,6 +215,11 @@ class Teamanalyse:
     brawler: list = field(default_factory=list)
     anforderungen: dict = field(default_factory=dict)
     profil: dict = field(default_factory=dict)
+    # {key: (bekannt, gesamt)} - wie viele Picks zu dieser Eigenschaft
+    # ueberhaupt etwas sagen. Ohne diese Zahl ist ein Profilwert von 0
+    # nicht lesbar: er kann "niemand kann das" oder "wir wissen nichts"
+    # heissen.
+    bekannt: dict = field(default_factory=dict)
     bedarf: dict = field(default_factory=dict)
     ueberschuss: dict = field(default_factory=dict)
     rollen: dict = field(default_factory=dict)
@@ -197,6 +236,7 @@ class Teamanalyse:
             brawler=list(brawler_liste),
             anforderungen=anforderungen,
             profil=profil,
+            bekannt=bekannt_je_eigenschaft(brawler_liste),
             bedarf=bedarf(profil, anforderungen),
             ueberschuss=ueberschuss(profil, anforderungen),
             rollen=rollenzaehlung(brawler_liste),

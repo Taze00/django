@@ -225,7 +225,7 @@ def aspekt_erfuellung(brawler, aspekte_tabelle):
         gesamt = sum(keys.values())
         if gesamt <= 0:
             continue
-        ergebnis[name] = sum(g * brawler.wert(k) for k, g in keys.items()) / gesamt
+        ergebnis[name] = sum(g * brawler.wert_oder(k) for k, g in keys.items()) / gesamt
     return ergebnis
 
 
@@ -406,7 +406,7 @@ def objective_sustain(brawler):
     """
     if not brawler.hat_profil:
         return None
-    return min(brawler.wert("objective_damage"), brawler.wert("sustained_damage"))
+    return min(brawler.wert_oder("objective_damage"), brawler.wert_oder("sustained_damage"))
 
 
 def objective_defense(brawler):
@@ -417,5 +417,5 @@ def objective_defense(brawler):
     """
     if not brawler.hat_profil:
         return None
-    halten = max(brawler.wert("survivability"), brawler.wert("frontline"))
-    return min(1.0, 0.6 * brawler.wert("zone_control") + 0.4 * halten)
+    halten = max(brawler.wert_oder("survivability"), brawler.wert_oder("frontline"))
+    return min(1.0, 0.6 * brawler.wert_oder("zone_control") + 0.4 * halten)

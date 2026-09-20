@@ -41,8 +41,10 @@ class RollenwissenTest(DrafterTest):
         b = self.anlegen()
         self.assertFalse(b.hat_profil)
         for key in ("tankiness", "frontline", "anti_tank"):
-            self.assertEqual(b.wert(key), 0.0,
-                             "die Rolle darf kein Attribut setzen")
+            # Unbekannt, nicht 0: die Rolle setzt kein Attribut UND
+            # behauptet auch nicht, dass er es nicht kann.
+            self.assertIsNone(b.wert(key), "die Rolle darf kein Attribut setzen")
+            self.assertFalse(b.bekannt(key))
         self.assertIn("frontline", rollenwissen.deckt(b),
                       "sie sagt nur, worum es bei ihm geht")
 

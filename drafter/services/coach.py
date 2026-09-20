@@ -107,8 +107,8 @@ def aufgaben(brawler, ctx, analyse, raum, zugewiesener_gegner=None):
     for mitspieler in ctx.own_picks:
         if mitspieler.id == brawler.id:
             continue
-        bedarf = mitspieler.wert("long_range") * (1 - mitspieler.wert("survivability"))
-        if bedarf > 0.4 and max(brawler.wert("peel"), brawler.wert("anti_assassin")) > 0.55:
+        bedarf = mitspieler.wert_oder("long_range") * (1 - mitspieler.wert_oder("survivability"))
+        if bedarf > 0.4 and max(brawler.wert_oder("peel"), brawler.wert_oder("anti_assassin")) > 0.55:
             saetze.append(
                 f"Halte {mitspieler.name} den Rücken frei - allein wird "
                 f"{mitspieler.name} schnell zum ersten Ziel."
@@ -119,7 +119,7 @@ def aufgaben(brawler, ctx, analyse, raum, zugewiesener_gegner=None):
     if ctx.brawl_map is not None:
         anforderungen = ctx.brawl_map.anforderungs_vektor()
         passend = sorted(
-            ((k, w * brawler.wert(k)) for k, w in anforderungen.items()),
+            ((k, w * brawler.wert_oder(k)) for k, w in anforderungen.items()),
             key=lambda p: -p[1],
         )
         if passend and passend[0][1] > 0.35:
@@ -144,17 +144,17 @@ def vermeiden(brawler, ctx, raum):
         )
 
     # Wer wenig Mobilitaet hat, darf sich nicht verrennen.
-    if brawler.wert("mobility") < 0.3 and brawler.wert("long_range") > 0.55:
+    if brawler.wert_oder("mobility") < 0.3 and brawler.wert_oder("long_range") > 0.55:
         saetze.append("Geh nicht zu weit nach vorn - du kommst allein nicht zurück.")
 
     # Wer vom Team lebt, soll nicht allein losziehen.
-    if brawler.wert("survivability") < 0.4 and brawler.wert("engage") > 0.55:
+    if brawler.wert_oder("survivability") < 0.4 and brawler.wert_oder("engage") > 0.55:
         saetze.append("Geh nicht ohne dein Team rein - du hältst keinen Fokus aus.")
 
     # Ressourcen nicht am Falschen verbrennen.
     harmlos = [
         g for g in ctx.enemy_picks
-        if vorteil(g, brawler, raum)[0] < -0.15 and g.wert("mobility") > 0.6
+        if vorteil(g, brawler, raum)[0] < -0.15 and g.wert_oder("mobility") > 0.6
     ]
     if harmlos:
         saetze.append(
@@ -200,7 +200,7 @@ def warnungen(brawler, ctx, raum, katalog=None):
             )
 
     if ctx.brawl_map is not None and ctx.brawl_map.trait("bush_density", 0) > 65:
-        if brawler.wert("bush_control") < 0.35:
+        if brawler.wert_oder("bush_control") < 0.35:
             hinweise.append(
                 f"Viele Büsche auf {ctx.brawl_map.name} - lauf nicht blind hinein."
             )
@@ -284,13 +284,13 @@ def lane_vorschlag(eigene, ctx):
     if not eigene:
         return []
 
-    nach_mid = sorted(eigene, key=lambda b: -(b.wert("mid_control") + b.wert("area_control")))
+    nach_mid = sorted(eigene, key=lambda b: -(b.wert_oder("mid_control") + b.wert_oder("area_control")))
     mitte = nach_mid[0]
     rest = [b for b in eigene if b.id != mitte.id]
 
     # Die aeusseren Lanes nach Eigenstaendigkeit verteilen: wer allein
     # zurechtkommt, geht auf die Seite, die weiter vom Team weg liegt.
-    rest.sort(key=lambda b: -(b.wert("survivability") + b.wert("mobility")))
+    rest.sort(key=lambda b: -(b.wert_oder("survivability") + b.wert_oder("mobility")))
 
     zuordnung = [{"lane": "Mitte", "brawler": mitte.name, "slug": mitte.slug,
                   "grund": "beste Mid-Kontrolle im Team"}]
@@ -316,7 +316,7 @@ def win_condition(ctx, analyse, raum):
     bekannte = [b for b in ctx.own_picks if b.hat_profil]
     if staerken and bekannte:
         eigenschaft = staerken[0][0]
-        traeger = max(bekannte, key=lambda b: b.wert(eigenschaft.key))
+        traeger = max(bekannte, key=lambda b: b.wert_oder(eigenschaft.key))
         teile.append(f"{traeger.name} setzt {eigenschaft.label} durch")
 
     zuordnung = matchup_zuordnung(list(ctx.own_picks), list(ctx.enemy_picks), raum)
@@ -360,14 +360,14 @@ def team_schwaechen(ctx, analyse, raum):
     # services/team_need.py - sie stehen dort fuer die Bewertung, hier
     # fuer die Erklaerung.
     ausnutzer = {
-        "anti_tank": lambda g: g.wert("tankiness"),
-        "anti_assassin": lambda g: max(g.wert("engage"), g.wert("mobility"))
+        "anti_tank": lambda g: g.wert_oder("tankiness"),
+        "anti_assassin": lambda g: max(g.wert_oder("engage"), g.wert_oder("mobility"))
             if {"assassin", "aggro"} & set(g.alle_rollen) else 0.0,
         "anti_thrower": lambda g: 1.0 if "thrower" in g.alle_rollen else 0.0,
-        "long_range": lambda g: g.wert("long_range"),
-        "frontline": lambda g: g.wert("frontline"),
-        "mobility": lambda g: g.wert("area_control"),
-        "peel": lambda g: max(g.wert("engage"), g.wert("backline_pressure")),
+        "long_range": lambda g: g.wert_oder("long_range"),
+        "frontline": lambda g: g.wert_oder("frontline"),
+        "mobility": lambda g: g.wert_oder("area_control"),
+        "peel": lambda g: max(g.wert_oder("engage"), g.wert_oder("backline_pressure")),
     }
 
     schwaechen = []
