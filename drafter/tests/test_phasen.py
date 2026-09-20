@@ -1,6 +1,7 @@
 """Draft-Phasen: dieselbe Lage, andere Gewichte."""
 
 from drafter import config
+from drafter.models import Datenquelle
 from drafter.services import draft_position
 from drafter.tests.basis import DrafterTest
 
@@ -43,22 +44,55 @@ class GewichteTest(DrafterTest):
 
 
 class PickReihenfolgeTest(DrafterTest):
-    def test_blind_pick_wert_zaehlt_nur_am_anfang(self):
+    """Die gepflegten Draftwerte speisen das Scoring nicht mehr.
+
+    Bis zum 2026-09-20 kam die Draft-Position aus sechs von Hand
+    eingetragenen Zahlen (`blind_pick_value`, `counterability`, …), die
+    nur die zwanzig Demo-Brawler hatten - und die damit genau diese
+    zwanzig bevorzugten. Die gemessene Ableitung
+    (`gegnerabhaengigkeit`) traegt jetzt allein; ohne sie ist die
+    Komponente **nicht verfuegbar** statt geschaetzt.
+
+    Die Phasenlogik selbst ist damit nicht verschwunden, sie haengt nur
+    an der Messung - geprueft in
+    `test_infrastruktur.test_gemessene_ableitung_dreht_mit_der_phase`.
+    """
+
+    def test_demo_draftwerte_tragen_die_komponente_nicht_mehr(self):
         mortis = self.brawler("mortis")   # blind 35, last 70, counter 85
-        gale = self.brawler("gale")       # blind 72
+        self.assertTrue(mortis.hat_draftwerte, "die Werte stehen weiter in der DB")
+        self.assertIsNotNone(mortis.draftwert("blind_pick_value"))
 
-        erst = self.context(first_pick=True)
-        zuletzt = self.context(eigene=["belle", "max"], gegner=["bull", "tick"])
+        for ctx in (self.context(first_pick=True),
+                    self.context(eigene=["belle", "max"], gegner=["bull", "tick"])):
+            komp = draft_position.komponente(mortis, ctx)
+            self.assertIsNotNone(komp, "immer eine Komponente, nie None")
+            self.assertFalse(komp.verfuegbar,
+                             "ohne belastbare Quelle gibt es keine Draft-Position")
+            self.assertEqual(komp.beitrag, 0.0)
 
-        mortis_erst = draft_position.komponente(mortis, erst).wert
-        mortis_zuletzt = draft_position.komponente(mortis, zuletzt).wert
-        self.assertGreater(mortis_zuletzt, mortis_erst)
+    def test_belastbare_quelle_traegt_weiterhin(self):
+        """Nicht die Werte sind verboten, sondern ihre Herkunft.
 
-        gale_erst = draft_position.komponente(gale, erst).wert
-        self.assertGreater(gale_erst, mortis_erst)
+        Derselbe Brawler mit `source=manual` statt `demo` bekommt seine
+        Draft-Position zurueck - die Regel haengt an der Quelle, nicht
+        an einem Sonderfall fuer einzelne Namen.
+        """
+        mortis = self.brawler("mortis")
+        mortis.source = Datenquelle.MANUAL
+        mortis.save(update_fields=["source"])
+
+        erst = draft_position.komponente(mortis, self.context(first_pick=True))
+        zuletzt = draft_position.komponente(
+            mortis, self.context(eigene=["belle", "max"], gegner=["bull", "tick"]))
+        self.assertTrue(erst.verfuegbar)
+        self.assertGreater(zuletzt.wert, erst.wert,
+                           "spaeter Pick nutzt seine Konterstaerke")
 
     def test_konterbarkeit_stoert_nur_solange_der_gegner_waehlen_darf(self):
         piper = self.brawler("piper")   # counterability 85
+        piper.source = Datenquelle.MANUAL
+        piper.save(update_fields=["source"])
         offen = self.context(gegner=["bull"])
         geschlossen = self.context(
             eigene=["gale", "belle"], gegner=["bull", "tick", "gene"]

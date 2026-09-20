@@ -85,14 +85,24 @@ class VerlaesslichkeitTest(DrafterTest):
         self.assertFalse(ohne.hat_draftwerte)
 
     def test_komponente_weist_verlaesslichkeit_aus(self):
+        """Wo ein Prior mitrechnet, muss seine Verlaesslichkeit dabeistehen.
+
+        Seit dem 2026-09-20 ist der Prior der Flexibilitaet weg: er
+        bestand aus den Demo-Draftwerten, die nicht mehr ins Scoring
+        gehen. Die Komponente ist dann entweder rein gemessen oder gar
+        nicht verfuegbar - ein Prior ohne Verlaesslichkeitsangabe darf
+        es aber weiterhin nirgends geben.
+        """
         from drafter.services.draft_engine import DraftEngine
         e = self.empfehlung(DraftEngine(self.context()).empfehlungen(anzahl=300), "gale")
         eintrag = next(k for k in e.als_dict()["komponenten"]
                        if k["key"] == config.K_FLEXIBILITY)
-        self.assertIsNotNone(eintrag["prior_reliability"])
-        self.assertIsNotNone(eintrag["measured_weight"])
-        self.assertAlmostEqual(eintrag["measured_weight"] + eintrag["prior_weight"], 1.0,
-                               places=6)
+        if eintrag["prior_weight"]:
+            self.assertIsNotNone(eintrag["prior_reliability"])
+            self.assertAlmostEqual(
+                eintrag["measured_weight"] + eintrag["prior_weight"], 1.0, places=6)
+        else:
+            self.assertIn(eintrag["quelle"], ("Measured", "Unknown"))
 
     def test_alle_gepflegten_profile_stammen_aus_dem_seed(self):
         """Haelt den Audit-Befund fest - faellt, sobald jemand pflegt."""

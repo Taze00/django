@@ -159,8 +159,17 @@ class DatenstufenTest(DrafterTest):
 
     def test_voll_bekannter_brawler_ist_die_schlichte_summe(self):
         e = self.empfehlung(DraftEngine(self.context()), "gale")
-        self.assertEqual(e.datenabdeckung, 1.0)
-        self.assertEqual(e.ausgelassen, [])
+        # Seit dem 2026-09-20 zaehlen Draft-Position und Flexibilitaet
+        # ohne Messung nicht mehr mit - die Rechenbarkeit faellt dadurch
+        # unter 1.0, und genau das soll sie: sie misst, welcher Anteil
+        # der Formel wirklich gerechnet wurde.
+        self.assertGreater(e.datenabdeckung, 0.7)
+        self.assertNotIn("Map & Modus", e.ausgelassen)
+        # Draft-Position und Flexibilitaet haengen seit dem 2026-09-20
+        # allein an der Messung; im Demo-Seed gibt es sie nicht, und sie
+        # stehen deshalb zu Recht unter "ausgelassen".
+        self.assertEqual({k.key for k in e.ausgelassen},
+                         {config.K_DRAFT_POSITION, config.K_FLEXIBILITY})
         self.assertAlmostEqual(
             e.roher_score, sum(k.beitrag for k in e.komponenten.values()), places=9)
 
@@ -335,8 +344,9 @@ class PersoenlicheConfidenceOptionalTest(DrafterTest):
         persoenlich = e.komponenten[config.K_PERSONAL]
         self.assertFalse(persoenlich.verfuegbar)
         self.assertEqual(persoenlich.beitrag, 0.0)
-        self.assertEqual(e.datenabdeckung, 1.0, "Abdeckung bleibt voll")
-        self.assertEqual(e.ausgelassen, [], "gilt nicht als fehlende Komponente")
+        self.assertGreater(e.datenabdeckung, 0.7, "Abdeckung bleibt hoch")
+        self.assertNotIn(config.K_PERSONAL, {k.key for k in e.ausgelassen},
+                         "gilt nicht als fehlende Komponente")
 
     def test_ohne_werte_ist_die_confidence_nicht_niedriger(self):
         ohne = next(x for x in DraftEngine(self.context()).empfehlungen()

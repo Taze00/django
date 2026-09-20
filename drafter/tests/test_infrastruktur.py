@@ -139,14 +139,27 @@ class DraftlageTest(DrafterTest):
         return DraftEngine(self.context(**kwargs), provider=gemessen_mit_prior_provider())
 
     def test_felder_liegen_bei_null(self):
-        """Profilbesitz ist eine Information, kein Bonus."""
+        """Profilbesitz ist eine Information, kein Bonus.
+
+        Seit dem 2026-09-20 noch strenger: die Demo-Draftwerte speisen
+        Draft-Position und Flexibilitaet gar nicht mehr. Ohne gemessene
+        Ableitung ist beides schlicht nicht verfuegbar - ein gepflegtes
+        Profil allein erzeugt hier keinen Wert mehr.
+        """
+        empfehlungen = self.engine().empfehlungen(anzahl=300)
         for key in (config.K_DRAFT_POSITION, config.K_FLEXIBILITY):
-            werte = [e.komponenten[key].wert
-                     for e in self.engine().empfehlungen(anzahl=300)
+            werte = [e.komponenten[key].wert for e in empfehlungen
                      if e.komponenten[key].verfuegbar]
-            self.assertTrue(werte, key)
-            self.assertAlmostEqual(sum(werte) / len(werte), 0.0, delta=0.15,
-                                   msg=f"{key}: das Feld ist nicht zentriert")
+            if werte:
+                self.assertAlmostEqual(sum(werte) / len(werte), 0.0, delta=0.15,
+                                       msg=f"{key}: das Feld ist nicht zentriert")
+            mit_profil = [e for e in empfehlungen if e.brawler.hat_profil]
+            self.assertTrue(mit_profil, "Testlage ohne profilierte Brawler")
+            for e in mit_profil:
+                if e.komponenten[key].verfuegbar:
+                    self.assertNotEqual(
+                        e.komponenten[key].quelle, "Profile Prior",
+                        f"{key}: gepflegte Draftwerte duerfen nicht mehr tragen")
 
     def test_unbekannt_bleibt_neutral(self):
         ohne = Brawler.objects.create(name="NORU", slug="noru", external_id="99301",

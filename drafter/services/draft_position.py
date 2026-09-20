@@ -183,6 +183,28 @@ def _felder(kandidaten, raum, roh_profil, roh_messung):
     return z_werte(roh_profil), z_werte(roh_messung)
 
 
+def gepflegter_draftwert(brawler, key):
+    """Ein gepflegter Draftwert - **nur wenn er belastbar ist**.
+
+    Alle sechs Draftwerte stammen aus der Demo-Handarbeit vom
+    2026-09-14. Sie sagen ueber die heutige Meta nichts, und weil nur
+    zwanzig von 106 Brawlern sie haben, bevorzugten sie genau diese
+    zwanzig bei Flexibilitaet und Draft-Position. Gemessene Ableitungen
+    fuer beides gibt es inzwischen (`modusbreite`,
+    `gegnerabhaengigkeit`) - die haben Vorrang, und wo sie fehlen, ist
+    die Antwort Unknown statt einer Handzahl.
+
+    Die Werte bleiben in der Datenbank lesbar; nur ins Scoring gehen sie
+    nicht mehr. Wird spaeter eine belastbare Quelle gepflegt (`source`
+    ungleich demo), traegt sie hier wieder.
+    """
+    from drafter.models.base import Datenquelle
+
+    if brawler.source == Datenquelle.DEMO:
+        return None
+    return brawler.draftwert(key)
+
+
 def komponenten_fuer_pool(kandidaten, ctx, raum):
     """Draft-Position fuer alle Kandidaten - Messung mischt sich mit dem Profil."""
     phase = ctx.phase
@@ -193,8 +215,9 @@ def komponenten_fuer_pool(kandidaten, ctx, raum):
 
     roh_profil, roh_messung, belege = {}, {}, {}
     for b in kandidaten:
-        if b.hat_draftwerte:
-            roh_profil[b.id] = sum(b.draftwert(key) * anteil
+        werte = {key: gepflegter_draftwert(b, key) for key in anteile}
+        if all(v is not None for v in werte.values()):
+            roh_profil[b.id] = sum(werte[key] * anteil
                                    for key, anteil in anteile.items())
         lage = gegnerabhaengigkeit(b, raum)
         if lage is not None:
@@ -253,8 +276,9 @@ def flexibilitaet_fuer_pool(kandidaten, ctx, raum):
     """Flexibilitaet fuer alle Kandidaten - Messung mischt sich mit dem Profil."""
     roh_profil, roh_messung, belege = {}, {}, {}
     for b in kandidaten:
-        if b.hat_draftwerte:
-            roh_profil[b.id] = b.draftwert("flexibility_value")
+        flex = gepflegter_draftwert(b, "flexibility_value")
+        if flex is not None:
+            roh_profil[b.id] = flex
         breite = modusbreite(b, raum)
         if breite is not None:
             streuung, n, modi = breite
@@ -298,26 +322,36 @@ def flexibilitaet_fuer_pool(kandidaten, ctx, raum):
 
 
 def _profiltexte(komp, kandidat, ctx, phase):
-    """Die gepflegten Saetze zur Draft-Position - unveraendert."""
+    """Die gepflegten Saetze zur Draft-Position.
+
+    Sie zitieren die Demo-Draftwerte und erscheinen deshalb nur noch,
+    wo eine belastbare Quelle sie traegt - sonst gar nicht. Ein Satz,
+    der sich auf eine Zahl beruft, die nicht mehr ins Scoring eingeht,
+    waere eine Begruendung fuer etwas, das gar nicht passiert ist.
+    """
+    hole = lambda key: gepflegter_draftwert(kandidat, key)
+    if all(hole(k) is None for k in
+           ("counterability", "blind_pick_value", "counter_pick_value")):
+        return
     offen = ctx.gegner_restpicks
     if offen > 0:
-        konterbar = kandidat.draftwert("counterability")
+        konterbar = (hole("counterability") or 0.0)
         if konterbar >= 0.65:
             komp.gruende.append(Grund(
                 text=f"leicht zu kontern, und der Gegner hat noch {offen} Pick(s)",
                 positiv=False, staerke=0.45 + konterbar * 0.2,
             ))
-    if phase == config.PHASE_FIRST_PICK and kandidat.draftwert("blind_pick_value") >= 0.7:
+    if phase == config.PHASE_FIRST_PICK and (hole("blind_pick_value") or 0.0) >= 0.7:
         komp.gruende.append(Grund(
             text="sicherer Blind Pick - schwer gezielt zu bestrafen",
             positiv=True, staerke=0.7,
         ))
-    elif phase == config.PHASE_LAST and kandidat.draftwert("counter_pick_value") >= 0.7:
+    elif phase == config.PHASE_LAST and (hole("counter_pick_value") or 0.0) >= 0.7:
         komp.gruende.append(Grund(
             text="typischer Last Pick: bestraft gezielt, was schon steht",
             positiv=True, staerke=0.75,
         ))
-    elif phase == config.PHASE_FIRST_PICK and kandidat.draftwert("blind_pick_value") <= 0.35:
+    elif phase == config.PHASE_FIRST_PICK and (hole("blind_pick_value") or 0.0) <= 0.35:
         komp.gruende.append(Grund(
             text="als erster Pick riskant - der Gegner kann darauf antworten",
             positiv=False, staerke=0.6,
@@ -325,16 +359,24 @@ def _profiltexte(komp, kandidat, ctx, phase):
 
 
 def komponente(kandidat, ctx):
+    """Draft-Position aus GEPFLEGTEN Werten - ohne sie: nicht verfuegbar.
+
+    Liefert immer eine Komponente, nie None: eine fehlende Auskunft ist
+    `verfuegbar=False`, kein fehlendes Objekt. Der Aufrufer soll nicht
+    zwischen "weiss nichts" und "gibt es nicht" unterscheiden muessen.
+    """
     phase = ctx.phase
     komp = Komponente(key=config.K_DRAFT_POSITION)
-    if not kandidat.hat_draftwerte:
-        # Ohne gepflegte Draft-Werte waere jeder Wert der Default 0.5 -
-        # eine Annahme, keine Auskunft.
-        komp.verfuegbar = False
-        return komp
+    hole = lambda key: gepflegter_draftwert(kandidat, key)
 
     anteile = _PROFILE.get(phase, _PROFILE[config.PHASE_MID])
-    roh = sum(kandidat.draftwert(key) * anteil for key, anteil in anteile.items())
+    werte = {key: hole(key) for key in anteile}
+    if any(v is None for v in werte.values()):
+        # Seit dem 2026-09-20: die Demo-Draftwerte zaehlen nicht mehr,
+        # und ohne belastbare Quelle waere jeder Wert eine Annahme.
+        komp.verfuegbar = False
+        return komp
+    roh = sum(werte[key] * anteil for key, anteil in anteile.items())
     wert = zentriere(roh)
 
     # Konterbarkeit: gefaehrlich nur, solange der Gegner noch waehlen darf.
@@ -342,7 +384,7 @@ def komponente(kandidat, ctx):
     # kann mehr reagieren. Genau das unterscheidet Last Pick von First Pick.
     offen = ctx.gegner_restpicks
     if offen > 0:
-        konterbar = kandidat.draftwert("counterability")
+        konterbar = (hole("counterability") or 0.0)
         strafe = (konterbar - 0.5) * 0.5 * (offen / 3.0)
         wert -= strafe
         if strafe > 0.12:
@@ -353,17 +395,17 @@ def komponente(kandidat, ctx):
 
     komp.wert = klemme(wert)
 
-    if phase == config.PHASE_FIRST_PICK and kandidat.draftwert("blind_pick_value") >= 0.7:
+    if phase == config.PHASE_FIRST_PICK and (hole("blind_pick_value") or 0.0) >= 0.7:
         komp.gruende.append(Grund(
             text="sicherer Blind Pick - schwer gezielt zu bestrafen",
             positiv=True, staerke=0.7,
         ))
-    elif phase == config.PHASE_LAST and kandidat.draftwert("counter_pick_value") >= 0.7:
+    elif phase == config.PHASE_LAST and (hole("counter_pick_value") or 0.0) >= 0.7:
         komp.gruende.append(Grund(
             text="typischer Last Pick: bestraft gezielt, was schon steht",
             positiv=True, staerke=0.75,
         ))
-    elif phase == config.PHASE_FIRST_PICK and kandidat.draftwert("blind_pick_value") <= 0.35:
+    elif phase == config.PHASE_FIRST_PICK and (hole("blind_pick_value") or 0.0) <= 0.35:
         komp.gruende.append(Grund(
             text="als erster Pick riskant - der Gegner kann darauf antworten",
             positiv=False, staerke=0.6,
@@ -377,7 +419,11 @@ def flexibilitaet(kandidat, ctx):
     if not kandidat.hat_draftwerte:
         komp.verfuegbar = False
         return komp
-    komp.wert = zentriere(kandidat.draftwert("flexibility_value"))
+    flex = gepflegter_draftwert(kandidat, "flexibility_value")
+    if flex is None:
+        komp.verfuegbar = False
+        return komp
+    komp.wert = zentriere(flex)
     if komp.wert > 0.35 and ctx.unsere_restpicks > 1:
         komp.gruende.append(Grund(
             text="flexibel - legt unsere restlichen Picks nicht fest",

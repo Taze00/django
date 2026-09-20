@@ -19,6 +19,7 @@ Genau diese Verschiebung machen `BAN_FOKUS_*` in der Konfiguration.
 """
 
 from drafter import config
+from drafter.services import draft_position
 from drafter.services.counters import vorteil
 from drafter.services.map_fit import roh_passung
 from drafter.services.scoring import z_werte
@@ -74,16 +75,21 @@ def empfehlungen(ctx, raum, anzahl=None):
         if meta.bekannt:
             roh["meta_strength"][b.id] = meta.rate
 
-        if b.hat_draftwerte:
+        # Gepflegte Draftwerte zaehlen nur, wenn sie belastbar sind -
+        # die Demo-Handwerte vom 2026-09-14 gehen seit dem 2026-09-20
+        # nicht mehr ins Scoring (siehe draft_position).
+        draftwerte = {k: draft_position.gepflegter_draftwert(b, k) for k in
+                      ("blind_pick_value", "last_pick_value", "counter_pick_value",
+                       "flexibility_value", "counterability")}
+        if all(v is not None for v in draftwerte.values()):
             # Was ihn in der gegnerischen Pickposition gefaehrlich macht.
             if gegner_hat_first:
-                roh["pick_order_threat"][b.id] = b.draftwert("blind_pick_value")
+                roh["pick_order_threat"][b.id] = draftwerte["blind_pick_value"]
             else:
                 roh["pick_order_threat"][b.id] = max(
-                    b.draftwert("last_pick_value"), b.draftwert("counter_pick_value")
-                )
-            roh["flexibility"][b.id] = b.draftwert("flexibility_value")
-            roh["uncounterability"][b.id] = 1.0 - b.draftwert("counterability")
+                    draftwerte["last_pick_value"], draftwerte["counter_pick_value"])
+            roh["flexibility"][b.id] = draftwerte["flexibility_value"]
+            roh["uncounterability"][b.id] = 1.0 - draftwerte["counterability"]
 
         # Wie hart bestraft er das, was wir spielen wollen? Unbekannte
         # Matchups zaehlen nicht mit.
