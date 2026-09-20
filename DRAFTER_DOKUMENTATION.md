@@ -1015,6 +1015,127 @@ Pick- und Winrate, Confidence, Counter, Synergien — und für jede Map die Top 
 der Engine einmal mit Demo- und einmal mit gemessenen Daten. Erst wenn die
 Stichproben tragen, lohnt die Freigabe.
 
+## 17b. Die Wissensbasis: fünf Stufen, und Unknown ist eine davon
+
+Bis zum 2026-09-20 kannte der Drafter genau eine Art von Wissen über
+einen Brawler: `attributes`, 32 Schlüssel mit Werten 0–100. Zwanzig von
+106 Brawlern hatten sie, alle anderen nicht — und **ein fehlender
+Schlüssel galt als 0**. Daraus folgten zwei Fehler, die sich gegenseitig
+verstärkten:
+
+* PAM hat 14 von 32 Eigenschaften gepflegt und galt in den übrigen 18
+  als *nachweislich unfähig*. AMBER, ein eigener Pick mit Rolle,
+  Fähigkeiten und 2 044 gemessenen Partien, galt in allen 32 so.
+* Die dadurch entstandenen Phantomlücken konnten nur Brawler „schließen",
+  die selbst ein Profil hatten. Profilbesitz war damit ein struktureller
+  Vorteil: 16–19 % der Kandidaten holten 43–67 % der ersten Plätze.
+
+### Die Rangfolge
+
+```
+MECHANIK    objektiv, patchstabil, nachschlagbar ("Pam heilt")
+FACHQUELLE  gepflegte Einordnung (Rolle, Fähigkeit) - qualitativ
+GEMESSEN    aus Partien abgeleitet
+DEMO        Handschätzung vom 2026-09-14, grobes 5er-Raster
+UNBEKANNT   nichts davon - und das ist eine Antwort, keine Lücke
+```
+
+`services/vertrauen.py` setzt sie um: `wert_mit_stufe(brawler, key)`
+liefert den belastbarsten verfügbaren Wert **und** seine Stufe. Eine
+Demo-Zahl kommt nur zum Zug, wenn keine bessere Quelle etwas sagt.
+
+### Unbekannt ist nicht null
+
+`Brawler.wert(key)` liefert jetzt **`None`**, wenn nichts eingetragen
+ist. Wer eine Zahl braucht, nimmt `wert_oder(key, standard)` und sagt
+damit ausdrücklich, welcher Ersatz gemeint ist — eine stille 0 ist keine
+Antwort, sondern eine Behauptung. `bekannt(key)` fragt, ob überhaupt
+etwas dasteht.
+
+Drei Bedeutungen, die vorher eine waren:
+
+| Zustand | Beispiel | `bekannt()` | `wert()` |
+|---|---|---|---|
+| unbekannt | PAM / `anti_tank` | False | `None` |
+| bekannt und wirklich null | ein gepflegtes `healing: 0` | True | `0.0` |
+| bekannt und positiv | PAM / `healing: 90` | True | `0.9` |
+
+Alle Scorepfade wurden daraufhin durchgesehen. Summen und Heuristiken
+(Map-Fit, Objective, Counter-/Synergie-Heuristik, Coach) benutzen
+`wert_oder()` — der Term fällt weg, die Rechnung läuft weiter, **ohne
+Renormalisierung**. Schwellenvergleiche, die eine *Schwäche* behaupten
+(`< 0.35` im Map-Fit), verlangen zusätzlich `bekannt()`: aus Unwissen
+darf kein Vorwurf werden.
+
+### Die Mechanikschicht
+
+`services/mechanik.py` beschreibt, was ein Brawler **hat**, nicht wie gut
+er darin ist: `has_healing`, `has_wallbreak`, `has_knockback`,
+`has_stun`, `has_slow`, `has_pierce`, `has_shield`, dazu
+`range_category`, `engage_mechanic`, `mobility_category`.
+
+Gepflegt wird nichts doppelt: die Schicht liest die vorhandene
+Fachquelle (`draft_rolle`, `draft_faehigkeiten`) und normalisiert sie.
+Abgeleitet wird **nur Definitorisches**:
+
+| Quelle | Mechanik | Sicher? |
+|---|---|---|
+| Fähigkeit `wallbreak` | `has_wallbreak = True` | ja, definitorisch |
+| Fähigkeit `pierce` | `has_pierce = True` | ja |
+| Fähigkeit `knockback_stun` | `hat_knockback_oder_stun = True` | ja — **welches** der beiden, sagt die Quelle nicht |
+| Rolle `sniper` | `range_category = "sniper"` | ja |
+| Attribut `healing > 0` | `has_healing = True` | ja, als Ja/Nein — nie als Zahl |
+| alles andere | — | **Unknown** |
+
+**Wer nicht in einer Fähigkeitsliste steht, gilt als unbekannt, nicht als
+„hat es nicht".** Die Listen nennen, WER etwas hat; ob sie vollständig
+sind, ist nicht belegt. Das ist der Unterschied zwischen einer Liste und
+einem Verzeichnis. `Brawler.mechanik` (JSON) ist der Platz für das, was
+später von Hand nachgetragen wird — heute leer, mit Vorrang vor jeder
+Ableitung.
+
+### Das Teamprofil zählt jeden Pick
+
+`teamprofil()` rechnet über **alle** Picks, aus welcher Quelle auch
+immer. Daneben steht `bekannt_anteil(picks, key)` → `(bekannt, gesamt)`:
+die Zahl, die aus „Frontline 0.00" entweder *niemand kann das* oder *wir
+wissen es von keinem* macht. In `Teamanalyse.bekannt` steht sie für das
+ganze Vokabular.
+
+### Die Demo-Werte sind entmachtet, nicht gelöscht
+
+`attributes` und `draft_values` der zwanzig bleiben unverändert in der
+Datenbank — alte Praxisfälle bleiben reproduzierbar. Aber:
+
+* **Attribute** werden vor jeder Verwendung auf ihre **Bänder**
+  zurückgeführt (`vertrauen.band`, drei Stufen: 0.30 / 0.55 / 0.80). Die
+  Quelle hat 263 Werte aus 21 verschiedenen Zahlen, 92 % Vielfache von
+  fünf — mehr als drei Stufen gibt sie nicht her. Eine ausdrückliche 0
+  bleibt 0.
+* **Draftwerte** gehen gar nicht mehr ins Scoring.
+  `draft_position.gepflegter_draftwert()` liefert für `source=demo`
+  `None`; Flexibilität und Draft-Position kommen aus den gemessenen
+  Ableitungen (`modusbreite`, `gegnerabhaengigkeit`), und wo die fehlen,
+  ist die Komponente **nicht verfügbar** statt geschätzt. Eine andere
+  Quelle (`manual`, `api`) trägt sofort wieder — die Regel hängt an der
+  Herkunft, nicht an Namen.
+
+### Drei Aussagen statt „Data Coverage"
+
+| Neu | Bedeutung |
+|---|---|
+| **Rechenbarkeit** | welcher Anteil der Formel gerechnet werden konnte (die frühere `datenabdeckung`) |
+| **Statistische Abdeckung** | welcher Anteil auf gemessenen Partien beruht |
+| **Fachprofil** | Vollständig / Teilweise / Rolle+Fähigkeiten / Unknown |
+
+„Data Coverage 100 %" las sich wie *wir wissen alles über ihn*, gemeint
+war nur *jede Komponente konnte gerechnet werden* — auch aus einer
+Rollenschublade. PAM steht heute bei Rechenbarkeit 100 %, statistischer
+Abdeckung 42 %, Fachprofil „Teilweise". Das alte Feld `data_coverage`
+bleibt in der API erhalten.
+
+---
+
 ## 18a. Das Patchdatum ist externe Information
 
 `Patch.released_on` schneidet das Fenster `seit_patch` — das Fenster mit

@@ -955,10 +955,17 @@ function erklaerungsTafel(x) {
         || 'keine Komponente berechenbar'],
     ['Personal', punkte(x.personal.punkte),
       x.personal.gepflegt ? 'eigene Sicherheit gepflegt' : 'nicht gepflegt'],
-    ['Data Coverage', `${x.data_coverage.prozent} %`,
-      x.data_coverage.label
-        + (x.data_coverage.ausgelassen.length
-          ? ` · ohne ${x.data_coverage.ausgelassen.join(', ')}` : '')],
+    // Drei getrennte Aussagen. "Data Coverage 100 %" las sich wie
+    // "wir wissen alles ueber ihn" - gemeint war nur, dass jede
+    // Komponente gerechnet werden konnte, auch aus einer Rollenschublade.
+    ['Rechenbarkeit', `${x.rechenbarkeit.prozent} %`,
+      x.rechenbarkeit.label
+        + (x.rechenbarkeit.ausgelassen.length
+          ? ` · ohne ${x.rechenbarkeit.ausgelassen.join(', ')}` : '')],
+    ['Statistische Abdeckung', `${x.statistische_abdeckung.prozent} %`,
+      'Anteil, der auf gemessenen Partien beruht'],
+    ['Fachprofil', x.fachprofil.stufe,
+      `${x.fachprofil.attribute} von 32 Eigenschaften gepflegt`],
     ['Statistical Confidence', sc.gesamt.toFixed(2),
       `${sc.label} · Messung ${sc.messung.toFixed(2)}`
         + (sc.intervall

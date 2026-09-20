@@ -214,6 +214,43 @@ class Empfehlung:
         return config.DATENABDECKUNG_STUFEN[-1][1]
 
     @property
+    def statistische_abdeckung(self):
+        """0-1: welcher Anteil des Scores auf MESSUNG beruht.
+
+        Etwas anderes als `datenabdeckung`. Die sagt, wie viel der Formel
+        ueberhaupt gerechnet werden konnte - eine Komponente aus einer
+        Rollenschublade zaehlt dort voll mit. Hier zaehlt nur, was aus
+        Partien stammt. Beide zusammen beantworten erst die Frage, die
+        man eigentlich stellt: worauf beruht das hier?
+        """
+        komps = [k for k in self.komponenten.values()
+                 if not k.ist_strafe and k.key != config.K_PERSONAL]
+        gesamt = sum(k.gewicht for k in komps)
+        gemessen = sum(k.gewicht for k in komps
+                       if k.verfuegbar and str(k.quelle).startswith("Measured"))
+        return gemessen / gesamt if gesamt > 0 else 0.0
+
+    @property
+    def fachprofil(self):
+        """Wie vollstaendig ist das gepflegte Wissen ueber diesen Brawler?
+
+        Vier Stufen statt einer Prozentzahl: ein Profil mit 14 von 32
+        Eigenschaften ist etwas anderes als eines mit 30, und beides ist
+        etwas anderes als "nur Rolle und Faehigkeiten".
+        """
+        from drafter import attributes as attr
+
+        b = self.brawler
+        anzahl = len(b.attributes or {})
+        if anzahl >= len(attr.ATTRIBUT_KEYS) * 0.75:
+            return "Vollständig"
+        if anzahl:
+            return "Teilweise"
+        if b.draft_rolle or b.draft_faehigkeiten:
+            return "Rolle+Fähigkeiten"
+        return "Unknown"
+
+    @property
     def ausgelassen(self):
         """Komponenten, die mangels Daten aus dem Score fallen.
 
@@ -388,10 +425,29 @@ class Empfehlung:
                 "punkte": round(self.gruppen_beitrag(config.G_PERSOENLICH), 1),
                 "gepflegt": bool(persoenlich is not None and persoenlich.verfuegbar),
             },
+            # Drei getrennte Aussagen statt einer. "Data Coverage 100 %"
+            # las sich wie "wir wissen alles ueber ihn", gemeint war aber
+            # nur "jede Komponente konnte gerechnet werden" - auch dann,
+            # wenn sie aus einer Rollenschublade kam.
             "data_coverage": {
                 "prozent": round(self.datenabdeckung * 100),
                 "label": self.datenabdeckung_label,
                 "ausgelassen": [k.label for k in self.ausgelassen],
+            },
+            "rechenbarkeit": {
+                "prozent": round(self.datenabdeckung * 100),
+                "label": self.datenabdeckung_label,
+                "ausgelassen": [k.label for k in self.ausgelassen],
+                "bedeutung": "welcher Anteil der Formel gerechnet werden konnte",
+            },
+            "statistische_abdeckung": {
+                "prozent": round(self.statistische_abdeckung * 100),
+                "bedeutung": "welcher Anteil auf gemessenen Partien beruht",
+            },
+            "fachprofil": {
+                "stufe": self.fachprofil,
+                "attribute": len(self.brawler.attributes or {}),
+                "bedeutung": "wie vollständig das gepflegte Wissen ist",
             },
             "statistical_confidence": {
                 "gesamt": round(self.confidence, 3),
