@@ -76,13 +76,31 @@ class Command(BaseCommand):
         self._sag(f"Demo-Daten geloescht: {geloescht} Zeilen")
 
     def _patch(self):
+        """Platzhalter-Patch - das Datum wird nur beim ANLEGEN gesetzt.
+
+        Frueher stand `released_on` in `defaults`, also in jedem Lauf neu
+        auf "heute". Am 2026-09-19 sprang der Platzhalter dadurch auf
+        einen Tag NACH der juengsten gesammelten Partie: das Fenster
+        "seit Patch" war leer, und die Engine fiel still auf sieben Tage
+        zurueck. Ein Seed darf Demo-Daten auffrischen, aber keine
+        Zeitgrenze verschieben, an der die halbe Aggregation haengt.
+
+        `create_defaults` gilt nur beim Anlegen, `defaults` auch beim
+        Aktualisieren - Beschreibung und `is_current` duerfen mit, das
+        Datum nicht.
+        """
         patch, _ = Patch.objects.update_or_create(
             name="Demo-Patch",
-            defaults={
+            create_defaults={
                 "released_on": timezone.now().date(),
+                "datum_bestaetigt": False,
+                "datum_quelle": "Platzhalter aus seed_brawl_data - kein echtes Patchdatum",
+            },
+            defaults={
                 "description": (
                     "Platzhalter für den aktuellen Patch. Sobald echte "
-                    "Patchdaten gepflegt werden, ersetzt sie diesen Eintrag."
+                    "Patchdaten gepflegt werden, ersetzt sie diesen Eintrag. "
+                    "Datum setzen mit: manage.py patch_setzen"
                 ),
                 "is_current": True,
             },

@@ -21,6 +21,24 @@ class Patch(Zeitstempel):
     description = models.TextField(blank=True)
     is_current = models.BooleanField(default=False)
 
+    # Ein Patchdatum ist EXTERNE fachliche Information. Es darf nicht aus
+    # der ersten gesehenen Partie, dem letzten Collector-Lauf oder dem
+    # heutigen Datum abgeleitet werden - ein geratenes Datum sieht genauso
+    # aus wie ein gepflegtes und schneidet still die Statistik.
+    #
+    # Genau das ist am 2026-09-19 passiert: `seed_brawl_data` schrieb bei
+    # jedem Lauf `released_on = heute`, der Platzhalter sprang dadurch auf
+    # einen Tag NACH der juengsten Partie, und das Fenster "seit Patch"
+    # war leer. Deshalb steht hier jetzt, woher das Datum kommt.
+    datum_bestaetigt = models.BooleanField(
+        default=False,
+        help_text="True nur, wenn das Datum aus einer externen Quelle gepflegt wurde",
+    )
+    datum_quelle = models.CharField(
+        max_length=200, blank=True,
+        help_text="Woher das Datum stammt - Ankündigung, Patch Notes, Beobachtung",
+    )
+
     class Meta:
         ordering = ["-released_on"]
         verbose_name = "Patch"
@@ -32,6 +50,13 @@ class Patch(Zeitstempel):
     @classmethod
     def aktueller(cls):
         return cls.objects.filter(is_current=True).first() or cls.objects.first()
+
+    @property
+    def datumslage(self):
+        """Kurztext fuer Oberflaeche und Debug: taugt dieses Datum als Grenze?"""
+        if self.datum_bestaetigt:
+            return f"bestätigt{f' ({self.datum_quelle})' if self.datum_quelle else ''}"
+        return "unbestätigt - Platzhalter, nicht als Patchgrenze belastbar"
 
 
 class BrawlerBalanceChange(Zeitstempel):
