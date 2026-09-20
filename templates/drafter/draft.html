@@ -33,6 +33,12 @@ Zeilen steht er als Text auf der Seite - genau das ist hier passiert.
     Ranked-Partien. Die Brawler<em>profile</em> (Eigenschaften, Draft-Werte) sind
     für {{ datenlage.demo_profile }} Brawler weiterhin gepflegte Einschätzungen
     und werden mit wachsender Messung zurückgedrängt.
+    {% if datenlage.seit_patch_leer %}
+      <br><strong>Fenster:</strong> nicht „seit Patch" — seit dem eingetragenen
+      Patchdatum ({{ datenlage.patch.released_on }}{% if not datenlage.patch_bestaetigt %},
+      unbestätigt{% endif %}) liegt keine Partie vor. Gerechnet wird mit dem
+      nächstbesten Zeitfenster.
+    {% endif %}
   {% else %}
     <strong>Demo-Daten</strong> — gepflegte Einschätzungen, keine gemessenen
     Statistiken. Die Empfehlungslogik ist echt, die Zahlenbasis noch nicht.

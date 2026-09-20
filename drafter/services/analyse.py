@@ -85,5 +85,9 @@ def als_dict(empfehlung, rang, anzahl, ctx, raum):
         "rang": rang,
         "kandidaten": anzahl,
         "matchups": paarbeitraege(empfehlung.brawler, ctx, raum),
+        # Mit welchen Zahlen gerechnet wurde. "seit Patch" ist das
+        # bevorzugte Fenster; faellt es aus, muss das dastehen, statt
+        # dass 7-Tage-Werte als Patchstand durchgehen.
+        "statistikfenster": raum.fenster_lage(),
     })
     return daten

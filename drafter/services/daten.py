@@ -80,6 +80,13 @@ class Datenraum:
 
         self.brawler = []
         self._nach_id = {}
+        # Wie oft welches Zeitfenster eine Zeile gestellt hat - fuer die
+        # Auskunft, MIT WELCHEN Zahlen gerechnet wurde (fenster_lage()).
+        self._fenster_verwendet = {}
+        # Alle gemessenen Fenster, die der Provider ueberhaupt geliefert
+        # hat - ohne sie liesse sich "nicht benutzt" nicht von "gibt es
+        # nicht" unterscheiden.
+        self._fenster_gesehen = set()
         self._counter = {}    # (brawler_id, gegner_id)   -> StatRecord
         self._synergie = {}   # (kleinere_id, groessere_id) -> StatRecord
         self._stat = {}       # brawler_id                -> StatRecord
@@ -211,6 +218,8 @@ class Datenraum:
                 continue
             if record.partner_id is not None and record.partner_id not in ids:
                 continue
+            if record.ist_gemessen and record.window_label:
+                self._fenster_gesehen.add(record.window_label)
             punkte = _spezifitaet(record, self.brawl_map, self.game_mode, self.rank_pool)
             if punkte < 0:
                 continue
@@ -219,7 +228,41 @@ class Datenraum:
             if rang > bewertung.get(k, (-1, -1)):
                 gewaehlt[k] = record
                 bewertung[k] = rang
+        # Welche Zeitfenster tatsaechlich zum Zuge kamen. Die Oberflaeche
+        # soll nicht "seit Patch" behaupten, wenn sie 7-Tage-Zahlen zeigt.
+        for record in gewaehlt.values():
+            if record.ist_gemessen and record.window_label:
+                self._fenster_verwendet[record.window_label] = (
+                    self._fenster_verwendet.get(record.window_label, 0) + 1)
         return gewaehlt
+
+    def fenster_lage(self):
+        """Mit welchen Zeitfenstern wurde hier gerechnet - und warum nicht "seit Patch"?
+
+        Der Fallback selbst ist richtig: lieber sieben Tage als gar nichts.
+        Falsch waere nur, ihn zu verschweigen. Am 2026-09-19 stand das
+        Patchdatum einen Tag hinter der juengsten Partie - "seit Patch"
+        war leer, und die Zahlen kamen still aus dem 7-Tage-Fenster.
+        """
+        verwendet = sorted(self._fenster_verwendet.items(), key=lambda kv: -kv[1])
+        gesehen = set(self._fenster_gesehen)
+        bevorzugt = config.STAT_FENSTER_VORRANG[0]
+        lage = {
+            "verwendet": [{"fenster": f, "zeilen": n} for f, n in verwendet],
+            "hauptfenster": verwendet[0][0] if verwendet else None,
+            "bevorzugt": bevorzugt,
+            "bevorzugt_vorhanden": bevorzugt in gesehen,
+            "vorhandene_fenster": sorted(gesehen),
+            "grund": "",
+        }
+        if verwendet and lage["hauptfenster"] != bevorzugt:
+            lage["grund"] = (
+                f"Keine Statistikzeilen im Fenster '{bevorzugt}' - gerechnet wird "
+                f"mit '{lage['hauptfenster']}'."
+                if not lage["bevorzugt_vorhanden"] else
+                f"'{bevorzugt}' liegt vor, passte aber für diese Lage schlechter "
+                f"als '{lage['hauptfenster']}'.")
+        return lage
 
     # --- Abfragen -------------------------------------------------------
     # --- Prior (gepflegte Werte) ---------------------------------------

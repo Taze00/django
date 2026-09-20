@@ -990,6 +990,18 @@ export function zeigeDetail(e) {
 
   if (e.erklaerung) inhalt.appendChild(erklaerungsTafel(e.erklaerung));
 
+  // Mit welchen Zahlen gerechnet wurde. Faellt das bevorzugte Fenster
+  // ("seit Patch") aus, steht das hier - sonst gingen 7-Tage-Werte
+  // stillschweigend als Patchstand durch.
+  const fl = e.statistikfenster;
+  if (fl && fl.hauptfenster) {
+    const zeile = el('p', 'fensterlage');
+    const namen = { seit_patch: 'seit Patch', '7d': '7 Tage', '30d': '30 Tage', '90d': '90 Tage' };
+    zeile.appendChild(el('strong', null, `Fenster: ${namen[fl.hauptfenster] || fl.hauptfenster}`));
+    if (fl.grund) zeile.appendChild(el('span', null, ` — ${fl.grund}`));
+    inhalt.appendChild(zeile);
+  }
+
   if (e.pro.length || e.contra.length) {
     inhalt.appendChild(el('h3', null, 'Warum dieser Pick'));
     inhalt.appendChild(gruendeListe(e.pro, e.contra));

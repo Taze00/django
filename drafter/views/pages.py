@@ -25,6 +25,8 @@ def _datenlage():
     from drafter.models.matches import Match
     from drafter.services.providers.registry import hole_stat_provider
 
+    from drafter.models import Patch
+
     provider = hole_stat_provider()
     gemessen = provider.name != "demo"
     partien = Match.objects.filter(
@@ -32,11 +34,22 @@ def _datenlage():
         battle_type__in=config.DRAFT_STATISTIK_BATTLE_TYPEN).count() if gemessen else 0
     demo_profile = Brawler.objects.filter(source=Datenquelle.DEMO).exclude(
         attributes={}).count()
+    # Das bevorzugte Zeitfenster ist "seit Patch". Steht das Patchdatum
+    # hinter der juengsten Partie, ist es leer und die Engine rechnet mit
+    # einem anderen - das gehoert auf die Seite, nicht in eine Fussnote.
+    patch = Patch.aktueller()
+    from drafter.models import CounterStat
+    seit_patch = (gemessen and CounterStat.objects
+                  .filter(source__in=["api", "aggregated", "fixture"],
+                          window_label=config.STAT_FENSTER_VORRANG[0]).exists())
     return {
         "provider": provider.name,
         "gemessen": gemessen,
         "partien": partien,
         "demo_profile": demo_profile,
+        "patch": patch,
+        "patch_bestaetigt": bool(patch and patch.datum_bestaetigt),
+        "seit_patch_leer": bool(gemessen and not seit_patch),
     }
 
 

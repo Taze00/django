@@ -123,6 +123,13 @@ class Command(BaseCommand):
         schreib(f"  Datenabdeckung:    {a['datenabdeckung']} % ({a['datenabdeckung_label']})")
         schreib(f"  Confidence:        {a['confidence']} ({a['confidence_label']})")
         schreib(f"  Datenstufe:        {a['datenstufe']}")
+        fl = a.get("statistikfenster") or {}
+        if fl.get("hauptfenster"):
+            teile = ", ".join(f"{v['fenster']} ({v['zeilen']} Zeilen)"
+                              for v in fl["verwendet"])
+            schreib(f"  Statistikfenster:  {teile}")
+            if fl.get("grund"):
+                schreib(f"                     {fl['grund']}")
 
         schreib(self.style.HTTP_INFO("\n  Komponenten"))
         schreib(f"    {'Komponente':<20} {'Wert':>7} {'Gew':>6} {'Beitrag':>8}  Quelle")

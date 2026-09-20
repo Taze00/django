@@ -1015,6 +1015,66 @@ Pick- und Winrate, Confidence, Counter, Synergien — und für jede Map die Top 
 der Engine einmal mit Demo- und einmal mit gemessenen Daten. Erst wenn die
 Stichproben tragen, lohnt die Freigabe.
 
+## 18a. Das Patchdatum ist externe Information
+
+`Patch.released_on` schneidet das Fenster `seit_patch` — das Fenster mit
+dem höchsten Vorrang in `STAT_FENSTER_VORRANG`. Es darf deshalb **nicht**
+aus den Daten abgeleitet werden: nicht aus der ersten gesehenen Partie,
+nicht aus dem letzten Collector-Lauf, nicht aus dem heutigen Datum. Ein
+geratenes Datum sieht im Betrieb genauso aus wie ein gepflegtes.
+
+Genau das ist am **2026-09-19** passiert. `seed_brawl_data` schrieb
+`released_on = timezone.now().date()` in `defaults`, also bei **jedem**
+Lauf neu. Ein Seed um 15:01 UTC zog den Platzhalter auf den 19. — einen
+Tag hinter die jüngste gesammelte Partie (18.09.). `seit_patch` war
+damit leer, die Aggregation schrieb dafür keine Zeile mehr, und die
+Engine fiel nach `STAT_FENSTER_VORRANG` still auf `7d` zurück.
+
+Zwei Reparaturen:
+
+* **Der Seed setzt das Datum nur noch beim Anlegen** (`create_defaults`
+  statt `defaults`). Beschreibung und `is_current` darf er weiter
+  auffrischen — eine Zeitgrenze, an der die halbe Aggregation hängt,
+  nicht.
+* **`Patch.datum_bestaetigt` / `datum_quelle`** sagen, woher das Datum
+  kommt. Ohne gepflegte Quelle gilt es als *unbestätigt* und wird auch so
+  angezeigt (`Patch.datumslage`).
+
+Gesetzt wird ein Patch ausdrücklich:
+
+```
+python manage.py patch_setzen --liste
+python manage.py patch_setzen --name "2026-09 Herbstupdate" \
+    --released-on 2026-09-17 --quelle "Patch Notes vom 16.09." --aktivieren
+```
+
+`--released-on` ist Pflicht und wird nirgends errechnet; ohne `--quelle`
+bleibt der Eintrag unbestätigt. Das Kommando sagt vorher, wie viele
+Partien nach dem Datum liegen, und warnt, wenn es keine gibt.
+
+**Ein Patchwechsel wirft nichts weg.** Der alte Patch bleibt stehen,
+seine `BrawlerBalanceChange`-Einträge und alle Statistikzeilen mit ihm;
+`--aktivieren` setzt lediglich `is_current` um (genau einer bleibt
+aktuell). Die neue Grenze gilt erst für die nächste Aggregation. Eine
+automatische Patch-Erkennung gibt es nicht und soll es nicht geben.
+
+### Wenn das Patchfenster leer ist
+
+Der Fallback ist richtig — sieben Tage sind besser als nichts. Falsch
+wäre nur, ihn zu verschweigen. `Datenraum.fenster_lage()` zählt mit,
+welche Fenster die Zeilen tatsächlich gestellt haben, und meldet:
+
+```
+Statistikfenster:  7d (7856 Zeilen)
+                   Keine Statistikzeilen im Fenster 'seit_patch' - gerechnet wird mit '7d'.
+```
+
+Sichtbar in `drafter_analyse`, unter `statistikfenster` in der
+Analyse-API, als Zeile im Detailfenster der Oberfläche und als Hinweis
+über dem Draft, sobald für `seit_patch` keine Zeile existiert.
+
+---
+
 ## 18b. Paarwerte über Ebenen: global ist die Basis
 
 Counter und Synergien werden auf zwei Ebenen aggregiert, **global** und
