@@ -8,8 +8,8 @@
 
 ## Milestones und Acceptance Criteria
 1. Phase 0: Repo-Karte, Schutzbereiche, Baseline, Legacy-Stand dokumentiert.
-2. Phase 1: DB-/Rawpayload-/API-Audit mit reproduzierbaren Queries, UNKNOWN-Lücken und Sampling-Befund.
-3. Phase 2: eingefrorener zeitbasierter Split, Baselines B0-B5, Log-Loss/Brier/Kalibrierung, Leakage-Prüfungen und Runner.
+2. Phase 1: DB-/Rawpayload-/API-Audit mit reproduzierbaren Queries, UNKNOWN-Lücken und Sampling-Befund. **Erledigt in `54d8e18`.**
+3. Phase 2: eingefrorener zeitbasierter Split, Baselines B0-B5, Log-Loss/Brier/Kalibrierung, Leakage-Prüfungen und Runner. **Framework erledigt; empirische Werte warten auf historische Daten.**
 4. Phase 3: Legacy auf identischem Holdout benchmarken; keine Legacy-Scoringänderung.
 5. Phase 4: regularisiertes probabilistisches V-Modell, Manifest, Persistenz, Training/Evaluation und Model Card.
 6. Phase 5-7: Mechanik-/Teamfeatures und faktorisierte Interaktionen nur bei belegtem Nutzen; sonst als verworfen dokumentieren.

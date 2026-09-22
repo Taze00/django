@@ -1,9 +1,9 @@
 # Drafter V2 Status
 
 Overall:
-- Completed milestones: 2 / 10
-- Current phase: Phase 2, Evaluationsframework
-- Current task: reproduzierbaren zeitbasierten Split und Baseline-Runner bauen
+- Completed milestones: 3 / 10
+- Current phase: Phase 3, Legacy-Benchmark
+- Current task: Legacy auf demselben Holdout abbilden; bei fehlenden Matches DATA_UNAVAILABLE erhalten
 - Blocker: keiner; Datenbank ist im Feature-Worktree noch nicht angelegt
 
 Latest validation:
@@ -13,6 +13,8 @@ Latest validation:
 - Testbaseline: 680 Drafter-Tests, 4 übersprungen, 0 Fehler, 237.054 s; Systemcheck ohne Befund
 - V2-Audit-Test: 1 Test, 0 Fehler
 - V2-Datenaudit: isolierte DB ohne Rawpayloads, Matches, Stats oder Katalogdaten
+- V2-Evaluationsvertrag: 3 Tests, 0 Fehler
+- V2-Evaluationscommand: `DATA_UNAVAILABLE`, input/train/validation/holdout `0`
 - Evaluation: ausstehend
 
 Data integrity:
@@ -21,6 +23,6 @@ Data integrity:
 - unresolved gaps: keine isolierten historischen Trainingsdaten; Pickorder, Bans, Builds, Kampfstatistiken und valide Skillkontrolle UNKNOWN
 
 Next:
-- Zeitbasierten Split und Baselines implementieren, ohne Holdout-Tuning.
-- Leeren/zu kleinen Datensatz als DATA_UNAVAILABLE ausgeben, nicht mit Ersatzdaten füllen.
-- Danach Phase 2 dokumentieren und committen.
+- Legacy-Snapshot/-Abbildung auf denselben EvaluationExample-Vertrag bauen.
+- Ohne Matchbasis keine Performance behaupten und keine V2-Promotion durchführen.
+- Danach Phase 3 dokumentieren und committen.
