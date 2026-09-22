@@ -169,7 +169,8 @@ def metrics(predictor, examples):
     calibration = []
     for lower in (0.0, 0.2, 0.4, 0.6, 0.8):
         bucket = [(p, y) for p, y in zip(probabilities, labels)
-                  if lower <= p < lower + 0.2 or (lower == 0.8 and p <= 1.0)]
+                  if lower <= p < lower + 0.2
+                  or (lower == 0.8 and lower <= p <= 1.0)]
         if bucket:
             calibration.append({
                 "lower": lower,

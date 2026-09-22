@@ -43,3 +43,7 @@ class EvaluationContractTest(SimpleTestCase):
             self.assertEqual(result["holdout"]["status"], "ok")
             self.assertGreaterEqual(result["holdout"]["log_loss"], 0.0)
             self.assertGreaterEqual(result["holdout"]["brier"], 0.0)
+            self.assertEqual(
+                sum(bucket["n"] for bucket in result["holdout"]["calibration"]),
+                result["holdout"]["n"],
+            )
