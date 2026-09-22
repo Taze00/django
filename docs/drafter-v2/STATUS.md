@@ -7,7 +7,7 @@ Overall:
 - Blocker: none for authorized audit; V2 is not promotable because unchanged Legacy performs better
 
 Latest validation:
-- Git status: pending final shared-subset commit
+- Git status: clean after commit `bc8e1aa`
 - Branch: `feature/drafter-v2`
 - Live Compose `alex-django`: läuft separat unter `/media/docker/alex-django`
 - Testbaseline: 680 Drafter-Tests, 4 übersprungen, 0 Fehler, 237.054 s; Systemcheck ohne Befund
