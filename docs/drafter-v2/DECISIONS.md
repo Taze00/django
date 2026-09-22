@@ -22,3 +22,38 @@ Vor Containerstart: `realpath`, `stat`, `docker compose -p drafter-v2-isolated c
 
 Revisit if:
 Historische Daten für Evaluation benötigt werden. Dann zuerst read-only Snapshot/Export mit dokumentierter Isolation entwerfen; keine direkte Live-Verbindung.
+
+## D-002: Symmetrisches, dependency-freies V-Modell
+
+Problem:
+V2 braucht eine probabilistische Bewertungsfunktion für vollständige Teams,
+aber die isolierte Datenbank enthält keine historischen Ranked-Matches und die
+Runtime-Abhängigkeiten enthalten keine ML-Bibliothek.
+
+Alternativen:
+Neural-/Set-Modell; neue ML-Abhängigkeit installieren; Legacy-Score als V2
+ausgeben; regularisierte Logit-Regression mit Standardbibliothek.
+
+Evidence:
+Phase-2/3 Runner melden reproduzierbar `DATA_UNAVAILABLE`; der Legacy-Engine
+Vertrag ist heuristisch und nicht als kalibrierte Team-Wahrscheinlichkeit
+ausgewiesen.
+
+Decision:
+Eine kleine L2-regularisierte logistische Regression mit signierten
+Teamdifferenz-Features wird parallel trainierbar gemacht. Es gibt keinen
+Intercept; Team-Swap ist dadurch exakt symmetrisch. Das Modell ist nicht aktiv
+und wird nur bei explizitem Output-Pfad persistiert.
+
+Why:
+Die Architektur ist erklärbar, deterministisch, CPU-tauglich und kann bei
+verfügbaren Daten gegen B0-B5 evaluiert werden, ohne die Legacy-Baseline zu
+verändern oder Plausibilitätsgewichte zu erfinden.
+
+Validation:
+Symmetrie- und Determinismustests grün; leerer Trainingslauf liefert
+`DATA_UNAVAILABLE` und erzeugt kein Artefakt.
+
+Revisit if:
+Ein eingefrorener Holdout zeigt, dass einfachere B0-B5-Modelle gleich gut oder
+besser sind, oder echte Daten die Feature-Sparsität begrenzen.
