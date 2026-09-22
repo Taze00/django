@@ -29,3 +29,11 @@ holdout all `0`; no model metrics were emitted.
 The implementation is dependency-free and lives in
 `drafter/services/evaluation.py`. It records skipped incomplete or unknown
 rows, and reports log loss, Brier score and probability-bin calibration.
+
+## Legacy benchmark
+
+The command additionally evaluates the unchanged Legacy probability layer
+(`DraftEngine.siegchance()`) on the identical holdout when complete catalog
+references are available. It does not train, alter, or normalize Legacy
+scores. With the current isolated database the holdout is empty, so Legacy
+performance is `DATA_UNAVAILABLE` rather than a fabricated number.

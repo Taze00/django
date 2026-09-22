@@ -7,7 +7,10 @@ from datetime import datetime, timezone
 from django.core.management.base import BaseCommand
 
 from drafter import config
+from drafter.models import Brawler
 from drafter.models.matches import Match
+from drafter.services.context import DraftContext
+from drafter.services.draft_engine import DraftEngine
 from drafter.services.evaluation import evaluate, examples_from_queryset, time_split
 
 
@@ -49,6 +52,9 @@ class Command(BaseCommand):
             },
             "models": evaluate(train, validation, holdout) if train else {},
         }
+        if holdout:
+            legacy = self._legacy_predictions(holdout)
+            report["legacy"] = self._legacy_result(legacy)
         if options["format"] == "json":
             self.stdout.write(json.dumps(report, indent=2, sort_keys=True))
         else:
@@ -73,3 +79,46 @@ class Command(BaseCommand):
             ).strip()
         except (OSError, subprocess.CalledProcessError):
             return "UNKNOWN"
+
+    @staticmethod
+    def _legacy_predictions(rows):
+        """Evaluate the unchanged Legacy probability layer on the holdout."""
+        brawlers = {b.id: b for b in Brawler.objects.all()}
+        predictions = []
+        for row in rows:
+            try:
+                match = Match.objects.select_related("game_mode", "brawl_map").prefetch_related(
+                    "players__brawler"
+                ).get(fingerprint=row.fingerprint)
+            except Match.DoesNotExist:
+                continue
+            players = [player for player in match.players.all() if player.brawler_id in brawlers]
+            own = tuple(player.brawler for player in players if player.side == "a")
+            enemy = tuple(player.brawler for player in players if player.side == "b")
+            if len(own) != 3 or len(enemy) != 3:
+                continue
+            context = DraftContext(
+                game_mode=match.game_mode,
+                brawl_map=match.brawl_map,
+                own_picks=own,
+                enemy_picks=enemy,
+                own_team_first_pick=True,
+            )
+            prediction = DraftEngine(context).siegchance()["prozent"] / 100.0
+            predictions.append((prediction, row.label))
+        return predictions
+
+    @staticmethod
+    def _legacy_result(predictions):
+        if not predictions:
+            return {"status": "DATA_UNAVAILABLE", "n": 0}
+        from drafter.services.evaluation import metrics
+
+        class Row:
+            def __init__(self, prediction, label):
+                self.prediction = prediction
+                self.label = label
+
+        # Reuse the metric definition without making the Legacy probability
+        # layer part of V2 training or changing its output.
+        return metrics(lambda row: row.prediction, [Row(*item) for item in predictions])
