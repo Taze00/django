@@ -1,6 +1,7 @@
 """Run the frozen, time-based Drafter V2 baseline evaluation."""
 
 import json
+import os
 import subprocess
 from datetime import datetime, timezone
 
@@ -73,6 +74,8 @@ class Command(BaseCommand):
 
     @staticmethod
     def _git_commit():
+        if os.environ.get("DRAFTER_V2_COMMIT"):
+            return os.environ["DRAFTER_V2_COMMIT"]
         try:
             return subprocess.check_output(
                 ["git", "rev-parse", "HEAD"], text=True, stderr=subprocess.DEVNULL

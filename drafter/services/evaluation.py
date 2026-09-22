@@ -66,6 +66,10 @@ def examples_from_queryset(queryset):
 
 def time_split(examples, train_fraction=0.6, validation_fraction=0.2):
     """Return train/validation/holdout with no fingerprint crossing splits."""
+    if not 0 <= train_fraction <= 1 or not 0 <= validation_fraction <= 1:
+        raise ValueError("split fractions must be between 0 and 1")
+    if train_fraction + validation_fraction > 1:
+        raise ValueError("train and validation fractions exceed 1")
     ordered = sorted(examples, key=lambda row: (row.played_at, row.fingerprint))
     fingerprints = [row.fingerprint for row in ordered]
     if len(fingerprints) != len(set(fingerprints)):

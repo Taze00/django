@@ -1,6 +1,6 @@
 # Drafter V2 Data Audit
 
-Status: Phase 1 complete; the isolated database is fresh and contains no historical
+Status: Phase 1 prerequisite audit complete; the isolated database is fresh and contains no historical
 production data. The repository baseline ran successfully: 680 Drafter tests,
 4 skipped, 0 failures, 237.054 seconds.
 
@@ -57,3 +57,9 @@ deleting or merging anything, and conflict matches are reported separately.
 No collector, official API request, RawPayload import, aggregation, reset, delete,
 or production DB access was run in Phase 0. The test database was created by Django
 inside the isolated Compose project and destroyed after the test run.
+
+The host had no `BRAWL_STARS_API_KEY` and the feature worktree had no `.env`, so
+no official API request was attempted. The live `.env`, database and rawpayload
+directories were not opened or mounted. A future historical-data audit requires
+a separately authorized read-only export/snapshot into a new isolated location;
+direct access to `/media/docker/alex-django/data/db` is intentionally not used.

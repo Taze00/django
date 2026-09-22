@@ -20,6 +20,18 @@ class EvaluationContractTest(SimpleTestCase):
         self.assertLess(validation[-1].played_at, holdout[0].played_at)
         self.assertEqual(len({row.fingerprint for row in train + validation + holdout}), 10)
 
+    def test_doppelte_fingerprints_werden_abgelehnt(self):
+        rows = beispiele()
+        rows[1] = EvaluationExample(rows[0].fingerprint, rows[1].played_at,
+                                    rows[1].mode, rows[1].map_name,
+                                    rows[1].team_a, rows[1].team_b, rows[1].label)
+        with self.assertRaises(ValueError):
+            time_split(rows)
+
+    def test_ungueltige_splitanteile_werden_abgelehnt(self):
+        with self.assertRaises(ValueError):
+            time_split(beispiele(), train_fraction=0.8, validation_fraction=0.3)
+
     def test_baselines_liefern_probabilitaeten_und_metriken(self):
         train, validation, holdout = time_split(beispiele())
         report = evaluate(train, validation, holdout)

@@ -23,6 +23,38 @@ Vor Containerstart: `realpath`, `stat`, `docker compose -p drafter-v2-isolated c
 Revisit if:
 Historische Daten für Evaluation benötigt werden. Dann zuerst read-only Snapshot/Export mit dokumentierter Isolation entwerfen; keine direkte Live-Verbindung.
 
+## D-003: Kein API- oder Live-Datenzugriff ohne getrennte Autorisierung
+
+Problem:
+Die Phase-1-Datenbank im Feature-Worktree ist frisch. Ein historischer
+Holdout oder ein offizieller API-Audit könnte nur aus dem Live-System oder mit
+einem Credential kommen, das hier nicht vorhanden ist.
+
+Evidence:
+Der Host und der Feature-Worktree enthalten keinen gesetzten
+`BRAWL_STARS_API_KEY`; `/media/docker/alex-django` läuft separat und seine
+`.env`/Datenbank wurden nicht geöffnet. Die anonymisierte Fixture ist lokal,
+aber kein Ersatz für historische Daten.
+
+Decision:
+Keine API-Anfrage, kein Collector-Lauf und keine direkte Live-DB-Abfrage. Für
+spätere Evaluation ist ausschließlich ein separat autorisierter read-only
+Logical Snapshot zulässig: read-only DB-Rolle, export in einen neuen isolierten
+Zielpfad, anschließende Offline-Evaluation gegen eine eigene Datenbank; keine
+Live-Mounts, keine Rawpayload-Löschung und keine Rückschreibeverbindung.
+
+Why:
+So bleiben Live-DB, produktionsnahe Volumes, Rawpayloads und Original-Worktree
+unberührt. Fehlende historische Daten werden als DATA_UNAVAILABLE behandelt.
+
+Validation:
+Compose-Mountprüfung zeigte nur den Feature-Worktree; API-Key-Prüfung zeigte
+keinen Key; alle Evaluationscommands lieferten bei leerer DB `DATA_UNAVAILABLE`.
+
+Revisit if:
+Ein sicherer, separat autorisierter Snapshot und ein dokumentierter Importpfad
+bereitgestellt werden.
+
 ## D-002: Symmetrisches, dependency-freies V-Modell
 
 Problem:
