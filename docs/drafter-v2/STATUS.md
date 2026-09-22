@@ -4,10 +4,10 @@ Overall:
 - Completed milestones: 3 / 10
 - Current phase: Phase 1/2 prerequisites remain active; later V2 components are prototypes only
 - Current task: complete safe data/API access assessment and freeze evaluation prerequisites
-- Blocker: historical matches unavailable in isolated worktree; official API audit blocked because no key is available here
+- Blocker: historical matches unavailable in isolated worktree; official API audit blocked because no key is available here. Isolated DB schema exists and is empty.
 
 Latest validation:
-- Git status: clean vor Dokumentationsänderung
+- Git status: clean after commit `341a4f5`
 - Branch: `feature/drafter-v2`
 - Live Compose `alex-django`: läuft separat unter `/media/docker/alex-django`
 - Testbaseline: 680 Drafter-Tests, 4 übersprungen, 0 Fehler, 237.054 s; Systemcheck ohne Befund
