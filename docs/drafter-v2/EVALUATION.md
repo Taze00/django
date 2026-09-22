@@ -1,7 +1,7 @@
 # Drafter V2 Evaluation
 
 Status: historical dataset frozen; B0-B5 and the non-active V2 candidate have
-been measured. Legacy full comparison is still running separately.
+ been measured. Legacy comparison is complete; V2 was not promoted.
 
 Planned frozen protocol:
 - Unit of observation: deduplicated, conflict-free Ranked match with known winner.
@@ -16,9 +16,10 @@ The holdout is not used for tuning or feature selection. The current freeze is
 manifest `v2-dataset-freeze-1`, fingerprint digest
 `2bb8222b9025a5da7daadea8b9a252c39b16bcda8b07b9bc2df69315ea4dcf9e`, with
 6,094 train, 2,031 validation and 2,033 holdout rows. The eligible window is
-2026-08-29 through 2026-09-18 UTC. The host commit used for the freeze was
-`425499425fcf9a3c07b15b389cad8bbf51129859`; the final code commit must be
-recorded again before the sealed comparison.
+2026-08-29 through 2026-09-18 UTC. The initial freeze used commit
+`425499425fcf9a3c07b15b389cad8bbf51129859`; the final sealed rerun used
+`5c3d7bf766e86aac839a32fcbadc281dc52f9778` and produced the same digest and
+split counts.
 
 ## Measured baselines
 
@@ -73,8 +74,12 @@ rows, and reports log loss, Brier score and probability-bin calibration.
 The command additionally evaluates the unchanged Legacy probability layer
 (`DraftEngine.siegchance()`) on the identical holdout when complete catalog
 references are available. It does not train, alter, or normalize Legacy
-scores. With the current isolated database the holdout is empty, so Legacy
-performance is `DATA_UNAVAILABLE` rather than a fabricated number.
+scores. On the frozen isolated snapshot it evaluated 1,956 eligible rows;
+ineligible duplicate-Brawler rows are reported separately rather than silently
+altered.
 Historical matches with duplicate Brawlers are valid observations for V2 but
 are ineligible for the unchanged DraftContext Legacy contract; the report
 counts those rows under `legacy.skipped` instead of modifying Legacy.
+
+Final regression after the sealed rerun: 691 Drafter tests, 4 skipped, 0
+failures. The separate Fitness suite remained green at 253 tests.

@@ -10,8 +10,8 @@
 1. Phase 0: Repo-Karte, Schutzbereiche, Baseline, Legacy-Stand dokumentiert.
 2. Phase 1: DB-/Rawpayload-/API-Audit mit reproduzierbaren Queries, UNKNOWN-Lücken und Sampling-Befund. **Erledigt in `54d8e18`.**
 3. Phase 2: eingefrorener zeitbasierter Split, Baselines B0-B5, Log-Loss/Brier/Kalibrierung, Leakage-Prüfungen und Runner. **Framework erledigt in `6dea940`; Acceptance empirisch offen wegen DATA_UNAVAILABLE.**
-4. Phase 3: Legacy auf identischem Holdout benchmarken; keine Legacy-Scoringänderung. **Abbildung vorhanden; Acceptance offen, Messung DATA_UNAVAILABLE.**
-5. Phase 4: regularisiertes probabilistisches V-Modell, Manifest, Persistenz, Training/Evaluation und Model Card. **Prototyp in `bc4f071`; nicht akzeptiert/promotet ohne Holdout.**
+4. Phase 3: Legacy auf identischem Holdout benchmarken; keine Legacy-Scoringänderung. **Erledigt in `5c3d7bf`; Legacy schlägt V2.**
+5. Phase 4: regularisiertes probabilistisches V-Modell, Manifest, Persistenz, Training/Evaluation und Model Card. **Kandidat evaluiert, aber nicht promotet; Legacy bleibt Default.**
 6. Phase 5-7: Mechanik-/Teamfeatures und faktorisierte Interaktionen nur bei belegtem Nutzen; sonst als verworfen dokumentieren. **Nur Bestands-Pipeline inventarisiert; aktive Featureauswahl blockiert.**
 7. Phase 8-9: legaler Last-Pick aus V, dokumentierte Mid-/First-Search, faktenbasierte Erklärungen. **Prototypen vorhanden; nicht akzeptiert, solange V nicht validiert ist.**
 8. Phase 10-11: explizite Modellversion in API/UI und modellversioniertes Draft-Logging; Legacy bleibt verfügbar.

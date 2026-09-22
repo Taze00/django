@@ -11,7 +11,7 @@ Initial status after repository orientation. No replacement values are introduce
 | Pick order / bans in official match history | UNKNOWN | Use observed payload fields only; current model comments indicate these are absent |
 | Objective mechanics at patch level | PARTIAL | Use observed official sources or mark individual fields UNKNOWN with source provenance |
 | Validated team-composition feature benefit | UNAVAILABLE | Needs train/validation/holdout match data; no hand-set anti-tank/team weights |
-| Sufficient data for V2 promotion | PARTIAL | Dataset is sufficient for baseline/model experiments; promotion still requires sealed final comparison and Legacy result |
+| Sufficient data for V2 promotion | NOT MET | Dataset supports experiments, but Legacy beats V2 on the sealed holdout; collect later Ranked data before reconsideration |
 | Historical data transfer to isolated evaluation | RESOLVED safely | Snapshot was exported read-only into `/tmp`, anonymized/minimized, then imported only into the isolated DB |
 
 Rules: UNKNOWN is not zero; no fabricated statistics, mechanics, samples, rankings or missing fields.
