@@ -2,33 +2,33 @@
 
 Overall:
 - Completed milestones: 3 / 10
-- Current phase: Phase 1/2 prerequisites remain active; later V2 components are prototypes only
-- Current task: complete safe data/API access assessment and freeze evaluation prerequisites
-- Blocker: historical matches unavailable in isolated worktree; official API audit blocked because no key is available here. Isolated DB schema exists and is empty.
+- Current phase: Phase 3/4 evidence evaluation
+- Current task: complete unchanged Legacy benchmark, then perform one sealed final comparison
+- Blocker: none for data access; Legacy benchmark is still running in the isolated container
 
 Latest validation:
-- Git status: clean after commit `341a4f5`
+- Git status: documentation and freeze-command changes pending commit
 - Branch: `feature/drafter-v2`
 - Live Compose `alex-django`: läuft separat unter `/media/docker/alex-django`
 - Testbaseline: 680 Drafter-Tests, 4 übersprungen, 0 Fehler, 237.054 s; Systemcheck ohne Befund
 - Aktuelle Vollsuite: 690 Drafter-Tests, 4 übersprungen, 0 Fehler, 234.768 s
 - Fitness-Cross-App-Suite: 253 Tests, 0 Fehler, 5.726 s
 - V2-Audit-Test: 1 Test, 0 Fehler
-- V2-Datenaudit: isolierte DB ohne Rawpayloads, Matches, Stats oder Katalogdaten
+- V2-Datenaudit: 10,162 countable soloRanked matches, 10,191 soloRanked total; 0 conflicts and 0 reconstructed-fingerprint duplicates
 - V2-Evaluationsvertrag: 5 Tests, 0 Fehler; Duplicate-Fingerprint- und Split-Grenzen geprüft
-- V2-Evaluationscommand: `DATA_UNAVAILABLE`, input/train/validation/holdout `0`
-- Legacy-Abbildung: unveränderter `DraftEngine.siegchance()`-Pfad; empirische Messung `DATA_UNAVAILABLE`
-- V2-Modellvertrag: 4 Tests, 0 Fehler; Training `DATA_UNAVAILABLE`, kein Artefakt
+- V2-Evaluationscommand: 10,158 eligible; train 6,094, validation 2,031, holdout 2,033
+- Baselines: B0 holdout LogLoss 0.693147; B2 0.704446; B3 0.730888; B4 0.772412; B5 0.717746
+- V2-Modellvertrag: 4 Tests, 0 Fehler; validation LogLoss 0.688604, preliminary holdout 0.692603; not promoted
 - Mechanik/UNKNOWN/Search: 14 fokussierte Tests, 0 Fehler; Last Pick und Mid-Expectimax nicht-aktiv verfügbar
 - V2-Erklärung: 1 fokussierter Test, 0 Fehler; nicht in API/UI aktiv
-- Evaluation: prerequisite framework exists; empirical evaluation unavailable
+- API audit: bounded HTTP 200 audit completed; unsupported fields remain UNKNOWN
+- Legacy-Abbildung: unchanged engine benchmark still running; duplicate-Brawler rows are counted as skipped
 
 Data integrity:
 - fabricated values: 0
 - destructive operations: 0
-- unresolved gaps: keine isolierten historischen Trainingsdaten; Pickorder, Bans, Builds, Kampfstatistiken und valide Skillkontrolle UNKNOWN; objektive Patchmechanikwerte UNKNOWN; official API audit unavailable
+- unresolved gaps: Pickorder, Bans, Builds, Kampfstatistiken und valide Skillkontrolle UNKNOWN; objektive Patchmechanikwerte UNKNOWN; Legacy benchmark pending
 
 Next:
-- RESUME FROM: Phase 1/2 data prerequisite; only a separately authorized read-only historical snapshot or API credential can unblock empirical evaluation.
-- API-Audit erst nach sicherer Credential-/Rate-Limit-Prüfung; kein Key im Worktree.
-- V2-Modell, Search und Erklärung nicht aktivieren oder als abgeschlossene Phasen zählen.
+- RESUME FROM: Phase 3 / unchanged Legacy benchmark result, then sealed final comparison.
+- V2-Modell, Search und Erklärung nicht aktivieren; keine Holdout-basierte Nachjustierung.

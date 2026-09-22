@@ -1,7 +1,7 @@
 # Drafter V2 Evaluation
 
-Status: Phase 2 framework implemented; current isolated database has no valid
-finished Ranked matches, so no empirical model result is claimed.
+Status: historical dataset frozen; B0-B5 and the non-active V2 candidate have
+been measured. Legacy full comparison is still running separately.
 
 Planned frozen protocol:
 - Unit of observation: deduplicated, conflict-free Ranked match with known winner.
@@ -12,7 +12,36 @@ Planned frozen protocol:
 - Fixed seed, commit hash, feature manifest, split definition and patch window recorded in every report.
 - Leakage checks cover duplicate fingerprints, future features, result-derived fields, player identity, post-match fields and sampling artifacts.
 
-The holdout is not used for tuning or feature selection.
+The holdout is not used for tuning or feature selection. The current freeze is
+manifest `v2-dataset-freeze-1`, fingerprint digest
+`2bb8222b9025a5da7daadea8b9a252c39b16bcda8b07b9bc2df69315ea4dcf9e`, with
+6,094 train, 2,031 validation and 2,033 holdout rows. The eligible window is
+2026-08-29 through 2026-09-18 UTC. The host commit used for the freeze was
+`425499425fcf9a3c07b15b389cad8bbf51129859`; the final code commit must be
+recorded again before the sealed comparison.
+
+## Measured baselines
+
+| Model | Validation Log Loss | Validation Brier | Holdout Log Loss | Holdout Brier |
+|---|---:|---:|---:|---:|
+| B0 50/50 | 0.693147 | 0.250000 | 0.693147 | 0.250000 |
+| B2 global meta | 0.692929 | 0.249731 | 0.704446 | 0.255430 |
+| B3 meta + mode | 0.722226 | 0.262396 | 0.730888 | 0.266350 |
+| B4 meta + map | 0.765516 | 0.278296 | 0.772412 | 0.281109 |
+| B5 meta + pair/synergy | 0.698784 | 0.252338 | 0.717746 | 0.261380 |
+
+B1 skill-only is unavailable: no validated causal skill control was identified.
+The B0-B5 holdout values are descriptive and sealed for model selection.
+
+## Candidate V measurement
+
+The dependency-free L2 logistic candidate was trained on train only with 300
+epochs and regularization 1.0, selected using validation. Validation:
+Log Loss 0.688604, Brier 0.247741. A preliminary holdout read yielded Log Loss
+0.692603 and Brier 0.249727; this is not a promotion decision and must be
+reproduced once after the final code/documentation commit. Regularization checks
+0.01/0.1/1/10 showed validation Log Loss 0.688602/0.688603/0.688604/0.688617;
+the selection was made on validation only.
 
 ## Reproducer
 
@@ -27,6 +56,9 @@ when the holdout is empty. Pass `--git-commit $(git rev-parse HEAD)` when the
 container image has no Git binary. Current isolated result: input/train/validation/
 holdout all `0`; no model metrics were emitted.
 
+Use `--skip-legacy` for the faster B0-B5-only run; the default still includes
+the unchanged Legacy benchmark and reports any ineligible rows.
+
 The implementation is dependency-free and lives in
 `drafter/services/evaluation.py`. It records skipped incomplete or unknown
 rows, and reports log loss, Brier score and probability-bin calibration.
@@ -38,3 +70,6 @@ The command additionally evaluates the unchanged Legacy probability layer
 references are available. It does not train, alter, or normalize Legacy
 scores. With the current isolated database the holdout is empty, so Legacy
 performance is `DATA_UNAVAILABLE` rather than a fabricated number.
+Historical matches with duplicate Brawlers are valid observations for V2 but
+are ineligible for the unchanged DraftContext Legacy contract; the report
+counts those rows under `legacy.skipped` instead of modifying Legacy.

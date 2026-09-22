@@ -1,7 +1,7 @@
 # Drafter V2 Model Card
 
 Status: V2 architecture is trainable but no V2 model is active. Legacy remains
-the current engine because the isolated worktree contains no historical matches.
+the current engine pending the sealed comparison and all promotion gates.
 
 Intended use: explainable Ranked draft assistance based on observed, provenance-tracked data. Not a guarantee of match outcome.
 
@@ -14,6 +14,6 @@ the training command receives `--model-path`.
 
 Data policy: unknown values remain unavailable; measured, derived, assumed and unknown facts are kept distinct. Synthetic fixtures are test-only and never mixed with real match data.
 
-Promotion gate: a V2 model must beat or appropriately match baselines on frozen holdout log loss/Brier/calibration, pass leakage/symmetry/legal-pick/determinism tests, integrate without unrelated regressions, and retain Legacy rollback. Current status: not promotable; holdout is unavailable.
+Promotion gate: a V2 model must beat or appropriately match baselines on frozen holdout log loss/Brier/calibration, pass leakage/symmetry/legal-pick/determinism tests, integrate without unrelated regressions, and retain Legacy rollback. Current status: not promotable; Legacy comparison and final sealed rerun remain.
 
-Known limitations: current data inventory and objective mechanics availability are not yet measured in this isolated environment; player-skill confounding and pick-order information may be unavailable.
+Known limitations: objective mechanics are still only partially sourced; player-skill confounding, pick-order, bans, builds and objective combat fields remain unavailable. Historical rows can contain duplicate Brawlers and are valid for V2 but ineligible for the unchanged Legacy DraftContext contract.

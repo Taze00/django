@@ -1,6 +1,8 @@
 # Drafter V2 Data Audit
 
-Status: Phase 1 prerequisite audit complete; the isolated database is fresh and contains no historical
+Status: Phase 1 prerequisite audit complete; the isolated database contains an
+anonymized read-only snapshot from the live Drafter data, and contains no
+unrelated Fitness, Films, user/account or other application data.
 production data. The repository baseline ran successfully: 680 Drafter tests,
 4 skipped, 0 failures, 237.054 seconds.
 
@@ -48,6 +50,43 @@ reproducible database audit. In the isolated Phase-1 database it reported
 zero raw payloads, zero matches, zero players, zero stats, zero maps, zero
 modes and zero patches. This is an environment fact, not a claim about the
 live checkout.
+
+## Measured historical snapshot
+
+Source was queried read-only through `alex-django-db-1`; destination was the
+separate `drafter-v2-isolated-db-1` bind mount. Exported tables were only the
+Drafter catalog, patches, matches, match players, match-payload links and
+aggregated Brawler/Counter/Synergy statistics. Raw JSON was replaced with `{}`;
+player tags and builds were blanked; collector, preference, Praxisfall and all
+other application tables were excluded.
+
+Snapshot counts: 108 Brawler, 15 modes, 97 maps, 2 patches, 18,222 matches,
+111,868 match players, 10,191 `soloRanked` matches, 10,162 countable
+`soloRanked` matches, 11,843 Brawler stats, 57,648 Counter stats and 48,555
+Synergy stats. Reconstructed-fingerprint duplicates: 0; conflicts: 0.
+The countable Ranked window is 2026-08-29 through 2026-09-18 UTC.
+
+The isolated import had zero orphaned match-player, Brawler, map or payload-link
+references. Snapshot staging was `/tmp/drafter-v2-snapshot-20260922`; it was not
+copied into the worktree or the live checkout.
+
+## Bounded official API audit
+
+Five bounded GET targets returned HTTP 200: `/brawlers` (108 items),
+`/events/rotation` (JSON array), `/rankings/global/players` (200 items), one
+observed player's profile and that player's `/battlelog` (24 items, 8
+`soloRanked`, 16 `ranked`). Only status and schema metadata were retained.
+The live key was read only into process memory and was never printed, stored or
+copied. Battlelog fields observed in this current audit were:
+
+- Item: `battle`, `battleTime`, `event`
+- Battle: `duration`, `mode`, `result`, `starPlayer`, `teams`, `trophyChange`, `type`
+- Event: `id`, `map`, `mode`, `modeId`
+- Team brawler: `id`, `name`, `power`, `trophies`
+- Player profile: includes ranked rank/Elo fields, but no validated causal skill variable was assumed
+
+Pick order, bans, builds, damage/healing/kills/deaths/objective statistics and a
+match/replay ID were not observed in this audit and remain UNKNOWN.
 
 Sampling and deduplication are implemented in the report: sampling is read from
 RawPayload provenance, reconstructed-fingerprint duplicates are counted without

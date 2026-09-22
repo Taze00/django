@@ -10,7 +10,7 @@ from django.core.management.base import BaseCommand
 from drafter import config
 from drafter.models import Brawler
 from drafter.models.matches import Match
-from drafter.services.context import DraftContext
+from drafter.services.context import DraftContext, DraftFehler
 from drafter.services.draft_engine import DraftEngine
 from drafter.services.evaluation import evaluate, examples_from_queryset, time_split
 
@@ -22,6 +22,8 @@ class Command(BaseCommand):
         parser.add_argument("--format", choices=("text", "json"), default="text")
         parser.add_argument("--train-fraction", type=float, default=0.6)
         parser.add_argument("--validation-fraction", type=float, default=0.2)
+        parser.add_argument("--skip-legacy", action="store_true",
+                    help="Skip the unchanged Legacy benchmark")
         parser.add_argument("--git-commit", default="", help="Host commit for reproducible reports")
 
     def handle(self, *args, **options):
@@ -54,9 +56,10 @@ class Command(BaseCommand):
             },
             "models": evaluate(train, validation, holdout) if train else {},
         }
-        if holdout:
+        if holdout and not options["skip_legacy"]:
             legacy = self._legacy_predictions(holdout)
-            report["legacy"] = self._legacy_result(legacy)
+            report["legacy"] = self._legacy_result(legacy[0])
+            report["legacy"]["skipped"] = legacy[1]
         if options["format"] == "json":
             self.stdout.write(json.dumps(report, indent=2, sort_keys=True))
         else:
@@ -89,6 +92,7 @@ class Command(BaseCommand):
         """Evaluate the unchanged Legacy probability layer on the holdout."""
         brawlers = {b.id: b for b in Brawler.objects.all()}
         predictions = []
+        skipped = {}
         for row in rows:
             try:
                 match = Match.objects.select_related("game_mode", "brawl_map").prefetch_related(
@@ -101,16 +105,21 @@ class Command(BaseCommand):
             enemy = tuple(player.brawler for player in players if player.side == "b")
             if len(own) != 3 or len(enemy) != 3:
                 continue
-            context = DraftContext(
-                game_mode=match.game_mode,
-                brawl_map=match.brawl_map,
-                own_picks=own,
-                enemy_picks=enemy,
-                own_team_first_pick=True,
-            )
-            prediction = DraftEngine(context).siegchance()["prozent"] / 100.0
+            try:
+                context = DraftContext(
+                    game_mode=match.game_mode,
+                    brawl_map=match.brawl_map,
+                    own_picks=own,
+                    enemy_picks=enemy,
+                    own_team_first_pick=True,
+                )
+                prediction = DraftEngine(context).siegchance()["prozent"] / 100.0
+            except DraftFehler as error:
+                reason = str(error)
+                skipped[reason] = skipped.get(reason, 0) + 1
+                continue
             predictions.append((prediction, row.label))
-        return predictions
+        return predictions, skipped
 
     @staticmethod
     def _legacy_result(predictions):
