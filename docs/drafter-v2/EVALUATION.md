@@ -1,7 +1,8 @@
 # Drafter V2 Evaluation
 
-Status: historical dataset frozen; B0-B5 and the non-active V2 candidate have
- been measured. Legacy comparison is complete; V2 was not promoted.
+Status: historical dataset frozen; B0-B5, the non-active V2 candidate and the
+reporting-only Legacy/V2 shared subset have been measured. Legacy comparison is
+complete; V2 was not promoted.
 
 Planned frozen protocol:
 - Unit of observation: deduplicated, conflict-free Ranked match with known winner.
@@ -35,6 +36,21 @@ Unchanged Legacy probability layer: validation not applicable (the Legacy
 probability provider is not trained on this split); holdout Log Loss `0.689749`,
 Brier `0.248301`, `n=1,956`. It skipped 77 rows with duplicate Brawlers because
 the unchanged `DraftContext` contract rejects those historical compositions.
+
+## Shared Legacy/V2 subset
+
+For the final apples-to-apples reporting correction, both models were evaluated
+on the exact 1,956 holdout fingerprints eligible for unchanged Legacy. The
+full V2 holdout remains a separate coverage metric (`n=2,033`).
+
+| Model | Shared n | Log Loss | Brier |
+|---|---:|---:|---:|
+| Legacy unchanged | 1,956 | 0.689749 | 0.248301 |
+| V2 candidate | 1,956 | 0.692600 | 0.249725 |
+
+The shared subset changes reporting only. It did not change V2 features,
+hyperparameters, regularization, model structure, training data or selection.
+The report includes the exact shared fingerprints under `shared_subset`.
 
 B1 skill-only is unavailable: no validated causal skill control was identified.
 The B0-B5 holdout values are descriptive and sealed for model selection.

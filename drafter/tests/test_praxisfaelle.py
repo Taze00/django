@@ -16,6 +16,7 @@ from drafter.models import (
     Praxisfall, SynergyStat,
 )
 from drafter.tests.basis import DrafterTest
+from drafter.management.commands.praxisfall import MODELLSTAND
 
 
 class EintragenTest(DrafterTest):
@@ -78,8 +79,7 @@ class EintragenTest(DrafterTest):
 
     def test_modellstand_wird_mitgeschrieben(self):
         fall, _ = self.eintragen()
-        self.assertTrue(fall.modellstand,
-                        "ohne die Modellversion ist ein Fall nicht auswertbar")
+        self.assertEqual(fall.modellstand, MODELLSTAND)
 
 
 class KeineRueckwirkungTest(DrafterTest):

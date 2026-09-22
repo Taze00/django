@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 
 from django.test import SimpleTestCase
 
-from drafter.services.evaluation import EvaluationExample, evaluate, time_split
+from drafter.services.evaluation import EvaluationExample, evaluate, metrics, time_split
 
 
 def beispiele():
@@ -31,6 +31,14 @@ class EvaluationContractTest(SimpleTestCase):
     def test_ungueltige_splitanteile_werden_abgelehnt(self):
         with self.assertRaises(ValueError):
             time_split(beispiele(), train_fraction=0.8, validation_fraction=0.3)
+
+    def test_shared_subset_hat_dieselbe_zeilenmenge_fuer_beide_modelle(self):
+        train, _, holdout = time_split(beispiele())
+        shared = holdout[:4]
+        legacy = metrics(lambda row: 0.5, shared)
+        candidate = metrics(lambda row: 0.51, shared)
+        self.assertEqual(legacy["n"], candidate["n"])
+        self.assertEqual(legacy["n"], len(shared))
 
     def test_baselines_liefern_probabilitaeten_und_metriken(self):
         train, validation, holdout = time_split(beispiele())

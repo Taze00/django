@@ -1,17 +1,17 @@
 # Drafter V2 Status
 
 Overall:
-- Completed milestones: 4 / 10
-- Current phase: Phase 4 evidence gate closed; later phases remain non-active prototypes
-- Current task: document rollback/default decision and exact resume point for future data growth
+- Completed milestones: 5 / 10
+- Current phase: Phase 10/11 reporting and regression gates closed; later V2 phases remain non-active
+- Current task: preserve Legacy default and collect newer Ranked data before reconsidering V2
 - Blocker: none for authorized audit; V2 is not promotable because unchanged Legacy performs better
 
 Latest validation:
-- Git status: clean after commit `ff7fa07`
+- Git status: pending final shared-subset commit
 - Branch: `feature/drafter-v2`
 - Live Compose `alex-django`: läuft separat unter `/media/docker/alex-django`
 - Testbaseline: 680 Drafter-Tests, 4 übersprungen, 0 Fehler, 237.054 s; Systemcheck ohne Befund
-- Aktuelle Vollsuite: 691 Drafter-Tests, 4 übersprungen, 0 Fehler, 251.603 s
+- Aktuelle Vollsuite: 692 Drafter-Tests, 4 übersprungen, 0 Fehler, 227.127 s
 - Fitness-Cross-App-Suite: 253 Tests, 0 Fehler, 5.726 s
 - V2-Audit-Test: 1 Test, 0 Fehler
 - V2-Datenaudit: 10,162 countable soloRanked matches, 10,191 soloRanked total; 0 conflicts and 0 reconstructed-fingerprint duplicates
@@ -23,6 +23,8 @@ Latest validation:
 - V2-Erklärung: 1 fokussierter Test, 0 Fehler; nicht in API/UI aktiv
 - API audit: bounded HTTP 200 audit completed; unsupported fields remain UNKNOWN
 - Legacy-Abbildung: unchanged engine holdout LogLoss 0.689749, Brier 0.248301, n=1,956; 77 duplicate-Brawler rows skipped; beats V2
+- Shared subset: exact n=1,956; Legacy 0.689749/0.248301 vs V2 0.692600/0.249725; full V2 coverage remains n=2,033
+- UI/Logging regression: 49 focused tests, 0 errors; full suite includes explicit Legacy modellstand logging contract
 
 Data integrity:
 - fabricated values: 0

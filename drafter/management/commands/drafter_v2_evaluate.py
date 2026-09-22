@@ -14,6 +14,7 @@ from drafter.services.context import DraftContext, DraftFehler
 from drafter.services.daten import Datenraum
 from drafter.services.draft_engine import DraftEngine
 from drafter.services.evaluation import evaluate, examples_from_queryset, time_split
+from drafter.services.v2_model import evaluate_model, train_model
 
 
 class Command(BaseCommand):
@@ -57,10 +58,20 @@ class Command(BaseCommand):
             },
             "models": evaluate(train, validation, holdout) if train else {},
         }
+        if train:
+            v2_candidate = train_model(train, regularization=1.0, epochs=300)
+            report["v2_candidate"] = {
+                "validation": evaluate_model(v2_candidate, validation),
+                "holdout": evaluate_model(v2_candidate, holdout),
+                "training": {"regularization": 1.0, "epochs": 300},
+            }
         if holdout and not options["skip_legacy"]:
             legacy = self._legacy_predictions(holdout)
             report["legacy"] = self._legacy_result(legacy[0])
             report["legacy"]["skipped"] = legacy[1]
+            report["shared_subset"] = self._shared_subset_result(
+                train, legacy[0]
+            )
         if options["format"] == "json":
             self.stdout.write(json.dumps(report, indent=2, sort_keys=True))
         else:
@@ -130,7 +141,7 @@ class Command(BaseCommand):
                 reason = str(error)
                 skipped[reason] = skipped.get(reason, 0) + 1
                 continue
-            predictions.append((prediction, row.label))
+            predictions.append((row, prediction))
         return predictions, skipped
 
     @staticmethod
@@ -146,4 +157,26 @@ class Command(BaseCommand):
 
         # Reuse the metric definition without making the Legacy probability
         # layer part of V2 training or changing its output.
-        return metrics(lambda row: row.prediction, [Row(*item) for item in predictions])
+        return metrics(lambda row: row.prediction, [
+            Row(prediction, row.label) for row, prediction in predictions
+        ])
+
+    @staticmethod
+    def _shared_subset_result(train, legacy_predictions):
+        """Compare fixed V2 and Legacy only on identical Legacy-eligible rows."""
+        if not legacy_predictions:
+            return {"status": "DATA_UNAVAILABLE", "n": 0}
+        from drafter.services.evaluation import metrics
+
+        model = train_model(train, regularization=1.0, epochs=300)
+        rows = [row for row, _ in legacy_predictions]
+        legacy_rows = [
+            type("Prediction", (), {"prediction": prediction, "label": row.label})
+            for row, prediction in legacy_predictions
+        ]
+        return {
+            "n": len(rows),
+            "fingerprints": [row.fingerprint for row in rows],
+            "legacy": metrics(lambda item: item.prediction, legacy_rows),
+            "v2_candidate": evaluate_model(model, rows),
+        }
