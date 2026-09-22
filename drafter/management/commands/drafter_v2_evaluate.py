@@ -11,6 +11,7 @@ from drafter import config
 from drafter.models import Brawler
 from drafter.models.matches import Match
 from drafter.services.context import DraftContext, DraftFehler
+from drafter.services.daten import Datenraum
 from drafter.services.draft_engine import DraftEngine
 from drafter.services.evaluation import evaluate, examples_from_queryset, time_split
 
@@ -93,6 +94,7 @@ class Command(BaseCommand):
         brawlers = {b.id: b for b in Brawler.objects.all()}
         predictions = []
         skipped = {}
+        raum_cache = {}
         for row in rows:
             try:
                 match = Match.objects.select_related("game_mode", "brawl_map").prefetch_related(
@@ -106,6 +108,16 @@ class Command(BaseCommand):
             if len(own) != 3 or len(enemy) != 3:
                 continue
             try:
+                cache_key = (match.game_mode_id, match.brawl_map_id, match.patch_id)
+                raum = raum_cache.get(cache_key)
+                if raum is None:
+                    raum = Datenraum(
+                        brawl_map=match.brawl_map,
+                        game_mode=match.game_mode,
+                        patch=match.patch,
+                        rank_pool="alle",
+                    ).laden()
+                    raum_cache[cache_key] = raum
                 context = DraftContext(
                     game_mode=match.game_mode,
                     brawl_map=match.brawl_map,
@@ -113,7 +125,7 @@ class Command(BaseCommand):
                     enemy_picks=enemy,
                     own_team_first_pick=True,
                 )
-                prediction = DraftEngine(context).siegchance()["prozent"] / 100.0
+                prediction = DraftEngine(context, raum=raum).siegchance()["prozent"] / 100.0
             except DraftFehler as error:
                 reason = str(error)
                 skipped[reason] = skipped.get(reason, 0) + 1

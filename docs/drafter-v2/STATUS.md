@@ -3,11 +3,11 @@
 Overall:
 - Completed milestones: 3 / 10
 - Current phase: Phase 3/4 evidence evaluation
-- Current task: complete unchanged Legacy benchmark, then perform one sealed final comparison
-- Blocker: none for data access; Legacy benchmark is still running in the isolated container
+- Current task: rerun sealed V2 comparison on current commit and close regression gates
+- Blocker: none for data access; V2 is not promotable because unchanged Legacy performs better
 
 Latest validation:
-- Git status: calibration fix pending commit; snapshot/freeze commit `d58c4f9` is pushed
+- Git status: Legacy benchmark harness/documentation pending commit
 - Branch: `feature/drafter-v2`
 - Live Compose `alex-django`: läuft separat unter `/media/docker/alex-django`
 - Testbaseline: 680 Drafter-Tests, 4 übersprungen, 0 Fehler, 237.054 s; Systemcheck ohne Befund
@@ -22,13 +22,13 @@ Latest validation:
 - Mechanik/UNKNOWN/Search: 14 fokussierte Tests, 0 Fehler; Last Pick und Mid-Expectimax nicht-aktiv verfügbar
 - V2-Erklärung: 1 fokussierter Test, 0 Fehler; nicht in API/UI aktiv
 - API audit: bounded HTTP 200 audit completed; unsupported fields remain UNKNOWN
-- Legacy-Abbildung: unchanged engine benchmark still running; duplicate-Brawler rows are counted as skipped
+- Legacy-Abbildung: unchanged engine holdout LogLoss 0.689749, Brier 0.248301, n=1,956; 77 duplicate-Brawler rows skipped
 
 Data integrity:
 - fabricated values: 0
 - destructive operations: 0
-- unresolved gaps: Pickorder, Bans, Builds, Kampfstatistiken und valide Skillkontrolle UNKNOWN; objektive Patchmechanikwerte UNKNOWN; Legacy benchmark pending
+- unresolved gaps: Pickorder, Bans, Builds, Kampfstatistiken und valide Skillkontrolle UNKNOWN; objektive Patchmechanikwerte UNKNOWN
 
 Next:
-- RESUME FROM: Phase 3 / unchanged Legacy benchmark result, then sealed final comparison.
-- V2-Modell, Search und Erklärung nicht aktivieren; keine Holdout-basierte Nachjustierung.
+- RESUME FROM: Phase 4 / final sealed V2 rerun on current commit, then full regression and closeout report.
+- V2-Modell, Search und Erklärung nicht aktivieren; Legacy bleibt Default.

@@ -30,6 +30,11 @@ recorded again before the sealed comparison.
 | B4 meta + map | 0.765516 | 0.278296 | 0.772412 | 0.281109 |
 | B5 meta + pair/synergy | 0.698784 | 0.252338 | 0.717746 | 0.261380 |
 
+Unchanged Legacy probability layer: validation not applicable (the Legacy
+probability provider is not trained on this split); holdout Log Loss `0.689749`,
+Brier `0.248301`, `n=1,956`. It skipped 77 rows with duplicate Brawlers because
+the unchanged `DraftContext` contract rejects those historical compositions.
+
 B1 skill-only is unavailable: no validated causal skill control was identified.
 The B0-B5 holdout values are descriptive and sealed for model selection.
 
@@ -37,9 +42,9 @@ The B0-B5 holdout values are descriptive and sealed for model selection.
 
 The dependency-free L2 logistic candidate was trained on train only with 300
 epochs and regularization 1.0, selected using validation. Validation:
-Log Loss 0.688604, Brier 0.247741. A preliminary holdout read yielded Log Loss
-0.692603 and Brier 0.249727; this is not a promotion decision and must be
-reproduced once after the final code/documentation commit. Regularization checks
+Log Loss 0.688604, Brier 0.247741. The sealed holdout yielded Log Loss
+0.692603 and Brier 0.249727. Legacy remains better on the sealed comparison,
+so V2 is not promoted and Legacy remains the default. Regularization checks
 0.01/0.1/1/10 showed validation Log Loss 0.688602/0.688603/0.688604/0.688617;
 the selection was made on validation only.
 
@@ -53,8 +58,8 @@ The command is read-only. It loads conflict-free, known-result, complete 3v3
 `soloRanked` matches, sorts by `(played_at, fingerprint)`, rejects duplicate
 fingerprints, and uses a 60/20/20 time split. `DATA_UNAVAILABLE` is returned
 when the holdout is empty. Pass `--git-commit $(git rev-parse HEAD)` when the
-container image has no Git binary. Current isolated result: input/train/validation/
-holdout all `0`; no model metrics were emitted.
+container image has no Git binary. Current frozen result: input `10,158`, train
+`6,094`, validation `2,031`, holdout `2,033`.
 
 Use `--skip-legacy` for the faster B0-B5-only run; the default still includes
 the unchanged Legacy benchmark and reports any ineligible rows.
