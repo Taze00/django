@@ -11,9 +11,9 @@
 2. Phase 1: DB-/Rawpayload-/API-Audit mit reproduzierbaren Queries, UNKNOWN-Lücken und Sampling-Befund. **Erledigt in `54d8e18`.**
 3. Phase 2: eingefrorener zeitbasierter Split, Baselines B0-B5, Log-Loss/Brier/Kalibrierung, Leakage-Prüfungen und Runner. **Erledigt in `6dea940`; empirische Werte warten auf historische Daten.**
 4. Phase 3: Legacy auf identischem Holdout benchmarken; keine Legacy-Scoringänderung. **Benchmark-Abbildung erledigt; Messung DATA_UNAVAILABLE.**
-5. Phase 4: regularisiertes probabilistisches V-Modell, Manifest, Persistenz, Training/Evaluation und Model Card.
-6. Phase 5-7: Mechanik-/Teamfeatures und faktorisierte Interaktionen nur bei belegtem Nutzen; sonst als verworfen dokumentieren.
-7. Phase 8-9: legaler Last-Pick aus V, dokumentierte Mid-/First-Search, faktenbasierte Erklärungen.
+5. Phase 4: regularisiertes probabilistisches V-Modell, Manifest, Persistenz, Training/Evaluation und Model Card. **Erledigt in `bc4f071`; nicht aktiv ohne Holdout.**
+6. Phase 5-7: Mechanik-/Teamfeatures und faktorisierte Interaktionen nur bei belegtem Nutzen; sonst als verworfen dokumentieren. **Mechanikpipeline vorhanden; objektive Patchwerte und Teamfeature-Nutzen wegen DATA_UNAVAILABLE nicht aktiv.**
+7. Phase 8-9: legaler Last-Pick aus V, dokumentierte Mid-/First-Search, faktenbasierte Erklärungen. **Last-Pick und Mid-Expectimax als nicht-aktive Search-Schicht implementiert; Erklärung folgt.**
 8. Phase 10-11: explizite Modellversion in API/UI und modellversioniertes Draft-Logging; Legacy bleibt verfügbar.
 9. Phase 12: Collector-Runbook bzw. begrenzter Lauf nur nach Sicherheits-/Rate-Limit-Prüfung.
 10. Phase 13-14: Regressionen, Gesamtbericht, Rollback, Status und Abschlussdokumentation.
