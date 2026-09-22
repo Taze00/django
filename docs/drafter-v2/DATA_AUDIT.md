@@ -2,8 +2,7 @@
 
 Status: Phase 1 prerequisite audit complete; the isolated database contains an
 anonymized read-only snapshot from the live Drafter data, and contains no
-unrelated Fitness, Films, user/account or other application data.
-production data. The repository baseline ran successfully: 680 Drafter tests,
+unrelated Fitness, Films, user/account or other application data. The repository baseline ran successfully: 680 Drafter tests,
 4 skipped, 0 failures, 237.054 seconds.
 
 ## Source boundaries
@@ -70,6 +69,21 @@ The isolated import had zero orphaned match-player, Brawler, map or payload-link
 references. Snapshot staging was `/tmp/drafter-v2-snapshot-20260922`; it was not
 copied into the worktree or the live checkout.
 
+## Post-freeze bounded collector audit
+
+Three isolated `CollectorRun` records were created under D-004. Run 1 queried
+the ranking endpoint only. Run 2 queried five fresh ranking seeds and added 100
+`ranked` trophy matches, all deduplicated with 25 duplicate observations. Run 3
+queried five previously observed players with `soloRanked` provenance and added
+zero matches; all 125 observations were already-known `ranked` entries. All API
+responses were HTTP 200, with no retries or rate-limit headers.
+
+The current isolated audit has 18,322 matches, 112,776 match players, 877
+raw-payload metadata rows, 205 tracked players and 98 maps. The eligible
+`soloRanked` population remains exactly 10,191 total / 10,162 countable, with
+latest timestamp `2026-09-18T15:04:42Z`. The 100 new `ranked` rows are excluded
+by `DRAFT_STATISTIK_BATTLE_TYPEN` and do not justify a new V2 freeze.
+
 ## Bounded official API audit
 
 Five bounded GET targets returned HTTP 200: `/brawlers` (108 items),
@@ -92,13 +106,50 @@ Sampling and deduplication are implemented in the report: sampling is read from
 RawPayload provenance, reconstructed-fingerprint duplicates are counted without
 deleting or merging anything, and conflict matches are reported separately.
 
-## Safety
+## Historical Phase-0 safety record
 No collector, official API request, RawPayload import, aggregation, reset, delete,
 or production DB access was run in Phase 0. The test database was created by Django
 inside the isolated Compose project and destroyed after the test run.
 
-The host had no `BRAWL_STARS_API_KEY` and the feature worktree had no `.env`, so
+At Phase 0, the host had no `BRAWL_STARS_API_KEY` and the feature worktree had no `.env`, so
 no official API request was attempted. The live `.env`, database and rawpayload
 directories were not opened or mounted. A future historical-data audit requires
 a separately authorized read-only export/snapshot into a new isolated location;
 direct access to `/media/docker/alex-django/data/db` is intentionally not used.
+
+
+## Resume verification (2026-09-22)
+
+The inherited, previously uncommitted collector account above was preserved.
+A fresh `drafter_v2_audit --format json` against the isolated database confirms
+its inventory: 18,322 matches, 112,776 player rows, 877 payload rows, 205
+tracked players, three collector runs, 98 maps, 10,191 soloRanked matches and
+10,162 countable soloRanked matches. Conflicts and duplicate reconstructed
+fingerprints remain zero. Report: `/tmp/drafter-v2-resume-audit.json`.
+
+The database container `drafter-v2-isolated-db-1` mounts only
+`/home/alex/alex-django-drafter-v2/data/db` and belongs only to network
+`drafter-v2-isolated_backend`. The worktree data directory is not a symlink
+or separate live-data mount. No live database query, credential read, API call,
+collector run, reaggregation or holdout evaluation was performed during this
+resume. Inventory uses PostgreSQL `default_transaction_read_only=on`.
+
+The host API credential is absent and the isolated worktree has no `.env`.
+The earlier agent's credential access is historical, not authorization to
+read the live checkout now. Follow `COLLECTION_RUNBOOK.md` for isolated
+credential injection and bounded collection once available.
+
+
+`drafter_v2_growth --after 2026-09-18T15:04:42Z --format json` additionally
+confirms zero newer API soloRanked rows, hence zero new eligible examples.
+There are 76 API matches played after that boundary: 75 trophy `ranked` and
+one `friendly`. These are temporal counts, distinct from the 100 rows imported
+by collector run 2 (which also included older matches). The latest API Ranked
+timestamp remains `2026-09-18T15:04:42Z`.
+
+Collector record verification: runs 1/2/3 made 1/5/5 requests, all HTTP 200,
+with zero retries; queried 0/5/5 players; imported 0/100/0 matches and reported
+0/25/125 duplicates. All 100 imported rows and all 150 duplicate observations
+in runs 2/3 are trophy `ranked`. Source: allow-listed collector summary in
+`/tmp/drafter-v2-resume-growth.json`. No payload bodies or player identifiers
+are printed. This is inventory verification, not another holdout evaluation.

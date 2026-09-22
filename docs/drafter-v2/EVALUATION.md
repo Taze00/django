@@ -99,3 +99,28 @@ counts those rows under `legacy.skipped` instead of modifying Legacy.
 
 Final regression after the sealed rerun: 691 Drafter tests, 4 skipped, 0
 failures. The separate Fitness suite remained green at 253 tests.
+
+
+## Closed freeze and future-experiment boundary
+
+The current user's resume instruction closes this freeze, including its
+shared-subset comparison. All recorded numbers above remain final and
+unchanged. Do not rerun `drafter_v2_evaluate`, `drafter_v2_train` or
+`drafter_v2_freeze` on the historical database for further selection. The
+commands currently derive their input/split from mutable database contents;
+they are historical reproducers, not a safe automatic next-experiment protocol.
+
+Code-inspection limitation, without recomputing the final results:
+`drafter_v2_evaluate.Command._legacy_predictions` loads `Datenraum` from the
+database provider, not a train-only `SnapshotStatProvider`. The imported
+statistics are not shown to exclude holdout observations. Thus the recorded
+Legacy/V2 comparison is not evidence of leakage-free out-of-sample superiority.
+The shared subset fixes coverage comparability, not statistical-input timing.
+This caveat does not alter the final report, justify retuning V2, or change
+the decision to keep Legacy active. Future evaluation must use immutable
+dataset membership and training-only aggregates, including all priors.
+
+For now, run only `drafter_v2_growth --after 2026-09-18T15:04:42Z` to audit
+new temporal evidence. It computes no predictions or performance metrics.
+Positive counts mean observations exist, not that a dataset is large enough,
+calibrated, patch-comparable or suitable for promotion.

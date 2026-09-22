@@ -1,7 +1,7 @@
 # Drafter V2 Model Card
 
 Status: V2 architecture is trainable but no V2 model is active. Legacy remains
-the current engine pending the sealed comparison and all promotion gates.
+the active/default engine. The sealed shared-subset comparison is final; no further tuning uses that holdout.
 
 Intended use: explainable Ranked draft assistance based on observed, provenance-tracked data. Not a guarantee of match outcome.
 
@@ -14,6 +14,6 @@ the training command receives `--model-path`.
 
 Data policy: unknown values remain unavailable; measured, derived, assumed and unknown facts are kept distinct. Synthetic fixtures are test-only and never mixed with real match data.
 
-Promotion gate: a V2 model must beat or appropriately match baselines on frozen holdout log loss/Brier/calibration, pass leakage/symmetry/legal-pick/determinism tests, integrate without unrelated regressions, and retain Legacy rollback. Current status: not promoted. Legacy holdout Log Loss 0.689749 / Brier 0.248301 beats V2 0.692603 / 0.249727; Legacy remains default.
+Promotion gate: a V2 model must beat or appropriately match baselines on frozen holdout log loss/Brier/calibration, pass leakage/symmetry/legal-pick/determinism tests, integrate without unrelated regressions, and retain Legacy rollback. Current status: not promoted. Final shared subset (n=1,956): Legacy Log Loss 0.689749 / Brier 0.248301; V2 0.692600 / 0.249725. Full V2 coverage remains n=2,033 (0.692603 / 0.249727). These recorded results are unchanged; see the benchmark provenance limitation in EVALUATION.md. Legacy remains default.
 
 Known limitations: objective mechanics are still only partially sourced; player-skill confounding, pick-order, bans, builds and objective combat fields remain unavailable. Historical rows can contain duplicate Brawlers and are valid for V2 but ineligible for the unchanged Legacy DraftContext contract. The snapshot covers 2026-08-29 through 2026-09-18 UTC and may not represent later meta changes.

@@ -55,6 +55,44 @@ Revisit if:
 Ein sicherer, separat autorisierter Snapshot und ein dokumentierter Importpfad
 bereitgestellt werden.
 
+## D-004: Bounded isolated collector for new data
+
+Problem:
+The frozen comparison ends on 2026-09-18. A future evaluation needs genuinely
+new Ranked observations rather than retuning on the sealed holdout.
+
+Evidence:
+The repository collector enforces a 0.25 second request spacing, retries only
+transient failures, caps a run at `max_spieler`, limits discovery depth and
+stores provenance on `CollectorRun`/`RawPayload`. The isolated database is
+separate from the live database.
+
+Decision:
+Run one authorized, bounded collector job in the isolated Compose project
+with at most five battlelogs, depth 1, six-hour refresh spacing, no optional
+raw files, and the existing official API key only in process environment.
+Then audit/import/aggregate only in the isolated database. Do not use new
+rows to modify the sealed historical comparison.
+
+Why:
+This grows the dataset additively and preserves source provenance,
+deduplication and patch boundaries without touching live data or copying the
+live `.env`.
+
+Validation:
+Before the run, live and isolated containers/mounts were distinct; the key is
+not printed or stored; the collector command performs no aggregation.
+
+Observed result:
+Three isolated runs completed with HTTP 200 responses and no rate-limit
+headers. One run added 100 non-eligible `ranked` trophy matches; the targeted
+soloRanked follow-up added zero new matches because all 125 observations were
+duplicates. The old soloRanked freeze was not reopened.
+
+Revisit if:
+The API returns credential/rate-limit errors, the collector cannot persist
+provenance safely, or the new window has too few observations for a new freeze.
+
 ## D-002: Symmetrisches, dependency-freies V-Modell
 
 Problem:
@@ -89,3 +127,41 @@ Symmetrie- und Determinismustests grün; leerer Trainingslauf liefert
 Revisit if:
 Ein eingefrorener Holdout zeigt, dass einfachere B0-B5-Modelle gleich gut oder
 besser sind, oder echte Daten die Feature-Sparsität begrenzen.
+
+
+## D-005: Continue with a growth audit, not another historical evaluation
+
+Problem:
+The previous agent left four documentation changes uncommitted. Its status
+still called for a collector run although its audit recorded three completed
+runs with no newer Ranked evidence. The evaluated holdout is closed.
+
+Evidence:
+The isolated read-only inventory reproduces the inherited counts and three
+collector records. No API credential is available in the current host/worktree.
+The current user forbids access to the live checkout/database.
+
+Decision:
+Preserve the prior notes and verify their aggregates. Add `drafter_v2_growth`
+with an explicit timezone-aware, exclusive played-at cutoff. It reads only
+new API rows for eligibility; trophy, synthetic and unverified fixture rows
+are excluded. Unknown winners, conflicts, incomplete teams and missing Brawler
+references remain exclusions. Multiple payload sightings do not increase the
+match count. Report missing provenance as UNKNOWN and missing run counters as
+null. Do not train, evaluate, create another freeze, change Legacy or infer
+promotion readiness from the presence of observations.
+
+Why:
+This makes progress measurable without reusing the sealed holdout or
+mistaking a recently fetched old match for new temporal evidence. A bounded
+runbook allows collection to resume when an isolated credential is available.
+
+Validation:
+Regression tests exercise timestamp boundaries, source/type filters, missing
+data, repeated sightings, read-only SQL and redacted collector summaries.
+The real growth audit runs with PostgreSQL read-only transactions.
+
+Revisit if:
+New eligible API observations arrive. Before experimenting, define a new
+temporal split, source/patch policy and train-only statistical snapshots;
+do not silently repartition the growing database with the old commands.

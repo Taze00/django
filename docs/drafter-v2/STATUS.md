@@ -1,36 +1,40 @@
+RESUME FROM: Phase 12 / supply an isolated API credential, run one bounded collection under COLLECTION_RUNBOOK.md, then audit newer Ranked observations. Do not rerun the sealed evaluation.
+
 # Drafter V2 Status
 
 Overall:
-- Completed milestones: 5 / 10
-- Current phase: Phase 10/11 reporting and regression gates closed; later V2 phases remain non-active
-- Current task: preserve Legacy default and collect newer Ranked data before reconsidering V2
-- Blocker: none for authorized audit; V2 is not promotable because unchanged Legacy performs better
+- Active/default engine: frozen Legacy `3a565bd`; no runtime/API/UI switch.
+- Completed safe milestone: interrupted collector notes preserved; isolated inventory verified; read-only post-freeze growth command and collection runbook implemented and validated.
+- Current phase: Phase 12 data growth; V2 promotion/integration remains gated.
+- External blocker: no `BRAWL_STARS_API_KEY` in the host environment and no `.env` in the isolated worktree. The live checkout/database/credentials are out of scope.
+- Data blocker: zero eligible API Ranked matches played after `2026-09-18T15:04:42Z`. No new experiment or promotion is justified from current growth.
+- Working root: `/home/alex/alex-django-drafter-v2`, branch `feature/drafter-v2`.
 
 Latest validation:
-- Git status: clean after commit `bc8e1aa`
-- Branch: `feature/drafter-v2`
-- Live Compose `alex-django`: läuft separat unter `/media/docker/alex-django`
-- Testbaseline: 680 Drafter-Tests, 4 übersprungen, 0 Fehler, 237.054 s; Systemcheck ohne Befund
-- Aktuelle Vollsuite: 692 Drafter-Tests, 4 übersprungen, 0 Fehler, 227.127 s
-- Fitness-Cross-App-Suite: 253 Tests, 0 Fehler, 5.726 s
-- V2-Audit-Test: 1 Test, 0 Fehler
-- V2-Datenaudit: 10,162 countable soloRanked matches, 10,191 soloRanked total; 0 conflicts and 0 reconstructed-fingerprint duplicates
-- V2-Evaluationsvertrag: 5 Tests, 0 Fehler; Duplicate-Fingerprint- und Split-Grenzen geprüft
-- V2-Evaluationscommand: 10,158 eligible; train 6,094, validation 2,031, holdout 2,033; fingerprint digest recorded in `EVALUATION.md`
-- Baselines: B0 holdout LogLoss 0.693147; B2 0.704446; B3 0.730888; B4 0.772412; B5 0.717746
-- V2-Modellvertrag: 4 Tests, 0 Fehler; validation LogLoss 0.688604, sealed holdout 0.692603; not promoted
-- Mechanik/UNKNOWN/Search: 14 fokussierte Tests, 0 Fehler; Last Pick und Mid-Expectimax nicht-aktiv verfügbar
-- V2-Erklärung: 1 fokussierter Test, 0 Fehler; nicht in API/UI aktiv
-- API audit: bounded HTTP 200 audit completed; unsupported fields remain UNKNOWN
-- Legacy-Abbildung: unchanged engine holdout LogLoss 0.689749, Brier 0.248301, n=1,956; 77 duplicate-Brawler rows skipped; beats V2
-- Shared subset: exact n=1,956; Legacy 0.689749/0.248301 vs V2 0.692600/0.249725; full V2 coverage remains n=2,033
-- UI/Logging regression: 49 focused tests, 0 errors; full suite includes explicit Legacy modellstand logging contract
+- Resume inventory (PostgreSQL read-only): 18,322 matches, 112,776 match players, 877 payload rows, 205 tracked players, three collector runs and 98 maps.
+- Ranked: 10,191 total / 10,162 countable; zero conflicts and zero reconstructed-fingerprint duplicates.
+- Growth (API-only, exclusive played-at cutoff): 76 newer matches, comprising 75 `ranked` and one `friendly`; zero newer `soloRanked`, zero eligible new Ranked observations. Latest API Ranked timestamp unchanged.
+- Existing runs 1/2/3 verified: 0/5/5 players queried, 0/100/0 new matches, 0/25/125 duplicate observations; all new rows in run 2 are trophy matches. No collector rerun during this resume.
+- Current focused regressions: 66 V2/collector/API-client/Praxisfall tests passed, zero failures, 9.190 s test runtime, normal Django settings; system check clean. Initial read-only assertion corrected for PostgreSQL SELECT cursors; no production behavior change.
+- Historical full suites (previous agent): 692 Drafter tests, four skipped, zero failures; 253 Fitness tests, zero failures. Not represented as newly rerun.
+- Fresh report paths: `/tmp/drafter-v2-resume-audit.json`, `/tmp/drafter-v2-resume-growth.json`; commands are in COLLECTION_RUNBOOK.md.
+
+Sealed evaluation (final, unchanged):
+- Manifest `v2-dataset-freeze-1`, digest `2bb8222b9025a5da7daadea8b9a252c39b16bcda8b07b9bc2df69315ea4dcf9e`.
+- 10,158 eligible historical examples: train 6,094 / validation 2,031 / holdout 2,033.
+- Final shared subset n=1,956: Legacy LogLoss/Brier 0.689749/0.248301; V2 0.692600/0.249725.
+- Full V2 holdout n=2,033: 0.692603/0.249727; 77 duplicate-Brawler rows are ineligible for unchanged Legacy.
+- No historical training, re-evaluation, new split, feature tuning or ranking adjustment during this resume.
+- Provenance limitation: Legacy benchmark uses stored aggregates without enforcing train-only input. See EVALUATION.md; final numbers retained, not treated as proof of leakage-free generalization.
 
 Data integrity:
-- fabricated values: 0
-- destructive operations: 0
-- unresolved gaps: Pickorder, Bans, Builds, Kampfstatistiken und valide Skillkontrolle UNKNOWN; objektive Patchmechanikwerte UNKNOWN
+- No invented observations, mechanics or API fields; missing provenance is UNKNOWN.
+- No live database queries, live credential reads, API requests, imports, aggregation, schema changes, data deletion or service restarts during this resume.
+- Existing uncommitted DATA_AUDIT/DATA_GAPS/DECISIONS content preserved and incorporated.
+- Pick order, bans, builds, combat stats and validated skill control remain UNKNOWN; objective patch mechanics remain insufficiently sourced.
 
 Next:
-- RESUME FROM: Phase 5 / collect more current Ranked data before reconsidering V2 features or promotion.
-- Rollback/default: keep Legacy engine and existing API/UI; V2 commands remain offline/non-active.
+1. Once an independently supplied isolated API credential is available, verify the documented mounts/network and run at most five battlelogs with depth 1 and six-hour refresh spacing. Do not read live credentials or reset queue timestamps.
+2. Run `drafter_v2_growth --after 2026-09-18T15:04:42Z --format json` with DB read-only protection. Zero new eligible rows remains DATA_UNAVAILABLE, not a reason to fabricate data or retry the same population indefinitely.
+3. Before any future model experiment, preregister immutable new split membership, source/patch eligibility and training-only statistics/priors. Keep the old freeze and shared subset closed.
+4. V2 search/explanations remain offline prototypes; active integration awaits evidence. No promotion or Legacy edits.

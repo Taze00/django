@@ -44,3 +44,12 @@ Raw payloads default to `data/brawl_api_raw/`, reports to `data/brawl_reports/`;
 
 ## Legacy boundary
 The current Legacy scorer remains the production implementation until a separately versioned V2 model passes the frozen evaluation and regression gates. No Phase-0 change alters scoring behavior.
+
+
+## Post-freeze continuation
+- `management/commands/drafter_v2_growth.py`: read-only, API-only inventory of
+  observations strictly after an explicit timestamp; no model or evaluator imports.
+- `tests/test_v2_growth.py`: boundary, unknown-data, source, dedup-sighting,
+  read-only and collector-summary contracts on isolated synthetic test records.
+- `docs/drafter-v2/COLLECTION_RUNBOOK.md`: isolated credential, request-budget,
+  growth-audit and future-experiment procedure.
