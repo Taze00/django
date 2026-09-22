@@ -4,9 +4,9 @@ Initial status after repository orientation. No replacement values are introduce
 
 | Gap | Status | Legitimate next step |
 |---|---|---|
-| Actual historical DB counts in this isolated worktree | UNKNOWN | Run read-only audit against isolated DB only; request/document read-only snapshot if holdout needs real history |
-| Rawpayload inventory and file provenance | UNKNOWN | Inspect only isolated `data/brawl_api_raw/`; never copy live raw data |
-| Official API capability matrix | UNKNOWN | Inspect anonymized fixture and, only if authorized and isolated, bounded official read-only audit |
+| Actual historical DB counts in this isolated worktree | UNAVAILABLE (fresh DB: all audited counts 0) | Request/document read-only snapshot if holdout needs real history; never connect evaluation to live DB |
+| Rawpayload inventory and file provenance | UNAVAILABLE in isolated DB; anonymized fixture available | Use only local anonymized fixture or a documented read-only isolated snapshot |
+| Official API capability matrix | PARTIAL from one anonymized battlelog fixture | Bounded official read-only audit only if credentials and destination isolation are verified |
 | Valid player-skill control variable | UNKNOWN | Search observed API fields and provenance; do not use rank/trophies as skill without validation |
 | Pick order / bans in official match history | UNKNOWN | Use observed payload fields only; current model comments indicate these are absent |
 | Objective mechanics at patch level | PARTIAL | Use observed official sources or mark individual fields UNKNOWN with source provenance |
