@@ -22,6 +22,7 @@ class Command(BaseCommand):
         parser.add_argument("--format", choices=("text", "json"), default="text")
         parser.add_argument("--train-fraction", type=float, default=0.6)
         parser.add_argument("--validation-fraction", type=float, default=0.2)
+        parser.add_argument("--git-commit", default="", help="Host commit for reproducible reports")
 
     def handle(self, *args, **options):
         queryset = Match.objects.filter(
@@ -35,7 +36,7 @@ class Command(BaseCommand):
         report = {
             "status": "ok" if holdout else "DATA_UNAVAILABLE",
             "generated_at": datetime.now(timezone.utc).isoformat(),
-            "git_commit": self._git_commit(),
+            "git_commit": options["git_commit"] or self._git_commit(),
             "split": {
                 "train_fraction": options["train_fraction"],
                 "validation_fraction": options["validation_fraction"],

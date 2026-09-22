@@ -23,7 +23,7 @@ python manage.py drafter_v2_evaluate --format json
 The command is read-only. It loads conflict-free, known-result, complete 3v3
 `soloRanked` matches, sorts by `(played_at, fingerprint)`, rejects duplicate
 fingerprints, and uses a 60/20/20 time split. `DATA_UNAVAILABLE` is returned
-when the holdout is empty. Set `DRAFTER_V2_COMMIT` to the host commit when the
+when the holdout is empty. Pass `--git-commit $(git rev-parse HEAD)` when the
 container image has no Git binary. Current isolated result: input/train/validation/
 holdout all `0`; no model metrics were emitted.
 
