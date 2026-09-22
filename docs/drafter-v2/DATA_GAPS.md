@@ -11,7 +11,7 @@ Current status after resume verification (2026-09-22). No replacement values are
 | Pick order / bans in official match history | UNKNOWN | Use observed payload fields only; current model comments indicate these are absent |
 | Objective mechanics at patch level | PARTIAL | Use observed official sources or mark individual fields UNKNOWN with source provenance |
 | Validated team-composition feature benefit | UNAVAILABLE | Needs sourced mechanics and a new preregistered evaluation window; historical holdout is closed; no hand-set anti-tank/team weights |
-| Isolated API credential | UNAVAILABLE in this session | Supply `BRAWL_STARS_API_KEY` through the isolated process environment; never read the live checkout or live container environment |
+| Isolated API credential | USER REPORTS CONFIGURED; not visible to command execution | Make `BRAWL_STARS_API_KEY` inheritable by this session's command processes and verify presence only. Login/non-login/escalated checks returned false; no API request attempted. Never read live credentials |
 | Sufficient data for V2 promotion | NOT MET | V2 remains unpromoted after the final sealed comparison; the bounded collector added no new soloRanked observations, so collect a newer Ranked window before reconsideration |
 | New current soloRanked observations after 2026-09-18 | UNAVAILABLE | Recent sampled battlelogs returned only already-known `ranked` trophy entries; do not create a new freeze until soloRanked rows advance the window |
 | Historical data transfer to isolated evaluation | RESOLVED safely | Snapshot was exported read-only into `/tmp`, anonymized/minimized, then imported only into the isolated DB |

@@ -1,12 +1,12 @@
-RESUME FROM: Phase 12 / supply an isolated API credential, run one bounded collection under COLLECTION_RUNBOOK.md, then audit newer Ranked observations. Do not rerun the sealed evaluation.
+RESUME FROM: Phase 12 / resolve API credential inheritance into this session's command-execution environment; require a successful presence-only check, then run the still-pending five-battlelog collection under COLLECTION_RUNBOOK.md. Do not rerun the sealed evaluation.
 
 # Drafter V2 Status
 
 Overall:
 - Active/default engine: frozen Legacy `3a565bd`; no runtime/API/UI switch.
 - Completed safe milestone: interrupted collector notes preserved; isolated inventory verified; read-only post-freeze growth command and collection runbook implemented and validated.
-- Current phase: Phase 12 data growth; V2 promotion/integration remains gated.
-- External blocker: no `BRAWL_STARS_API_KEY` in the host environment and no `.env` in the isolated worktree. The live checkout/database/credentials are out of scope.
+- Current phase: Phase 12 collection preflight blocked by credential visibility; V2 promotion/integration remains gated.
+- External blocker: user reports the isolated API credential is configured, but `BRAWL_STARS_API_KEY` is not inherited by this session's command processes. Login, non-login, and escalated host presence-only checks returned false, including a final recheck. No collector was started; no authentication request failed. Live credentials remain out of scope.
 - Data blocker: zero eligible API Ranked matches played after `2026-09-18T15:04:42Z`. No new experiment or promotion is justified from current growth.
 - Working root: `/home/alex/alex-django-drafter-v2`, branch `feature/drafter-v2`.
 
@@ -17,7 +17,9 @@ Latest validation:
 - Existing runs 1/2/3 verified: 0/5/5 players queried, 0/100/0 new matches, 0/25/125 duplicate observations; all new rows in run 2 are trophy matches. No collector rerun during this resume.
 - Current focused regressions: 66 V2/collector/API-client/Praxisfall tests passed, zero failures, 9.190 s test runtime, normal Django settings; system check clean. Initial read-only assertion corrected for PostgreSQL SELECT cursors; no production behavior change.
 - Historical full suites (previous agent): 692 Drafter tests, four skipped, zero failures; 253 Fitness tests, zero failures. Not represented as newly rerun.
-- Fresh report paths: `/tmp/drafter-v2-resume-audit.json`, `/tmp/drafter-v2-resume-growth.json`; commands are in COLLECTION_RUNBOOK.md.
+- Latest credential-resume audit paths: `/tmp/drafter-v2-credential-resume-audit.json`, `/tmp/drafter-v2-credential-resume-growth.json`; both executed with PostgreSQL read-only protection. Counts remain unchanged and growth status is DATA_UNAVAILABLE. No new run beyond IDs 1/2/3.
+- This documentation-only checkpoint changes no code: prior 66-test regression remains applicable and was not rerun; fresh read-only audits provide validation for the updated inventory.
+- Credential visibility last verified at: 2026-09-22T18:08:52.563568+00:00.
 
 Sealed evaluation (final, unchanged):
 - Manifest `v2-dataset-freeze-1`, digest `2bb8222b9025a5da7daadea8b9a252c39b16bcda8b07b9bc2df69315ea4dcf9e`.
@@ -34,7 +36,7 @@ Data integrity:
 - Pick order, bans, builds, combat stats and validated skill control remain UNKNOWN; objective patch mechanics remain insufficiently sourced.
 
 Next:
-1. Once an independently supplied isolated API credential is available, verify the documented mounts/network and run at most five battlelogs with depth 1 and six-hour refresh spacing. Do not read live credentials or reset queue timestamps.
+1. Once a presence-only check confirms the isolated API credential is visible to the command-execution process, verify the documented mounts/network and run at most five battlelogs with depth 1 and six-hour refresh spacing. Do not read live credentials or reset queue timestamps.
 2. Run `drafter_v2_growth --after 2026-09-18T15:04:42Z --format json` with DB read-only protection. Zero new eligible rows remains DATA_UNAVAILABLE, not a reason to fabricate data or retry the same population indefinitely.
 3. Before any future model experiment, preregister immutable new split membership, source/patch eligibility and training-only statistics/priors. Keep the old freeze and shared subset closed.
 4. V2 search/explanations remain offline prototypes; active integration awaits evidence. No promotion or Legacy edits.

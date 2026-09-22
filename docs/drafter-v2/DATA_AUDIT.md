@@ -153,3 +153,26 @@ with zero retries; queried 0/5/5 players; imported 0/100/0 matches and reported
 in runs 2/3 are trophy `ranked`. Source: allow-listed collector summary in
 `/tmp/drafter-v2-resume-growth.json`. No payload bodies or player identifiers
 are printed. This is inventory verification, not another holdout evaluation.
+
+
+## Credential-resume preflight (2026-09-22T18:08:52.563568+00:00)
+
+The user reported that an isolated host API credential was now available.
+Presence-only checks in login, non-login and escalated host command
+processes all returned false; the final recheck also returned false.
+No token value was printed or fetched from another source. The runbook
+credential guard therefore prevented collection: no new CollectorRun,
+API call, import or authentication failure occurred.
+
+The isolated database mount and network were reverified. Both read-only
+audits completed, reporting the same 18,322 matches, 10,191 Ranked /
+10,162 countable Ranked, 877 payload rows and three collector runs.
+Conflicts and duplicate reconstructed fingerprints remain zero.
+Growth remains DATA_UNAVAILABLE: zero eligible API soloRanked matches
+after 2026-09-18T15:04:42Z; the 76 newer API matches are 75 trophy
+ranked and one friendly. This is not the result of a new collector run.
+
+Reports: `/tmp/drafter-v2-credential-resume-audit.json` and
+`/tmp/drafter-v2-credential-resume-growth.json`. Reproduce with the
+unchanged read-only commands in COLLECTION_RUNBOOK.md. No model command,
+sealed evaluation, live data access or production change was performed.

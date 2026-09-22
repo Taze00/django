@@ -68,6 +68,13 @@ docker compose -p drafter-v2-isolated run --rm --no-deps -T \
   --strategie broad_high_rank --ohne-katalog --ohne-rangliste
 ```
 
+If the presence check fails, stop before starting the collector. A variable
+exported in another shell is not automatically inherited by an already
+running command-execution process. Verify presence in the process that will
+launch Compose, without printing the value. Record this as a credential
+visibility blocker, not an API authentication failure or an empty collection.
+The read-only audits can still run. Do not fall back to live credentials.
+
 This uses the existing isolated catalog and player queue, preserving the
 refresh interval; do not force timestamps backwards to repeat completed work.
 Raw responses persist in isolated RawPayload rows; `--dateien` is unnecessary.
