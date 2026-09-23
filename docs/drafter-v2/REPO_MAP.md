@@ -61,3 +61,13 @@ Tagged-frontier collection (D-008): `drafter/services/tagged_frontier.py`, comma
 Uses existing BrawlApiClient/parser/importer; shared cooldowns remain on TrackedPlayer.
 `docs/drafter-v2/frontier_audit.py` is a read-only aggregate provenance reproducer.
 No runtime/UI/Legacy/model integration.
+
+
+Phase 5A offline inventory additions (D-009):
+- `drafter/services/v2_mechanics_audit.py`: standard-library CLI, hash-pinned
+  local CSV/identity inputs to coverage stdout; no Django/client/runtime import.
+- `drafter/tests/test_v2_mechanics_audit.py`: synthetic provenance/UNKNOWN/scope/
+  bounded-traversal and exact replay contracts, no external data or API requests.
+- `docs/drafter-v2/MECHANICS_SOURCES.md`, `MECHANICS_COVERAGE.md`, `MECHANICS_*json`:
+  source register, frozen catalog/minimized identities, request hashes and
+  reproducible aggregate/per-Brawler evidence. No final mechanics schema.

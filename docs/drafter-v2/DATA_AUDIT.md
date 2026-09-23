@@ -318,3 +318,49 @@ commands in COLLECTION_RUNBOOK.md. Local transient outputs were
 and isolated DB. Regression results: 138 expanded + 38 importer tests passed;
 final 24 frontier tests passed after the last boundary guard. No real credential
 was loaded for regression tests.
+
+
+## Phase 5A mechanics source/coverage audit (2026-09-23, D-009)
+
+Continued from clean a0242b9; bootstrap run 5 remains complete. Isolated DB mount
+and network were checked. Read-only catalog query under transaction-read-only
+PGOPTIONS returned 108 Brawlers (106 Ranked-available), five collector runs,
+18,372 matches and 881 raw payload rows. No retained official brawlers raw body.
+This inventory did not inspect holdout labels, mutate data or run collection.
+
+26 public unauthenticated bounded HTTP GETs returned 200, zero retries, total
+12,441,891 bytes, maximum 3 MB per response. These are mechanics/documentation
+probes, not player/battlelog requests. No credential was loaded or exposed.
+Six source tables contain 456 characters, 713 skills, 759 projectiles, 842 areas,
+1,474 cards and 276 accessories. Native CSV replay requires only 1,617,663 bytes.
+Archive revision cc307ffd36678ac463cc2ca9373a08b0a2d2b0b7, claimed build 69.230;
+older 68.250 character CSV provides a limited historical comparison, not intervals.
+
+107/108 character/kit source links corroborated; Bolt excluded for mismatched
+public gadget targets. Public JSON coerces CSV blanks to false/zero. Raw nonempty
+fragments counted in 47 categories, with complete per-Brawler witness/UNKNOWN
+lists and conditional scopes. Gadgets/SP references 107 each, Hypercharge/Nano
+105 each, Buffy 27, other trait/event-deck 97. Those are candidate source coverage,
+not effective kit counts. All qualified current-patch mechanic counts are zero
+under the full identity/unit/condition/validity contract; unknown is never absent.
+
+Four narrow official-change checks show stale HP/reload/damage raw values
+(Wendy, Willow, Belle). Currentness and match-time validity cannot be inferred
+from retrieval time, Git commit or build number. Opaque status/component/buddy/
+deck dependencies and units remain unresolved. The small verification sample,
+source-by-mechanic classifications, exact field locators, provenance and minimal
+future schema proposal are in MECHANICS_SOURCES and MECHANICS_COVERAGE. D-009:
+Phase 5A complete, Phase 5B NOT PASSED; no migrations or mechanics consumers added.
+
+Validation: 73 combined tests passed in isolated Django test DB, 10.747 s;
+system check clean (existing missing staticfiles-directory warning only).
+Modules: test_v2_mechanics_audit, test_v2_audit, test_v2_growth, test_identitaet,
+test_katalog, test_tagged_frontier. Final 15 standard-library audit tests passed
+in 0.012 s including a subsequently added full minimized-input replay/tamper test;
+test sets overlap. Audit reproduction must be byte-identical to committed JSON
+and Markdown, and all input/dedup/scope/hash contracts fail closed.
+
+No Legacy change, holdout access/evaluation, training, tuning, API credential
+load, gameplay collection, runtime integration or data/ modification. No current
+mechanics or missing historical loadouts were fabricated. Modern source coverage
+is not evidence of predictive benefit. New Ranked evidence stays DATA_UNAVAILABLE.

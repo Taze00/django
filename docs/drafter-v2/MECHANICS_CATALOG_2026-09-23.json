@@ -1,0 +1,770 @@
+{
+  "observed_at": "2026-09-23T18:02:40.931056+00:00",
+  "read_only": true,
+  "catalog": [
+    {
+      "external_id": "16000000",
+      "name": "SHELLY",
+      "slug": "shelly",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000001",
+      "name": "COLT",
+      "slug": "colt",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000002",
+      "name": "Bull",
+      "slug": "bull",
+      "ranked_verfuegbar": true,
+      "is_active": true
+    },
+    {
+      "external_id": "16000003",
+      "name": "Brock",
+      "slug": "brock",
+      "ranked_verfuegbar": true,
+      "is_active": true
+    },
+    {
+      "external_id": "16000004",
+      "name": "RICO",
+      "slug": "rico",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000005",
+      "name": "SPIKE",
+      "slug": "spike",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000006",
+      "name": "Barley",
+      "slug": "barley",
+      "ranked_verfuegbar": true,
+      "is_active": true
+    },
+    {
+      "external_id": "16000007",
+      "name": "JESSIE",
+      "slug": "jessie",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000008",
+      "name": "NITA",
+      "slug": "nita",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000009",
+      "name": "DYNAMIKE",
+      "slug": "dynamike",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000010",
+      "name": "EL PRIMO",
+      "slug": "el-primo",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000011",
+      "name": "Mortis",
+      "slug": "mortis",
+      "ranked_verfuegbar": true,
+      "is_active": true
+    },
+    {
+      "external_id": "16000012",
+      "name": "CROW",
+      "slug": "crow",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000013",
+      "name": "Poco",
+      "slug": "poco",
+      "ranked_verfuegbar": true,
+      "is_active": true
+    },
+    {
+      "external_id": "16000014",
+      "name": "BO",
+      "slug": "bo",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000015",
+      "name": "Piper",
+      "slug": "piper",
+      "ranked_verfuegbar": true,
+      "is_active": true
+    },
+    {
+      "external_id": "16000016",
+      "name": "Pam",
+      "slug": "pam",
+      "ranked_verfuegbar": true,
+      "is_active": true
+    },
+    {
+      "external_id": "16000017",
+      "name": "TARA",
+      "slug": "tara",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000018",
+      "name": "Darryl",
+      "slug": "darryl",
+      "ranked_verfuegbar": true,
+      "is_active": true
+    },
+    {
+      "external_id": "16000019",
+      "name": "PENNY",
+      "slug": "penny",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000020",
+      "name": "Frank",
+      "slug": "frank",
+      "ranked_verfuegbar": true,
+      "is_active": true
+    },
+    {
+      "external_id": "16000021",
+      "name": "Gene",
+      "slug": "gene",
+      "ranked_verfuegbar": true,
+      "is_active": true
+    },
+    {
+      "external_id": "16000022",
+      "name": "Tick",
+      "slug": "tick",
+      "ranked_verfuegbar": true,
+      "is_active": true
+    },
+    {
+      "external_id": "16000023",
+      "name": "LEON",
+      "slug": "leon",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000024",
+      "name": "Rosa",
+      "slug": "rosa",
+      "ranked_verfuegbar": true,
+      "is_active": true
+    },
+    {
+      "external_id": "16000025",
+      "name": "CARL",
+      "slug": "carl",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000026",
+      "name": "BIBI",
+      "slug": "bibi",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000027",
+      "name": "8-BIT",
+      "slug": "8-bit",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000028",
+      "name": "Sandy",
+      "slug": "sandy",
+      "ranked_verfuegbar": true,
+      "is_active": true
+    },
+    {
+      "external_id": "16000029",
+      "name": "BEA",
+      "slug": "bea",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000030",
+      "name": "EMZ",
+      "slug": "emz",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000031",
+      "name": "MR. P",
+      "slug": "mr-p",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000032",
+      "name": "Max",
+      "slug": "max",
+      "ranked_verfuegbar": true,
+      "is_active": true
+    },
+    {
+      "external_id": "16000034",
+      "name": "JACKY",
+      "slug": "jacky",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000035",
+      "name": "Gale",
+      "slug": "gale",
+      "ranked_verfuegbar": true,
+      "is_active": true
+    },
+    {
+      "external_id": "16000036",
+      "name": "NANI",
+      "slug": "nani",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000037",
+      "name": "SPROUT",
+      "slug": "sprout",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000038",
+      "name": "Surge",
+      "slug": "surge",
+      "ranked_verfuegbar": true,
+      "is_active": true
+    },
+    {
+      "external_id": "16000039",
+      "name": "Colette",
+      "slug": "colette",
+      "ranked_verfuegbar": true,
+      "is_active": true
+    },
+    {
+      "external_id": "16000040",
+      "name": "AMBER",
+      "slug": "amber",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000041",
+      "name": "LOU",
+      "slug": "lou",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000042",
+      "name": "BYRON",
+      "slug": "byron",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000043",
+      "name": "EDGAR",
+      "slug": "edgar",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000044",
+      "name": "RUFFS",
+      "slug": "ruffs",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000045",
+      "name": "Stu",
+      "slug": "stu",
+      "ranked_verfuegbar": true,
+      "is_active": true
+    },
+    {
+      "external_id": "16000046",
+      "name": "Belle",
+      "slug": "belle",
+      "ranked_verfuegbar": true,
+      "is_active": true
+    },
+    {
+      "external_id": "16000047",
+      "name": "SQUEAK",
+      "slug": "squeak",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000048",
+      "name": "GROM",
+      "slug": "grom",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000049",
+      "name": "BUZZ",
+      "slug": "buzz",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000050",
+      "name": "GRIFF",
+      "slug": "griff",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000051",
+      "name": "ASH",
+      "slug": "ash",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000052",
+      "name": "MEG",
+      "slug": "meg",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000053",
+      "name": "LOLA",
+      "slug": "lola",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000054",
+      "name": "FANG",
+      "slug": "fang",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000056",
+      "name": "EVE",
+      "slug": "eve",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000057",
+      "name": "JANET",
+      "slug": "janet",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000058",
+      "name": "BONNIE",
+      "slug": "bonnie",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000059",
+      "name": "OTIS",
+      "slug": "otis",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000060",
+      "name": "SAM",
+      "slug": "sam",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000061",
+      "name": "GUS",
+      "slug": "gus",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000062",
+      "name": "Buster",
+      "slug": "buster",
+      "ranked_verfuegbar": true,
+      "is_active": true
+    },
+    {
+      "external_id": "16000063",
+      "name": "CHESTER",
+      "slug": "chester",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000064",
+      "name": "GRAY",
+      "slug": "gray",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000065",
+      "name": "MANDY",
+      "slug": "mandy",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000066",
+      "name": "R-T",
+      "slug": "r-t",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000067",
+      "name": "WILLOW",
+      "slug": "willow",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000068",
+      "name": "MAISIE",
+      "slug": "maisie",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000069",
+      "name": "HANK",
+      "slug": "hank",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000070",
+      "name": "CORDELIUS",
+      "slug": "cordelius",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000071",
+      "name": "DOUG",
+      "slug": "doug",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000072",
+      "name": "PEARL",
+      "slug": "pearl",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000073",
+      "name": "CHUCK",
+      "slug": "chuck",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000074",
+      "name": "CHARLIE",
+      "slug": "charlie",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000075",
+      "name": "MICO",
+      "slug": "mico",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000076",
+      "name": "KIT",
+      "slug": "kit",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000077",
+      "name": "LARRY & LAWRIE",
+      "slug": "larry-lawrie",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000078",
+      "name": "MELODIE",
+      "slug": "melodie",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000079",
+      "name": "ANGELO",
+      "slug": "angelo",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000080",
+      "name": "DRACO",
+      "slug": "draco",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000081",
+      "name": "LILY",
+      "slug": "lily",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000082",
+      "name": "BERRY",
+      "slug": "berry",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000083",
+      "name": "CLANCY",
+      "slug": "clancy",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000084",
+      "name": "MOE",
+      "slug": "moe",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000085",
+      "name": "KENJI",
+      "slug": "kenji",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000086",
+      "name": "SHADE",
+      "slug": "shade",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000087",
+      "name": "JUJU",
+      "slug": "juju",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000089",
+      "name": "MEEPLE",
+      "slug": "meeple",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000090",
+      "name": "OLLIE",
+      "slug": "ollie",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000091",
+      "name": "LUMI",
+      "slug": "lumi",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000092",
+      "name": "FINX",
+      "slug": "finx",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000093",
+      "name": "JAE-YONG",
+      "slug": "jae-yong",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000094",
+      "name": "KAZE",
+      "slug": "kaze",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000095",
+      "name": "ALLI",
+      "slug": "alli",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000096",
+      "name": "TRUNK",
+      "slug": "trunk",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000097",
+      "name": "MINA",
+      "slug": "mina",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000098",
+      "name": "ZIGGY",
+      "slug": "ziggy",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000099",
+      "name": "PIERCE",
+      "slug": "pierce",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000100",
+      "name": "GIGI",
+      "slug": "gigi",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000101",
+      "name": "GLOWY",
+      "slug": "glowy",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000102",
+      "name": "SIRIUS",
+      "slug": "sirius",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000103",
+      "name": "NAJIA",
+      "slug": "najia",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000104",
+      "name": "DAMIAN",
+      "slug": "damian",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000105",
+      "name": "STARR NOVA",
+      "slug": "starr-nova",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000106",
+      "name": "BOLT",
+      "slug": "bolt",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000107",
+      "name": "NORI",
+      "slug": "nori",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000108",
+      "name": "WENDY",
+      "slug": "wendy",
+      "ranked_verfuegbar": true,
+      "is_active": false
+    },
+    {
+      "external_id": "16000109",
+      "name": "COSMO",
+      "slug": "cosmo",
+      "ranked_verfuegbar": false,
+      "is_active": false
+    },
+    {
+      "external_id": "16000110",
+      "name": "VINCE",
+      "slug": "vince",
+      "ranked_verfuegbar": false,
+      "is_active": false
+    }
+  ],
+  "official_brawler_payloads": [],
+  "counts": {
+    "brawlers": 108,
+    "ranked_available": 106,
+    "collector_runs": 5,
+    "matches": 18372,
+    "raw_payloads": 881
+  }
+}

@@ -328,3 +328,44 @@ retain 393 distinct team tags. Frontier size 3, due 0 at the post-run audit.
 DATA_UNAVAILABLE remains the new Ranked evidence status. Stop this experiment;
 no follow-up request or model experiment was made. Real soloRanked expansion is
 not empirically demonstrated by this run. See BOOTSTRAP_EXPERIMENT_2026-09-23.json.
+
+
+## D-009: Raw mechanics coverage is not patch-qualified feature coverage
+
+Problem: Phase 5A must establish empirically available objective data before
+mechanics schema/features. Broad source coverage alone can conceal stale values,
+missing-cell coercion, conditional effects and identity conflicts.
+
+Evidence: 26 bounded public unauthenticated requests; fixed isolated catalog
+108/106 Ranked-available; six pinned CSV tables plus public identity metadata.
+107 source identity/ability mappings corroborated, Bolt quarantined for two
+wrong-target gadget IDs. CSV blanks become false/zero in public JSON. Four exact
+raw cells still match official pre-September-16 values. Build history exists
+without verified effective intervals. Full 47-category/per-Brawler coverage and
+reproducible field locators are committed in MECHANICS_* artifacts.
+
+Decision: Phase 5A inventory complete; Phase 5B implementation gate NOT PASSED.
+Count nonempty raw fragments independently from complete current mechanics.
+Preserve base/attack/Super/equipment/Hypercharge/Buffy/Nano/form/summon paths,
+source conflicts and unknown dependencies. Explicit zero/false is an observation;
+blank/unknown never implies absent. All 108 current-qualified field values remain
+UNKNOWN under this audit contract. Individual official patch change statements
+are supported without becoming universal current functions or validity intervals.
+
+Alternatives rejected: importing latest-fetch JSON as current; decoding engine
+opcodes from intuition; assigning defaults/subjective ratings; dropping Bolt's
+inconvenient gadgets; modern-to-historical backfill; reopening the old holdout.
+
+Smallest proposed future schema: source snapshot, corroborated/quarantined
+identity/ability link, scoped raw observation, separately sourced conditions and
+nullable temporal claims. No final mechanics schema, migrations, formulas or
+consumer added. Refer to MECHANICS_SOURCES for exact fields and remaining gates.
+
+Validation: offline audit/hash/UNKNOWN/conditional/conflict/bounded traversal
+tests plus existing catalog/provenance/frontier regressions. Exact final counts
+are recorded in STATUS and DATA_AUDIT. No runtime engine change or data import.
+
+Revisit only with bounded evidence resolving source freshness, identity, units,
+opaque dependencies and availability. Historical mechanics additionally require
+validity intervals and observed loadout context. New model work needs independent
+preregistered data; the old holdout/shared-subset comparison remains final.

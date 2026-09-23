@@ -12,7 +12,7 @@
 3. Phase 2: eingefrorener zeitbasierter Split, Baselines B0-B5, Log-Loss/Brier/Kalibrierung, Leakage-Prüfungen und Runner. **Historical freeze and baseline measurements complete; sealed and closed to further tuning. See EVALUATION.md.**
 4. Phase 3: Legacy auf identischem Holdout benchmarken; keine Legacy-Scoringänderung. **Erledigt in `5c3d7bf`; Recorded metrics favor Legacy; statistical-input timing limitation documented in EVALUATION.md.**
 5. Phase 4: regularisiertes probabilistisches V-Modell, Manifest, Persistenz, Training/Evaluation und Model Card. **Kandidat evaluiert, aber nicht promotet; Legacy bleibt Default.**
-6. Phase 5: strukturierte, versionierte Rohmechaniken, deterministische Ableitungen und validierte strategische Konzepte strikt trennen. **Architektur präzisiert; Quellen-/Coverage-Gate vor Implementierung offen.**
+6. Phase 5: strukturierte, versionierte Rohmechaniken, deterministische Ableitungen und validierte strategische Konzepte strikt trennen. **Phase 5A Inventar abgeschlossen (D-009); Phase-5B-Implementierungsgate NOT PASSED.**
    Phase 6: bedingte und patchbezogene Kompositions-Matchups, jede Interaktionshypothese separat ablatierbar. **Keine aktive Featureauswahl ohne neue Evaluation.**
    Phase 7: Faktorisierung nur bei empirisch belegtem Bedarf; keine automatische Erweiterung.
 7. Phase 8-9: legaler Last-Pick aus V, dokumentierte Mid-/First-Search, faktenbasierte Erklärungen. **Prototypen vorhanden; nicht akzeptiert, solange V nicht validiert ist.**
@@ -23,7 +23,7 @@
 Nach jedem Milestone: fokussierte Tests, Fehlerbehebung, Dokumentation, kleiner Commit, `STATUS.md` aktualisieren. The existing holdout and shared-subset report are final. Do not rerun selection on that freeze.
 
 ## Current continuation
-- Preserve completed Phase-12 runs 1–4. The user now authorizes a separate tagged frontier bootstrap (D-008); do not repeat the empty broad run.
+- Preserve completed Phase-12 runs 1–5. Tagged bootstrap (D-008) is complete; do not repeat it or the empty broad run.
 - Read-only growth report implemented in `896ec90`; continue using the fixed exclusive cutoff `2026-09-18T15:04:42Z`. No training, evaluation, or new split.
 - Run relevant regressions and commit/push the safe milestone.
 - The independent tagged-frontier bootstrap is complete (run 5, D-008). Three genuine ranking seeds persist; zero new soloRanked observations. Historical broad provenance remains unavailable. Never retrieve live data or reconstruct anonymized identities.
@@ -88,5 +88,28 @@ HTTP 200 requests (ranking + three battlelogs), persisted three seeds, imported
 50 unique trophy matches and obtained zero new eligible soloRanked or frontier
 neighbors. DATA_UNAVAILABLE; no larger/second run. Read-only audits and exact
 regression results are committed in BOOTSTRAP_EXPERIMENT_2026-09-23.json.
-Next independent work is Phase 5A sources/coverage inventory. Model selection,
-new freezes, V2 integration and promotion remain gated; Legacy stays default.
+At that milestone the next task was Phase 5A, now completed below. Model
+selection, new freezes, V2 integration and promotion remain gated; Legacy stays default.
+
+
+## Phase 5A result (2026-09-23, D-009)
+
+Completed allowed-source register, fixed 108-Brawler catalog, 47-category raw/
+conditional/UNKNOWN coverage, per-Brawler source/field witnesses, small diverse
+verification sample and four official-patch drift checks. Offline standard-library
+audit utility reads pinned CSVs and committed minimized identities only; no DB,
+network or runtime import. Sources, exact reproduction and smallest future schema
+proposal: MECHANICS_SOURCES.md. Output: MECHANICS_COVERAGE.md and MECHANICS_* JSON.
+
+**5B NOT PASSED:** raw fragments do not establish current patch, normalized units,
+complete condition graphs or historical validity. Do not implement 5B/5C or model
+features from this inventory. No change to master prompt needed: D-006 already
+requires precisely this evidence gate and separation.
+
+Next independent research scope, if continued: document a small bounded probe of
+missing status/component/buddy/gear/deck definitions; seek current source/hotfix
+evidence and authoritative units; resolve Bolt conflict without guessing. Preserve
+this dated inventory and add new snapshots instead of changing its denominator or
+source hashes. Gate can be revisited only after evidence supports a narrowly
+specified contract. Historical loadout/time gaps and new Ranked DATA_UNAVAILABLE
+remain separately blocking model work. No follow-up collection is part of 5A.

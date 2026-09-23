@@ -1,10 +1,44 @@
-RESUME FROM: Phase 12B complete. Bounded bootstrap run 5 (code 8661c29) is finished and must not be repeated as unfinished work. DATA_UNAVAILABLE: zero genuinely newer eligible soloRanked matches. Next independent task is Phase 5A source/coverage inventory under D-006; no more collection, model tuning, freeze or evaluation in this experiment. Inspect this status, the committed BOOTSTRAP_EXPERIMENT_2026-09-23.json and the local tree before resuming.
+RESUME FROM: Phase 5A source/coverage inventory completed after a0242b9; D-009. Phase 5B implementation gate NOT PASSED. Read MECHANICS_SOURCES.md, MECHANICS_COVERAGE.md and the committed MECHANICS_* evidence before further work. Next legitimate independent task is a documented bounded source follow-up for current patch/units/opaque conditional dependencies and Bolt identity conflict; preserve this dated snapshot. Do not repeat bootstrap run 5, restart collection, implement speculative mechanics, reopen the sealed evaluation or train/tune a model. New Ranked evidence remains DATA_UNAVAILABLE.
 
 # Drafter V2 Status
 
-Overall:
+Latest completed milestone — Phase 5A (2026-09-23):
+- Started from clean a0242b9 on feature/drafter-v2; preserved 8661c29/run-5 work.
+- Fixed catalog: 108 Brawlers / 106 Ranked-available. Read-only isolated queries;
+  no live checkout/DB/credential access, collector requests or model experiment.
+- 26 bounded public unauthenticated GETs, all HTTP 200, no retries; 12,441,891
+  total response bytes. Six relevant mechanics tables, metadata, official docs,
+  release pages and one older character snapshot; no bulk game archive import.
+- 47-category reproducible coverage plus every Brawler, exact scoped field
+  witnesses, source distribution, UNKNOWNs and patch qualification. Offline
+  standard-library audit reads pinned CSV/minimized identities, writes stdout.
+- 107 corroborated source identity/ability mappings. Bolt remains quarantined:
+  two public gadget IDs target RocketGirl instead of Rock. No inferred repair.
+- Native CSV distinguishes missing from explicit false/zero; public JSON loses
+  that distinction. Base/Super/equipment/Hypercharge/Buffy/Nano/form/summon scopes
+  remain separate. Opaque opcodes/dependencies are not decoded into game facts.
+- Candidate kit references: gadgets/SP 107 each, Hypercharge/NanoPower 105 each,
+  Buffy 27, other trait/event-deck 97. These are source fragments, not known
+  equipped, current or Ranked-effective mechanics. Full counts in coverage JSON.
+- Four cells remain at values preceding official September-16 changes. No
+  source establishes a complete current patch or historical validity join;
+  all qualified current-patch field counts remain 0/108 under this audit contract.
+- Small verification sample spans ranged/percentage damage, healing, wallbreak,
+  mobility, CC, conditional kits, transformation, summon and identity conflict.
+- Phase 5B NOT PASSED. Minimal future observation/identity/condition/temporal
+  contract proposed only; no schema, feature/formula or strategic rating added.
+- Validation: 73 combined mechanics/catalog/identity/provenance/frontier tests
+  passed in isolated Django test DB (10.747 s), system check clean. Final 15
+  offline audit tests passed (0.012 s), including subsequently added hash replay
+  test. Counts overlap; not 88 distinct tests. No API credential loaded.
+- Exact reproduction, immutable URLs/digests, frozen catalog, minimized source
+  identities and generated results are durable in docs/drafter-v2. Six pinned
+  CSVs can be re-fetched explicitly if /tmp is lost; mutable-page replay may fail
+  its historical hash. Such failure is documented, never patched with new values.
+
+Previous completed Phase 12B milestone:
 - Active/default engine: frozen Legacy `3a565bd`; no runtime/API/UI switch.
-- Started this task from clean `b818313`; implementation milestone `8661c29`
+- Phase 12B started from clean `b818313`; implementation milestone `8661c29`
   committed and pushed to feature/drafter-v2 before the real experiment.
 - Completed D-008: persistent tagged frontier, official-ranking seed provenance,
   observed soloRanked graph-edge support, shared cooldowns and strict HTTP budgets.
@@ -80,12 +114,19 @@ Data integrity and recovery:
   isolated CollectorRun/RawPayload/frontier, not dependent on /tmp files.
 
 Next:
-1. Do not rerun completed bootstrap 5 or the empty broad run 4. Retain
-   DATA_UNAVAILABLE for new Ranked/model evidence; trophy tags cannot fill that gap.
-2. Continue independent Phase 5A allowed-source and mechanics coverage inventory
-   under D-006 and PLAN. Establish actual source/patch/condition coverage before
-   schema/features; no hand ratings, LLM-filled mechanics or historical loadout guesses.
-3. Any future collection experiment needs a documented bounded plan (sample, timing,
-   request/depth budget, cooldowns and stop conditions). Preserve the current frontier.
-4. Before any model experiment, preregister immutable new temporal membership and
-   training-only statistical inputs. Historical holdout/shared subset remain closed.
+1. Preserve completed Phase 5A artifacts and bootstrap runs 1–5. The public
+   source inventory is complete for its bounded scope; do not repeat its probes
+   merely because earlier /tmp files are gone. Use committed replay instructions.
+2. A subsequent source follow-up should prerecord small request/size limits and
+   test needed status/component/buddy/gear/deck definitions, current hotfix
+   evidence and explicit unit semantics. Resolve identity conflicts through
+   observed authoritative links, never manual aliases/defaults. Update D-009
+   only with concrete evidence; do not declare the gate passed by availability alone.
+3. Phase 5B schema/features remain gated. The smallest defensible future proposal
+   is in MECHANICS_SOURCES; unknown units, conditions, timestamps and historical
+   loadouts remain nullable/UNKNOWN. No unsupported feature or strategic score.
+4. New soloRanked/model evidence is still DATA_UNAVAILABLE. Any future collection
+   needs its own bounded plan and existing cooldowns; current task authorizes none.
+5. Before model work, preregister immutable independent temporal membership and
+   training-only statistics. Historical holdout/shared subset stay sealed;
+   Legacy remains active/default. No promotion follows a source-coverage audit.
