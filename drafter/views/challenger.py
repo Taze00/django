@@ -32,13 +32,8 @@ def challenger_recommend(request):
             raise DraftFehler('Legacy-Vergleich muss true oder false sein.')
         result = recommend(ctx)
         if data.get('compare_legacy'):
-            from drafter.services.draft_engine import DraftEngine
-            result['legacy'] = {
-                'model_version': 'legacy-frozen-3a565bd',
-                'score_kind': 'heuristic_score_not_probability',
-                'recommendations': [{'slug': e.brawler.slug, 'name': e.brawler.name, 'score': e.anzeige_score}
-                                    for e in DraftEngine(ctx).empfehlungen(anzahl=200, mit_details=0)],
-            }
+            from drafter.services.v2_legacy_comparison import compare
+            result['legacy'] = compare(ctx)
         if request.user.is_authenticated:
             result['snapshot_token'] = snapshot_token(request.user, ctx, result)
         return JsonResponse(result)

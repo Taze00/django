@@ -8,7 +8,7 @@
   <h1>V2 Challenger</h1>
   <p>Experimentelles Kompositionsmodell. Legacy bleibt der Standard.
     Die Modellschätzung ist keine nachgewiesene aktuelle Siegchance; Unsicherheit und aktuelle Patch-Gültigkeit sind unbekannt.</p>
-  <form id="challenger-form" data-info="{% url 'drafter:api_challenger_info' %}" data-catalog="{% url 'drafter:api_katalog' %}" data-endpoint="{% url 'drafter:api_challenger' %}" data-snapshots="{% url 'drafter:api_challenger_snapshots' %}">
+  <form id="challenger-form" data-legacy="{% url 'drafter:api_recommend' %}" data-info="{% url 'drafter:api_challenger_info' %}" data-catalog="{% url 'drafter:api_katalog' %}" data-endpoint="{% url 'drafter:api_challenger' %}" data-snapshots="{% url 'drafter:api_challenger_snapshots' %}">
     {% csrf_token %}
     <p><label>Map <select id="challenger-map" required></select></label></p>
     <p><label><input id="challenger-first" type="checkbox"> Eigenes Team hat First Pick</label></p>

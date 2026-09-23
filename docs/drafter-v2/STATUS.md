@@ -1,4 +1,4 @@
-RESUME FROM: D-016 autonomous experimental product checkpoint complete. Working First/Mid/Last Challenger, side-by-side Legacy and versioned snapshots are implemented. Remaining stop is scientific: independent future Ranked evaluation evidence unavailable; fixed opponent-interaction experiment failed Validation. Do not reopen old holdout, repeat completed mechanics research or promote by assumption. Full report: CHALLENGER_REPORT.md; operations: CHALLENGER_RUNBOOK.md.
+RESUME FROM: D-017 Hideout diagnostic and exact Legacy adapter complete. See HIDEOUT_DIAGNOSTIC.md. D-016 autonomous experimental product checkpoint remains complete. Working First/Mid/Last Challenger, side-by-side Legacy and versioned snapshots are implemented. Remaining stop is scientific: independent future Ranked evaluation evidence unavailable; fixed opponent-interaction experiment failed Validation. Do not reopen old holdout, repeat completed mechanics research or promote by assumption. Full report: CHALLENGER_REPORT.md; operations: CHALLENGER_RUNBOOK.md.
 
 # Drafter V2 Status
 
@@ -11,7 +11,14 @@ Overall:
   no observed Validation improvement from the preregistered opponent feature grid.
 - No current-patch, calibrated-uncertainty or superior-draft-quality claim.
 
-Latest validation:
+Latest validation (D-017):
+- 52 focused tests passed (9.145 s); real read-only Hideout endpoint parity passed.
+- V2 probabilities and artifact unchanged; exact additive diagnostic now visible.
+- Legacy comparison uses normal als_dict path with full context/data receipt.
+- Reported Sprout/Carl/Gray order remains unreproduced; other session inputs UNKNOWN.
+- V8 parse and local HTTP/CSRF/static/First/Mid/Last smoke passed.
+
+Previous D-016 validation:
 - Full Drafter: 774 tests, four existing skips, no failures (336.643 s).
 - Protected Fitness: 253 tests passed (138.720 s).
 - Final focused Challenger/content/UX: 13 passed (2.517 s); overlaps full suite.

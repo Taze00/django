@@ -84,6 +84,24 @@
       if (data.legacy) {
         results.append(element('h2', 'Experimenteller Vergleich'));
         results.append(element('p', 'V2: Modellschätzung. Legacy: heuristischer Score, keine Wahrscheinlichkeit. Gleicher Draft; Rangunterschiede belegen keine bessere Qualität.'));
+        const receipt = data.legacy.receipt, state = receipt.draft_state;
+        results.append(element('p', `Legacy-Kontext auf ${window.location.origin}: ${state.mode} / ${state.map}; eigene Picks ${state.own_picks.join(', ')}; Gegner ${state.enemy_picks.join(', ')}; Bans ${state.bans.join(', ') || 'keine'}; First Pick ${state.own_team_first_pick ? 'wir' : 'Gegner'}; Pick ${state.pick_nummer}, Phase ${state.phase}, am Zug ${state.am_zug}; Rangpool ${state.rank_pool}; Provider ${receipt.provider}; ${receipt.candidate_pool.length} bewertbare Kandidaten; ${receipt.personal_preferences_count} persönliche Einstellungen.`));
+        results.append(element('p', 'Der Vergleich gilt für diese Instanz und Sitzung. Eine andere Datenbank, persönliche Einstellungen oder die Sortierung des Brawler-Gitters können abweichen. Verglichen wird die normale Legacy-Empfehlungsliste.'));
+        const receiptDetails = document.createElement('details');
+        receiptDetails.append(element('summary', 'Vergleichseingaben und Datenbeleg'));
+        receiptDetails.append(element('pre', JSON.stringify(receipt, null, 2))); results.append(receiptDetails);
+        const verify = element('button', 'Normalen Legacy-Endpunkt mit diesem Zustand prüfen'); verify.type = 'button';
+        verify.addEventListener('click', async () => {
+          verify.disabled = true;
+          try {
+            const normal = await post(form.dataset.legacy, state);
+            const ranks = entries => entries.map(e => [e.slug, e.score, e.score_roh]);
+            const identical = JSON.stringify(ranks(normal.empfehlungen)) === JSON.stringify(ranks(data.legacy.recommendations));
+            verify.textContent = identical ? 'Identische Legacy-Rangfolge bestätigt' : 'Abweichung: Sitzung/Daten/Zustand erneut prüfen';
+          } catch (error) { verify.textContent = error.message; }
+          finally { verify.disabled = false; }
+        });
+        results.append(verify);
         const table = document.createElement('table');
         const head = document.createElement('tr');
         for (const label of ['Rang', 'V2 · Modellschätzung', 'Legacy · Score']) head.append(element('th', label));
@@ -92,7 +110,7 @@
           const v2 = data.recommendations[i], legacy = data.legacy.recommendations[i];
           const row = document.createElement('tr'); row.append(element('td', i + 1));
           row.append(element('td', v2 ? `${v2.name} · ${(v2.p_win * 100).toFixed(1)} %` : 'Keine Empfehlung'));
-          row.append(element('td', legacy ? `${legacy.name} · ${legacy.score}` : 'Keine Empfehlung'));
+          row.append(element('td', legacy ? `${legacy.name} · ${legacy.score}` : 'Außerhalb der Legacy-Topliste'));
           table.append(row);
         }
         results.append(table);
@@ -102,9 +120,34 @@
         details.append(element('summary', `${item.name} · Modellschätzung ${(item.p_win * 100).toFixed(1)} %`));
         details.append(element('p', `Unsicherheit: UNKNOWN. Unbekannte Features: ${item.evidence.unknown_features.length}. Beiträge sind gelernte Zusammenhänge, keine kausalen Effekte.`));
         if (item.continuation.length) details.append(element('p', `Hypothetische Fortsetzung: ${item.continuation.map(p => `${p.side === 'own' ? 'Wir' : 'Gegner'}: ${p.slug}`).join(' → ')}. Beiträge beziehen sich auf diese vollständige Komposition.`));
+        const diagnostic = item.diagnostic, comparison = diagnostic.comparison;
+        details.append(element('p', diagnostic.ranking_limit));
+        details.append(element('p', 'Evidenz für genau diese Sechser-Komposition: UNKNOWN. Trainingszahlen gelten für einzelne Features; sie sind keine Konfidenzintervalle. Mechanik-, Terrain- und Rollenmerkmale sind nicht aktiv; Übertragbarkeit auf den aktuellen Patch: UNKNOWN.'));
+        if (comparison) details.append(element('p', `Gegenüber ${comparison.reference_name}: ${comparison.probability_difference_pp >= 0 ? '+' : ''}${comparison.probability_difference_pp.toFixed(2)} Prozentpunkte Modellschätzung. Sicherheit dieses Abstandes: UNKNOWN.`));
+        details.append(element('p', 'Die folgenden Logit-Beiträge sind additive Modellwerte, keine Prozentpunkte. Positive Unterschiede sprechen im Modell für diesen Pick; einzelne Terme sind nicht separat als taktischer Nutzen validiert.'));
+        const breakdown = document.createElement('table');
+        const headings = document.createElement('tr');
+        for (const title of ['Anteil', 'Dieser Pick', comparison ? `Differenz zu ${comparison.reference_name}` : 'Differenz', 'Evidenz']) headings.append(element('th', title));
+        breakdown.append(headings);
+        for (const [family, group] of Object.entries(diagnostic.families)) {
+          const row = document.createElement('tr');
+          row.append(element('td', group.label));
+          row.append(element('td', group.active ? group.modeled_logit.toFixed(4) : 'Nicht aktiv'));
+          const delta = comparison?.candidate_family_logit_differences[family];
+          row.append(element('td', delta == null ? '—' : `${delta >= 0 ? '+' : ''}${delta.toFixed(4)}`));
+          row.append(element('td', group.active ? `${group.status}; ${group.unknown_terms} unbelegte Terme` : 'Keine entsprechende Modellfunktion'));
+          breakdown.append(row);
+        }
+        details.append(breakdown);
+        details.append(element('p', diagnostic.search.active ? 'Search: hypothetische Fortsetzung aktiv; gemeinsame Hintergrundterme können deshalb zwischen Kandidaten abweichen. Kein zusätzlicher Search-Bonus.' : `Search: Last Pick, keine Folgezüge. Gemeinsamer fester Draftbeitrag: ${diagnostic.background_logit.toFixed(4)} Logit; erklärt nicht den Rangunterschied.`));
+        if (comparison && diagnostic.search.active) details.append(element('p', `Unterschied der übrigen hypothetischen Komposition: ${comparison.background_logit_difference.toFixed(4)} Logit.`));
+        const rootEvidence = document.createElement('ul');
+        for (const group of Object.values(diagnostic.families)) for (const term of group.terms) rootEvidence.append(element('li', `${group.label} · ${term.subjects.join(' / ')}: ${term.logit_contribution == null ? 'UNKNOWN, im Modell ausgelassen' : term.logit_contribution.toFixed(4) + ' Logit'}; Trainingsmatches: ${term.training_matches ?? 'UNKNOWN'}`));
+        details.append(rootEvidence);
+        const totalDetails = document.createElement('details'); totalDetails.append(element('summary', 'Größte Beiträge der gesamten fertigen Komposition (nicht nur dieses Picks)'));
         const list = document.createElement('ul');
         for (const fact of item.contributions) list.append(element('li', `${fact.label || fact.feature}: ${fact.logit_contribution.toFixed(4)} Logit; ${item.evidence.feature_support[fact.feature]} Trainingsmatches`));
-        details.append(list);
+        totalDetails.append(list); details.append(totalDetails);
         if (data.snapshot_token) {
           const save = element('button', 'Diesen Pick als Entscheidung speichern'); save.type = 'button';
           save.addEventListener('click', async () => {

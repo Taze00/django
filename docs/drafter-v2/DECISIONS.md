@@ -540,3 +540,18 @@ no live services/credentials touched. Full report and exact start/stop/model rol
 commands in CHALLENGER_REPORT.md and CHALLENGER_RUNBOOK.md. No automatic promotion.
 Revisit when independently sourced new eligible Ranked evidence can support a
 preregistered future evaluation, not when another routine approval is obtained.
+
+
+## D-017 — exact Legacy adapter and candidate-specific attribution
+Use normal DraftEngine(ctx).als_dict() unchanged in the opt-in comparison,
+including default recommendation depth/details. Existing 200/no-details adapter
+already matched measured top scores; the reported external ranking remains
+unreproduced, not attributed to a guessed cause. Expose resolved context, complete
+pool, personal/configuration/loaded-data hashes and same-session endpoint check.
+Partition the complete feature vector into root-candidate and background terms;
+never predict partial teams. Explain relative additive contributions separately
+from absolute composition effects. Inactive enemy interactions remain inactive;
+UNKNOWN evidence is not a measured zero. Search continuation is hypothetical,
+not a bonus. No independent tactical/causal attribution or uncertainty claim.
+Validation and exact evidence: HIDEOUT_DIAGNOSTIC.md/.json. All ranking/model and
+Legacy scoring functions unchanged. Scientific promotion gate remains closed.

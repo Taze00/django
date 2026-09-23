@@ -12,6 +12,7 @@ from drafter.models import Brawler
 from drafter.services.context import DraftFehler
 from drafter.services.v2_model import CompositionLogitModel, FEATURE_VERSIONS, _feature_counts
 from drafter.services.v2_explanation import contributions
+from drafter.services.v2_diagnostics import diagnose, compare_candidates
 from drafter.services.v2_search import _row, legal_candidates
 from drafter.services.v2_planning import plan, PlanningError, schedule
 
@@ -110,12 +111,16 @@ def recommend(ctx):
             'continuation': [{'side': side, 'slug': by_id[c].slug} for side, c in item['continuation']],
             'explanation_scope': 'hypothetical_complete_composition' if item['continuation'] else 'complete_last_pick',
             'contributions': facts,
+            'diagnostic': diagnose(model, row, candidate, data['feature_support'], names, item['continuation']),
             'evidence': {'kind': 'jointly_fitted_association_not_causal',
                          'feature_support': {name: data['feature_support'].get(name) for name in features},
                          'unknown_features': unknown},
             'uncertainty': {'status': 'UNKNOWN', 'interval': None},
         })
     result.sort(key=lambda item: (-item['p_win'], item['slug']))
+    for index, item in enumerate(result):
+        if len(result) > 1:
+            item['diagnostic']['comparison'] = compare_candidates(item, result[1] if index == 0 else result[0])
     return {
         'engine': 'v2_challenger', 'status': 'EXPERIMENTAL_NOT_PROMOTED',
         'model_version': model.feature_version, 'artifact_sha256': artifact_digest,

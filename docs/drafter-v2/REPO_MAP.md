@@ -121,3 +121,13 @@ pins content as well as membership digests. `CHALLENGER_REPORT.md` consolidates
 product acceptance/evidence; `CHALLENGER_HTTP_SMOKE.json` retains final local HTTP
 observations. Preview container `drafter-v2-challenger-preview` binds loopback
 18080 with Traefik disabled; no live service replacement.
+
+
+## D-017 diagnostic integration
+`services/v2_legacy_comparison.py` wraps exact unchanged normal Legacy als_dict
+path and hashes resolved/loaded inputs. `services/v2_diagnostics.py` partitions
+actual complete-composition features and compares candidates without scoring
+changes. Challenger UI shows receipts, normal-endpoint verification, relative
+terms and evidence limits. `docs/drafter-v2/hideout_diagnostic.py` is a read-only
+runtime reproducer; matching JSON/Markdown retain measured evidence. No other app
+or default Legacy path changes.

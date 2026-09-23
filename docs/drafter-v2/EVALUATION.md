@@ -180,3 +180,11 @@ Runtime byte SHA-256 is now explicitly separate from canonical artifact content
 SHA-256 in both training commands and reports. Original canonical digests remain
 preserved; no fitted values or recorded metrics changed. Final product/evidence
 matrix, limitations and remaining independent-test blocker: CHALLENGER_REPORT.md.
+
+
+## D-017 runtime diagnostic, not evaluation
+HIDEOUT_DIAGNOSTIC.json records exact real Hideout probabilities, additive
+attribution, Legacy parity and resolved context/data hashes. No outcomes queried,
+model fit, holdout access or improvement claim. 52 focused regressions passed;
+real repeatable-read endpoint parity and local HTTP smoke passed. Differences in
+rank/probability are not evidence of draft quality or statistical significance.

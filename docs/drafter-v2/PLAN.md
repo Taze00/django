@@ -186,3 +186,9 @@ complete; see CHALLENGER_REPORT.md. Independent future outcome evidence blocks
 promotion/quality claims. Do not re-tune the sealed holdout or run more research
 merely to avoid acknowledging that scientific gate. Exact operations and rollback:
 CHALLENGER_RUNBOOK.md. Legacy remains default and data remain preserved.
+
+
+## D-017 diagnostic follow-up complete
+Concrete Hideout parity and additive explanation are implemented and tested;
+see HIDEOUT_DIAGNOSTIC.md. No ranking tuning/retraining or new mechanics.
+The existing experimental phase completions and independent-evidence gate stand.

@@ -1,0 +1,840 @@
+{
+  "explicit_comparisons": {
+    "belle": {
+      "background_interpretation": "shared_fixed_draft_cancels",
+      "background_logit_difference": -5.551115123125783e-17,
+      "candidate_family_logit_differences": {
+        "enemy": null,
+        "individual": 0.04286472120426388,
+        "map": -0.004485533401952215,
+        "mode": 0.016971183090888096,
+        "teammate": -0.008669028731838547
+      },
+      "interpretation": "exact_model_decomposition_not_causal_effect_or_significance",
+      "probability_difference_pp": 1.1617997782259637,
+      "reference_name": "Belle",
+      "reference_slug": "belle",
+      "total_logit_difference": 0.04668134216136115,
+      "uncertainty_of_difference": "UNKNOWN"
+    },
+    "gus": {
+      "background_interpretation": "shared_fixed_draft_cancels",
+      "background_logit_difference": -5.551115123125783e-17,
+      "candidate_family_logit_differences": {
+        "enemy": null,
+        "individual": 0.044849465770945875,
+        "map": -0.020095480938533427,
+        "mode": 0.004316514301618914,
+        "teammate": 0.01160593226835588
+      },
+      "interpretation": "exact_model_decomposition_not_causal_effect_or_significance",
+      "probability_difference_pp": 1.0125614443309228,
+      "reference_name": "GUS",
+      "reference_slug": "gus",
+      "total_logit_difference": 0.040676431402387206,
+      "uncertainty_of_difference": "UNKNOWN"
+    }
+  },
+  "kind": "runtime_diagnostic_not_outcome_evaluation",
+  "legacy_identical": true,
+  "legacy_receipt": {
+    "candidate_pool": [
+      "8-bit",
+      "alli",
+      "angelo",
+      "ash",
+      "barley",
+      "bea",
+      "belle",
+      "berry",
+      "bibi",
+      "bo",
+      "bolt",
+      "bonnie",
+      "brock",
+      "bull",
+      "buster",
+      "buzz",
+      "byron",
+      "carl",
+      "charlie",
+      "chester",
+      "chuck",
+      "clancy",
+      "colette",
+      "colt",
+      "cordelius",
+      "crow",
+      "damian",
+      "darryl",
+      "doug",
+      "draco",
+      "dynamike",
+      "edgar",
+      "el-primo",
+      "emz",
+      "eve",
+      "fang",
+      "finx",
+      "frank",
+      "gale",
+      "gigi",
+      "glowy",
+      "gray",
+      "griff",
+      "grom",
+      "gus",
+      "hank",
+      "jacky",
+      "jae-yong",
+      "janet",
+      "jessie",
+      "juju",
+      "kaze",
+      "kenji",
+      "kit",
+      "larry-lawrie",
+      "leon",
+      "lily",
+      "lola",
+      "lou",
+      "lumi",
+      "maisie",
+      "mandy",
+      "max",
+      "meeple",
+      "meg",
+      "melodie",
+      "mico",
+      "mina",
+      "moe",
+      "mr-p",
+      "najia",
+      "nani",
+      "nita",
+      "nori",
+      "ollie",
+      "otis",
+      "pam",
+      "penny",
+      "pierce",
+      "poco",
+      "r-t",
+      "rico",
+      "rosa",
+      "ruffs",
+      "sam",
+      "sandy",
+      "shade",
+      "shelly",
+      "sirius",
+      "spike",
+      "sprout",
+      "squeak",
+      "starr-nova",
+      "stu",
+      "surge",
+      "tara",
+      "tick",
+      "trunk",
+      "wendy",
+      "willow",
+      "ziggy"
+    ],
+    "configuration_sha256": "4900c9891458b34f8bd94e6653dc417f1f8f99ca815cb057ddf71e021f1cdc92",
+    "context_sha256": "d74ef933b9347c4c1a54e5e5f17570a78dab01e638892d0e21dd4a5ee87b7c80",
+    "draft_state": {
+      "am_zug": "own",
+      "bans": [],
+      "draft_fertig": false,
+      "enemy_picks": [
+        "piper",
+        "amber",
+        "pearl"
+      ],
+      "gegner_restpicks": 0,
+      "map": "hideout",
+      "mode": "bounty",
+      "own_picks": [
+        "mortis",
+        "gene"
+      ],
+      "own_team_first_pick": false,
+      "phase": "last",
+      "phase_label": "Last Pick",
+      "pick_nummer": 6,
+      "rank_pool": "masters",
+      "unsere_restpicks": 1
+    },
+    "entrypoint": "DraftEngine(ctx).als_dict()",
+    "loaded_scoring_inputs_sha256": "4af2dbc4ded2bb456f2a75fadb3dc338393aec5b437183e59ef1c4db558b621f",
+    "personal_preferences_count": 0,
+    "personal_preferences_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+    "provider": "gemessen",
+    "resolved_ids": {
+      "map": 33,
+      "mode": 5,
+      "patch": 2
+    },
+    "snapshot_scope": "loaded_statistics_catalog_balance_map_mode_patch; not entire database"
+  },
+  "limitation": "User-reported Sprout/Carl/Gray order not reproduced locally; other instance/session inputs unavailable, no inferred cause.",
+  "normal_first_pick_true_top": [
+    "sandy",
+    "belle",
+    "emz",
+    "rico",
+    "ziggy",
+    "brock",
+    "wendy",
+    "r-t"
+  ],
+  "normal_legacy_top": [
+    {
+      "score": 70,
+      "score_roh": 0.397,
+      "slug": "sandy"
+    },
+    {
+      "score": 60,
+      "score_roh": 0.206,
+      "slug": "belle"
+    },
+    {
+      "score": 57,
+      "score_roh": 0.145,
+      "slug": "emz"
+    },
+    {
+      "score": 57,
+      "score_roh": 0.142,
+      "slug": "rico"
+    },
+    {
+      "score": 56,
+      "score_roh": 0.117,
+      "slug": "ziggy"
+    },
+    {
+      "score": 55,
+      "score_roh": 0.109,
+      "slug": "brock"
+    },
+    {
+      "score": 55,
+      "score_roh": 0.106,
+      "slug": "wendy"
+    },
+    {
+      "score": 55,
+      "score_roh": 0.103,
+      "slug": "r-t"
+    }
+  ],
+  "request": {
+    "bans": [],
+    "compare_legacy": true,
+    "enemy_picks": [
+      "piper",
+      "amber",
+      "pearl"
+    ],
+    "map": "hideout",
+    "mode": "bounty",
+    "own_picks": [
+      "mortis",
+      "gene"
+    ],
+    "own_team_first_pick": false
+  },
+  "v2_artifact_sha256": "92e0b427bf9abce62e047419ea1008f740c9ee7b39b1458ae15692402b7cf52d",
+  "v2_diagnostics": {
+    "belle": {
+      "background_logit": -0.22788768984639524,
+      "candidate_logit": 0.07108124557804389,
+      "comparison": {
+        "background_interpretation": "shared_fixed_draft_cancels",
+        "background_logit_difference": 5.551115123125783e-17,
+        "candidate_family_logit_differences": {
+          "enemy": null,
+          "individual": -0.04286472120426388,
+          "map": 0.004485533401952215,
+          "mode": -0.016971183090888096,
+          "teammate": 0.008669028731838547
+        },
+        "interpretation": "exact_model_decomposition_not_causal_effect_or_significance",
+        "probability_difference_pp": -1.1617997782259637,
+        "reference_name": "WENDY",
+        "reference_slug": "wendy",
+        "total_logit_difference": -0.04668134216136115,
+        "uncertainty_of_difference": "UNKNOWN"
+      },
+      "families": {
+        "enemy": {
+          "active": false,
+          "interpretation": "not included in active model",
+          "label": "Gegnerspezifische Paarterme",
+          "modeled_logit": null,
+          "status": "INACTIVE",
+          "terms": [],
+          "unknown_terms": 0
+        },
+        "individual": {
+          "active": true,
+          "interpretation": "association; independent feature benefit not established",
+          "label": "Brawler-Beitrag",
+          "modeled_logit": 0.04416141414954364,
+          "status": "LEARNED",
+          "terms": [
+            {
+              "amount": 1.0,
+              "feature": "brawler:2",
+              "logit_contribution": 0.04416141414954364,
+              "status": "LEARNED",
+              "subjects": [
+                "Belle"
+              ],
+              "training_matches": 238,
+              "weight": 0.04416141414954364
+            }
+          ],
+          "unknown_terms": 0
+        },
+        "map": {
+          "active": true,
+          "interpretation": "association; independent feature benefit not established",
+          "label": "Map-Beitrag",
+          "modeled_logit": 0.005330932919372073,
+          "status": "LEARNED",
+          "terms": [
+            {
+              "amount": 1.0,
+              "feature": "brawler_map:Hideout:2",
+              "logit_contribution": 0.005330932919372073,
+              "status": "LEARNED",
+              "subjects": [
+                "Belle"
+              ],
+              "training_matches": 23,
+              "weight": 0.005330932919372073
+            }
+          ],
+          "unknown_terms": 0
+        },
+        "mode": {
+          "active": true,
+          "interpretation": "association; independent feature benefit not established",
+          "label": "Modus-Beitrag",
+          "modeled_logit": 0.015339280441714948,
+          "status": "LEARNED",
+          "terms": [
+            {
+              "amount": 1.0,
+              "feature": "brawler_context:bounty:2",
+              "logit_contribution": 0.015339280441714948,
+              "status": "LEARNED",
+              "subjects": [
+                "Belle"
+              ],
+              "training_matches": 100,
+              "weight": 0.015339280441714948
+            }
+          ],
+          "unknown_terms": 0
+        },
+        "teammate": {
+          "active": true,
+          "interpretation": "association; independent feature benefit not established",
+          "label": "Gelernte Team-Paarterme",
+          "modeled_logit": 0.00624961806741324,
+          "status": "LEARNED",
+          "terms": [
+            {
+              "amount": 1.0,
+              "feature": "pair:2:5",
+              "logit_contribution": -0.002300671454051387,
+              "status": "LEARNED",
+              "subjects": [
+                "Belle",
+                "Gene"
+              ],
+              "training_matches": 8,
+              "weight": -0.002300671454051387
+            },
+            {
+              "amount": 1.0,
+              "feature": "pair:2:9",
+              "logit_contribution": 0.008550289521464628,
+              "status": "LEARNED",
+              "subjects": [
+                "Belle",
+                "Mortis"
+              ],
+              "training_matches": 24,
+              "weight": 0.008550289521464628
+            }
+          ],
+          "unknown_terms": 0
+        }
+      },
+      "missing_evidence": [
+        "mechanics/terrain/roles not modeled",
+        "uncertainty interval UNKNOWN",
+        "current patch applicability UNKNOWN",
+        "no causal or independently validated family attribution"
+      ],
+      "ranking_limit": "Bei diesem Last Pick unterscheiden nur additive gelernte Brawler-, Map-/Modus- und Team-Paarterme die Kandidaten. Keine aktive gegnerspezifische Pick-Interaktion; keine belegte Anti-Tank-, Kontroll- oder Rollenbegr\u00fcndung.",
+      "search": {
+        "active": false,
+        "independent_bonus": false,
+        "status": "LAST_PICK_NO_FUTURE_MOVES"
+      },
+      "total_logit": -0.15680644426835133
+    },
+    "gus": {
+      "background_logit": -0.22788768984639524,
+      "candidate_logit": 0.07708615633701786,
+      "comparison": {
+        "background_interpretation": "shared_fixed_draft_cancels",
+        "background_logit_difference": 5.551115123125783e-17,
+        "candidate_family_logit_differences": {
+          "enemy": null,
+          "individual": -0.044849465770945875,
+          "map": 0.020095480938533427,
+          "mode": -0.004316514301618914,
+          "teammate": -0.01160593226835588
+        },
+        "interpretation": "exact_model_decomposition_not_causal_effect_or_significance",
+        "probability_difference_pp": -1.0125614443309228,
+        "reference_name": "WENDY",
+        "reference_slug": "wendy",
+        "total_logit_difference": -0.040676431402387206,
+        "uncertainty_of_difference": "UNKNOWN"
+      },
+      "families": {
+        "enemy": {
+          "active": false,
+          "interpretation": "not included in active model",
+          "label": "Gegnerspezifische Paarterme",
+          "modeled_logit": null,
+          "status": "INACTIVE",
+          "terms": [],
+          "unknown_terms": 0
+        },
+        "individual": {
+          "active": true,
+          "interpretation": "association; independent feature benefit not established",
+          "label": "Brawler-Beitrag",
+          "modeled_logit": 0.04217666958286164,
+          "status": "LEARNED",
+          "terms": [
+            {
+              "amount": 1.0,
+              "feature": "brawler:61",
+              "logit_contribution": 0.04217666958286164,
+              "status": "LEARNED",
+              "subjects": [
+                "GUS"
+              ],
+              "training_matches": 1911,
+              "weight": 0.04217666958286164
+            }
+          ],
+          "unknown_terms": 0
+        },
+        "map": {
+          "active": true,
+          "interpretation": "association; independent feature benefit not established",
+          "label": "Map-Beitrag",
+          "modeled_logit": 0.020940880455953284,
+          "status": "LEARNED",
+          "terms": [
+            {
+              "amount": 1.0,
+              "feature": "brawler_map:Hideout:61",
+              "logit_contribution": 0.020940880455953284,
+              "status": "LEARNED",
+              "subjects": [
+                "GUS"
+              ],
+              "training_matches": 42,
+              "weight": 0.020940880455953284
+            }
+          ],
+          "unknown_terms": 0
+        },
+        "mode": {
+          "active": true,
+          "interpretation": "association; independent feature benefit not established",
+          "label": "Modus-Beitrag",
+          "modeled_logit": 0.02799394923098413,
+          "status": "LEARNED",
+          "terms": [
+            {
+              "amount": 1.0,
+              "feature": "brawler_context:bounty:61",
+              "logit_contribution": 0.02799394923098413,
+              "status": "LEARNED",
+              "subjects": [
+                "GUS"
+              ],
+              "training_matches": 206,
+              "weight": 0.02799394923098413
+            }
+          ],
+          "unknown_terms": 0
+        },
+        "teammate": {
+          "active": true,
+          "interpretation": "association; independent feature benefit not established",
+          "label": "Gelernte Team-Paarterme",
+          "modeled_logit": -0.014025342932781187,
+          "status": "LEARNED",
+          "terms": [
+            {
+              "amount": 1.0,
+              "feature": "pair:5:61",
+              "logit_contribution": -0.01304787469110334,
+              "status": "LEARNED",
+              "subjects": [
+                "Gene",
+                "GUS"
+              ],
+              "training_matches": 51,
+              "weight": -0.01304787469110334
+            },
+            {
+              "amount": 1.0,
+              "feature": "pair:9:61",
+              "logit_contribution": -0.0009774682416778468,
+              "status": "LEARNED",
+              "subjects": [
+                "Mortis",
+                "GUS"
+              ],
+              "training_matches": 100,
+              "weight": -0.0009774682416778468
+            }
+          ],
+          "unknown_terms": 0
+        }
+      },
+      "missing_evidence": [
+        "mechanics/terrain/roles not modeled",
+        "uncertainty interval UNKNOWN",
+        "current patch applicability UNKNOWN",
+        "no causal or independently validated family attribution"
+      ],
+      "ranking_limit": "Bei diesem Last Pick unterscheiden nur additive gelernte Brawler-, Map-/Modus- und Team-Paarterme die Kandidaten. Keine aktive gegnerspezifische Pick-Interaktion; keine belegte Anti-Tank-, Kontroll- oder Rollenbegr\u00fcndung.",
+      "search": {
+        "active": false,
+        "independent_bonus": false,
+        "status": "LAST_PICK_NO_FUTURE_MOVES"
+      },
+      "total_logit": -0.1508015335093774
+    },
+    "shade": {
+      "background_logit": -0.22788768984639526,
+      "candidate_logit": 0.0855579046986144,
+      "comparison": {
+        "background_interpretation": "shared_fixed_draft_cancels",
+        "background_logit_difference": 2.7755575615628914e-17,
+        "candidate_family_logit_differences": {
+          "enemy": null,
+          "individual": -0.010906421402512745,
+          "map": 0.004274993329886134,
+          "mode": -0.01827222981638306,
+          "teammate": -0.007301025151781031
+        },
+        "interpretation": "exact_model_decomposition_not_causal_effect_or_significance",
+        "probability_difference_pp": -0.8019013966028721,
+        "reference_name": "WENDY",
+        "reference_slug": "wendy",
+        "total_logit_difference": -0.032204683040790674,
+        "uncertainty_of_difference": "UNKNOWN"
+      },
+      "families": {
+        "enemy": {
+          "active": false,
+          "interpretation": "not included in active model",
+          "label": "Gegnerspezifische Paarterme",
+          "modeled_logit": null,
+          "status": "INACTIVE",
+          "terms": [],
+          "unknown_terms": 0
+        },
+        "individual": {
+          "active": true,
+          "interpretation": "association; independent feature benefit not established",
+          "label": "Brawler-Beitrag",
+          "modeled_logit": 0.07611971395129477,
+          "status": "LEARNED",
+          "terms": [
+            {
+              "amount": 1.0,
+              "feature": "brawler:85",
+              "logit_contribution": 0.07611971395129477,
+              "status": "LEARNED",
+              "subjects": [
+                "SHADE"
+              ],
+              "training_matches": 979,
+              "weight": 0.07611971395129477
+            }
+          ],
+          "unknown_terms": 0
+        },
+        "map": {
+          "active": true,
+          "interpretation": "association; independent feature benefit not established",
+          "label": "Map-Beitrag",
+          "modeled_logit": 0.005120392847305992,
+          "status": "LEARNED",
+          "terms": [
+            {
+              "amount": 1.0,
+              "feature": "brawler_map:Hideout:85",
+              "logit_contribution": 0.005120392847305992,
+              "status": "LEARNED",
+              "subjects": [
+                "SHADE"
+              ],
+              "training_matches": 34,
+              "weight": 0.005120392847305992
+            }
+          ],
+          "unknown_terms": 0
+        },
+        "mode": {
+          "active": true,
+          "interpretation": "association; independent feature benefit not established",
+          "label": "Modus-Beitrag",
+          "modeled_logit": 0.014038233716219983,
+          "status": "LEARNED",
+          "terms": [
+            {
+              "amount": 1.0,
+              "feature": "brawler_context:bounty:85",
+              "logit_contribution": 0.014038233716219983,
+              "status": "LEARNED",
+              "subjects": [
+                "SHADE"
+              ],
+              "training_matches": 163,
+              "weight": 0.014038233716219983
+            }
+          ],
+          "unknown_terms": 0
+        },
+        "teammate": {
+          "active": true,
+          "interpretation": "association; independent feature benefit not established",
+          "label": "Gelernte Team-Paarterme",
+          "modeled_logit": -0.009720435816206338,
+          "status": "LEARNED",
+          "terms": [
+            {
+              "amount": 1.0,
+              "feature": "pair:5:85",
+              "logit_contribution": -0.006808433267811501,
+              "status": "LEARNED",
+              "subjects": [
+                "Gene",
+                "SHADE"
+              ],
+              "training_matches": 24,
+              "weight": -0.006808433267811501
+            },
+            {
+              "amount": 1.0,
+              "feature": "pair:9:85",
+              "logit_contribution": -0.002912002548394836,
+              "status": "LEARNED",
+              "subjects": [
+                "Mortis",
+                "SHADE"
+              ],
+              "training_matches": 26,
+              "weight": -0.002912002548394836
+            }
+          ],
+          "unknown_terms": 0
+        }
+      },
+      "missing_evidence": [
+        "mechanics/terrain/roles not modeled",
+        "uncertainty interval UNKNOWN",
+        "current patch applicability UNKNOWN",
+        "no causal or independently validated family attribution"
+      ],
+      "ranking_limit": "Bei diesem Last Pick unterscheiden nur additive gelernte Brawler-, Map-/Modus- und Team-Paarterme die Kandidaten. Keine aktive gegnerspezifische Pick-Interaktion; keine belegte Anti-Tank-, Kontroll- oder Rollenbegr\u00fcndung.",
+      "search": {
+        "active": false,
+        "independent_bonus": false,
+        "status": "LAST_PICK_NO_FUTURE_MOVES"
+      },
+      "total_logit": -0.14232978514778086
+    },
+    "wendy": {
+      "background_logit": -0.2278876898463953,
+      "candidate_logit": 0.11776258773940511,
+      "comparison": {
+        "background_interpretation": "shared_fixed_draft_cancels",
+        "background_logit_difference": -2.7755575615628914e-17,
+        "candidate_family_logit_differences": {
+          "enemy": null,
+          "individual": 0.010906421402512745,
+          "map": -0.004274993329886134,
+          "mode": 0.01827222981638306,
+          "teammate": 0.007301025151781031
+        },
+        "interpretation": "exact_model_decomposition_not_causal_effect_or_significance",
+        "probability_difference_pp": 0.8019013966028721,
+        "reference_name": "SHADE",
+        "reference_slug": "shade",
+        "total_logit_difference": 0.032204683040790674,
+        "uncertainty_of_difference": "UNKNOWN"
+      },
+      "families": {
+        "enemy": {
+          "active": false,
+          "interpretation": "not included in active model",
+          "label": "Gegnerspezifische Paarterme",
+          "modeled_logit": null,
+          "status": "INACTIVE",
+          "terms": [],
+          "unknown_terms": 0
+        },
+        "individual": {
+          "active": true,
+          "interpretation": "association; independent feature benefit not established",
+          "label": "Brawler-Beitrag",
+          "modeled_logit": 0.08702613535380752,
+          "status": "LEARNED",
+          "terms": [
+            {
+              "amount": 1.0,
+              "feature": "brawler:106",
+              "logit_contribution": 0.08702613535380752,
+              "status": "LEARNED",
+              "subjects": [
+                "WENDY"
+              ],
+              "training_matches": 929,
+              "weight": 0.08702613535380752
+            }
+          ],
+          "unknown_terms": 0
+        },
+        "map": {
+          "active": true,
+          "interpretation": "association; independent feature benefit not established",
+          "label": "Map-Beitrag",
+          "modeled_logit": 0.0008453995174198577,
+          "status": "LEARNED",
+          "terms": [
+            {
+              "amount": 1.0,
+              "feature": "brawler_map:Hideout:106",
+              "logit_contribution": 0.0008453995174198577,
+              "status": "LEARNED",
+              "subjects": [
+                "WENDY"
+              ],
+              "training_matches": 29,
+              "weight": 0.0008453995174198577
+            }
+          ],
+          "unknown_terms": 0
+        },
+        "mode": {
+          "active": true,
+          "interpretation": "association; independent feature benefit not established",
+          "label": "Modus-Beitrag",
+          "modeled_logit": 0.03231046353260304,
+          "status": "LEARNED",
+          "terms": [
+            {
+              "amount": 1.0,
+              "feature": "brawler_context:bounty:106",
+              "logit_contribution": 0.03231046353260304,
+              "status": "LEARNED",
+              "subjects": [
+                "WENDY"
+              ],
+              "training_matches": 165,
+              "weight": 0.03231046353260304
+            }
+          ],
+          "unknown_terms": 0
+        },
+        "teammate": {
+          "active": true,
+          "interpretation": "association; independent feature benefit not established",
+          "label": "Gelernte Team-Paarterme",
+          "modeled_logit": -0.0024194106644253068,
+          "status": "LEARNED",
+          "terms": [
+            {
+              "amount": 1.0,
+              "feature": "pair:5:106",
+              "logit_contribution": -0.013721662995056772,
+              "status": "LEARNED",
+              "subjects": [
+                "Gene",
+                "WENDY"
+              ],
+              "training_matches": 24,
+              "weight": -0.013721662995056772
+            },
+            {
+              "amount": 1.0,
+              "feature": "pair:9:106",
+              "logit_contribution": 0.011302252330631465,
+              "status": "LEARNED",
+              "subjects": [
+                "Mortis",
+                "WENDY"
+              ],
+              "training_matches": 61,
+              "weight": 0.011302252330631465
+            }
+          ],
+          "unknown_terms": 0
+        }
+      },
+      "missing_evidence": [
+        "mechanics/terrain/roles not modeled",
+        "uncertainty interval UNKNOWN",
+        "current patch applicability UNKNOWN",
+        "no causal or independently validated family attribution"
+      ],
+      "ranking_limit": "Bei diesem Last Pick unterscheiden nur additive gelernte Brawler-, Map-/Modus- und Team-Paarterme die Kandidaten. Keine aktive gegnerspezifische Pick-Interaktion; keine belegte Anti-Tank-, Kontroll- oder Rollenbegr\u00fcndung.",
+      "search": {
+        "active": false,
+        "independent_bonus": false,
+        "status": "LAST_PICK_NO_FUTURE_MOVES"
+      },
+      "total_logit": -0.11012510210699018
+    }
+  },
+  "v2_model": "v2-composition-logit-1",
+  "v2_top": [
+    {
+      "p_win": 0.47249651465386483,
+      "slug": "wendy"
+    },
+    {
+      "p_win": 0.4644775006878361,
+      "slug": "shade"
+    },
+    {
+      "p_win": 0.4623709002105556,
+      "slug": "gus"
+    },
+    {
+      "p_win": 0.4608785168716052,
+      "slug": "belle"
+    }
+  ]
+}

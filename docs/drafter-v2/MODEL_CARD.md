@@ -58,3 +58,14 @@ candidate rejected. No mechanics features or active/default-engine change.
 Status: usable opt-in experimental Challenger, **NOT PROMOTED**. Full product,
 metrics, testing limits, provenance, logging bias and next evidence requirements:
 CHALLENGER_REPORT.md. Local preview is development-only; no live deployment.
+
+
+## D-017 explanation scope
+Active artifact and predictions remain unchanged. Runtime diagnostics separate
+candidate individual/mode/map/team terms from shared whole-draft background.
+Enemy-specific interaction is inactive in selected V; fixed Last-Pick enemies
+cannot explain candidate ordering beyond legality under this additive model.
+Earlier-phase background can differ through hypothetical search continuations.
+UI exposes UNKNOWN missing terms/uncertainty and additive-only explanation limits.
+See HIDEOUT_DIAGNOSTIC.md for measured Wendy/Gus/Belle decomposition; no causal
+anti-tank/control/role story or family-level validation claim.

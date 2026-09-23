@@ -122,3 +122,13 @@ preregistered future outcome evidence; the closed holdout is not reusable.
 No new collector was run, no mechanics facts fabricated, and no model promotion
 was inferred from working UI/API or user snapshots. Browser DOM/visual automation
 was unavailable; HTTP/static/CSRF and V8 syntax checks have narrower validation scope.
+
+
+## D-017 Hideout diagnostic limitations
+User-reported normal Sprout/Carl/Gray ranking cannot be reproduced on the isolated
+instance; its exact request/session/provider snapshot is unavailable. Difference
+UNKNOWN. New receipt and same-session check expose these inputs going forward.
+Active V lacks candidate-enemy interactions, role/terrain/mechanics attribution,
+composition-specific uncertainty and established current-patch applicability.
+Feature support counts do not establish six-brawler composition support or causal
+benefit. See HIDEOUT_DIAGNOSTIC.md; no data invented or newly collected.
