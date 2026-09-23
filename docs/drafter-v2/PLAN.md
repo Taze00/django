@@ -145,3 +145,15 @@ storage and dated conditional explanations are available through
 `drafter.services.v2_mechanics_claims`; see MECHANICS_CLAIM_ARCHIVE.md.
 This is not general Phase 5B or a current-state consumer. Next: a separately bounded
 revalidation protocol and reviewed revision/conflict contract before current use.
+
+## Active autonomous continuation — D-012 (supersedes earlier research pauses)
+
+The latest user instruction authorizes experimental product integration and
+Train/Validation-only development. Promotion and the sealed holdout stay gated.
+1. DONE: opt-in `/draft/challenger/`, Last-Pick API, safe artifact loader and
+   development-only trainer. Existing 300-epoch model reproduced on Train/Validation.
+2. NEXT: D-013 bounded opponent-interaction experiment in CHALLENGER_PROTOCOL.md.
+3. Then complete-composition Mid/First planning with explicit approximation bounds.
+4. Then experimental side-by-side Legacy comparison and versioned draft snapshots.
+5. Broad regressions, operational documentation, honest final evidence limitations.
+Continue after test/document/commit/push; no routine milestone approval.

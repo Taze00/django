@@ -131,3 +131,14 @@ calibrated, patch-comparable or suitable for promotion.
 and explanation tests. These validate provenance preservation and rejection
 behavior, not gameplay accuracy, current source freshness or prediction quality.
 No dataset/model/holdout evaluation performed; sealed results remain unchanged.
+
+## D-012 development-only recovery
+
+User now authorizes Train/Validation experimentation, superseding the earlier
+blanket ban on training. Historical holdout remains closed; old commands remain
+unsuitable. `drafter_v2_challenger_train` verifies frozen membership metadata and
+loads only the two development partitions. See CHALLENGER_PROTOCOL.md and
+CHALLENGER_BASELINE.json. Validation reproduced LogLoss 0.6886038069604661,
+Brier 0.24774078927297735 (n=2,031); no new holdout metric.
+Train example digest: 5e8ff094ad9f93ed565bcaed9f725ffd7d78dd67c22e31c7b6aaed6cd2cec447.
+Validation digest: 4b2806db07d35e20dd8a0e6e76bef74dd928706b90e6615a3b2f64776c3df797.

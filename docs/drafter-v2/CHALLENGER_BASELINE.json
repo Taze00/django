@@ -1,0 +1,55 @@
+{
+  "artifact_sha256": "5ca00558a6ac36d475a673c5ed6563d4697f151575c65fbdae69a8d5717b2e7c",
+  "implementation_note": "Run used base revision 24893b5 plus the D-012 implementation committed with this report; revision is the base, not the complete source tree.",
+  "limitations": [
+    "Current patch applicability UNKNOWN",
+    "Skill/builds UNKNOWN",
+    "No calibrated uncertainty interval",
+    "No independent promotion evidence"
+  ],
+  "provenance": {
+    "freeze_sha256": "2bb8222b9025a5da7daadea8b9a252c39b16bcda8b07b9bc2df69315ea4dcf9e",
+    "holdout_access": "membership_digest_only_no_examples_or_predictions",
+    "revision": "24893b5",
+    "train": {
+      "examples_sha256": "5e8ff094ad9f93ed565bcaed9f725ffd7d78dd67c22e31c7b6aaed6cd2cec447",
+      "first": "2026-08-29T00:48:08+00:00",
+      "last": "2026-09-17T21:43:04+00:00",
+      "n": 6094
+    },
+    "validation": {
+      "examples_sha256": "4b2806db07d35e20dd8a0e6e76bef74dd928706b90e6615a3b2f64776c3df797",
+      "first": "2026-09-17T21:43:13+00:00",
+      "last": "2026-09-18T08:34:00+00:00",
+      "n": 2031
+    }
+  },
+  "schema": "drafter-v2-challenger-1",
+  "status": "EXPERIMENTAL_NOT_PROMOTED",
+  "validation": {
+    "brier": 0.24774078927297735,
+    "calibration": [
+      {
+        "lower": 0.2,
+        "mean_predicted": 0.3933045631688641,
+        "n": 9,
+        "observed_rate": 0.6666666666666666
+      },
+      {
+        "lower": 0.4,
+        "mean_predicted": 0.5059642585261973,
+        "n": 2001,
+        "observed_rate": 0.49375312343828087
+      },
+      {
+        "lower": 0.6,
+        "mean_predicted": 0.6179805317006303,
+        "n": 21,
+        "observed_rate": 0.7619047619047619
+      }
+    ],
+    "log_loss": 0.6886038069604661,
+    "n": 2031,
+    "status": "ok"
+  }
+}

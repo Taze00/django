@@ -89,3 +89,12 @@ D-010 bounded follow-up additions:
   idempotence and use-boundary tests; standard library only.
 - `docs/drafter-v2/MECHANICS_CLAIM_ARCHIVE.md`: reproduction and scope limits.
 No Django model, migration, endpoint or scoring consumer added.
+
+## Experimental Challenger (D-012)
+
+`v2_challenger_training.py` / `drafter_v2_challenger_train`: verified development
+partitions and model/provenance/support artifact (ignored data/brawl_reports).
+`v2_challenger.py`: validated model runtime and Last-Pick ranking.
+`views/challenger.py`, Drafter URLs, `templates/drafter/challenger.html` and
+`static/drafter/challenger.js`: separate opt-in UI/API; Legacy flow untouched.
+`test_v2_challenger.py`: endpoint/model/legality/holdout access regression contracts.

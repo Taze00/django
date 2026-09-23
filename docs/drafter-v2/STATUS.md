@@ -1,7 +1,15 @@
-RESUME FROM: D-011 offline reviewed-claim archive completed. Source research D-009/D-010 remains complete. The new module stores exact reviewed annotation bytes and renders archived source statements only. Current reuse still requires a bounded source revalidation protocol; do not enable current UI/features from the archived timestamp. No collector, model or sealed evaluation work. See MECHANICS_CLAIM_ARCHIVE.md.
+RESUME FROM: D-012 functional experimental Last-Pick challenger implemented and validated. Continue D-013 preregistered Train/Validation-only opponent-interaction experiment, then complete-state Mid/First planning and side-by-side UI. See CHALLENGER_PROTOCOL.md. Mechanics research is complete and deferred. Legacy default; sealed holdout stays closed.
+
 
 
 # Drafter V2 Status
+
+D-012 complete: experimental Last-Pick UI/API, validated model loader and
+Train/Validation-only trainer. 35 focused tests passed; isolated real page/API
+smoke 200/200, 100 legal recommendations, 43.606 ms. Artifact local at
+`data/brawl_reports/v2_challenger.json`; no production deployment. Baseline report
+committed in CHALLENGER_BASELINE.json. Next D-013 per CHALLENGER_PROTOCOL.md.
+
 
 Latest completed milestone — D-011 reviewed annotation archive:
 - Continued from clean 894148b after user instruction to continue.

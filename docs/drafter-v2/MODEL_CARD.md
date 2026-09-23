@@ -23,3 +23,12 @@ Known limitations: objective mechanics are still only partially sourced; player-
 The offline claim archive has no connection to model inputs, training, predictions
 or ranking. Dated explanations do not establish present-day applicability or
 predictive benefit. Legacy remains the active/default scorer; model gates unchanged.
+
+## D-012 experimental runtime
+
+An opt-in Last-Pick Challenger now loads the existing composition model from an
+explicit local artifact; Legacy remains default. This supersedes “no V2 model is
+active” only for the experimental surface, not production promotion. Training:
+6,094 examples through 2026-09-17T21:43:04Z; validation: 2,031 through
+2026-09-18T08:34:00Z. Actual matchup uncertainty/current patch applicability remain
+UNKNOWN. Candidate features without training support are exposed, not fabricated.

@@ -89,3 +89,11 @@ Body availability is NOT_CHECKED; current validity remains UNKNOWN. A pinned
 annotation digest establishes review identity, not server currency. New revisions
 require evidence review; persistent conflict resolution and current revalidation
 are not implemented. All D-010 unit/loadout/temporal gaps remain unchanged.
+
+## D-012 product integration
+
+Temporary historical artifacts were unavailable. Original development membership
+was recovered against its known aggregate digest without loading holdout examples.
+This enables experimental Train/Validation work, not independent validation or
+current-patch confidence. A fresh uninspected test window remains necessary for
+promotion. No new mechanics or player/loadout facts were added.

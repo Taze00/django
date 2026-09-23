@@ -437,3 +437,26 @@ revision admission/quarantine resolution, fresh current use and Django consumers
 remain separate work. Original publisher bodies are not copied or claimed present.
 No numeric features, loadout inference, temporal joins or model changes. Validation:
 31 offline tests; CLI archive/read replay. Usage: MECHANICS_CLAIM_ARCHIVE.md.
+
+## D-012 — functional experimental challenger, separate from promotion
+
+Latest user instruction prioritizes usable Last Pick and allows Train/Validation
+experiments. Earlier blanket pauses on V2 integration are superseded; no automatic
+promotion or old holdout evaluation. Mechanics work stays preserved and deferred.
+Missing temporary model files are recovered by verifying the original ordered
+membership digest via structural metadata, then loading only 6,094 Train and 2,031
+Validation examples. SQL never selects holdout labels/teams; the complete membership
+digest check uses eligibility predicates, including known-result status, only.
+Training is read-only, deterministic and uses the already selected 300 epochs/L2 1.
+
+Separate `/draft/challenger/` and `/draft/api/challenger/` opt in explicitly.
+No change to Legacy endpoint/scoring. Model loader validates versions, finite
+weights, feature/support alignment and catalog identities. Unknown maps fail closed;
+unknown candidate main effects are reported unavailable. Probabilities carry
+experimental/unknown-uncertainty labels and actual joint model contributions.
+Support is number of training matches containing a feature, not causal evidence.
+
+Validation: 35 focused model/search/API/recovery tests passed (7.134 s); real isolated
+page/API smoke returned 200/200, 100 legal recommendations, 43.606 ms measured
+service time in one request. This is a smoke timing, not a production percentile.
+No live rollout, DB mutation, collector, mechanics features or held-out evaluation.

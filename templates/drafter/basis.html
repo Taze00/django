@@ -28,6 +28,7 @@ zaehlt, steht in draft.css. Mehrzeilig nur mit comment-Tag - {# #} gilt fuer ein
   </a>
   <nav class="kopf-nav">
     <a href="{% url 'drafter:draft' %}"{% if aktiv == 'draft' %} class="ist-aktiv"{% endif %}>Drafter</a>
+    <a href="{% url 'drafter:challenger' %}">V2 Labor</a>
     <a href="{% url 'drafter:meine_brawler' %}"{% if aktiv == 'brawler' %} class="ist-aktiv"{% endif %}>Meine Brawler</a>
     {% if user.is_authenticated %}
       <form method="post" action="{% url 'drafter:logout' %}" class="kopf-abmelden">
