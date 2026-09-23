@@ -1,0 +1,13 @@
+{
+  "at": "2026-09-23T21:51:32.564385+00:00",
+  "collection_started": false,
+  "frontier_due": 0,
+  "frontier_size": 3,
+  "holdout_read": false,
+  "new_api_soloRanked": 0,
+  "new_api_trophy_ranked": 125,
+  "next_fetch_after_min": "2026-09-23 23:39:17.371841+00:00",
+  "read_only": true,
+  "shadow_integrity_failures": 0,
+  "shadow_snapshots": 0
+}

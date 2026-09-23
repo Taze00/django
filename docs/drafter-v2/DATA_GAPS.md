@@ -135,3 +135,6 @@ benefit. See HIDEOUT_DIAGNOSTIC.md; no data invented or newly collected.
 
 
 D-018: shadow entries have no verified real-match identity, played-at time, outcome or selection probability. Recommendation exposure is recorded, display/attention is unverified. Repeated requests are not deduplicated matches. No causal or independent-test inference.
+
+
+D-019 readiness: zero new API soloRanked, three frontier members/zero due at 21:51:32 UTC; earliest next_fetch_after 23:39:17 UTC. Zero real shadow records; no outcomes fabricated. Frozen restorable Train-only Legacy inputs are not yet established: context hashes do not prove lineage. No new independent evaluation window is registered or claimed ready.

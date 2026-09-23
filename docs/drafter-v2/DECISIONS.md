@@ -558,3 +558,6 @@ Legacy scoring functions unchanged. Scientific promotion gate remains closed.
 
 
 D-018: reuse additive Praxisfall metadata for opt-in pre-choice capture and append-only user-report history under row lock. No migration or inferred choice/result. Both engine outputs persist; unsupported legal picks have null V2 rank. Shadow cohort remains self-selected, unverified and ineligible for automatic training/independent test. See SHADOW_EVALUATION.md for contracts and 19 passing tests.
+
+
+D-019: keep self-selected shadow reports separate from official future soloRanked admission. Pure preregistration contract plus read-only temporal DB adapter, exclusive manifest publication, content/raw provenance hashes and verification without metrics. Minimum 1,000 is a preregistered operational floor, not evidence of power. No real registration until input lineage and frozen bundles are audited; current Legacy receipt is insufficient. Calendar dates remain unregistered rather than invented. Tests and actual cooldown evidence: FUTURE_EVALUATION_PROTOCOL.md.

@@ -72,3 +72,6 @@ anti-tank/control/role story or family-level validation claim.
 
 
 D-018: models unchanged. Optional shadow requests preserve both responses before choice; later reports are unverified and excluded from training. No promotion or quality claim.
+
+
+D-019: active V unchanged; opponent feature rejection retained. Shadow and future membership code do not fit models or promote candidates. Future fair comparison requires a genuinely frozen Train-only Legacy input bundle; current runtime hashes do not establish it.

@@ -134,3 +134,6 @@ or default Legacy path changes.
 
 
 D-018: v2_snapshots stores canonical response digest, context/bias provenance and row-locked user-report history. challenger view exposes explicit authenticated shadow_capture; existing result endpoint also accepts chosen. Challenger UI offers capture and later reporting/replay. No other app/default Legacy path changed.
+
+
+D-019: services/v2_future_window.py supplies pure preregistration/seal/publication/integrity contracts; management/commands/drafter_v2_future_window.py supplies read-only temporal inventory and optional sealing/verification. docs shadow_frontier_readiness.py audits counts/cooldowns without credentials or holdout data. No evaluator, collector schedule, migration or shared-app change.

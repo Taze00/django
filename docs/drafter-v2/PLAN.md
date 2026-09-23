@@ -195,3 +195,6 @@ The existing experimental phase completions and independent-evidence gate stand.
 
 
 D-018 complete: opt-in pre-choice shadow persistence and audited reports. Next D-019: future-only protocol, immutable membership and eligibility safeguards; then bounded frontier readiness audit. No routine approval pause.
+
+
+D-019 complete: future-only protocol/membership preparation, atomic publication and integrity verification. No real registration/test seal. Collection blocked by zero due frontier players at audit; future evaluation blocked by absent new eligible Ranked evidence. Before arming, verified Train-only Legacy bundle and prospective dates are required. See FUTURE_EVALUATION_PROTOCOL.md.

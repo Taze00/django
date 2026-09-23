@@ -130,3 +130,12 @@ the old historical train/evaluate/freeze commands for further selection. Return
 to `/draft/` for Legacy; no model migration is needed. Disable/remove the configured
 experimental model path to fail closed, preserving prior artifacts. Keep additive
 snapshot fields/data when rolling code back; do not drop logs to switch engines.
+
+
+## D-018/D-019 follow-up
+Opt-in pre-choice shadow capture now preserves both responses and explicit bias;
+later choice/outcome corrections append owner-bound report history. Unsupported
+legal picks may be recorded without an invented V2 rank. No automatic training.
+Future-window admission/sealing infrastructure and protocol are prepared, not a
+registered/evaluated test. Current data/cooldown evidence and prerequisites:
+SHADOW_EVALUATION.md, FUTURE_EVALUATION_PROTOCOL.md and STATUS.md.
