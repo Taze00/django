@@ -192,3 +192,6 @@ CHALLENGER_RUNBOOK.md. Legacy remains default and data remain preserved.
 Concrete Hideout parity and additive explanation are implemented and tested;
 see HIDEOUT_DIAGNOSTIC.md. No ranking tuning/retraining or new mechanics.
 The existing experimental phase completions and independent-evidence gate stand.
+
+
+D-018 complete: opt-in pre-choice shadow persistence and audited reports. Next D-019: future-only protocol, immutable membership and eligibility safeguards; then bounded frontier readiness audit. No routine approval pause.

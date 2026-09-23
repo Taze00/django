@@ -17,6 +17,8 @@
     <fieldset><legend>Gegnerteam · offene Plätze leer lassen</legend><div id="challenger-enemy"></div></fieldset>
     <p><label>Bans · bis zu sechs <select id="challenger-bans" multiple size="6"></select></label></p>
     <p><label><input id="challenger-compare" type="checkbox"> Legacy daneben anzeigen</label></p>
+    {% if user.is_authenticated %}<p><label><input id="challenger-shadow" type="checkbox"> Shadow-Protokoll: jede Berechnung mit beiden Empfehlungen vor der Auswahl speichern</label></p>
+    <p>Selbst ausgewählte Beobachtungen, kein unabhängiger Test. Pick und Ergebnis bleiben offen, bis du sie angibst. Kein automatisches Training.</p>{% endif %}
     <button type="submit" id="challenger-submit" disabled>Pick berechnen</button>
   </form>
   <p id="challenger-status" role="status" aria-live="polite">Katalog wird geladen …</p>

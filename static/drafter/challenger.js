@@ -19,7 +19,7 @@
       if (!response.ok) throw Error('Gespeicherte Drafts nicht verfügbar');
       const data = await response.json(); snapshots.replaceChildren();
       for (const saved of data.snapshots) {
-        const row = element('div', `#${saved.id} · ${saved.chosen} · ${saved.model_version} · ${saved.at} `);
+        const row = element('div', `#${saved.id} · ${saved.chosen || "Pick unbekannt"} · ${saved.model_version} · ${saved.at} `);
         const select = document.createElement('select'); select.setAttribute('aria-label', `Ergebnis für Draft ${saved.id}`);
         for (const [value, label] of [['unknown', 'Ergebnis unbekannt'], ['win', 'Sieg'], ['loss', 'Niederlage']]) select.add(new Option(label, value));
         select.value = saved.result;
@@ -41,7 +41,13 @@
             content.append(element('p', `Eigene Picks: ${detail.draft.own.join(', ')} · Gegner: ${detail.draft.enemy.join(', ')} · Bans: ${detail.draft.bans.join(', ')}`));
             const list = document.createElement('ol');
             for (const item of detail.snapshot.recommendations) list.append(element('li', `${item.name}: ${(item.p_win * 100).toFixed(1)} % Modellschätzung`));
-            content.append(list); row.append(content);
+            content.append(list);
+            const evidence = document.createElement('pre'); evidence.textContent = JSON.stringify({legacy: detail.snapshot.legacy, metadata: detail.metadata}, null, 2); content.append(evidence);
+            const chosen = document.createElement('select'); chosen.setAttribute('aria-label', 'Tatsächlich gewählter Pick'); chosen.add(new Option('Pick angeben', ''));
+            for (const slug of detail.snapshot.legacy?.receipt.candidate_pool || detail.snapshot.recommendations.map(r => r.slug)) chosen.add(new Option(slug, slug));
+            const report = element('button', 'Pick melden'); report.type = 'button';
+            report.addEventListener('click', async () => { try { await post(`${form.dataset.snapshots}${saved.id}/result/`, {chosen: chosen.value}); await loadSnapshots(); } catch (error) { status.textContent = error.message; } });
+            content.append(chosen, report); row.append(content);
           } catch (error) { status.textContent = error.message; inspect.disabled = false; }
         });
         row.append(inspect); snapshots.append(row);
@@ -75,7 +81,7 @@
     const picks = side => [...form.querySelectorAll(`[data-side="${side}"]`)].map(s => s.value).filter(Boolean);
     try {
       const response = await fetch(form.dataset.endpoint, {method: 'POST', headers: {'Content-Type': 'application/json', 'X-CSRFToken': form.querySelector('[name=csrfmiddlewaretoken]').value},
-        body: JSON.stringify({map: maps.value, own_picks: picks('own'), enemy_picks: picks('enemy'), bans: [...bans.selectedOptions].map(o => o.value), own_team_first_pick: document.getElementById('challenger-first').checked, compare_legacy: document.getElementById('challenger-compare').checked})});
+        body: JSON.stringify({map: maps.value, own_picks: picks('own'), enemy_picks: picks('enemy'), bans: [...bans.selectedOptions].map(o => o.value), own_team_first_pick: document.getElementById('challenger-first').checked, compare_legacy: document.getElementById('challenger-compare').checked, shadow_capture: document.getElementById('challenger-shadow')?.checked || false})});
       const data = await response.json(); if (!response.ok) throw Error(data.fehler || 'Anfrage fehlgeschlagen');
       if (version !== requestVersion) return;
       status.textContent = `${data.model_version} · ${data.recommendations.length} Kandidaten · ${data.elapsed_ms} ms · experimentell`;
@@ -115,6 +121,7 @@
         }
         results.append(table);
       }
+      if (data.snapshot_id) { results.append(element('p', `Shadow-Snapshot #${data.snapshot_id} gespeichert; Pick und Ergebnis noch unbekannt.`)); await loadSnapshots(); }
       for (const item of data.recommendations) {
         const details = document.createElement('details');
         details.append(element('summary', `${item.name} · Modellschätzung ${(item.p_win * 100).toFixed(1)} %`));
@@ -153,7 +160,7 @@
           save.addEventListener('click', async () => {
             save.disabled = true;
             try {
-              const saved = await post(form.dataset.snapshots, {token: data.snapshot_token, chosen: item.slug});
+              const saved = data.snapshot_id ? await post(`${form.dataset.snapshots}${data.snapshot_id}/result/`, {chosen: item.slug}) : await post(form.dataset.snapshots, {token: data.snapshot_token, chosen: item.slug});
               status.textContent = `Draft #${saved.id} gespeichert. Ergebnis kann später ergänzt werden.`;
               await loadSnapshots();
             } catch (error) { status.textContent = error.message; save.disabled = false; }

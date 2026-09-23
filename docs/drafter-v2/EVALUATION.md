@@ -188,3 +188,6 @@ attribution, Legacy parity and resolved context/data hashes. No outcomes queried
 model fit, holdout access or improvement claim. 52 focused regressions passed;
 real repeatable-read endpoint parity and local HTTP smoke passed. Differences in
 rank/probability are not evidence of draft quality or statistical significance.
+
+
+D-018: shadow capture is descriptive observation only; no LogLoss/Brier claims from unverified self-reported outcomes or hypothetical early-pick continuations. Keep this cohort outside future independent evaluation membership.

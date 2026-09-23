@@ -1,3 +1,5 @@
+RESUME FROM: D-018 shadow capture complete; next implement future-window protocol and immutable membership safeguards. Earlier independent-evidence gate still applies to quality claims, not this authorized infrastructure work.
+
 RESUME FROM: D-017 Hideout diagnostic and exact Legacy adapter complete. See HIDEOUT_DIAGNOSTIC.md. D-016 autonomous experimental product checkpoint remains complete. Working First/Mid/Last Challenger, side-by-side Legacy and versioned snapshots are implemented. Remaining stop is scientific: independent future Ranked evaluation evidence unavailable; fixed opponent-interaction experiment failed Validation. Do not reopen old holdout, repeat completed mechanics research or promote by assumption. Full report: CHALLENGER_REPORT.md; operations: CHALLENGER_RUNBOOK.md.
 
 # Drafter V2 Status
@@ -10,6 +12,9 @@ Overall:
 - Blocker: no independent eligible future test window in completed collection evidence;
   no observed Validation improvement from the preregistered opponent feature grid.
 - No current-patch, calibrated-uncertainty or superior-draft-quality claim.
+
+Latest D-018 validation: 19 focused tests passed (3.063 s), V8 parse passed.
+Opt-in pre-choice capture, audited later pick/result reporting, both-engine replay and bias provenance implemented. No model/data collection/holdout changes. See SHADOW_EVALUATION.md.
 
 Latest validation (D-017):
 - 52 focused tests passed (9.145 s); real read-only Hideout endpoint parity passed.

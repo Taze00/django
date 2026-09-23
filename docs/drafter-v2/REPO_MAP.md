@@ -131,3 +131,6 @@ changes. Challenger UI shows receipts, normal-endpoint verification, relative
 terms and evidence limits. `docs/drafter-v2/hideout_diagnostic.py` is a read-only
 runtime reproducer; matching JSON/Markdown retain measured evidence. No other app
 or default Legacy path changes.
+
+
+D-018: v2_snapshots stores canonical response digest, context/bias provenance and row-locked user-report history. challenger view exposes explicit authenticated shadow_capture; existing result endpoint also accepts chosen. Challenger UI offers capture and later reporting/replay. No other app/default Legacy path changed.

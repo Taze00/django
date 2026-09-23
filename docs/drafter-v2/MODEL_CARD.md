@@ -69,3 +69,6 @@ Earlier-phase background can differ through hypothetical search continuations.
 UI exposes UNKNOWN missing terms/uncertainty and additive-only explanation limits.
 See HIDEOUT_DIAGNOSTIC.md for measured Wendy/Gus/Belle decomposition; no causal
 anti-tank/control/role story or family-level validation claim.
+
+
+D-018: models unchanged. Optional shadow requests preserve both responses before choice; later reports are unverified and excluded from training. No promotion or quality claim.

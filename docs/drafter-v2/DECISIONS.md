@@ -555,3 +555,6 @@ UNKNOWN evidence is not a measured zero. Search continuation is hypothetical,
 not a bonus. No independent tactical/causal attribution or uncertainty claim.
 Validation and exact evidence: HIDEOUT_DIAGNOSTIC.md/.json. All ranking/model and
 Legacy scoring functions unchanged. Scientific promotion gate remains closed.
+
+
+D-018: reuse additive Praxisfall metadata for opt-in pre-choice capture and append-only user-report history under row lock. No migration or inferred choice/result. Both engine outputs persist; unsupported legal picks have null V2 rank. Shadow cohort remains self-selected, unverified and ineligible for automatic training/independent test. See SHADOW_EVALUATION.md for contracts and 19 passing tests.

@@ -132,3 +132,6 @@ Active V lacks candidate-enemy interactions, role/terrain/mechanics attribution,
 composition-specific uncertainty and established current-patch applicability.
 Feature support counts do not establish six-brawler composition support or causal
 benefit. See HIDEOUT_DIAGNOSTIC.md; no data invented or newly collected.
+
+
+D-018: shadow entries have no verified real-match identity, played-at time, outcome or selection probability. Recommendation exposure is recorded, display/attention is unverified. Repeated requests are not deduplicated matches. No causal or independent-test inference.
