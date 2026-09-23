@@ -91,6 +91,10 @@ class Praxisfall(Zeitstempel):
                                     blank=True)
     notizen = models.TextField(blank=True)
 
+    # Additive Challenger provenance; legacy snapshots retain their original shape.
+    snapshot_key = models.CharField(max_length=64, unique=True, null=True, blank=True)
+    snapshot_metadata = models.JSONField(default=dict, blank=True)
+
     # Welche Fassung des Modells diesen Fall erzeugt hat.
     modellstand = models.CharField(max_length=80, blank=True)
 

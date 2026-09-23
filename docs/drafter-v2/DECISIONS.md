@@ -493,3 +493,25 @@ search facts, not proven tactical weaknesses or guarantees of a strongest respon
 First 105 candidates / 8,452 evaluated leaves / 770.071 ms; Mid 102 / 900 / 92.893 ms;
 Last 100 / 100 / 44.313 ms. One request each, not percentile/load-test evidence.
 No gameplay quality claim or new model fit; V stays the D-012 artifact.
+
+## D-015 — opt-in comparison and signed decision snapshots
+
+Legacy comparison is an explicit request flag; calls the unchanged engine and
+labels its heuristic scores separately from V2 probabilities. No quality inference
+from rank agreement. Default endpoint stays unchanged.
+Authenticated users may save a signed, owner-bound, two-hour decision snapshot
+and chosen recommended pick. Saving does not re-run a changed model. Idempotent
+unique snapshot key prevents duplicate writes; conflicting resaves are rejected.
+Only the owner can list/read snapshots or update their self-reported outcome.
+Recommendations remain immutable; user results are not verified match evidence.
+
+Reuse Praxisfall with additive nullable unique snapshot_key and JSON metadata
+(migration 0020). Legacy integer score remains null for V2 probabilities. Preserve
+model version, artifact hash, complete response/provenance/search, draft state and
+chosen rank. No ingestion, aggregates or trainer reads these rows. CSRF stays on.
+55 API/Praxisfall/comparison tests passed (15.225 s), then 12 final Challenger tests
+passed (1.595 s), including expiry/ownership/tampering/idempotence/private replay.
+Schema drift check clean. Applied 0020 only to isolated DB; zero pre-existing
+Praxisfall rows there, before/after legacy-field digests match. Legacy preservation
+with populated snapshots is covered by existing tests, not claimed as a real-data
+migration experiment. No production schema or server changes.

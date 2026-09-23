@@ -1,12 +1,14 @@
 {% extends "drafter/basis.html" %}
 {% load static %}
+{% block kopf_zusatz %}<link rel="stylesheet" href="{% static 'drafter/challenger.css' %}">{% endblock %}
+{% block koerperklasse %} challenger-page{% endblock %}
 {% block titel %}V2 Challenger{% endblock %}
 {% block inhalt %}
 <main class="seite">
   <h1>V2 Challenger</h1>
   <p>Experimentelles Kompositionsmodell. Legacy bleibt der Standard.
     Die Modellschätzung ist keine nachgewiesene aktuelle Siegchance; Unsicherheit und aktuelle Patch-Gültigkeit sind unbekannt.</p>
-  <form id="challenger-form" data-catalog="{% url 'drafter:api_katalog' %}" data-endpoint="{% url 'drafter:api_challenger' %}">
+  <form id="challenger-form" data-catalog="{% url 'drafter:api_katalog' %}" data-endpoint="{% url 'drafter:api_challenger' %}" data-snapshots="{% url 'drafter:api_challenger_snapshots' %}">
     {% csrf_token %}
     <p><label>Map <select id="challenger-map" required></select></label></p>
     <p><label><input id="challenger-first" type="checkbox"> Eigenes Team hat First Pick</label></p>
@@ -14,10 +16,16 @@
     <fieldset><legend>Eigenes Team · offene Plätze leer lassen</legend><div id="challenger-own"></div></fieldset>
     <fieldset><legend>Gegnerteam · offene Plätze leer lassen</legend><div id="challenger-enemy"></div></fieldset>
     <p><label>Bans · bis zu sechs <select id="challenger-bans" multiple size="6"></select></label></p>
+    <p><label><input id="challenger-compare" type="checkbox"> Legacy daneben anzeigen</label></p>
     <button type="submit" id="challenger-submit" disabled>Pick berechnen</button>
   </form>
   <p id="challenger-status" role="status" aria-live="polite">Katalog wird geladen …</p>
   <div id="challenger-results"></div>
+  {% if user.is_authenticated %}
+  <h2>Meine gespeicherten Drafts</h2>
+  <p>Protokollierte Entscheidungen fließen nicht ins Training ein. Ergebnisse sind eigene Angaben.</p>
+  <div id="challenger-snapshots"></div>
+  {% else %}<p>Zum Speichern von Drafts und späteren Ergebnissen bitte anmelden.</p>{% endif %}
 </main>
 {% endblock %}
 {% block skripte %}<script src="{% static 'drafter/challenger.js' %}" defer></script>{% endblock %}

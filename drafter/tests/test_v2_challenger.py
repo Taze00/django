@@ -127,3 +127,83 @@ class ChallengerTests(DrafterTest):
             Match.objects.filter(fingerprint='fixture-3').update(fingerprint='changed')
             with self.assertRaises(ValueError):
                 training.development_partitions()
+
+    def login_user(self, name='challenger-user'):
+        from django.contrib.auth.models import User
+        user = User.objects.create_user(username=name)
+        self.client.force_login(user)
+        return user
+
+    def test_comparison_separates_score_types_and_default_endpoint(self):
+        result = self.post({**self.payload, 'compare_legacy': True}).json()
+        self.assertEqual(result['legacy']['score_kind'], 'heuristic_score_not_probability')
+        self.assertTrue(result['legacy']['recommendations'])
+        self.assertNotIn('legacy', self.post().json())
+        legacy = self.client.post(reverse('drafter:api_recommend'), json.dumps(self.payload), content_type='application/json').json()
+        self.assertIn('empfehlungen', legacy)
+        self.assertNotIn('engine', legacy)
+
+    def test_signed_snapshot_is_idempotent_and_preserves_actual_response(self):
+        from drafter.models import Praxisfall
+        self.login_user()
+        result = self.post().json()
+        request = {'token': result['snapshot_token'], 'chosen': result['recommendations'][0]['slug']}
+        url = reverse('drafter:api_challenger_snapshots')
+        self.path.unlink()  # Saving must not re-run the model or require its current artifact.
+        first = self.client.post(url, json.dumps(request), content_type='application/json')
+        self.assertEqual(first.status_code, 201)
+        second = self.client.post(url, json.dumps(request), content_type='application/json')
+        self.assertEqual(second.status_code, 200)
+        self.assertEqual(first.json()['id'], second.json()['id'])
+        record = Praxisfall.objects.get(pk=first.json()['id'])
+        self.assertEqual(record.empfehlungen, result['recommendations'])
+        self.assertEqual(record.snapshot_metadata['artifact_sha256'], result['artifact_sha256'])
+        self.assertIs(record.snapshot_metadata['training_eligible'], False)
+        self.assertIsNone(record.gewaehlter_score)
+        frozen = record.empfehlungen
+        outcome_url = reverse('drafter:api_challenger_result', args=[record.id])
+        response = self.client.post(outcome_url, json.dumps({'result': 'win'}), content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        record.refresh_from_db()
+        self.assertEqual(record.ergebnis, 'win')
+        self.assertEqual(record.empfehlungen, frozen)
+        self.assertEqual(self.client.get(url).json()['snapshots'][0]['id'], record.id)
+
+    def test_snapshot_tampering_ownership_and_choice_rejected(self):
+        self.login_user()
+        result = self.post().json()
+        url = reverse('drafter:api_challenger_snapshots')
+        chosen = result['recommendations'][0]['slug']
+        for payload in [{'token': result['snapshot_token'] + 'x', 'chosen': chosen},
+                        {'token': result['snapshot_token'], 'chosen': 'not-recommended'}]:
+            self.assertEqual(self.client.post(url, json.dumps(payload), content_type='application/json').status_code, 400)
+        valid = {'token': result['snapshot_token'], 'chosen': chosen}
+        saved = self.client.post(url, json.dumps(valid), content_type='application/json').json()['id']
+        self.login_user('other-user')
+        self.assertEqual(self.client.post(url, json.dumps(valid), content_type='application/json').status_code, 400)
+        self.assertEqual(self.client.get(url).json()['snapshots'], [])
+        self.assertEqual(self.client.post(reverse('drafter:api_challenger_result', args=[saved]),
+                                        json.dumps({'result': 'loss'}), content_type='application/json').status_code, 404)
+
+    def test_anonymous_logging_and_csrf_are_rejected(self):
+        from django.test import Client
+        self.assertNotIn('snapshot_token', self.post().json())
+        self.assertEqual(self.client.post(reverse('drafter:api_challenger_snapshots'), '{}', content_type='application/json').status_code, 403)
+        secure_client = Client(enforce_csrf_checks=True)
+        self.assertEqual(secure_client.post(reverse('drafter:api_challenger'), json.dumps(self.payload), content_type='application/json').status_code, 403)
+
+    def test_snapshot_expiry_conflicting_resave_and_private_detail(self):
+        import time
+        self.login_user()
+        result = self.post().json()
+        url = reverse('drafter:api_challenger_snapshots')
+        payload = {'token': result['snapshot_token'], 'chosen': result['recommendations'][0]['slug']}
+        with patch('django.core.signing.time.time', return_value=time.time() + 7202):
+            self.assertEqual(self.client.post(url, json.dumps(payload), content_type='application/json').status_code, 400)
+        saved = self.client.post(url, json.dumps(payload), content_type='application/json').json()['id']
+        payload['chosen'] = result['recommendations'][1]['slug']
+        self.assertEqual(self.client.post(url, json.dumps(payload), content_type='application/json').status_code, 400)
+        detail_url = reverse('drafter:api_challenger_result', args=[saved])
+        self.assertEqual(self.client.get(detail_url).json()['snapshot']['recommendations'], result['recommendations'])
+        self.login_user('detail-other')
+        self.assertEqual(self.client.get(detail_url).status_code, 404)

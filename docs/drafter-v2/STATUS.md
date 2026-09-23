@@ -1,10 +1,15 @@
-RESUME FROM: D-014 complete-state First/Mid/Last planning implemented and validated. D-012 7229fd9 and D-013 bf91990 pushed. Continue D-015 side-by-side comparison and versioned logging, then broad regression/operational handoff. Existing V retained; old holdout remains closed.
+RESUME FROM: D-015 comparison and signed versioned snapshots complete. Migration 0020 applied only in isolation; 55 focused plus 12 final overlapping tests pass. Continue whole Drafter/Fitness regression and real HTTP/static smoke, then document scientific gates. D-014 ec245e9 pushed; Legacy default, old holdout closed.
+
 
 
 
 
 
 # Drafter V2 Status
+
+D-015 complete: explicit Legacy comparison, authenticated signed decision
+snapshots, idempotent save/private replay/later user-result controls. Migration
+0020 isolated only, no drift. 55 focused tests plus 12 final tests passed.
 
 D-014 complete: 15 tests passed; real isolated First/Mid/Last API smoke 200 each,
 770.071/92.893/44.313 ms. First/Mid bounded, complete-team minimax with visible

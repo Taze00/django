@@ -1,0 +1,14 @@
+.challenger-page .seite { max-width: 1100px; overflow-wrap: anywhere; }
+.challenger-page p, .challenger-page fieldset, .challenger-page h2 { margin: 1rem 0; }
+.challenger-page fieldset { border: 1px solid var(--rand-hell); border-radius: var(--radius); padding: 1rem; }
+.challenger-page fieldset > div { display: flex; flex-wrap: wrap; gap: 1rem; }
+.challenger-page label { display: inline-flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+.challenger-page select { background: var(--bg-2); color: var(--text); border: 1px solid var(--rand-hell); border-radius: var(--radius); padding: .5rem; max-width: 100%; }
+.challenger-page button { background: var(--bg-3); border: 1px solid var(--rand-hell); border-radius: var(--radius); padding: .6rem .8rem; margin: .3rem; }
+.challenger-page button:disabled { opacity: .5; cursor: wait; }
+.challenger-page details { padding: .8rem; margin: .5rem 0; background: var(--bg-2); border: 1px solid var(--rand); border-radius: var(--radius); }
+.challenger-page summary { cursor: pointer; }
+.challenger-page ul, .challenger-page ol { padding-left: 1.5rem; }
+.challenger-page table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+.challenger-page td, .challenger-page th { padding: .6rem; text-align: left; border-bottom: 1px solid var(--rand); }
+.challenger-page #challenger-status { color: var(--warn); }

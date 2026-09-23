@@ -50,3 +50,18 @@ shortlist ordered by training appearance count. The displayed worst reply is onl
 within that shortlist; unsearched responses may be stronger. All model evaluations
 are full 3v3 teams. Contributions for early picks refer to the displayed hypothetical
 continuation. They are not unconditional claims about the current incomplete team.
+
+## Comparison and saved drafts
+
+Check “Legacy daneben anzeigen” to compare rankings. Legacy numbers remain scores,
+V2 numbers remain model estimates; their scales are not interchangeable. No ranking
+agreement is described as accuracy. Logged-in users can expand a candidate and save
+that decision. The actual server-signed response is stored, not a later re-run.
+Tokens expire after two hours. Each snapshot accepts one chosen pick; repeats are
+idempotent. “Meine gespeicherten Drafts” offers private replay and later outcome
+entry. Outcomes are unverified self-reports, never automatically training data.
+
+Deploying this branch's logging requires `manage.py migrate drafter` (0020 adds two
+fields). Applied and tested only in isolation. Roll back code/model selection
+without deleting snapshot columns/data. Do not reverse the migration to perform a
+routine model rollback, since that would discard its new metadata.

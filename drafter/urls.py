@@ -11,11 +11,13 @@ from django.contrib.auth import views as auth_views
 from django.urls import path
 
 from drafter import views
-from drafter.views.challenger import challenger, challenger_recommend
+from drafter.views.challenger import challenger, challenger_recommend, challenger_snapshots, challenger_result
 
 app_name = "drafter"
 
 urlpatterns = [
+    path("api/challenger/snapshots/", challenger_snapshots, name="api_challenger_snapshots"),
+    path("api/challenger/snapshots/<int:pk>/result/", challenger_result, name="api_challenger_result"),
     path("challenger/", challenger, name="challenger"),
     path("api/challenger/", challenger_recommend, name="api_challenger"),
     path("", views.draft, name="draft"),

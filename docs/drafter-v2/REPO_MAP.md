@@ -108,3 +108,9 @@ D-014: `v2_planning.py` provides budgeted memoized full-composition minimax;
 `test_v2_planning.py` checks completed leaves, exact toy minimax, turn order,
 legal continuations, determinism and budget failure. Challenger UI accepts empty
 slots and explicit first-pick side. Old partial-search prototype is not the runtime.
+
+D-015: `v2_snapshots.py` signs owner-bound responses and saves immutable recommendation
+snapshots into Praxisfall. Additive `0020_challenger_snapshot` adds snapshot key and
+metadata only. Challenger views expose authenticated save/list/detail/result APIs;
+UI offers opt-in Legacy comparison, save buttons and outcome controls. Scoped
+`challenger.css` uses a Drafter-base head extension; protected app layouts untouched.

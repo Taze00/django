@@ -167,3 +167,8 @@ D-014 complete: usable experimental First/Mid/Last UI/API. Last exhaustive over
 supported legal pool; earlier phases bounded minimax over complete 3v3 outcomes.
 Next D-015: opt-in side-by-side Legacy output, immutable versioned snapshots,
 then full regression and operational handoff. Promotion remains evidence-gated.
+
+D-015 complete: optional side-by-side Legacy output and authenticated, signed,
+versioned Praxisfall snapshots with later self-reported result and private replay.
+Next: whole Drafter/protected Fitness regression, actual HTTP/static smoke,
+operational handoff and precise remaining scientific promotion gate.

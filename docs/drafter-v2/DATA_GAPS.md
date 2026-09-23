@@ -106,3 +106,7 @@ D-014: historical pick order remains unavailable. Search order comes from explic
 UI first-pick side and existing sequence, never reconstructed history. Training
 appearance support is not opponent pick probability. Strong replies outside the
 bounded shortlist can be missed; no search-quality improvement is asserted.
+
+D-015 logs selected user decisions and self-reported outcomes only. Neither player
+skill nor causal recommendation benefit nor verified battle linkage is obtained.
+Do not treat the log as an unbiased test set or automatically feed it into V.

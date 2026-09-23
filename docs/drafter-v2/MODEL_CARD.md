@@ -41,3 +41,7 @@ D-014: the same experimental V now supports First/Mid/Last decisions. Early
 search is bounded minimax with width-three Train-appearance shortlists. Current
 opponent pick probabilities, search regret and tactical completeness are UNKNOWN.
 Root candidates remain exhaustive over supported legal catalog entries.
+
+D-015 adds side-by-side Legacy output with separate score semantics. Versioned
+snapshots preserve actual experimental predictions and are explicitly ineligible
+for automatic training; selection bias and self-reported outcome provenance remain.

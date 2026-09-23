@@ -161,3 +161,8 @@ D-014 functional validation: 15 search/runtime regressions passed. One real
 isolated smoke request per phase measured First 770.071 ms (8,452 leaves), Mid
 92.893 ms (900), Last 44.313 ms (100). Shortlist approximation is disclosed; these
 are software/performance checks, not an empirical comparison of draft outcomes.
+
+D-015 validation: 55 API/Praxisfall regressions and 12 final Challenger tests passed
+(overlapping suites, not 67 unique tests). Migration drift clean; additive migration
+0020 applied only in isolation. Side-by-side output is not an outcome benchmark.
+Saved self-selected user decisions/results are excluded from automatic training.
