@@ -23,6 +23,8 @@ def challenger_recommend(request):
         for field in ('map', 'mode'):
             if field in data and (not isinstance(data[field], str) or len(data[field]) > 100):
                 raise DraftFehler(f'Ungültiges Feld: {field}')
+        if type(data.get('own_team_first_pick', True)) is not bool:
+            raise DraftFehler('First Pick muss true oder false sein.')
         ctx = context_aus_daten(data, request)
         return JsonResponse(recommend(ctx))
     except (UnicodeDecodeError, json.JSONDecodeError, DraftFehler) as error:

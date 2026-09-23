@@ -101,3 +101,8 @@ promotion. No new mechanics or player/loadout facts were added.
 D-013: no validation benefit from the tested opponent terms. Missing independent
 future evidence still prevents a promotion claim; no fabricated mechanics added
 to compensate for the negative result.
+
+D-014: historical pick order remains unavailable. Search order comes from explicit
+UI first-pick side and existing sequence, never reconstructed history. Training
+appearance support is not opponent pick probability. Strong replies outside the
+bounded shortlist can be missed; no search-quality improvement is asserted.

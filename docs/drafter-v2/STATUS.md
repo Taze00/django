@@ -1,9 +1,14 @@
-RESUME FROM: D-012 pushed as 7229fd9. D-013 fixed Train/Validation opponent-interaction experiment complete; all candidates worse, original model retained. Continue D-014 complete-composition Mid/First planning, then side-by-side and logging. No old holdout or mechanics research.
+RESUME FROM: D-014 complete-state First/Mid/Last planning implemented and validated. D-012 7229fd9 and D-013 bf91990 pushed. Continue D-015 side-by-side comparison and versioned logging, then broad regression/operational handoff. Existing V retained; old holdout remains closed.
+
 
 
 
 
 # Drafter V2 Status
+
+D-014 complete: 15 tests passed; real isolated First/Mid/Last API smoke 200 each,
+770.071/92.893/44.313 ms. First/Mid bounded, complete-team minimax with visible
+shortlist limitations. Legacy/default and model artifact unchanged.
 
 D-013 complete: 12 focused tests passed; fixed three-candidate experiment failed
 to improve validation. Existing model stays selected. Full report in

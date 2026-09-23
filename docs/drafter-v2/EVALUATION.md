@@ -156,3 +156,8 @@ All n=2,031. Existing selected under preregistered rule; no improvement claimed.
 The same train/validation canonical digests were reproduced. Full calibration,
 fit/inference times and artifact digest in CHALLENGER_OPPONENT_EXPERIMENT.json.
 Independent test/promotion remains unavailable; old sealed results untouched.
+
+D-014 functional validation: 15 search/runtime regressions passed. One real
+isolated smoke request per phase measured First 770.071 ms (8,452 leaves), Mid
+92.893 ms (900), Last 44.313 ms (100). Shortlist approximation is disclosed; these
+are software/performance checks, not an empirical comparison of draft outcomes.

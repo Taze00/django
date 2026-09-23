@@ -37,3 +37,16 @@ Validation: `manage.py test drafter.tests.test_v2_challenger
  drafter.tests.test_v2_model drafter.tests.test_v2_search drafter.tests.test_api --noinput`.
 The endpoint/page smoke used real isolated catalog/model with a constructed draft;
 it is functional evidence, not an outcome evaluation or gameplay ground truth.
+
+## First and Mid Pick
+
+The same page now supports open slots. For First Pick leave both teams empty and
+check own First Pick. For Mid Pick enter the actual picks and first-pick side;
+our team must be next in the 1-2-2-1 order. Last Pick stays 2 own / 3 enemy with own
+First Pick unchecked. Duplicate/unavailable picks and bans fail validation.
+
+All supported legal root choices are evaluated. Following moves use a width-three
+shortlist ordered by training appearance count. The displayed worst reply is only
+within that shortlist; unsearched responses may be stronger. All model evaluations
+are full 3v3 teams. Contributions for early picks refer to the displayed hypothetical
+continuation. They are not unconditional claims about the current incomplete team.

@@ -36,3 +36,8 @@ UNKNOWN. Candidate features without training support are exposed, not fabricated
 D-013: jointly fitted opponent interactions failed the fixed validation comparison.
 The opt-in runtime retains `v2-composition-logit-1`; no feature activation. This
 negative result does not establish all possible interaction models are useless.
+
+D-014: the same experimental V now supports First/Mid/Last decisions. Early
+search is bounded minimax with width-three Train-appearance shortlists. Current
+opponent pick probabilities, search regret and tactical completeness are UNKNOWN.
+Root candidates remain exhaustive over supported legal catalog entries.

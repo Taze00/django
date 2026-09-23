@@ -162,3 +162,8 @@ D-013 complete: fixed opponent-interaction experiment produced no validation
 improvement; retain existing V. Next D-014: bounded full-composition Mid/First
 planning, followed by side-by-side UI and snapshots. No more mechanics research
 or unbounded hyperparameter search on this validation set.
+
+D-014 complete: usable experimental First/Mid/Last UI/API. Last exhaustive over
+supported legal pool; earlier phases bounded minimax over complete 3v3 outcomes.
+Next D-015: opt-in side-by-side Legacy output, immutable versioned snapshots,
+then full regression and operational handoff. Promotion remains evidence-gated.

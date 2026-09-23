@@ -473,3 +473,23 @@ baseline 10.45 s; candidate fits 14.41/14.52/15.58 s. Full metrics/calibration a
 unchanged development digests: CHALLENGER_OPPONENT_EXPERIMENT.json. No holdout
 examples/outcomes/predictions, new split or mechanics facts. Do not enlarge the
 grid after seeing results; move to usable search rather than tune indefinitely.
+
+## D-014 — complete-state planning with bounded minimax
+
+Every supported legal root candidate is evaluated. Later turns follow the existing
+UI contract (1-2-2-1); invalid count/side combinations fail. Every model call is a
+complete 3v3, never a partial composition. Width-three subsequent shortlists use
+Train appearance support, explicitly not historical pick frequency or a validated
+opponent distribution. Opponent minimizes and own team maximizes within the tree.
+All legal unsupported candidates are reported unavailable; no mechanics invented.
+
+Memoized canonical team states and a 30,000-leaf upper bound bound runtime. Exceeding
+the budget fails the request rather than returning a biased partial ranking.
+Output includes actual worst-in-shortlist continuation, hypothetical complete-team
+contributions, remaining order, leaf count and omitted-branch count. These are
+search facts, not proven tactical weaknesses or guarantees of a strongest response.
+
+15 search/runtime tests passed (0.735 s). Real isolated constructed-draft smoke:
+First 105 candidates / 8,452 evaluated leaves / 770.071 ms; Mid 102 / 900 / 92.893 ms;
+Last 100 / 100 / 44.313 ms. One request each, not percentile/load-test evidence.
+No gameplay quality claim or new model fit; V stays the D-012 artifact.

@@ -103,3 +103,8 @@ D-013: `drafter_v2_challenger_experiment` runs the fixed Train/Validation-only
 grid. `v2_model`/`v2_explanation` support versioned antisymmetric opponent terms;
 current runtime artifact remains the original model. Report in
 CHALLENGER_OPPONENT_EXPERIMENT.json; candidate artifact stays local/ignored.
+
+D-014: `v2_planning.py` provides budgeted memoized full-composition minimax;
+`test_v2_planning.py` checks completed leaves, exact toy minimax, turn order,
+legal continuations, determinism and budget failure. Challenger UI accepts empty
+slots and explicit first-pick side. Old partial-search prototype is not the runtime.

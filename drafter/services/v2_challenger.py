@@ -13,6 +13,7 @@ from drafter.services.context import DraftFehler
 from drafter.services.v2_model import CompositionLogitModel, FEATURE_VERSIONS, _feature_counts
 from drafter.services.v2_explanation import contributions
 from drafter.services.v2_search import _row, legal_candidates
+from drafter.services.v2_planning import plan, PlanningError, schedule
 
 
 class ChallengerUnavailable(ValueError):
@@ -56,8 +57,10 @@ def recommend(ctx):
     started = perf_counter()
     if not ctx.brawl_map:
         raise DraftFehler('V2 benötigt eine Map.')
-    if len(ctx.own_picks) != 2 or len(ctx.enemy_picks) != 3:
-        raise DraftFehler('V2 Last Pick benötigt zwei eigene und drei gegnerische Picks.')
+    try:
+        schedule(ctx.own_picks, ctx.enemy_picks, ctx.own_team_first_pick)
+    except PlanningError as error:
+        raise DraftFehler(str(error)) from error
     data, model, artifact_digest = load_artifact()
     context = data['contexts'].get(ctx.brawl_map.slug)
     if context is None:
@@ -73,17 +76,29 @@ def recommend(ctx):
     by_id = {b.id: b for b in catalog if b.ranked_verfuegbar}
     own, enemy = tuple(b.id for b in ctx.own_picks), tuple(b.id for b in ctx.enemy_picks)
     candidates = legal_candidates(by_id, own, enemy, tuple(b.id for b in ctx.bans))
-    result, unavailable = [], []
-    for candidate in candidates:
+    unavailable = [by_id[c].slug for c in candidates
+                   if data['catalog'].get(by_id[c].slug) != c or f'brawler:{c}' not in model.manifest]
+    supported_pool = tuple(c for c, b in by_id.items()
+                           if data['catalog'].get(b.slug) == c and f'brawler:{c}' in model.manifest)
+    if not [c for c in candidates if c in supported_pool]:
+        planned, search = [], {'algorithm': 'no_supported_candidates', 'approximate': False}
+    else:
+        try:
+            planned, search = plan(model, supported_pool, own, enemy, tuple(b.id for b in ctx.bans),
+                                   data['feature_support'], **context, own_first=ctx.own_team_first_pick)
+        except PlanningError as error:
+            raise DraftFehler(str(error)) from error
+    result = []
+    for item in planned:
+        candidate = item['candidate']
         brawler = by_id[candidate]
-        if data['catalog'].get(brawler.slug) != candidate or f'brawler:{candidate}' not in model.manifest:
-            unavailable.append(brawler.slug)
-            continue
-        row = _row(own + (candidate,), enemy, **context)
+        row = _row(item['terminal_own'], item['terminal_enemy'], **context)
         features = _feature_counts(row, model.feature_version)
         unknown = sorted(set(features) - set(model.manifest))
         result.append({
-            'slug': brawler.slug, 'name': brawler.name, 'p_win': model.predict(row),
+            'slug': brawler.slug, 'name': brawler.name, 'p_win': item['p_win'],
+            'continuation': [{'side': side, 'slug': by_id[c].slug} for side, c in item['continuation']],
+            'explanation_scope': 'hypothetical_complete_composition' if item['continuation'] else 'complete_last_pick',
             'contributions': contributions(model, row, limit=8),
             'evidence': {'kind': 'jointly_fitted_association_not_causal',
                          'feature_support': {name: data['feature_support'].get(name) for name in features},
@@ -98,5 +113,6 @@ def recommend(ctx):
         'provenance': {name: {k: v for k, v in data['provenance'][name].items() if k != 'fingerprints'}
                        for name in ('train', 'validation')},
         'limitations': data['limitations'], 'context': context,
+        'search': search,
         'elapsed_ms': round((perf_counter() - started) * 1000, 3),
     }
