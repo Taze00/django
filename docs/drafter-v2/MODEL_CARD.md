@@ -45,3 +45,16 @@ Root candidates remain exhaustive over supported legal catalog entries.
 D-015 adds side-by-side Legacy output with separate score semantics. Versioned
 snapshots preserve actual experimental predictions and are explicitly ineligible
 for automatic training; selection bias and self-reported outcome provenance remain.
+
+## Final experimental configuration (D-016)
+
+Selected runtime artifact byte digest:
+`92e0b427bf9abce62e047419ea1008f740c9ee7b39b1458ae15692402b7cf52d`.
+Model: `v2-composition-logit-1`, Train 6,094 / Validation 2,031. Last exhaustive;
+Mid/First bounded minimax. 28 Train-derived map-context mappings; current selectable
+intersection shown in UI. Eligibility/uncertainty remain explicit. Opponent-term
+candidate rejected. No mechanics features or active/default-engine change.
+
+Status: usable opt-in experimental Challenger, **NOT PROMOTED**. Full product,
+metrics, testing limits, provenance, logging bias and next evidence requirements:
+CHALLENGER_REPORT.md. Local preview is development-only; no live deployment.

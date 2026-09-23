@@ -115,7 +115,10 @@ class ChallengerTests(DrafterTest):
                 for b in team:
                     MatchPlayer.objects.create(match=match, side=side, brawler=b)
         expected = hashlib.sha256('fixture-1\nfixture-2\nfixture-3'.encode()).hexdigest()
-        with patch.multiple(training, TRAIN_N=1, VALIDATION_N=1, TOTAL_N=3, FREEZE_DIGEST=expected):
+        examples, _ = training.examples_from_queryset(Match.objects.filter(fingerprint__in=['fixture-1', 'fixture-2']))
+        with patch.multiple(training, TRAIN_N=1, VALIDATION_N=1, TOTAL_N=3, FREEZE_DIGEST=expected,
+                            TRAIN_DIGEST=training.example_digest(examples[:1]),
+                            VALIDATION_DIGEST=training.example_digest(examples[1:])):
             with CaptureQueriesContext(connection) as queries:
                 train, validation = training.development_partitions()
             self.assertEqual([r.fingerprint for r in train + validation], ['fixture-1', 'fixture-2'])
@@ -124,6 +127,10 @@ class ChallengerTests(DrafterTest):
                 self.assertNotIn('insert ', sql)
                 if 'winner_side"' in sql.split(' from ')[0]:
                     self.assertNotIn('fixture-3', sql)
+            Match.objects.filter(fingerprint='fixture-1').update(winner_side='b')
+            with self.assertRaisesRegex(ValueError, 'content mismatch'):
+                training.development_partitions()
+            Match.objects.filter(fingerprint='fixture-1').update(winner_side='a')
             Match.objects.filter(fingerprint='fixture-3').update(fingerprint='changed')
             with self.assertRaises(ValueError):
                 training.development_partitions()
@@ -207,3 +214,12 @@ class ChallengerTests(DrafterTest):
         self.assertEqual(self.client.get(detail_url).json()['snapshot']['recommendations'], result['recommendations'])
         self.login_user('detail-other')
         self.assertEqual(self.client.get(detail_url).status_code, 404)
+
+    def test_model_info_lists_only_supported_maps_and_explanations_use_names(self):
+        info = self.client.get(reverse('drafter:api_challenger_info'))
+        self.assertEqual(info.json()['supported_maps'], ['hard-rock-mine'])
+        facts = self.post().json()['recommendations'][0]['contributions']
+        self.assertTrue(all('label' in fact for fact in facts))
+        self.assertTrue(any(b.name in fact['label'] for b in self.brawlers for fact in facts))
+        self.path.unlink()
+        self.assertEqual(self.client.get(reverse('drafter:api_challenger_info')).status_code, 503)

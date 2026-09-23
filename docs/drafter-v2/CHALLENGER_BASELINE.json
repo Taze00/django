@@ -1,5 +1,6 @@
 {
-  "artifact_sha256": "5ca00558a6ac36d475a673c5ed6563d4697f151575c65fbdae69a8d5717b2e7c",
+  "artifact_sha256": "92e0b427bf9abce62e047419ea1008f740c9ee7b39b1458ae15692402b7cf52d",
+  "canonical_content_sha256": "5ca00558a6ac36d475a673c5ed6563d4697f151575c65fbdae69a8d5717b2e7c",
   "implementation_note": "Run used base revision 24893b5 plus the D-012 implementation committed with this report; revision is the base, not the complete source tree.",
   "limitations": [
     "Current patch applicability UNKNOWN",

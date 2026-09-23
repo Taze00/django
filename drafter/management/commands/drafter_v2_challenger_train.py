@@ -1,5 +1,6 @@
 """Train the opt-in Challenger from verified development partitions only."""
 import json
+import hashlib
 from pathlib import Path
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connection, transaction
@@ -30,7 +31,8 @@ class Command(BaseCommand):
         except (ValueError, OSError) as error:
             raise CommandError(str(error)) from error
         report = {key: artifact[key] for key in ('schema', 'status', 'validation', 'limitations')}
-        report['artifact_sha256'] = digest(artifact)
+        report['artifact_sha256'] = hashlib.sha256(path.read_bytes()).hexdigest()
+        report['canonical_content_sha256'] = digest(artifact)
         report['provenance'] = {**artifact['provenance'], **{
             name: {k: v for k, v in artifact['provenance'][name].items() if k != 'fingerprints'}
             for name in ('train', 'validation')}}

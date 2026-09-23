@@ -1,5 +1,6 @@
 """Bounded, preregistered development-only opponent interaction experiment."""
 import json
+import hashlib
 from collections import Counter
 from pathlib import Path
 from time import perf_counter
@@ -62,7 +63,8 @@ class Command(BaseCommand):
                 json.dump(artifact, stream, indent=2, sort_keys=True)
         except (ValueError, OSError) as error:
             raise CommandError(str(error)) from error
-        report = {'experiment': artifact['experiment'], 'artifact_sha256': digest(artifact),
+        report = {'experiment': artifact['experiment'], 'artifact_sha256': hashlib.sha256(path.read_bytes()).hexdigest(),
+                  'canonical_content_sha256': digest(artifact),
                   'provenance': {**artifact['provenance'], **{
                       name: {k: v for k, v in artifact['provenance'][name].items() if k != 'fingerprints'}
                       for name in ('train', 'validation')}}}

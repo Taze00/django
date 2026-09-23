@@ -110,3 +110,15 @@ bounded shortlist can be missed; no search-quality improvement is asserted.
 D-015 logs selected user decisions and self-reported outcomes only. Neither player
 skill nor causal recommendation benefit nor verified battle linkage is obtained.
 Do not treat the log as an unbiased test set or automatically feed it into V.
+
+## D-016 remaining scientific blocker
+
+Independent newer eligible Ranked evaluation data is still unavailable from the
+completed evidence. Train/Validation-only iteration supports experimental selection,
+not a new generalization claim. The tested opponent interaction extension did not
+help. Stronger real-world search, current calibration and production promotion need
+preregistered future outcome evidence; the closed holdout is not reusable.
+
+No new collector was run, no mechanics facts fabricated, and no model promotion
+was inferred from working UI/API or user snapshots. Browser DOM/visual automation
+was unavailable; HTTP/static/CSRF and V8 syntax checks have narrower validation scope.

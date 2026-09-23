@@ -65,3 +65,42 @@ Deploying this branch's logging requires `manage.py migrate drafter` (0020 adds 
 fields). Applied and tested only in isolation. Roll back code/model selection
 without deleting snapshot columns/data. Do not reverse the migration to perform a
 routine model rollback, since that would discard its new metadata.
+
+## Isolated local preview
+
+A preview was started on loopback only, with Traefik explicitly disabled. It uses
+the isolated database and test-only Django configuration; it is not a live rollout.
+After the usual isolation checks, start it if it is not already running:
+
+```bash
+DJANGO_SECRET_KEY=drafter-v2-isolated-test-only \
+DJANGO_REGISTRATION_KEY=disabled \
+docker compose -p drafter-v2-isolated run --rm --no-deps -d \
+  --name drafter-v2-challenger-preview --label traefik.enable=false \
+  -p 127.0.0.1:18080:8000 -e PYTHONDONTWRITEBYTECODE=1 \
+  -e DJANGO_DEBUG=True -e DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1 \
+  --entrypoint python django-dev manage.py runserver 0.0.0.0:8000 --noreload
+```
+
+Open `http://127.0.0.1:18080/draft/challenger/`. For a remote host, forward that
+loopback port through your existing SSH connection. This command neither creates
+an account nor changes credentials. Use an existing isolated account for logging;
+anonymous recommendation and comparison work without one. No live credentials.
+
+Stop only this preview with `docker stop drafter-v2-challenger-preview`; its
+`--rm` container disappears, while DB/model/snapshots remain. After code changes,
+restart only this named preview. Nothing restarts the production Compose project.
+
+Final safe development commands (inside the isolated one-off runtime):
+
+```
+python manage.py drafter_v2_challenger_train --output <new-artifact-path> --revision <commit>
+python manage.py drafter_v2_challenger_experiment --output <new-experiment-path> --revision <commit>
+python manage.py test drafter --noinput
+python manage.py test fitness --noinput
+```
+
+The fixed experiment is already completed; commands document reproduction, not an
+instruction to repeatedly select on Validation. Both membership and canonical
+Train/Validation example digests are enforced. Byte `artifact_sha256` matches the
+runtime identifier; `canonical_content_sha256` separately identifies JSON content.

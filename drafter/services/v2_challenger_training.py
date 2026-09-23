@@ -13,10 +13,18 @@ from drafter.services.v2_model import _feature_counts, evaluate_model, train_mod
 FREEZE_DIGEST = '2bb8222b9025a5da7daadea8b9a252c39b16bcda8b07b9bc2df69315ea4dcf9e'
 CUTOFF = '2026-09-18T15:04:42Z'
 TRAIN_N, VALIDATION_N, TOTAL_N = 6094, 2031, 10158
+TRAIN_DIGEST = '5e8ff094ad9f93ed565bcaed9f725ffd7d78dd67c22e31c7b6aaed6cd2cec447'
+VALIDATION_DIGEST = '4b2806db07d35e20dd8a0e6e76bef74dd928706b90e6615a3b2f64776c3df797'
 
 
 def digest(value):
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
+
+
+def example_digest(rows):
+    return digest([{'fingerprint': r.fingerprint, 'played_at': r.played_at.isoformat(),
+                    'mode': r.mode, 'map_name': r.map_name, 'team_a': r.team_a,
+                    'team_b': r.team_b, 'label': r.label} for r in rows])
 
 
 def development_partitions():
@@ -41,6 +49,8 @@ def development_partitions():
         raise ValueError('Development partition changed after membership verification')
     if train[-1].played_at > validation[0].played_at:
         raise ValueError('Development time ordering violated')
+    if example_digest(train) != TRAIN_DIGEST or example_digest(validation) != VALIDATION_DIGEST:
+        raise ValueError('Frozen development content mismatch; training blocked')
     return train, validation
 
 
@@ -61,11 +71,8 @@ def build_artifact(train, validation, revision):
             raise ValueError('Ambiguous training map context')
         contexts[slug] = value
     def partition(rows):
-        values = [{'fingerprint': r.fingerprint, 'played_at': r.played_at.isoformat(),
-                   'mode': r.mode, 'map_name': r.map_name, 'team_a': r.team_a,
-                   'team_b': r.team_b, 'label': r.label} for r in rows]
         return {'n': len(rows), 'fingerprints': [r.fingerprint for r in rows],
-                'examples_sha256': digest(values), 'first': rows[0].played_at.isoformat(),
+                'examples_sha256': example_digest(rows), 'first': rows[0].played_at.isoformat(),
                 'last': rows[-1].played_at.isoformat()}
     return {
         'schema': 'drafter-v2-challenger-1', 'status': 'EXPERIMENTAL_NOT_PROMOTED',

@@ -8,7 +8,7 @@ from drafter.models import Praxisfall, Ergebnis
 from drafter.services.v2_snapshots import snapshot_token, save_snapshot
 from drafter.services.anfrage import context_aus_daten
 from drafter.services.context import DraftFehler
-from drafter.services.v2_challenger import ChallengerUnavailable, recommend
+from drafter.services.v2_challenger import ChallengerUnavailable, recommend, load_artifact
 
 
 @ensure_csrf_cookie
@@ -88,3 +88,13 @@ def challenger_result(request, pk):
     if not updated:
         return JsonResponse({'fehler': 'Snapshot nicht gefunden.'}, status=404)
     return JsonResponse({'id': pk, 'result': data['result'], 'provenance': 'user_report_not_verified'})
+
+
+@require_http_methods(['GET'])
+def challenger_info(request):
+    try:
+        data, model, digest = load_artifact()
+        return JsonResponse({'model_version': model.feature_version, 'artifact_sha256': digest,
+                             'supported_maps': sorted(data['contexts']), 'status': data['status']})
+    except ChallengerUnavailable as error:
+        return JsonResponse({'fehler': str(error), 'status': 'MODEL_UNAVAILABLE'}, status=503)

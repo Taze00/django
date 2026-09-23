@@ -515,3 +515,28 @@ Schema drift check clean. Applied 0020 only to isolated DB; zero pre-existing
 Praxisfall rows there, before/after legacy-field digests match. Legacy preservation
 with populated snapshots is covered by existing tests, not claimed as a real-data
 migration experiment. No production schema or server changes.
+
+## D-016 — final product validation and scientific stop boundary
+
+Problem: finish a usable experimental product without claiming stronger evidence
+than the available development data supports. The remaining independent-test gate
+cannot be satisfied by reopening the old holdout, unverified user outcomes or
+invented mechanics. The fixed opponent feature experiment was negative.
+
+Decision: retain the working selected V and all First/Mid/Last, comparison and
+snapshot capabilities; keep Legacy default. Final UX exposes known model maps and
+readable Brawler contribution labels. Enforce canonical Train/Validation content
+hashes as well as frozen membership. Distinguish artifact byte hashes from canonical
+JSON content hashes; reports preserve both and runtime uses the byte hash.
+
+Validation: full Drafter 774 tests/four existing skips (336.643 s), protected Fitness
+253 passed (138.720 s), final focused regression documented in STATUS. Real local
+HTTP/CSRF/static/modelinfo/three-phase comparison passed; JavaScript parsed in V8.
+No browser DOM/visual automation or production load claim. Legacy scorer files
+match 3a565bd. Actual development content hashes reverified read-only without a fit.
+
+Operational result: local preview on 127.0.0.1:18080, Traefik disabled, isolated DB,
+no live services/credentials touched. Full report and exact start/stop/model rollback
+commands in CHALLENGER_REPORT.md and CHALLENGER_RUNBOOK.md. No automatic promotion.
+Revisit when independently sourced new eligible Ranked evidence can support a
+preregistered future evaluation, not when another routine approval is obtained.

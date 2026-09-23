@@ -1,0 +1,59 @@
+{
+  "/draft/": {
+    "bytes": 9245,
+    "content_type": "text/html; charset=utf-8",
+    "status": 200
+  },
+  "/draft/api/challenger/info/": {
+    "bytes": 640,
+    "content_type": "application/json",
+    "status": 200
+  },
+  "/draft/challenger/": {
+    "bytes": 3335,
+    "content_type": "text/html; charset=utf-8",
+    "status": 200
+  },
+  "/static/drafter/challenger.css": {
+    "bytes": 1361,
+    "content_type": "text/css",
+    "status": 200
+  },
+  "/static/drafter/challenger.js": {
+    "bytes": 9713,
+    "content_type": "text/javascript",
+    "status": 200
+  },
+  "code_base": "356193e plus D-016 UI/provenance changes committed with report",
+  "first": {
+    "approximate": true,
+    "artifact_sha256": "92e0b427bf9abce62e047419ea1008f740c9ee7b39b1458ae15692402b7cf52d",
+    "leaves": 8452,
+    "legacy_candidates": 105,
+    "model_version": "v2-composition-logit-1",
+    "status": 200,
+    "v2_candidates": 105,
+    "wall_ms": 3129.532
+  },
+  "last": {
+    "approximate": false,
+    "artifact_sha256": "92e0b427bf9abce62e047419ea1008f740c9ee7b39b1458ae15692402b7cf52d",
+    "leaves": 100,
+    "legacy_candidates": 100,
+    "model_version": "v2-composition-logit-1",
+    "status": 200,
+    "v2_candidates": 100,
+    "wall_ms": 2435.857
+  },
+  "mid": {
+    "approximate": true,
+    "artifact_sha256": "92e0b427bf9abce62e047419ea1008f740c9ee7b39b1458ae15692402b7cf52d",
+    "leaves": 900,
+    "legacy_candidates": 102,
+    "model_version": "v2-composition-logit-1",
+    "status": 200,
+    "v2_candidates": 102,
+    "wall_ms": 2457.807
+  },
+  "validation_scope": "Real localhost HTTP + CSRF + static delivery; no browser DOM automation or production load test."
+}

@@ -1,11 +1,71 @@
-RESUME FROM: D-015 comparison and signed versioned snapshots complete. Migration 0020 applied only in isolation; 55 focused plus 12 final overlapping tests pass. Continue whole Drafter/Fitness regression and real HTTP/static smoke, then document scientific gates. D-014 ec245e9 pushed; Legacy default, old holdout closed.
-
-
-
-
-
+RESUME FROM: D-016 autonomous experimental product checkpoint complete. Working First/Mid/Last Challenger, side-by-side Legacy and versioned snapshots are implemented. Remaining stop is scientific: independent future Ranked evaluation evidence unavailable; fixed opponent-interaction experiment failed Validation. Do not reopen old holdout, repeat completed mechanics research or promote by assumption. Full report: CHALLENGER_REPORT.md; operations: CHALLENGER_RUNBOOK.md.
 
 # Drafter V2 Status
+
+Overall:
+- D-012–D-016 experimental product milestones complete. Legacy remains default.
+- Last Pick ranks complete compositions; Mid/First use disclosed bounded minimax.
+- Optional Legacy comparison and private signed Praxisfall snapshots are usable.
+- Current phase: independent-evidence/promotion gate, not another infrastructure task.
+- Blocker: no independent eligible future test window in completed collection evidence;
+  no observed Validation improvement from the preregistered opponent feature grid.
+- No current-patch, calibrated-uncertainty or superior-draft-quality claim.
+
+Latest validation:
+- Full Drafter: 774 tests, four existing skips, no failures (336.643 s).
+- Protected Fitness: 253 tests passed (138.720 s).
+- Final focused Challenger/content/UX: 13 passed (2.517 s); overlaps full suite.
+- JavaScript parsed in V8; real localhost HTTP/static/CSRF/model-info and all three
+  phases with comparison passed. No automated rendered-browser/visual test.
+- Migration drift clean; additive 0020 applied only to isolated DB. Existing
+  isolated Praxisfall count was zero; before/after legacy-field hashes match.
+- Legacy scorer, scoring and probability files unchanged from frozen 3a565bd.
+- Train/Validation content digests reverified read-only; no new model fit for that
+  final integrity check. No held-out examples, labels or predictions loaded.
+
+Runtime:
+- Preview: http://127.0.0.1:18080/draft/challenger/
+- Container: drafter-v2-challenger-preview; loopback only; Traefik disabled;
+  isolated DB and test-only configuration. No live checkout/service rollout.
+- Selected model: v2-composition-logit-1, epochs 300/L2 1.0, Train 6,094 /
+  Validation 2,031. Validation LogLoss 0.6886038069604661, Brier 0.24774078927297735.
+- Artifact: data/brawl_reports/v2_challenger.json (ignored, preserved locally).
+  Byte SHA-256 92e0b427bf9abce62e047419ea1008f740c9ee7b39b1458ae15692402b7cf52d.
+- Opponent candidates L2 1/10/100 all worse on Validation; not activated.
+- Known context mappings: 28; UI uses intersection with selectable catalog maps.
+- Initial V2-only smoke First/Mid/Last: 770.071/92.893/44.313 ms; final optional
+  comparison HTTP: 3129.532/2457.807/2435.857 ms. Single observations, not percentiles.
+
+Data integrity:
+- No fabricated values, raw payload deletion, historical row modification,
+  collection, old-holdout evaluation, feature promotion or default-engine switch.
+- Membership plus canonical Train/Validation content pinned. Artifact byte digest
+  and canonical JSON-content digest are separate fields in committed reports.
+- Snapshot outcomes are unverified user reports and not automatic training inputs.
+- Historical research, source claims, collector runs 1–5 and sealed reports preserved.
+
+Commits before this final checkpoint (all pushed to existing alex upstream):
+- 7229fd9: usable Last Pick and development-only model recovery.
+- bf91990: fixed opponent-interaction Validation experiment.
+- ec245e9: complete-composition Mid/First planning.
+- 356193e: opt-in Legacy comparison and signed snapshots.
+- D-016 final UX/integrity/report changes are committed together with this status.
+
+Next valid continuation:
+1. Use the experimental product; keep Legacy as default and retain model/log files.
+2. To support a scientific quality/promotion claim, obtain independently observed
+   eligible future Ranked data under a preregistered temporal/evaluation protocol,
+   with training-only statistical inputs. Do not silently reuse the old holdout.
+3. Preserve the bounded negative result; no expanded search grid or made-up
+   mechanics merely to force an improvement. New data alone does not imply promotion.
+4. Restart/stop only the named preview using CHALLENGER_RUNBOOK.md. No production
+   operation is needed to use the isolated preview. Keep snapshot metadata on rollback.
+
+## Historical milestone record
+
+The earlier resume/next statements below record prior scopes; the active state
+and latest user-authorized product continuation above supersede those pauses.
+
 
 D-015 complete: explicit Legacy comparison, authenticated signed decision
 snapshots, idempotent save/private replay/later user-result controls. Migration

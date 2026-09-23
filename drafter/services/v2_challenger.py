@@ -68,6 +68,7 @@ def recommend(ctx):
     catalog = list(Brawler.objects.filter(Q(is_active=True) | Q(external_id__isnull=False)))
     if any(b.slug in data['catalog'] and data['catalog'][b.slug] != b.id for b in catalog):
         raise ChallengerUnavailable('Modell und Brawler-Katalog haben unterschiedliche Identitäten.')
+    names = {str(b.id): b.name for b in catalog}
     all_picks = ctx.own_picks + ctx.enemy_picks
     if any(not b.ranked_verfuegbar for b in all_picks):
         raise DraftFehler('Ein gewählter Brawler ist nicht Ranked-verfügbar.')
@@ -95,11 +96,20 @@ def recommend(ctx):
         row = _row(item['terminal_own'], item['terminal_enemy'], **context)
         features = _feature_counts(row, model.feature_version)
         unknown = sorted(set(features) - set(model.manifest))
+        facts = contributions(model, row, limit=8)
+        for fact in facts:
+            kind, rest = fact['feature'].split(':', 1)
+            if kind in ('pair', 'opponent'):
+                ids = rest.split(':')
+                fact['label'] = ('Team-Zusammenhang: ' if kind == 'pair' else 'Gegner-Zusammenhang: ') + ' / '.join(names.get(i, 'UNKNOWN') for i in ids)
+            else:
+                label = {'brawler': 'Brawler-Beitrag', 'brawler_context': 'Modus-Beitrag', 'brawler_map': 'Map-Beitrag'}.get(kind, 'Modellbeitrag')
+                fact['label'] = label + ': ' + names.get(rest.rsplit(':', 1)[-1], 'UNKNOWN')
         result.append({
             'slug': brawler.slug, 'name': brawler.name, 'p_win': item['p_win'],
             'continuation': [{'side': side, 'slug': by_id[c].slug} for side, c in item['continuation']],
             'explanation_scope': 'hypothetical_complete_composition' if item['continuation'] else 'complete_last_pick',
-            'contributions': contributions(model, row, limit=8),
+            'contributions': facts,
             'evidence': {'kind': 'jointly_fitted_association_not_causal',
                          'feature_support': {name: data['feature_support'].get(name) for name in features},
                          'unknown_features': unknown},

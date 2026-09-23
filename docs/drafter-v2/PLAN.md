@@ -172,3 +172,17 @@ D-015 complete: optional side-by-side Legacy output and authenticated, signed,
 versioned Praxisfall snapshots with later self-reported result and private replay.
 Next: whole Drafter/protected Fitness regression, actual HTTP/static smoke,
 operational handoff and precise remaining scientific promotion gate.
+
+## D-016 final autonomous product checkpoint
+
+Experimental product priorities 1/3/4/5 are functional: Last Pick, Mid/First planning,
+side-by-side comparison and snapshots. Priority 2 was tested with the fixed
+Train/Validation experiment; no better model found, retain existing V. Priority 6
+remains evidence-gated; completed mechanics research is not reopened.
+
+Phases 8–11 are complete as an explicitly experimental surface, not as promoted
+validated gameplay policy. Phase 13 regressions and Phase 14 honest report are
+complete; see CHALLENGER_REPORT.md. Independent future outcome evidence blocks
+promotion/quality claims. Do not re-tune the sealed holdout or run more research
+merely to avoid acknowledging that scientific gate. Exact operations and rollback:
+CHALLENGER_RUNBOOK.md. Legacy remains default and data remain preserved.

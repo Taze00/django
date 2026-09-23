@@ -114,3 +114,10 @@ snapshots into Praxisfall. Additive `0020_challenger_snapshot` adds snapshot key
 metadata only. Challenger views expose authenticated save/list/detail/result APIs;
 UI offers opt-in Legacy comparison, save buttons and outcome controls. Scoped
 `challenger.css` uses a Drafter-base head extension; protected app layouts untouched.
+
+D-016: model-info endpoint supplies only known model contexts; UI filters available
+maps accordingly and explanations use catalog display names. Development loader
+pins content as well as membership digests. `CHALLENGER_REPORT.md` consolidates
+product acceptance/evidence; `CHALLENGER_HTTP_SMOKE.json` retains final local HTTP
+observations. Preview container `drafter-v2-challenger-preview` binds loopback
+18080 with Traefik disabled; no live service replacement.

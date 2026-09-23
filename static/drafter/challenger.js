@@ -19,7 +19,7 @@
       if (!response.ok) throw Error('Gespeicherte Drafts nicht verfügbar');
       const data = await response.json(); snapshots.replaceChildren();
       for (const saved of data.snapshots) {
-        const row = element('p', `#${saved.id} · ${saved.chosen} · ${saved.model_version} · ${saved.at} `);
+        const row = element('div', `#${saved.id} · ${saved.chosen} · ${saved.model_version} · ${saved.at} `);
         const select = document.createElement('select'); select.setAttribute('aria-label', `Ergebnis für Draft ${saved.id}`);
         for (const [value, label] of [['unknown', 'Ergebnis unbekannt'], ['win', 'Sieg'], ['loss', 'Niederlage']]) select.add(new Option(label, value));
         select.value = saved.result;
@@ -51,8 +51,11 @@
   loadSnapshots();
   let requestVersion = 0;
   form.addEventListener('change', () => { requestVersion++; results.replaceChildren(); status.textContent = 'Draft geändert. Neu berechnen.'; });
-  fetch(form.dataset.catalog).then(r => { if (!r.ok) throw Error('Katalog nicht verfügbar'); return r.json(); }).then(data => {
-    for (const mode of data.modi) for (const map of mode.maps) maps.add(new Option(`${mode.name} · ${map.name}`, map.slug));
+  Promise.all([form.dataset.catalog, form.dataset.info].map(async url => {
+    const response = await fetch(url); const data = await response.json();
+    if (!response.ok) throw Error(data.fehler || 'Katalog nicht verfügbar'); return data;
+  })).then(([data, info]) => {
+    for (const mode of data.modi) for (const map of mode.maps) if (info.supported_maps.includes(map.slug)) maps.add(new Option(`${mode.name} · ${map.name}`, map.slug));
     const available = data.brawler.filter(b => b.ranked_verfuegbar);
     for (const [side, count] of [['own', 3], ['enemy', 3]]) {
       for (let i = 0; i < count; i++) {
@@ -64,7 +67,7 @@
       }
     }
     for (const b of available) bans.add(new Option(b.name, b.slug));
-    submit.disabled = false; status.textContent = 'Wähle Map, Draftzustand und First-Pick-Seite.';
+    submit.disabled = maps.options.length === 0; status.textContent = maps.options.length ? 'Wähle Map, Draftzustand und First-Pick-Seite. Angezeigt werden Maps mit bekanntem Modellkontext.' : 'Keine aktuell wählbare Map hat einen bekannten Modellkontext.';
   }).catch(error => { status.textContent = error.message; });
   form.addEventListener('submit', async event => {
     event.preventDefault(); const version = ++requestVersion;
@@ -100,7 +103,7 @@
         details.append(element('p', `Unsicherheit: UNKNOWN. Unbekannte Features: ${item.evidence.unknown_features.length}. Beiträge sind gelernte Zusammenhänge, keine kausalen Effekte.`));
         if (item.continuation.length) details.append(element('p', `Hypothetische Fortsetzung: ${item.continuation.map(p => `${p.side === 'own' ? 'Wir' : 'Gegner'}: ${p.slug}`).join(' → ')}. Beiträge beziehen sich auf diese vollständige Komposition.`));
         const list = document.createElement('ul');
-        for (const fact of item.contributions) list.append(element('li', `${fact.feature}: ${fact.logit_contribution.toFixed(4)} Logit; ${item.evidence.feature_support[fact.feature]} Trainingsmatches`));
+        for (const fact of item.contributions) list.append(element('li', `${fact.label || fact.feature}: ${fact.logit_contribution.toFixed(4)} Logit; ${item.evidence.feature_support[fact.feature]} Trainingsmatches`));
         details.append(list);
         if (data.snapshot_token) {
           const save = element('button', 'Diesen Pick als Entscheidung speichern'); save.type = 'button';

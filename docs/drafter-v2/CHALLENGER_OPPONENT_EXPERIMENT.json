@@ -1,5 +1,6 @@
 {
-  "artifact_sha256": "5233b9209a6b5545a2d8b68ee72e02e5b09c00afc2cd3eaeabc00258a2ba060d",
+  "artifact_sha256": "545c9413279c00ea79dfcafaabbf155943baef1fba2b19b4c28635e893e94884",
+  "canonical_content_sha256": "5233b9209a6b5545a2d8b68ee72e02e5b09c00afc2cd3eaeabc00258a2ba060d",
   "experiment": {
     "candidates": [
       {

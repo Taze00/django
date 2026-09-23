@@ -166,3 +166,17 @@ D-015 validation: 55 API/Praxisfall regressions and 12 final Challenger tests pa
 (overlapping suites, not 67 unique tests). Migration drift clean; additive migration
 0020 applied only in isolation. Side-by-side output is not an outcome benchmark.
 Saved self-selected user decisions/results are excluded from automatic training.
+
+## D-016 final validation
+
+774 full Drafter tests passed with four existing skips (336.643 s); 253 protected
+Fitness tests passed (138.720 s). Final focused content/UX checks are recorded in
+STATUS. V8 syntax compilation and real localhost HTTP/static/CSRF/three-phase
+comparison passed (CHALLENGER_HTTP_SMOKE.json); no automated rendered-browser test.
+Actual Train/Validation content hashes reproduced once more after adding strict
+content guards, without fitting/predicting a model or touching held-out examples.
+
+Runtime byte SHA-256 is now explicitly separate from canonical artifact content
+SHA-256 in both training commands and reports. Original canonical digests remain
+preserved; no fitted values or recorded metrics changed. Final product/evidence
+matrix, limitations and remaining independent-test blocker: CHALLENGER_REPORT.md.
