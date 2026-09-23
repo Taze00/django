@@ -78,3 +78,52 @@ class CollectorRun(models.Model):
 
     def __str__(self):
         return f"{self.started_at:%Y-%m-%d %H:%M} {self.get_status_display()}"
+
+
+class TaggedPlayer(models.Model):
+    """Neue, belegte Frontier; alte Warteschlangen-Zeilen sind keine Saat.
+
+    Der eindeutige Tag und die unveraenderten Abruf-/Cooldown-Felder liegen
+    am TrackedPlayer. Eine erneute Entdeckung setzt sie niemals zurueck.
+    """
+
+    class Source(models.TextChoices):
+        RANKING = "ranking", "Offizielle Trophäenrangliste"
+        RANKED = "solo_ranked", "Beobachtet in neuer soloRanked-Partie"
+
+    player = models.OneToOneField(
+        TrackedPlayer, on_delete=models.PROTECT, related_name="tagged_frontier",
+    )
+    first_source = models.CharField(max_length=20, choices=Source.choices)
+    first_seen = models.DateTimeField()
+    last_seen = models.DateTimeField()
+    discovery_depth = models.PositiveIntegerField(default=0)
+    first_run = models.ForeignKey(CollectorRun, on_delete=models.PROTECT, related_name="+")
+
+
+class TaggedPlayerObservation(models.Model):
+    """Append-only Beleg: exakter JSON-Pointer, Rohantwort, Lauf und Graphkante.
+
+    `query` belegt die abgefragte Identitaet aus der Anfragehuelle; es ist
+    keine Behauptung, dass der Tag auch in einem Match enthalten war.
+    """
+
+    class Source(models.TextChoices):
+        RANKING = "ranking", "Ranglisten-Tag"
+        RANKED = "solo_ranked", "Tag in neuer soloRanked-Partie"
+        QUERY = "query", "Erfolgreich abgefragter Battlelog"
+
+    player = models.ForeignKey(TaggedPlayer, on_delete=models.PROTECT, related_name="observations")
+    source = models.CharField(max_length=20, choices=Source.choices)
+    observed_at = models.DateTimeField()
+    payload = models.ForeignKey("drafter.RawPayload", on_delete=models.PROTECT, related_name="tag_observations")
+    run = models.ForeignKey(CollectorRun, on_delete=models.PROTECT, related_name="tag_observations")
+    json_pointer = models.CharField(max_length=160)
+    queried_player = models.ForeignKey(TrackedPlayer, on_delete=models.PROTECT, null=True, related_name="+")
+    match = models.ForeignKey("drafter.Match", on_delete=models.PROTECT, null=True, related_name="+")
+
+    class Meta:
+        constraints = [models.UniqueConstraint(
+            fields=["player", "payload", "run", "source", "json_pointer"],
+            name="drafter_unique_tag_observation",
+        )]

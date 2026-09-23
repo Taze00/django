@@ -53,3 +53,11 @@ The current Legacy scorer remains the production implementation until a separate
   read-only and collector-summary contracts on isolated synthetic test records.
 - `docs/drafter-v2/COLLECTION_RUNBOOK.md`: isolated credential, request-budget,
   growth-audit and future-experiment procedure.
+
+
+Tagged-frontier collection (D-008): `drafter/services/tagged_frontier.py`, command
+`collect_tagged_frontier`, new TaggedPlayer/TaggedPlayerObservation models in
+`models/collector.py`, additive migration 0019, `tests/test_tagged_frontier.py`.
+Uses existing BrawlApiClient/parser/importer; shared cooldowns remain on TrackedPlayer.
+`docs/drafter-v2/frontier_audit.py` is a read-only aggregate provenance reproducer.
+No runtime/UI/Legacy/model integration.

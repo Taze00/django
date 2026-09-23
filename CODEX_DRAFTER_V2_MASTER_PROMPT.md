@@ -980,6 +980,21 @@ current active maps
 
 Keine Sampling-Korrektur erfinden.
 
+Autorisierter Bootstrap (2026-09-23, D-008): Wenn die anonymisierte Historie
+keine Spieler-Tags traegt, diese niemals rekonstruieren. Eine getrennte,
+persistente Tagged-Frontier darf echte Tags aus offiziellen Trophaeenranglisten
+als Saat aufnehmen; daraus folgt kein Ranked-/Skill-Label. Pro Beobachtung
+RawPayload, CollectorRun, exakten JSON-Pointer und ggf. abgefragten Elternspieler
+speichern. Nur belegte, neue, auswertbare soloRanked-Partien erweitern den Graph.
+Die bestehenden gemeinsamen Spieler-Cooldowns bleiben erhalten. Initial maximal
+ein Ranglisten-HTTP-Versuch, drei zugelassene Saat-Tags, fuenf Battlelog-HTTP-Versuche
+inklusive Retries und ein neuer Abruf-Hop pro Lauf. Rand-Tags bleiben persistent
+fuer spaetere Laeufe; keine offene Rekursion oder automatische Dauersammlung.
+Rohantworten vollstaendig erhalten, historische Zeilen nicht mit Tags auffuellen.
+Kein nutzbarer Ranglisten-Tag: Beleg speichern und stoppen, keine Ersatzquelle
+raten. Nach dem Experiment nur neuere Beobachtungen auditieren; alter Holdout,
+Legacy und finaler Shared-Subset-Vergleich bleiben geschlossen/unveraendert.
+
 Langfristiges Planungsziel darf 50k–100k deduplizierte aktuelle Ranked-Matches pro relevantem Patchfenster sein, aber Datenmenge niemals fälschen.
 
 Wenn kontrollierter Collector-Lauf innerhalb vorhandener Berechtigungen sicher möglich ist, darf er nach Phase 1 gestartet werden. Sonst Runbook/Automation bauen und mit verfügbaren Daten fortfahren.

@@ -257,3 +257,62 @@ No credential exposed, live access, model change or sealed evaluation.
 Revisit if:
 Independent observed Tagged Ranked evidence makes broad candidates available,
 or the user specifies a bounded discovery plan with separate provenance.
+
+
+## D-008: Independent persistent tagged frontier from official rankings
+
+Problem: all 61,146 historical Ranked MatchPlayer rows are anonymized. The
+existing broad_high_rank graph cannot recover their identity linkage. The
+user explicitly authorized an independent bounded bootstrap on 2026-09-23.
+
+Decision: add TaggedPlayer as an opt-in membership linked one-to-one to the
+existing unique TrackedPlayer tag and its shared fetch/cooldown state. Old
+queue membership alone is insufficient. TaggedPlayer preserves first source,
+first/last observed timestamps, first run and minimum observed graph depth.
+TaggedPlayerObservation appends the source kind (ranking, solo_ranked, query),
+exact raw JSON pointer, RawPayload, CollectorRun, queried player and observed
+match. Later sightings never overwrite first source or historical player tags.
+Only normalization of supplied tag strings is allowed; no names/IDs become tags.
+Ranking position/trophies stay raw ranking metadata, never match skill labels.
+
+Protocol: distinct sampling=tagged_frontier_v1; an explicit exclusive played-at
+cutoff; one global ranking HTTP attempt, at most three admitted seeds in this
+experiment, five battlelog HTTP attempts including retries. No catalog/profile
+requests, ranking pagination, auto aggregation or model work. Reuse the existing
+API client/parser/fingerprint importer. Unknown catalog references stay unknown.
+Records at/before the cutoff remain only in raw responses; no frozen labels or
+historical MatchPlayer tags are updated. Discovery requires a current known-result,
+conflict-free API soloRanked match with complete known-Brawler 3v3 teams and
+actual tag fields. Trophy `ranked`, missing perspective/result, malformed teams,
+unknown Brawlers and conflicts do not seed discovery. All raw fields remain saved.
+
+Depth is bounded new request hops per run: existing frontier members and freshly
+admitted ranking seeds are roots; depth 1 may query their discovered neighbors.
+Tags observed at the request boundary remain stored for the next run, with exact
+parent edges and their cumulative discovery depth. This grows across runs without
+open recursion. Each player is attempted once per run; HTTP retries consume the
+same five-attempt cap. A per-database advisory lock serializes frontier runs.
+A durable six-hour claim precedes HTTP, preventing immediate refetch after a crash.
+Successful fetches require six hours before revisit; 404 pauses seven days;
+transient errors retain at least six hours and can back off to 48 hours. No forced
+timestamp reset. The ranking endpoint also has a six-hour cooldown. 401/403 and
+exhausted 429 stop; three consecutive failed player fetches stop. No usable tags
+in the ranking response stops before any battlelog, retaining that response.
+
+Tradeoffs: trophy leaders and their observed neighbors form a biased convenience
+sample. Neither skill comparability nor sampling correction is established.
+The small run measures collection feasibility only. Historical anonymization
+remains irreversible. The existing broad strategy and Legacy engine are unchanged.
+No new seed source is selected if official rankings fail. No recurring job is added.
+
+Validation: focused synthetic tests cover source/JSON/run lineage, persistent
+multi-run discovery, duplicate players/matches and opposing player perspectives,
+cooldown boundary and old-queue preservation, blank/malformed tags, strict Ranked
+filtering, zero-request empty frontier, depth boundaries, capped retries/Retry-After,
+404/credential/parser failures and crash persistence. Real API evidence is recorded
+separately after the bounded experiment in DATA_AUDIT and STATUS.
+
+Revisit: only a documented new bounded collection plan may expand request limits,
+seed populations or depth. New observations need a preregistered immutable future
+split and train-only inputs before any model experiment. The historical comparison
+is final and is not rerun.

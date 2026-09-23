@@ -230,3 +230,19 @@ protection on `2026-09-23T17:11:57.566647Z`: all 205 tracked players were
 now due, yet tagged Ranked rows and broad-qualified candidates both remained
 zero. This confirms that expiry of the refresh interval does not resolve
 the missing-provenance prerequisite. Report: `/tmp/drafter-v2-queue-reproduced.json`.
+
+
+## Tagged-frontier implementation milestone (2026-09-23, D-008)
+
+Starting tree was clean at b818313. The isolated DB mount/network were reverified.
+A new provenance-only frontier and bounded command are implemented and tested;
+no real bootstrap request or import has occurred at this pre-experiment milestone.
+Migration 0019 adds two tables without altering existing rows. Initial 74 and
+expanded 138 focused regressions passed using synthetic disposable test data.
+The real experiment will record its independent official ranking response, exact
+raw/run/JSON-pointer seed evidence and observed graph edges separately below.
+Historical missing tags remain missing; no new data or model result is claimed yet.
+Additional importer/robustness regressions: 38 passed (5.123 s). Final frontier
+suite: 24 passed (2.835 s), including the case of a newer timestamp colliding
+with a frozen row under fingerprint rules: raw retained, frozen labels/links/tags
+unchanged. Migration drift check passed; plan shows only the two new tables.

@@ -84,7 +84,7 @@ or retrieve live data. A different bounded discovery/bootstrap strategy would
 need an explicit revised collection plan, labeled sampling provenance and
 its own budget; do not silently replace `broad_high_rank` with `standard`.
 
-## Bounded collection, only after isolated credential availability
+## Historical broad-only command (do not repeat without new qualifying provenance)
 
 The user supplied `/home/alex/.drafter-v2-api.env` independently (mode 600).
 Use that full absolute path. Load it only inside the collection subshell;
@@ -145,3 +145,104 @@ protocol: source/patch eligibility, immutable fingerprints, temporal splits,
 train-only Legacy/statistical inputs, validation selection and sealed future
 test access. Do not reuse the old holdout or call the old evaluation commands
 on an enlarged database as if that preserved the freeze. No automatic promotion.
+
+
+## Authorized tagged frontier bootstrap (D-008)
+
+This is the user's explicitly authorized replacement for the blocked Phase-12
+bootstrap, with distinct sampling `tagged_frontier_v1`. It does not modify
+`broad_high_rank` or adopt the 205 old queue entries without fresh source evidence.
+Official `/rankings/global/players` is a trophy list, not a soloRanked leaderboard.
+One response is preserved whole; admit at most the first three distinct valid
+supplied tag strings in response order. Do not paginate or substitute another
+source if tags are absent. Actual rank/trophies stay raw metadata; skill is UNKNOWN.
+
+After tests and isolation checks above, apply only the reviewed additive migration:
+
+```bash
+docker compose -p drafter-v2-isolated run --rm --no-deps -T \
+  -e PYTHONDONTWRITEBYTECODE=1 --entrypoint python django-dev \
+  manage.py migrate drafter --noinput
+```
+
+One experiment, with the independent credential loaded only in its subshell:
+
+```bash
+(
+set +x
+set -e
+set -a
+source /home/alex/.drafter-v2-api.env
+set +a
+test -n "${BRAWL_STARS_API_KEY:-}" || exit 1
+docker compose -p drafter-v2-isolated run --rm --no-deps -T \
+  -e PYTHONDONTWRITEBYTECODE=1 --entrypoint python django-dev \
+  manage.py collect_tagged_frontier \
+  --after 2026-09-18T15:04:42Z --ranking-seeds 3 \
+  --max-battlelogs 5 --max-depth 1 --code-revision "$(git rev-parse HEAD)"
+)
+```
+
+Hard budget: one ranking HTTP attempt plus five battlelog HTTP attempts, **including
+retries**, at most five distinct queried players. Existing 0.25-second minimum
+spacing, exponential backoff and capped Retry-After remain active; attempts are
+limited further to the remaining budget. No catalog/profile request or output raw
+file, no aggregation. Provider hourly quota remains UNKNOWN. 401/403 or exhausted
+429 stops; 404 pauses that tag seven days; transient errors pause at least six
+hours, increasing to 48 hours; three consecutive player failures stop the run.
+Successful payloads persist before parsing/import; unsupported bodies remain raw.
+
+The persistent frontier is TaggedPlayer plus TrackedPlayer's unique tag and
+last_fetched_at/next_fetch_after/is_active state. Every source observation links
+its exact JSON pointer, RawPayload, run and query parent. `query` observations
+refer to envelope `/referenz`, not an assertion that the response listed the tag.
+First source is immutable; subsequent ranking and battlelog evidence coexist.
+No historical tag backfill, even when a new payload duplicates a match.
+
+Only records played strictly after the sealed cutoff enter MatchImporter; older
+records stay in raw responses. A newer sighting that deduplicates to a row at/before
+the cutoff also remains raw-only and cannot enrich that frozen row. Only known-result, conflict-free API soloRanked
+complete known-Brawler 3v3 matches admit discovered tags. Trophy `ranked` remains
+ineligible. Missing tag/name/id combinations are never reconstructed. No skill
+threshold or arbitrary sampling correction is added. Existing catalog lookup and
+match fingerprint rules remain unchanged; unknown Brawlers do not trigger HTTP.
+
+Depth means new **request** hops in this run. Existing frontier and newly admitted
+ranking seeds start at hop 0; newly discovered hop-1 players may use the remaining
+budget. Further actual tags observed at the request boundary persist but are not
+queried during this run. In later runs persisted players are roots, still subject
+to cooldown. Cumulative discovery depth and every parent edge stay in provenance.
+No recurring job or automatic second experiment is authorized by this command.
+
+Revisiting is supported using `--ranking-seeds 0` (no ranking request), the same
+five-attempt cap/cutoff and unchanged six-hour gates. Repeated seed sightings never
+reset last_fetched_at or next_fetch_after. A durable claim before HTTP prevents
+immediate re-fetch after process failure. Do not edit timestamps to force requests.
+A database advisory lock rejects overlapping frontier runs; do not run the old
+collector concurrently. On interruption inspect the last CollectorRun, raw payloads
+and STATUS before resuming; retain failed/partial evidence. Recover parsing/import
+from stored payloads rather than refetching solely to fix local code.
+
+Immediately after the single experiment, run the read-only growth and inventory
+commands above and this aggregate provenance audit (no credential needed):
+
+```bash
+docker compose -p drafter-v2-isolated run --rm --no-deps -T \
+  -e PYTHONDONTWRITEBYTECODE=1 \
+  -e 'PGOPTIONS=-c default_transaction_read_only=on' \
+  --entrypoint python django-dev manage.py shell \
+  < docs/drafter-v2/frontier_audit.py
+```
+
+Record code revision/run ID, UTC window, ranking response schema/counts, admitted
+and due seeds, queried battlelogs, HTTP statuses/retries, unique discoveries,
+new unique/eligible soloRanked matches, duplicates, resulting frontier, raw IDs
+and hashes. Do not print player identities or credential values in reports.
+If no eligible new Ranked rows arrive: DATA_UNAVAILABLE, no immediate rerun,
+no expanded request/seed source, no new model freeze. If rankings cannot supply
+usable tags: retain the response and stop before considering another source.
+
+Regression command (disposable isolated test database, no credential loaded):
+`manage.py test drafter.tests.test_tagged_frontier drafter.tests.test_collector
+ drafter.tests.test_api_client drafter.tests.test_offizieller_battlelog
+ drafter.tests.test_v2_growth drafter.tests.test_stichprobe --noinput`.

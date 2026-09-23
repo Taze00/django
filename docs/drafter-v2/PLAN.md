@@ -23,7 +23,7 @@
 Nach jedem Milestone: fokussierte Tests, Fehlerbehebung, Dokumentation, kleiner Commit, `STATUS.md` aktualisieren. The existing holdout and shared-subset report are final. Do not rerun selection on that freeze.
 
 ## Current continuation
-- Preserve and verify the interrupted Phase-12 collector audit; do not repeat its completed runs.
+- Preserve completed Phase-12 runs 1–4. The user now authorizes a separate tagged frontier bootstrap (D-008); do not repeat the empty broad run.
 - Read-only growth report implemented in `896ec90`; continue using the fixed exclusive cutoff `2026-09-18T15:04:42Z`. No training, evaluation, or new split.
 - Run relevant regressions and commit/push the safe milestone.
 - Isolated credential loading succeeded for collector run 4. Collection is now blocked by absent player-tag/rank provenance for `broad_high_rank`, not credential inheritance. Never retrieve live data or reconstruct anonymized identities.
@@ -61,3 +61,22 @@ acceptance gates. Not implemented: a new mechanics schema, values, coverage
 command, strategic ratings or new model features. Existing regression commands
 are in COLLECTION_RUNBOOK.md; future mechanics tests are acceptance criteria,
 not claims that the existing Legacy tests validate this new architecture.
+
+
+## Phase 12B: tagged-frontier bootstrap (authorized 2026-09-23)
+
+1. Add opt-in persistent TaggedPlayer membership and append-only observations,
+   linked to existing shared cooldowns and RawPayload/CollectorRun provenance.
+2. Reuse verified official global trophy-ranking tags; distinguish seed evidence
+   from observed soloRanked graph edges. Preserve queried identities/raw tags,
+   never infer tags for the anonymized history or treat trophies as skill.
+3. Enforce one ranking attempt, three seeds, at most five battlelog HTTP attempts
+   including retries, one new request hop per run, six-hour revisits and no hidden
+   catalog fetch. Save boundary tags for future runs; no recurring job.
+4. Run focused/regression tests, review additive migration 0019, persist the exact
+   pre-experiment resume point and commit implementation. Apply only to isolation.
+5. Run one bounded experiment, then read-only frontier/inventory/new-growth audits.
+   Record actual HTTP/retry/seed/discovery/match/duplicate/frontier counts. If no
+   eligible new Ranked data appears, record DATA_UNAVAILABLE and stop collection.
+6. Commit and push evidence. Next independent work remains Phase 5A source/coverage
+   inventory; no old holdout, reaggregation, model tuning or engine promotion.

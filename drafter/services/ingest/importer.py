@@ -45,6 +45,7 @@ class ImportBericht:
     ungueltig: int = 0
     uebersprungen: int = 0
     neu: int = 0
+    new_match_ids: list = field(default_factory=list)
     duplikate: int = 0
     konflikte: int = 0
     # Wie Brawler zugeordnet wurden. Solange "per Name" dominiert, haengt
@@ -306,6 +307,15 @@ class MatchImporter:
             return kandidat
         return None
 
+    def finde_importierte_partie(self, record):
+        """Read-only Zuordnung eines Records nach denselben Dedup-Regeln.
+
+        Fuer provenance-erhaltende Nachverarbeitung; keine Tag-Rekonstruktion.
+        """
+        record, _ = kanonisiere(record, self._identitaet)
+        _, _, ort = self._ort_fuer(record)
+        return self._finde(record, ort)
+
     # --- Eine Partie ----------------------------------------------------
     def _match(self, record, payload, quelle, bericht):
         record, _ = kanonisiere(record, self._identitaet)
@@ -382,6 +392,7 @@ class MatchImporter:
             ))
         MatchBan.objects.bulk_create(bans)
         bericht.neu += 1
+        bericht.new_match_ids.append(match.pk)
         bericht.neu_nach_typ[record.battle_type or "-"] += 1
 
     def _zusammenfuehren(self, vorhanden, record, sieger, payload, bericht):
