@@ -165,3 +165,95 @@ Revisit if:
 New eligible API observations arrive. Before experimenting, define a new
 temporal split, source/patch policy and train-only statistical snapshots;
 do not silently repartition the growing database with the old commands.
+
+
+## D-006: Structured conditional mechanics and composition matchups
+
+Problem:
+Flat booleans lose ability/loadout requirements and patch validity. Subjective
+ratings confuse sourced mechanics with strategic value; role counts do not
+answer whether a team can meet the opponent's concrete threats.
+
+Alternatives:
+Extend the legacy 32-attribute system; flatten kit effects to global booleans;
+or separate versioned raw facts, deterministic derivations and empirically
+validated strategic concepts.
+
+Evidence:
+The user's architecture clarification (2026-09-23) requires the third option.
+Historical loadouts and patch-level objective mechanics remain insufficiently
+sourced. The old holdout is closed, so no new feature benefit can be asserted
+from it. This is a contract decision, not an empirical feature result.
+
+Decision:
+Master sections 12/13/15 and PLAN phase gates now specify a typed mechanics
+model with source/retrieval dates, patch validity, raw/normalized values,
+formula/input lineage and explicit ability dependencies/activation/uses.
+Base attack, Super, Gadget, Star Power, Hypercharge, transformations and
+summons remain distinct; ownership never proves equipped or active loadout.
+Unknown requirements, values and historical builds stay UNKNOWN.
+Composition hypotheses compare concrete capabilities to enemy defenses/win
+conditions, are independently ablatable and require a new empirical test
+window. Search evaluates complete resulting states, not isolated strength.
+The coverage audit must expose per-Brawler raw/conditional/unknown fields
+and global mechanic/source/patch coverage with explicit denominators.
+
+Why:
+This prevents gadget-only effects becoming permanent abilities, modern facts
+being applied retroactively and hand-tuned anti-tank/thrower/safety scores
+entering V2 under the name of mechanics. Critical weaknesses may lower an
+individual pick only through validated composition value, not a chosen rank.
+
+Validation:
+Requirements checked against all nine points in the user's clarification.
+No speculative schema, mechanic data, model feature, Legacy change or holdout
+rerun is part of this documentation milestone. Existing regression contracts
+are run separately; future mechanics acceptance tests remain prospective.
+
+Revisit if:
+Verified source/coverage evidence permits implementation, or new preregistered
+ablations support or reject an interaction. No feature promotion by plausibility.
+
+
+## D-007: Empty broad selection is missing provenance, not a cooldown bug
+
+Problem:
+The independently supplied credential loaded successfully, yet bounded run 4
+selected zero players and made zero requests. The previous STATUS credential
+blocker is obsolete; another identical run would not create evidence.
+
+Evidence:
+Run 4 (`cd6481e`) used max five battlelogs, depth 1 and six-hour spacing.
+The read-only queue audit found 61,146 Ranked player rows with zero nonblank
+tags, zero broad-qualified candidates, 205 active tracked players at depth
+<=1 and 200 due players at the recorded audit time. Historical anonymization
+removed the player-tag linkage required by HighRankStichprobe. The strategy
+intentionally returns None without falling back to the trophy ranking queue.
+
+Alternatives:
+Fabricate/reconstruct identity linkage; bypass cooldowns; silently switch to
+standard trophy-seed sampling; or preserve the sampling contract and obtain
+independently sourced genuine Ranked provenance.
+
+Decision:
+Keep the broad strategy, timestamps and deduplication unchanged. Record
+DATA_UNAVAILABLE for genuinely newer Ranked observations, stop repeated empty
+runs and retain the run record. Supply actual tagged soloRanked payloads through
+the normal isolated importer before attempting broad collection again. A
+separate discovery bootstrap requires an explicit revised collection plan and
+truthful sampling provenance; it is not a repair to the frozen engine/model.
+
+Why:
+Due trophy-ranking players are not evidence of qualifying Ranked history.
+Waiting for cooldowns or possessing a credential cannot restore redacted tags.
+The current data cannot safely resolve this prerequisite by itself.
+
+Validation:
+Isolated read-only inventory, growth report and queue audit reproduce the
+counts; 94 relevant collector/sampling/UNKNOWN/V2/logging contract tests passed
+with normal settings, zero failures (13.401 s test runtime).
+No credential exposed, live access, model change or sealed evaluation.
+
+Revisit if:
+Independent observed Tagged Ranked evidence makes broad candidates available,
+or the user specifies a bounded discovery plan with separate provenance.

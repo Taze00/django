@@ -603,82 +603,223 @@ MODEL_CARD
 
 ---
 
-# 12. PHASE 5 — Objektive Mechanikdaten statt 32 Handattribute
+# 12. PHASE 5 — Strukturierte, versionierte Mechanikdaten
 
-Keine subjektiven 0–100-Profile.
+Keine subjektiven 0–100-Profile und kein flaches Brawler-Profil aus
+`wallbreak=true`, `healing=true` oder `mobility=true`. Mechanikdaten dienen
+als belegbare Seiteninformation, Teamfeatures, Erklärung und Cold-start-Hilfe.
+Diese Architekturpräzisierung definiert Verträge, keine bereits verfügbaren
+Spieldaten. Ohne etablierte Quellen und Coverage keine spekulative Mechanik-
+Implementierung und keine Befüllung aus LLM-Wissen.
 
-Mechanikdaten dienen als Seiteninformation, Team-Aggregate, Erklärung und Cold-start-Hilfe.
+## Drei getrennte Ebenen
 
-Objektive Werte, soweit belegbar, z. B.:
+1. **Objektive Rohmechaniken:** tatsächlich belegte Werte und Effekte eines
+   konkreten Angriffs, einer Fähigkeit, Form oder Beschwörung.
+2. **Deterministisch abgeleitete Mechaniken:** versionierte Formeln über diese
+   Rohwerte; mit Einheiten, Eingaben, Voraussetzungen und Gültigkeitsbereich.
+3. **Statistisch validierte strategische Konzepte:** gelernte oder getestete
+   Zusammenhänge zur Kompositionsqualität. Kein manuelles Stärkeurteil.
+
+Ein Rohwert darf nicht still zu einem strategischen Rating werden. Insbesondere
+keine Werte wie `anti_tank = 90`, `thrower_counter = 80`, `safe_pick = 95`
+oder `flexibility = 90`. Alte Attribute und Legacy-Snapshots bleiben erhalten,
+sind aber keine objektiven V2-Mechanikfakten.
+
+## Mechanikvokabular und Datensatzvertrag
+
+Soweit zuverlässig belegt, umfasst der Mechanikkatalog:
 
 ```text
 HP
-damage per hit/projectile
-projectiles per attack
-reload
-ammo
-range
-movement speed
-projectile/attack type
-shoots over walls
-pierce
-wallbreak
-healing
-shield
-stun/slow/knockback/pull/silence
-dash/jump/teleport
+Schaden pro Treffer / Projektil / Schadensinstanz
+Projektilzahl / Zahl und zeitlicher Verlauf der Schadensinstanzen
+Reload, Munition, Reichweite
+Bewegungsgeschwindigkeit, Projektilgeschwindigkeit falls verfügbar
+Pierce, Splash/AOE, Bounce, prozentualer HP-Schaden
+Heilung, Schilde, Schadensreduktion
+Slow, Stun, Knockback, Pull, Silence / Root soweit zutreffend
+Dash, Jump, Teleport
+Wallbreak, Wanddurchdringung, Schießen über Wände (getrennte Eigenschaften)
+Beschwörungen, Transformationen
+Super-, Gadget-, Star-Power- und Hypercharge-Effekte
 ```
+
+Ein Datensatz identifiziert Brawler, Mechanik, Fähigkeit und ggf. Form oder
+Beschwörung. Er enthält einen typisierten Rohwert und normalisierten Wert mit
+Einheit, Skalierung/Power-Level und relevantem Ziel-/Loadout-Kontext; dazu
+Schema-/Mechanikversion, Patch-/Gültigkeitsbezug und Quellenbelege. Numerische,
+kategorische und explizit belegte Ja/Nein-Werte sind zulässig; fehlende Werte
+bleiben `UNKNOWN`, nicht null oder falsch. Ein belegter bedingter Effekt ist
+kein globales Fähigkeits-Bool des Brawlers.
+
+## Bedingungen bleiben Bedingungen
+
+Die Herkunft eines Effekts im Kit ist getrennt von seiner Datenquelle:
+`base_attack`, `super`, `gadget`, `star_power`, `hypercharge`,
+`transformation` oder `summon`. Mehrere Voraussetzungen können gleichzeitig
+nötig sein; sie dürfen nicht als gegenseitig ausschließende Kategorien
+missverstanden werden. Abhängigkeiten sind explizit mit AND/OR-Semantik zu
+beschreiben, sofern bekannt; unbekannte Aktivierungsbedingungen bleiben offen.
+
+Je nach Mechanik erfasst der Vertrag:
+
+```text
+conditional
+requires_super / requires_gadget / requires_star_power / requires_hypercharge
+konkrete benötigte Fähigkeit / Form / Beschwörung
+limited_uses / Ladungen und deren Bezugszeitraum
+repeatability / Wiederholbarkeit
+activation_condition / Aktivierungsbedingung
+Dauer, Cooldown, Aufladung oder Ressourcenkosten soweit belegt
+patch/version und Provenance
+```
+
+Nicht belegte Requirements dürfen nicht automatisch `False` werden. Ein
+Gadget-only-Wallbreak ist keine dauerhaft verfügbare Wandzerstörung.
+Potentielle Fähigkeit, Besitz, ausgerüstetes Loadout und aktuell verfügbare
+Ladung sind unterschiedliche Aussagen.
+
+## Historische Loadouts und Patchversionen
+
+Wenn Battlelogs das ausgerüstete Gadget, die Star Power oder Hypercharge nicht
+nennen, bleibt das historische Loadout `UNKNOWN`. Besitz im Spielerprofil ist
+kein Ausrüstungsnachweis. Keine erfundenen Builds, keine Annahme, dass ein
+bedingter Effekt aktiv war. Base Kit und optionale Loadout-Effekte bleiben
+getrennt. Explizite Was-wäre-wenn-Loadouts sind Szenarien, keine historischen
+Beobachtungen; auch Aktivierungswahrscheinlichkeiten werden nicht geraten.
+
+Jeder Quellenbeleg bewahrt:
+
+```text
+Quelle (stabile Referenz / URL / Datensatzkennung)
+source_date (Datum der Quelle)
+retrieved_at (Abrufdatum)
+patch/version und belegten zeitlichen Gültigkeitsbereich
+Rohwert sowie normalisierten Wert / Einheit, soweit relevant
+Normalisierungsversion und Provenance
+```
+
+Fehlende Quellendaten und Versionsgrenzen bleiben `UNKNOWN`; Abrufdatum ist
+kein Patchdatum. Moderne Werte werden nicht rückwirkend auf alte Matches
+übertragen. Ein zeitlich nicht belegbarer Join muss als unbekannt bzw.
+ausgeschlossen dokumentiert werden. Quellenkonflikte bleiben sichtbar und
+werden nicht durch plausibles Raten aufgelöst.
 
 Quellenpriorität:
 
+1. Offizielle API-/Spieldaten, wenn tatsächlich verfügbar und verifiziert.
+2. Offizielle Supercell-Patch-/Release-Notes.
+3. Zuverlässige strukturierte öffentliche Spieldatenquellen.
+4. Dokumentierte Referenzquellen zum Gegenprüfen.
+5. `UNKNOWN`.
+
+LLM-Wissen ist niemals Source of Truth. Pro-Wissen darf Hypothesen, Testfälle
+und Erklärungsvokabular liefern, keine ungeprüften Gewichte oder Ratings.
+
+## Abgeleitete Größen
+
+Zu untersuchen sind sustained DPS, Burst, effektive HP, Schaden gegen hohe HP,
+effektives Reichweitenprofil, Heil-/Schildkapazität, CC-Kapazität,
+Wallbreak-Verfügbarkeit/-Zuverlässigkeit, Mobilitäts-/Zugangsprofil,
+Mehrzielschaden und Thrower-Zugang.
+
+Jedes quantitative Feature braucht entweder eine dokumentierte deterministische
+Formel oder ein auf Daten validiertes gelerntes Modell. Deterministische
+Ableitungen speichern Formel-ID/-Version, Eingabereferenzen, Einheiten,
+Annahmen und Gültigkeitsbedingungen. Etwaige Treffer-, Zielzahl-, Zeitfenster-,
+Reload-/Angriffszyklus- oder Aktivierungsannahmen werden explizit ausgewiesen;
+sie sind keine gemessenen Tatsachen. Fehlt eine notwendige Eingabe, ist die
+Ableitung `UNKNOWN`. Teilweise bekannte Teamsummen sind keine vollständigen
+Teamwerte. Mechanisch berechenbar bedeutet noch nicht strategisch wirksam.
+
+## Reproduzierbarer Coverage-Audit
+
+Vor der Mechanikimplementierung Quelleninventar und erreichbare Abdeckung
+feststellen. Danach einen versionierten, reproduzierbaren Audit-Command planen
+und implementieren, dessen Eingaben Brawleruniversum, Mechanikmanifest,
+Patch/Version und Loadout-Kontext festhalten.
+
+Pro Brawler: bekannte Rohmechaniken, bedingte Effekte mit Requirements,
+UNKNOWN-Felder, Quellen und Patch-/Versionsbezug. Global: Abdeckung je
+Mechanik, UNKNOWN-Anteil, Quellenverteilung und Patchverteilung. Zähler und
+Nenner dokumentieren; Base Kit und Bedingungen getrennt berichten. Ein
+bedingter Effekt zählt nicht als bestätigte Verfügbarkeit im Match. Fehlend,
+nachweislich nicht vorhanden und nicht anwendbar bleiben unterscheidbar.
+
+Acceptance:
+
 ```text
-offizielle API wenn real verfügbar
-offizielle Supercell-Quellen/Patchnotes
-belastbare dokumentierte öffentliche Referenz
-UNKNOWN
+Quelleninventar und Coverage vor spekulativer Befüllung
+Versionierter Vertrag trennt raw / derived / validated strategic concepts
+Bedingungen und historisches UNKNOWN-Loadout bleiben erhalten
+Patch-/Provenance- und Formellineage nachvollziehbar
+Reproduzierbarer Coverage-Audit mit expliziten Nennern
+Keine erfundenen Mechaniken; belegte Lücken in DATA_GAPS.md
 ```
-
-Jeder Wert braucht Source, Source-Date, Patch/Version und Provenance.
-
-Alte 32 Attribute nicht zur aktiven Zielarchitektur machen. Historische Daten für Legacy-Reproduzierbarkeit behalten.
-
-Pro-Wissen nur als Feature-Hypothese/Testfall/Erklärungsvokabular, nicht als handgesetztes Gewicht.
 
 ---
 
-# 13. PHASE 6 — Team-Composition-Features
+# 13. PHASE 6 — Kompositions-Matchups statt bloßer Rollenzählung
 
-Modelliere die Frage:
+Die Frage lautet: Können die konkreten Fähigkeiten von Team A auf die
+Gewinnbedingungen und defensiven Eigenschaften von Team B antworten?
+Reine Rollenanzahlen beantworten sie nicht.
+
+Mit belegten Phase-5-Daten untersuchen:
+
+- Reicht eigener Dauerschaden gegen gegnerische effektive HP und Sustain?
+- Kann das eigene Team einen gegnerischen Reichweitenvorteil überwinden?
+- Erreicht es Thrower hinter Terrain und stoppt es eine Frontline mit hohen HP?
+- Sind Dauerschaden, Reichweite und Sustain für diesen Kontext ausreichend?
+- Sind Wallbreak/Terrainkontrolle und Mobilitäts-/Zugangswerkzeuge verfügbar,
+  wiederholbar und unter den tatsächlichen Bedingungen einsetzbar?
+- Welche schweren funktionalen Lücken oder Redundanzen bleiben?
+
+Terrainabhängigkeit, Gegnerdruck und andere Kontextgrößen benötigen eigene
+belegte Daten oder validierte Ableitungen. Fehlende Map-Geometrie darf nicht
+als bekanntes Thrower-Matchup erscheinen. UNKNOWN wird weder als Schwäche
+noch als bestätigte Deckung interpretiert.
+
+Ein individuell starker Brawler darf deutlich niedriger rangieren, wenn sein
+Pick eine kritische Kompositionsschwäche offen lässt und das validierte V
+für die resultierende Komposition einen schlechteren Wert vorhersagt.
+Daraus folgt keine feste Strafe, kein gewünschter Beispielrang und kein
+manueller Override für bestimmte Brawler.
+
+Unabhängig ablatierbare Interaktionshypothesen:
 
 ```text
-Wie gewinnt dieses Team gegen dieses Gegnerteam?
-```
-
-mit wenigen objektiven Aggregaten.
-
-Nur wenn Daten vorhanden:
-
-```text
-own/enemy total HP
-sustained damage vs enemy HP
-range profile
-wallbreak count
-hard CC count
-mobility/access tools
-thrower count
-thrower access
-healing/shield capacity
-```
-
-Mögliche Interaktionen wie:
-
-```text
-own_sustained_damage * enemy_effective_hp
-enemy_thrower_count * own_access_tools
+own_sustained_dps * enemy_effective_hp
+own_damage_vs_high_hp * enemy_high_hp_share
+own_access_tools * enemy_thrower_presence
+own_wallbreak_reliability * terrain_dependence
 own_range_profile * enemy_range_profile
+own_cc_capacity * enemy_frontline_or_mobility
+own_sustain * enemy_pressure
 ```
 
-Jede Hypothese einzeln evaluieren. Nur aktiv behalten, wenn Validation/Holdout den Nutzen trägt. Keine Regel wie "2 Tanks = +8 Anti-Tank".
+Jeder Term braucht Definition, Einheiten, Eingaben, Quellen-/Patchbezug,
+Bedingungen und UNKNOWN-Verhalten. Listen sind Hypothesen, keine fertigen
+Features und keine Effektbehauptungen. Weder "2 Tanks => +20 Anti-Tank" noch
+andere willkürliche Boni oder statische Synergiegewichte sind erlaubt.
+
+Hypothesen separat ablatieren; Auswahl auf Train/Validation, abschließende
+Prüfung auf einem neuen, zuvor unberührten Testfenster. Der bereits evaluierte
+historische Holdout und sein finaler Shared-Subset-Vergleich bleiben geschlossen.
+Keine Aktivierung ohne reproduzierbaren Nutzen, Leakage-Prüfung und erhaltene
+Kalibrierung/Symmetrie. Quellenabdeckung und formale Berechenbarkeit sind
+notwendige Voraussetzungen, aber kein Ersatz für empirische Validierung.
+
+Acceptance:
+
+```text
+Komposition gegen Gegnerkomposition bewertet; keine bloße Rollenliste
+Jede Hypothese separat ablatierbar und versioniert
+Bedingte Loadouts / UNKNOWN / Patchbezug propagiert
+Nur empirisch validierte Kompositionsterme aktiv
+Kein Tuning auf Einzelfälle oder den geschlossenen historischen Holdout
+```
 
 ---
 
@@ -706,6 +847,24 @@ Neuronales Set-/Transformer-Modell erst später als Challenger bei ausreichender
 # 15. PHASE 8 — Draft Decision Layer
 
 Voraussetzung: ausreichend gutes, kalibriertes V.
+
+## Jeder Kandidat erzeugt einen neuen Draftzustand
+
+Search bewertet nie nur isolierte Kandidatenstärke. Jeder legale Kandidat
+wird dem aktuellen Zustand hinzugefügt. V/Search bewertet die resultierende
+Komposition und, solange Picks offen sind, plausible Fortsetzungen:
+
+- welche Kompositionsschwächen der Pick behebt,
+- welche er offen lässt oder neu erzeugt,
+- welche plausiblen Antworten des Gegners folgen können,
+- wie gut die resultierende vollständige Komposition ist.
+
+Diese Aussagen müssen aus belegten Mechanik-/Kompositionstermen oder
+Search-Folgen kommen; bei fehlender Evidenz bleiben sie UNKNOWN. Sie sind
+keine zusätzliche Schicht handgesetzter Kandidaten-Scores. Base Kit,
+bedingte Loadouts, Ressourcen und Patchversionen müssen im bewerteten Zustand
+konsistent bleiben. First/Mid/Last verwenden dasselbe V und den jeweiligen
+Suchhorizont; keine Doppelzählung über separate Handgewichte.
 
 ## Last Pick
 

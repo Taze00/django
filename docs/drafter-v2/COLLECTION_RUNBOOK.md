@@ -53,19 +53,58 @@ No skill, mechanics, draft order or match builds are inferred.
 The shared settings print `/code` before command output; a saved JSON report
 must be read from the first `{`, without changing those protected settings.
 
-## Bounded collection, only after isolated credential availability
+## Read-only queue provenance preflight
 
-Supply `BRAWL_STARS_API_KEY` independently in the host process environment.
-Do not pass a literal token in a command, log it, or obtain it from the live
-checkout/container. Check presence only:
+Before another broad run, check whether its required Ranked provenance exists:
 
 ```bash
+docker compose -p drafter-v2-isolated run --rm --no-deps -T \
+  -e PYTHONDONTWRITEBYTECODE=1 \
+  -e 'PGOPTIONS=-c default_transaction_read_only=on' \
+  --entrypoint python django-dev manage.py shell \
+  < docs/drafter-v2/collection_queue_audit.py
+```
+
+This prints counts only. It uses `HighRankStichprobe.belegte_kandidaten()` and
+mirrors the runbook's depth 1, six-hour refresh interval and `next_fetch_after`
+constraints. It does not call `nachtragen()`, start a collector, reveal tags or
+reinterpret the rank field as a validated skill measure.
+
+Run 4 had zero candidates because all 61,146 historical soloRanked player rows
+had blank tags. At the diagnosis time 200 tracked players were due, but none
+had the tagged Ranked evidence required by `broad_high_rank`. The strategy
+intentionally has no fallback to trophy-ranking seeds. Waiting for cooldowns
+cannot restore missing provenance; do not keep repeating the same broad run.
+
+A valid next input is an independently supplied observed soloRanked payload
+with actual player tags and rank-field evidence. It must retain provenance,
+be imported only into isolation through the normal deduplicating importer,
+and pass the same rank/refresh checks. Do not reconstruct anonymized identities
+or retrieve live data. A different bounded discovery/bootstrap strategy would
+need an explicit revised collection plan, labeled sampling provenance and
+its own budget; do not silently replace `broad_high_rank` with `standard`.
+
+## Bounded collection, only after isolated credential availability
+
+The user supplied `/home/alex/.drafter-v2-api.env` independently (mode 600).
+Use that full absolute path. Load it only inside the collection subshell;
+never display, copy, log or commit its contents, and never use the live `.env`.
+API credential presence is not proof of server acceptance if no request occurs.
+
+```bash
+(
+set +x
+set -e
+set -a
+source /home/alex/.drafter-v2-api.env
+set +a
 test -n "${BRAWL_STARS_API_KEY:-}" || exit 1
 docker compose -p drafter-v2-isolated run --rm --no-deps -T \
   -e PYTHONDONTWRITEBYTECODE=1 \
   --entrypoint python django-dev manage.py collect_brawl_matches \
   --max-spieler 5 --max-tiefe 1 --abruf-abstand-stunden 6 \
   --strategie broad_high_rank --ohne-katalog --ohne-rangliste
+)
 ```
 
 If the presence check fails, stop before starting the collector. A variable

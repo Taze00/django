@@ -176,3 +176,57 @@ Reports: `/tmp/drafter-v2-credential-resume-audit.json` and
 `/tmp/drafter-v2-credential-resume-growth.json`. Reproduce with the
 unchanged read-only commands in COLLECTION_RUNBOOK.md. No model command,
 sealed evaluation, live data access or production change was performed.
+
+
+## Completed bounded run 4 and selection diagnosis
+
+Source revision: `cd6481e`; run ID 4 started at
+`2026-09-22T18:13:43.707390Z`. This completed run preceded the architecture
+clarification on 2026-09-23; it is not being repeated.
+The user-supplied isolated credential file was verified as mode 600 and loaded
+only into the collection process. Presence check passed. No credential value
+was displayed, copied or committed. Because no HTTP request occurred, remote
+credential validity was not tested by this run.
+
+Parameters: `broad_high_rank`, max five battlelogs, max depth 1, six-hour
+refresh spacing, ranking/catalog startup fetches disabled, no optional raw
+files. Result: finished, zero players queried, zero battlelogs, zero requests,
+zero retries, zero new/duplicate/conflicting matches. No response means no
+new HTTP status or rate-limit information, not an HTTP success assertion.
+Only the new CollectorRun record was added; no payload or match was imported.
+
+Post-run read-only inventory: four runs; otherwise unchanged at 18,322
+matches, 112,776 player rows, 877 payloads, 205 tracked players and 98 maps.
+Ranked remains 10,191 total / 10,162 countable. Conflicts and reconstructed
+fingerprint duplicates remain zero.
+Growth remains DATA_UNAVAILABLE: zero API soloRanked observations strictly
+after `2026-09-18T15:04:42Z`. The 76 newer API matches are still 75 trophy
+`ranked` plus one `friendly`; no new model evidence was obtained.
+
+Read-only queue diagnosis at `2026-09-22T18:15:25.024440Z`: 61,146
+soloRanked player rows, zero with nonblank tags, zero broad-qualified players.
+205 tracked players were active at depth <=1 and 200 were due under the
+six-hour/next-fetch gates, but zero due players met broad provenance criteria.
+These are snapshot-time queue counts; due counts may change with time.
+The anonymized snapshot deliberately blanked player tags. `HighRankStichprobe`
+skips blank tags; `Collector._naechster` returns None when its broad list is
+empty, without falling back to the trophy queue. Hence this is a missing
+provenance blocker, not a cooldown, credential or deduplication failure.
+
+Reproducer: `docs/drafter-v2/collection_queue_audit.py`, invoked through
+`manage.py shell` with PostgreSQL `default_transaction_read_only=on` as shown
+in COLLECTION_RUNBOOK.md. Reports from the completed run:
+`/tmp/drafter-v2-bounded-audit.json`, `/tmp/drafter-v2-bounded-growth.json`,
+`/tmp/drafter-v2-bounded-queue.json`. Aggregate counts only; no player identities.
+
+Next valid input: independently sourced actual soloRanked payloads carrying
+player tags and rank-field provenance, imported normally into isolation.
+No invented ranks/tags, deanonymization, live-data lookup, forced cooldown
+reset, strategy substitution, repeat empty broad run, aggregation or sealed
+holdout evaluation was performed. Legacy remains unchanged.
+
+The committed queue reproducer was executed under PostgreSQL read-only
+protection on `2026-09-23T17:11:57.566647Z`: all 205 tracked players were
+now due, yet tagged Ranked rows and broad-qualified candidates both remained
+zero. This confirms that expiry of the refresh interval does not resolve
+the missing-provenance prerequisite. Report: `/tmp/drafter-v2-queue-reproduced.json`.

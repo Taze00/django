@@ -1,25 +1,25 @@
-RESUME FROM: Phase 12 / resolve API credential inheritance into this session's command-execution environment; require a successful presence-only check, then run the still-pending five-battlelog collection under COLLECTION_RUNBOOK.md. Do not rerun the sealed evaluation.
+RESUME FROM: Phase 12 / obtain independently sourced tagged soloRanked provenance, verify broad_high_rank candidates with the read-only queue audit, then run one bounded collection only if eligible. Phase 5A source/coverage inventory is the next independent architecture task; no speculative mechanics implementation or sealed evaluation.
 
 # Drafter V2 Status
 
 Overall:
 - Active/default engine: frozen Legacy `3a565bd`; no runtime/API/UI switch.
-- Completed safe milestone: interrupted collector notes preserved; isolated inventory verified; read-only post-freeze growth command and collection runbook implemented and validated.
-- Current phase: Phase 12 collection preflight blocked by credential visibility; V2 promotion/integration remains gated.
-- External blocker: user reports the isolated API credential is configured, but `BRAWL_STARS_API_KEY` is not inherited by this session's command processes. Login, non-login, and escalated host presence-only checks returned false, including a final recheck. No collector was started; no authentication request failed. Live credentials remain out of scope.
-- Data blocker: zero eligible API Ranked matches played after `2026-09-18T15:04:42Z`. No new experiment or promotion is justified from current growth.
-- Working root: `/home/alex/alex-django-drafter-v2`, branch `feature/drafter-v2`.
+- Completed: user architecture clarification integrated into master sections 12/13/15, PLAN and DECISIONS D-006; no speculative mechanics implemented.
+- Completed collection: run 4 started `2026-09-22T18:13:43.707390Z` at code revision `cd6481e`, finished with zero battlelogs/requests/new matches. The authorized mode-600 isolated credential loaded only for that process; no secret was exposed. Remote credential validity was not exercised.
+- Genuine data blocker: anonymized Ranked player rows have no tags, so broad_high_rank has zero qualifying candidates. This supersedes the old credential-inheritance blocker; cooldown bypass cannot solve it (D-007).
+- Growth status: DATA_UNAVAILABLE; zero eligible API soloRanked matches played after `2026-09-18T15:04:42Z`.
+- Worktree: `/home/alex/alex-django-drafter-v2`, branch `feature/drafter-v2`. Live checkout and database remain out of scope.
 
 Latest validation:
-- Resume inventory (PostgreSQL read-only): 18,322 matches, 112,776 match players, 877 payload rows, 205 tracked players, three collector runs and 98 maps.
-- Ranked: 10,191 total / 10,162 countable; zero conflicts and zero reconstructed-fingerprint duplicates.
-- Growth (API-only, exclusive played-at cutoff): 76 newer matches, comprising 75 `ranked` and one `friendly`; zero newer `soloRanked`, zero eligible new Ranked observations. Latest API Ranked timestamp unchanged.
-- Existing runs 1/2/3 verified: 0/5/5 players queried, 0/100/0 new matches, 0/25/125 duplicate observations; all new rows in run 2 are trophy matches. No collector rerun during this resume.
-- Current focused regressions: 66 V2/collector/API-client/Praxisfall tests passed, zero failures, 9.190 s test runtime, normal Django settings; system check clean. Initial read-only assertion corrected for PostgreSQL SELECT cursors; no production behavior change.
-- Historical full suites (previous agent): 692 Drafter tests, four skipped, zero failures; 253 Fitness tests, zero failures. Not represented as newly rerun.
-- Latest credential-resume audit paths: `/tmp/drafter-v2-credential-resume-audit.json`, `/tmp/drafter-v2-credential-resume-growth.json`; both executed with PostgreSQL read-only protection. Counts remain unchanged and growth status is DATA_UNAVAILABLE. No new run beyond IDs 1/2/3.
-- This documentation-only checkpoint changes no code: prior 66-test regression remains applicable and was not rerun; fresh read-only audits provide validation for the updated inventory.
-- Credential visibility last verified at: 2026-09-22T18:08:52.563568+00:00.
+- Read-only post-run inventory: 18,322 matches, 112,776 match players, 877 payload rows, 205 tracked players, four collector runs and 98 maps.
+- Ranked: 10,191 total / 10,162 countable; zero conflicts and reconstructed-fingerprint duplicates.
+- Growth: 76 newer API matches (75 trophy ranked, one friendly), zero newer soloRanked. Latest API Ranked time remains `2026-09-18T15:04:42Z`.
+- Queue diagnosis at `2026-09-22T18:15:25.024440Z`: 61,146 Ranked player rows, zero with tags, zero broad-qualified players; 205 active tracked depth<=1, 200 due, zero due broad-qualified. Counts are from that audit time, not a promise of future cooldown state.
+- Reproduction on `2026-09-23T17:11:57.566647Z`: 205 players now due, still zero tagged Ranked rows and zero broad-qualified candidates; waiting did not resolve the prerequisite. Output: `/tmp/drafter-v2-queue-reproduced.json`.
+- Reproducer: `docs/drafter-v2/collection_queue_audit.py` via the read-only command in COLLECTION_RUNBOOK.md. Reports: `/tmp/drafter-v2-bounded-{audit,growth,queue}.json`.
+- Current regressions: 94 isolated collector/API-client/sampling/UNKNOWN/growth/search/model/Praxisfall tests passed, zero failures, 13.401 s test runtime; normal settings, system check clean, no API credential loaded for tests.
+- Historical validation: prior 66-test targeted suite passed; prior agent's full suites 692 Drafter (four skipped) and 253 Fitness passed. These historical runs are not new results.
+- Architecture validation: all nine requested clarifications mapped to master/plan acceptance gates. Prospective mechanics tests are not yet implemented or claimed as passed.
 
 Sealed evaluation (final, unchanged):
 - Manifest `v2-dataset-freeze-1`, digest `2bb8222b9025a5da7daadea8b9a252c39b16bcda8b07b9bc2df69315ea4dcf9e`.
@@ -30,13 +30,12 @@ Sealed evaluation (final, unchanged):
 - Provenance limitation: Legacy benchmark uses stored aggregates without enforcing train-only input. See EVALUATION.md; final numbers retained, not treated as proof of leakage-free generalization.
 
 Data integrity:
-- No invented observations, mechanics or API fields; missing provenance is UNKNOWN.
-- No live database queries, live credential reads, API requests, imports, aggregation, schema changes, data deletion or service restarts during this resume.
-- Existing uncommitted DATA_AUDIT/DATA_GAPS/DECISIONS content preserved and incorporated.
-- Pick order, bans, builds, combat stats and validated skill control remain UNKNOWN; objective patch mechanics remain insufficiently sourced.
+- No invented observations, mechanics, API fields, identity linkage or historical loadouts; UNKNOWN remains UNKNOWN.
+- Only an isolated CollectorRun record was added by run 4; no API request, raw import, reaggregation, schema change or data deletion. Existing snapshots and prior notes preserved.
+- No live credential/checkout/database access, service restart, sealed-holdout rerun, tuning, or Legacy engine change.
 
 Next:
-1. Once a presence-only check confirms the isolated API credential is visible to the command-execution process, verify the documented mounts/network and run at most five battlelogs with depth 1 and six-hour refresh spacing. Do not read live credentials or reset queue timestamps.
-2. Run `drafter_v2_growth --after 2026-09-18T15:04:42Z --format json` with DB read-only protection. Zero new eligible rows remains DATA_UNAVAILABLE, not a reason to fabricate data or retry the same population indefinitely.
-3. Before any future model experiment, preregister immutable new split membership, source/patch eligibility and training-only statistics/priors. Keep the old freeze and shared subset closed.
-4. V2 search/explanations remain offline prototypes; active integration awaits evidence. No promotion or Legacy edits.
+1. Resolve missing tagged Ranked provenance using independently supplied genuine payloads and the normal isolated importer. Re-run the read-only queue diagnostic; do not reconstruct redacted identities, reset timestamps, weaken deduplication or silently change strategy.
+2. Once broad-qualified due players exist, load the authorized isolated credential only for one run with at most five battlelogs, depth 1 and six-hour spacing. Audit growth against the unchanged cutoff afterward; zero evidence remains DATA_UNAVAILABLE. Do not repeat the already completed empty run.
+3. Independently, Phase 5A may inventory allowed sources and mechanics coverage. Establish actual source/patch/condition coverage before implementing a schema or derived features. D-006 and PLAN define the new contracts; no hand ratings or modern-value backfills.
+4. Before any model experiment, preregister new immutable split membership and train-only statistical inputs. Keep the historical holdout/shared subset closed; V2 search/explanations remain offline until validated.
