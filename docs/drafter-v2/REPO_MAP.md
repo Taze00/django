@@ -80,3 +80,12 @@ D-010 bounded follow-up additions:
 - `docs/drafter-v2/MECHANICS_FOLLOWUP*`, `MECHANICS_CURRENT_CLAIMS*`,
   `MECHANICS_PATCH_EVENTS*`: bounded evidence and independent current/historical
   gates; the original 5A JSONs remain frozen.
+
+## Offline reviewed claims (D-011)
+
+- `drafter/services/v2_mechanics_claims.py`: closed reviewed-artifact allowlist,
+  atomic no-replace annotation archive and dated conditional explanation CLI.
+- `drafter/tests/test_v2_mechanics_claims.py`: preservation, rejection, corruption,
+  idempotence and use-boundary tests; standard library only.
+- `docs/drafter-v2/MECHANICS_CLAIM_ARCHIVE.md`: reproduction and scope limits.
+No Django model, migration, endpoint or scoring consumer added.

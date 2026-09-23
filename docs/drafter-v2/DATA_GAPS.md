@@ -81,3 +81,11 @@ The source-structure gap narrowed; effect semantics and deployment boundaries di
 not become known. The limited current explanation pass is deliberately independent
 of the historical gate. Nothing here authorizes a numeric team feature, collection,
 Legacy change or sealed-holdout work. See MECHANICS_FOLLOWUP and evidence JSON.
+
+## D-011 storage boundary
+
+The archive preserves the four reviewed annotations, not publisher response bodies.
+Body availability is NOT_CHECKED; current validity remains UNKNOWN. A pinned
+annotation digest establishes review identity, not server currency. New revisions
+require evidence review; persistent conflict resolution and current revalidation
+are not implemented. All D-010 unit/loadout/temporal gaps remain unchanged.

@@ -17,3 +17,9 @@ Data policy: unknown values remain unavailable; measured, derived, assumed and u
 Promotion gate: a V2 model must beat or appropriately match baselines on frozen holdout log loss/Brier/calibration, pass leakage/symmetry/legal-pick/determinism tests, integrate without unrelated regressions, and retain Legacy rollback. Current status: not promoted. Final shared subset (n=1,956): Legacy Log Loss 0.689749 / Brier 0.248301; V2 0.692600 / 0.249725. Full V2 coverage remains n=2,033 (0.692603 / 0.249727). These recorded results are unchanged; see the benchmark provenance limitation in EVALUATION.md. Legacy remains default.
 
 Known limitations: objective mechanics are still only partially sourced; player-skill confounding, pick-order, bans, builds and objective combat fields remain unavailable. Historical rows can contain duplicate Brawlers and are valid for V2 but ineligible for the unchanged Legacy DraftContext contract. The snapshot covers 2026-08-29 through 2026-09-18 UTC and may not represent later meta changes.
+
+## D-011 annotation archive
+
+The offline claim archive has no connection to model inputs, training, predictions
+or ranking. Dated explanations do not establish present-day applicability or
+predictive benefit. Legacy remains the active/default scorer; model gates unchanged.

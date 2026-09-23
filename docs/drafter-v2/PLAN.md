@@ -136,3 +136,12 @@ mechanics require source evidence first; a universal interpreter is unjustified.
 Normal implementation failures can be fixed autonomously, but missing units,
 server validity or loadouts must remain UNKNOWN. Preserve prior runs/probes;
 no additional collection or replay of the sealed comparison is part of this plan.
+
+## D-011 result: offline reviewed claim archive
+
+The continuation implements a narrow first storage milestone for the four D-010
+annotations. Source research remains complete. Exact-byte, content-addressed
+storage and dated conditional explanations are available through
+`drafter.services.v2_mechanics_claims`; see MECHANICS_CLAIM_ARCHIVE.md.
+This is not general Phase 5B or a current-state consumer. Next: a separately bounded
+revalidation protocol and reviewed revision/conflict contract before current use.

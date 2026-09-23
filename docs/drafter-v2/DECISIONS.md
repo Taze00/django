@@ -422,3 +422,18 @@ research task. Numeric mechanics require new evidence; historical work requires
 its independent temporal/loadout evidence and future data protocol. Preserve all
 completed probes and quarantine actual conflicts rather than requesting normal
 milestone approvals or manufacturing missing facts.
+
+## D-011 — archived explanations before current runtime reuse
+
+User requested continuation after D-010. Choose a standard-library, offline,
+content-addressed annotation archive, with the committed reviewed artifact digest
+as the closed allowlist. This avoids silently promoting a dated support statement
+to a present-day effect. All source fields, requirements and UNKNOWNs are retained.
+Atomic publication never replaces existing records; modified artifacts fail
+closed for review. Rejection is not a persisted conflict-resolution workflow.
+
+Only archived source explanations are implemented. General source snapshots,
+revision admission/quarantine resolution, fresh current use and Django consumers
+remain separate work. Original publisher bodies are not copied or claimed present.
+No numeric features, loadout inference, temporal joins or model changes. Validation:
+31 offline tests; CLI archive/read replay. Usage: MECHANICS_CLAIM_ARCHIVE.md.

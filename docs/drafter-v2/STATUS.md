@@ -1,6 +1,24 @@
-RESUME FROM: Bounded source follow-up after 33c570c completed (D-010). Phase 5A and this follow-up must not be repeated. Read MECHANICS_FOLLOWUP.md and its committed evidence/claims/events. Gate A: CONDITIONAL limited pass for four source-attributed current gear explanations only; computed current composition mechanics remain NOT PASSED. Gate B: historical training NOT PASSED. No Phase 5B schema/features implemented. Next safe implementation scope, if subsequently requested, is reviewed source-claim/provenance storage and conditional explanations only. Numeric mechanics require new current/unit/behavior evidence; historical joins require independent temporal/loadout evidence. No collection, Legacy change, sealed evaluation or model work.
+RESUME FROM: D-011 offline reviewed-claim archive completed. Source research D-009/D-010 remains complete. The new module stores exact reviewed annotation bytes and renders archived source statements only. Current reuse still requires a bounded source revalidation protocol; do not enable current UI/features from the archived timestamp. No collector, model or sealed evaluation work. See MECHANICS_CLAIM_ARCHIVE.md.
+
 
 # Drafter V2 Status
+
+Latest completed milestone — D-011 reviewed annotation archive:
+- Continued from clean 894148b after user instruction to continue.
+- Added standard-library offline archive/CLI for the four D-010 claims; exact
+  reviewed artifact SHA-256 required. Source response digests/URLs/sections,
+  observed-at, requirements, limitations and null validity survive unchanged.
+- Atomic no-replace publication, idempotent import, corrupt/changed artifacts
+  rejected for review. No source body availability claim or current revalidation.
+- Explanations explicitly describe archived source statements, with unknown
+  equipment/activation/current validity. Numeric/historical/current-use requests
+  fail closed. No Django schema, runtime/API/UI integration or patch applicator.
+- Validation: 7 new tests plus 24 existing offline contracts, 31 passed (0.075 s).
+  CLI archive/read replay also checked. No DB/network/credentials accessed.
+- Next evidence-dependent step: preregister bounded official-source revalidation
+  and define reviewed revision/conflict records before any present-day consumer.
+  The fixed-digest archive intentionally cannot ingest arbitrary new evidence.
+
 
 Latest completed milestone — bounded source follow-up (2026-09-23, D-010):
 - Started from clean 33c570c in isolated feature/drafter-v2 worktree. Previous

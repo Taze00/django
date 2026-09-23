@@ -124,3 +124,10 @@ For now, run only `drafter_v2_growth --after 2026-09-18T15:04:42Z` to audit
 new temporal evidence. It computes no predictions or performance metrics.
 Positive counts mean observations exist, not that a dataset is large enough,
 calibrated, patch-comparable or suitable for promotion.
+
+## D-011 validation boundary
+
+31 offline claim/source-structure contracts passed, including seven new archive
+and explanation tests. These validate provenance preservation and rejection
+behavior, not gameplay accuracy, current source freshness or prediction quality.
+No dataset/model/holdout evaluation performed; sealed results remain unchanged.
