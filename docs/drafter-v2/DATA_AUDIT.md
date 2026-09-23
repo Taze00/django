@@ -246,3 +246,75 @@ Additional importer/robustness regressions: 38 passed (5.123 s). Final frontier
 suite: 24 passed (2.835 s), including the case of a newer timestamp colliding
 with a frozen row under fingerprint rules: raw retained, frozen labels/links/tags
 unchanged. Migration drift check passed; plan shows only the two new tables.
+
+
+## Completed independent tagged-frontier bootstrap (2026-09-23)
+
+Run 5 used implementation `8661c291af4ced3e29e12522a34fc0f2ca1356dd`, from
+17:39:14.691736Z to 17:39:20.965188Z. Migration 0019 was applied only to the
+verified isolated database. Before the request the new frontier was empty and
+all 61,146 historical soloRanked player tags remained blank. Credential mode 600
+was checked without reading its value; the independently supplied file was loaded
+only in the collection subprocess. No live checkout, credential or DB was accessed.
+
+Official `/rankings/global/players` returned HTTP 200 with 200 distinct usable
+player tag strings. Observed entry keys: club, icon, name, nameColor, rank, tag,
+trophies. Three distinct seeds were admitted in response order, all three eligible
+for a fetch under existing active/cooldown gates. This is trophy-ranking provenance,
+not evidence of Ranked play or skill. Each seed has an exact raw JSON pointer and
+run linkage; existing TrackedPlayer timestamps and origins were preserved.
+
+| Quantity | Observed result |
+|---|---:|
+| Ranking HTTP attempts | 1 |
+| Usable returned tags / admitted seeds / due seeds | 200 / 3 / 3 |
+| Battlelog HTTP attempts / successful battlelogs | 3 / 3 |
+| Total HTTP statuses / retries | 4 × 200 / 0 |
+| Battlelog entries / raw battle type | 75 / all trophy `ranked` |
+| Entries retained raw only at/before cutoff | 25 |
+| New unique imported matches | 50, all trophy `ranked` |
+| Imported duplicate matches / conflicts | 0 / 0 |
+| New eligible soloRanked matches | 0 |
+| Newly discovered eligible frontier tags | 0 |
+| Persisted frontier members / due at audit | 3 / 0 |
+| Ranking observations / query observations | 3 / 3 |
+| Distinct team tags preserved in raw battlelogs | 393 |
+
+No more players were eligible in this bounded frontier; two unused battlelog
+attempts were not spent on another seed population. All 393 raw team tags remain
+available as original evidence; trophy-only neighbors do not establish Ranked
+frontier eligibility. `duplicate_player_observations=3` counts the three query
+sightings of already admitted seeds, not three additional players. The 25 older
+entries were not passed to the importer, so they are not counted as imported
+duplicates. No rate-limit header or Retry-After was observed; hourly quota UNKNOWN.
+
+Provenance: RawPayload IDs 925 (ranking), 926–928 (battlelogs), all sampling
+`tagged_frontier_v1`, CollectorRun 5. Ranking RawPayload parse_status `unsupported`
+means it is not a match payload; the seed schema/tag extraction succeeded and is
+proven by its three TaggedPlayerObservations. Battlelogs are parsed. The committed
+`BOOTSTRAP_EXPERIMENT_2026-09-23.json` contains full hashes and aggregate audit/run
+reports, without raw bodies, player identities or credentials. Exact seed pointers
+and parent/query identifiers remain in the isolated DB, not in Git.
+
+Post-run read-only inventory: 18,372 matches, 113,276 player rows, 881 payloads,
+205 TrackedPlayer rows, three TaggedPlayer members, six observations, five runs,
+98 maps; catalog/stat counts unchanged. Ranked remains 10,191 total / 10,162
+countable, zero conflicts and reconstructed-fingerprint duplicates. All 61,146
+historical Ranked player rows still have blank tags.
+
+Growth strictly after `2026-09-18T15:04:42Z`: 126 API matches, comprising 125
+trophy `ranked` and one friendly. Zero soloRanked candidates or eligible examples;
+latest Ranked timestamp unchanged. DATA_UNAVAILABLE. No freeze, evaluation,
+aggregation, model fitting, Legacy change or promotion followed this result.
+Seed sourcing/persistence and bounded fetching are empirically demonstrated;
+soloRanked snowball expansion remains tested with synthetic contracts only because
+this real sample contained no eligible Ranked edges. Sampling remains biased and
+uncorrected. The completed experiment is not permission for a larger/recurring run.
+
+Reproduce with the read-only frontier_audit.py, drafter_v2_audit and drafter_v2_growth
+commands in COLLECTION_RUNBOOK.md. Local transient outputs were
+`/tmp/drafter-v2-frontier-{before,after,inventory,growth}.json` and
+`/tmp/drafter-v2-frontier-collection.log`; durable evidence is the committed JSON
+and isolated DB. Regression results: 138 expanded + 38 importer tests passed;
+final 24 frontier tests passed after the last boundary guard. No real credential
+was loaded for regression tests.

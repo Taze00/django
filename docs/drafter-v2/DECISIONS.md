@@ -316,3 +316,15 @@ Revisit: only a documented new bounded collection plan may expand request limits
 seed populations or depth. New observations need a preregistered immutable future
 split and train-only inputs before any model experiment. The historical comparison
 is final and is not rerun.
+
+
+D-008 observed outcome: run 5 at revision 8661c29 finished on 2026-09-23 with
+one ranking and three battlelog HTTP 200 responses, no retries. Official ranking
+provided 200 distinct usable tag strings; three seeds persisted and were due.
+All 75 battlelog entries were trophy `ranked`; 50 newer unique matches imported,
+25 older entries kept raw-only, zero duplicates/conflicts/new soloRanked or new
+frontier neighbors. Three ranking + three query observations persist; raw payloads
+retain 393 distinct team tags. Frontier size 3, due 0 at the post-run audit.
+DATA_UNAVAILABLE remains the new Ranked evidence status. Stop this experiment;
+no follow-up request or model experiment was made. Real soloRanked expansion is
+not empirically demonstrated by this run. See BOOTSTRAP_EXPERIMENT_2026-09-23.json.

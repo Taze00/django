@@ -1,5 +1,6 @@
 """Run through isolated manage.py shell with PGOPTIONS read-only. Counts only."""
 import json
+from collections import Counter
 from datetime import datetime, timedelta, timezone
 
 from django.db.models import Count, Q
@@ -39,4 +40,24 @@ if ranking:
         "entry_count": len(items) if isinstance(items, list) else None,
         "observed_item_keys": sorted({k for item in (items or []) if isinstance(item, dict) for k in item}),
     }
+types = Counter()
+team_tags = set()
+for payload in raw.filter(format="brawlstars.battlelog.raw"):
+    body = payload.payload.get("antwort")
+    items = body.get("items") if isinstance(body, dict) else None
+    for item in items if isinstance(items, list) else []:
+        battle = item.get("battle") if isinstance(item, dict) else None
+        if not isinstance(battle, dict):
+            types["UNKNOWN"] += 1
+            continue
+        battle_type = battle.get("type")
+        types[battle_type if isinstance(battle_type, str) and battle_type else "UNKNOWN"] += 1
+        teams = battle.get("teams")
+        for team in teams if isinstance(teams, list) else []:
+            for player in team if isinstance(team, list) else []:
+                tag = player.get("tag") if isinstance(player, dict) else None
+                if isinstance(tag, str) and tag:
+                    team_tags.add(tag)
+report["raw_battlelog_types"] = dict(sorted(types.items()))
+report["distinct_raw_team_tags"] = len(team_tags)
 print(json.dumps(report, indent=2, sort_keys=True))

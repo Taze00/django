@@ -1,0 +1,239 @@
+{
+  "artifact_version": "tagged-frontier-experiment-1",
+  "frontier_audit": {
+    "audit_at": "2026-09-23T17:40:46.697857+00:00",
+    "distinct_raw_team_tags": 393,
+    "frontier_depths": [
+      {
+        "discovery_depth": 0,
+        "n": 3
+      }
+    ],
+    "frontier_due": 0,
+    "frontier_first_sources": [
+      {
+        "first_source": "ranking",
+        "n": 3
+      }
+    ],
+    "frontier_size": 3,
+    "historical_ranked_player_rows": 61146,
+    "historical_ranked_players_with_tags": 0,
+    "latest_run": {
+      "finished_at": "2026-09-23T17:39:20.965188+00:00",
+      "id": 5,
+      "parameters": {
+        "abruf_abstand_stunden": 6,
+        "after_exclusive": "2026-09-18T15:04:42+00:00",
+        "battlelog_http_budget": 5,
+        "catalog_requests": 0,
+        "code_revision": "8661c291af4ced3e29e12522a34fc0f2ca1356dd",
+        "depth_semantics": "new_request_hops_per_run",
+        "max_tiefe": 1,
+        "ranking_http_budget": 1,
+        "ranking_seeds": 3,
+        "strategie": "tagged_frontier_v1"
+      },
+      "report": {
+        "abbruch": "",
+        "api": {
+          "anfragen": 4,
+          "ratenlimit_header": [],
+          "retry_after": [],
+          "status": {
+            "200": 4
+          },
+          "wartezeit_sekunden": 0.0,
+          "wiederholungen": 0
+        },
+        "battlelog_attempts": 3,
+        "battlelog_eintraege": 75,
+        "battlelogs_ok": 3,
+        "data_status": "DATA_UNAVAILABLE",
+        "datenlage": {},
+        "duplicate_player_observations": 3,
+        "duplikate": 0,
+        "duplikate_nach_typ": {},
+        "fehler": {},
+        "frontier_before": 0,
+        "frontier_size": 3,
+        "historical_records_retained_raw_only": 25,
+        "holdout_evaluated": false,
+        "id_widersprueche": [],
+        "invalid_discovered_tags": 0,
+        "katalog": [],
+        "katalog_neu": [],
+        "katalog_verknuepft": [],
+        "konflikte": 0,
+        "neu": 50,
+        "neu_nach_typ": {
+          "ranked": 50
+        },
+        "new_discovered_tags": 0,
+        "new_eligible_solo_ranked_matches": 0,
+        "new_frontier_seeds": 3,
+        "partien_gelesen": 50,
+        "protected_historical_duplicates_raw_only": 0,
+        "rangliste_gesehen": 0,
+        "rangliste_neu": 0,
+        "ranking_attempts": 1,
+        "ranking_cooldown_skipped": false,
+        "ranking_duplicate_tags": 0,
+        "ranking_entries": 200,
+        "ranking_invalid_tags": 0,
+        "ranking_seeds_admitted": 3,
+        "ranking_seeds_due": 3,
+        "ranking_valid_unique_tags": 200,
+        "report_version": "tagged_frontier_v1",
+        "run_id": 5,
+        "skill_labels": "UNKNOWN",
+        "spieler_abgefragt": 3,
+        "spieler_entdeckt": 0,
+        "uebersprungen": 0,
+        "unbekannte_brawler": [],
+        "ungueltig": 0
+      },
+      "started_at": "2026-09-23T17:39:14.691736+00:00",
+      "status": "finished"
+    },
+    "observation_sources": [
+      {
+        "n": 3,
+        "source": "query"
+      },
+      {
+        "n": 3,
+        "source": "ranking"
+      }
+    ],
+    "payloads": [
+      {
+        "content_hash": "61272823268aff35f68fe5db4fa0799c1294b221b4df3372646f89c1d9445ce8",
+        "format": "brawlstars.rankings.raw",
+        "id": 925,
+        "parse_status": "unsupported",
+        "sampling": "tagged_frontier_v1"
+      },
+      {
+        "content_hash": "a400470dac07fab52dc9b99f2cd44e9de2d25f84d269eca9d0ca66a867fb8c89",
+        "format": "brawlstars.battlelog.raw",
+        "id": 926,
+        "parse_status": "parsed",
+        "sampling": "tagged_frontier_v1"
+      },
+      {
+        "content_hash": "ed3a1bcfed33d352941e945345a28c7fbaec9f14650b39dc54cb7664ed5e9af5",
+        "format": "brawlstars.battlelog.raw",
+        "id": 927,
+        "parse_status": "parsed",
+        "sampling": "tagged_frontier_v1"
+      },
+      {
+        "content_hash": "978a15cb5d850bd85eff8b3cf10ae6acc217eb839cf82d7efd6dd14a257a8499",
+        "format": "brawlstars.battlelog.raw",
+        "id": 928,
+        "parse_status": "parsed",
+        "sampling": "tagged_frontier_v1"
+      }
+    ],
+    "ranking_schema": {
+      "endpoint": "/rankings/global/players",
+      "entry_count": 200,
+      "http_status": 200,
+      "observed_item_keys": [
+        "club",
+        "icon",
+        "name",
+        "nameColor",
+        "rank",
+        "tag",
+        "trophies"
+      ]
+    },
+    "raw_battlelog_types": {
+      "ranked": 75
+    },
+    "read_only": true
+  },
+  "growth": {
+    "after_exclusive": "2026-09-18T15:04:42+00:00",
+    "eligible_new_ranked_matches": 0,
+    "eligible_range": {
+      "first": null,
+      "last": null
+    },
+    "excluded": {},
+    "filter": {
+      "ranked_types": [
+        "soloRanked"
+      ],
+      "source": "api"
+    },
+    "holdout_evaluated": false,
+    "latest_api_ranked_at": "2026-09-18T15:04:42+00:00",
+    "new_api_by_battle_type": [
+      {
+        "battle_type": "friendly",
+        "n": 1
+      },
+      {
+        "battle_type": "ranked",
+        "n": 125
+      }
+    ],
+    "new_api_matches": 126,
+    "new_api_ranked_matches": 0,
+    "promotion": "NOT_ASSESSED",
+    "read_only": true,
+    "report_version": "v2-growth-1",
+    "sampling_counts_overlap": true,
+    "sampling_match_counts": {},
+    "status": "DATA_UNAVAILABLE"
+  },
+  "integrity": {
+    "conflicts": 0,
+    "reconstructed_fingerprint_duplicates": 0
+  },
+  "inventory_counts": {
+    "active_brawlers": 20,
+    "brawler_stats": 11843,
+    "brawlers": 108,
+    "build_stats": 0,
+    "collector_runs": 5,
+    "countable_ranked_matches": 10162,
+    "counter_stats": 57648,
+    "maps": 98,
+    "match_bans": 0,
+    "match_players": 113276,
+    "matches": 18372,
+    "modes": 15,
+    "patches": 2,
+    "praxisfaelle": 0,
+    "ranked_available_brawlers": 106,
+    "ranked_matches": 10191,
+    "raw_payloads": 881,
+    "synergy_stats": 48555,
+    "tracked_players": 205
+  },
+  "scope": "Isolated feature/drafter-v2 only; no model training, sealed evaluation, aggregation or Legacy change",
+  "validation": [
+    {
+      "failures": 0,
+      "seconds": 16.146,
+      "suite": "collector/API/parser/growth/sampling/UNKNOWN/search/model/Praxisfall",
+      "tests": 138
+    },
+    {
+      "failures": 0,
+      "seconds": 5.123,
+      "suite": "existing importer and import robustness",
+      "tests": 38
+    },
+    {
+      "failures": 0,
+      "seconds": 2.835,
+      "suite": "final tagged frontier including frozen fingerprint boundary",
+      "tests": 24
+    }
+  ]
+}

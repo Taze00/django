@@ -149,6 +149,13 @@ on an enlarged database as if that preserved the freeze. No automatic promotion.
 
 ## Authorized tagged frontier bootstrap (D-008)
 
+**Completed as run 5 on 2026-09-23; the commands below document that experiment,
+not unfinished work. Do not repeat automatically.** Results: three persisted
+seeds, four HTTP 200 responses, 50 new trophy matches, zero eligible soloRanked
+or discovered frontier tags. DATA_UNAVAILABLE; see STATUS and the committed
+BOOTSTRAP_EXPERIMENT_2026-09-23.json. Future collection requires a documented
+bounded plan and the existing cooldowns; the next independent task is Phase 5A.
+
 This is the user's explicitly authorized replacement for the blocked Phase-12
 bootstrap, with distinct sampling `tagged_frontier_v1`. It does not modify
 `broad_high_rank` or adopt the 205 old queue entries without fresh source evidence.

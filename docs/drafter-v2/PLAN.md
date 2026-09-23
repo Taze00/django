@@ -26,7 +26,7 @@ Nach jedem Milestone: fokussierte Tests, Fehlerbehebung, Dokumentation, kleiner 
 - Preserve completed Phase-12 runs 1–4. The user now authorizes a separate tagged frontier bootstrap (D-008); do not repeat the empty broad run.
 - Read-only growth report implemented in `896ec90`; continue using the fixed exclusive cutoff `2026-09-18T15:04:42Z`. No training, evaluation, or new split.
 - Run relevant regressions and commit/push the safe milestone.
-- Isolated credential loading succeeded for collector run 4. Collection is now blocked by absent player-tag/rank provenance for `broad_high_rank`, not credential inheritance. Never retrieve live data or reconstruct anonymized identities.
+- The independent tagged-frontier bootstrap is complete (run 5, D-008). Three genuine ranking seeds persist; zero new soloRanked observations. Historical broad provenance remains unavailable. Never retrieve live data or reconstruct anonymized identities.
 - Before any future experiment, preregister a new temporal protocol and training-only statistical inputs. New observations alone do not establish adequate sample size or promotion readiness.
 - Phase 10 V2 integration remains gated, not completed; the existing Legacy API/UI and Praxisfall logging have regression coverage.
 - Operational commands, budgets and stop conditions: `COLLECTION_RUNBOOK.md`.
@@ -80,3 +80,13 @@ not claims that the existing Legacy tests validate this new architecture.
    eligible new Ranked data appears, record DATA_UNAVAILABLE and stop collection.
 6. Commit and push evidence. Next independent work remains Phase 5A source/coverage
    inventory; no old holdout, reaggregation, model tuning or engine promotion.
+
+
+Phase 12B result: all six implementation/experiment/documentation steps completed.
+Implementation 8661c29 pushed; migration applied only to isolation. Run 5 made four
+HTTP 200 requests (ranking + three battlelogs), persisted three seeds, imported
+50 unique trophy matches and obtained zero new eligible soloRanked or frontier
+neighbors. DATA_UNAVAILABLE; no larger/second run. Read-only audits and exact
+regression results are committed in BOOTSTRAP_EXPERIMENT_2026-09-23.json.
+Next independent work is Phase 5A sources/coverage inventory. Model selection,
+new freezes, V2 integration and promotion remain gated; Legacy stays default.

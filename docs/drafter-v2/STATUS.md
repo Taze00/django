@@ -1,51 +1,63 @@
-RESUME FROM: Phase 12B / implementation tested; inspect latest CollectorRun and migration state, apply additive 0019 only to isolation if pending, then execute exactly one authorized tagged-frontier bootstrap from COLLECTION_RUNBOOK.md (three ranking seeds, one ranking HTTP attempt, five battlelog HTTP attempts including retries, one new request hop). No real bootstrap request has run yet at this milestone. Audit new growth against the fixed cutoff, record evidence, commit and push; do not repeat runs 1–4 or reopen evaluation.
+RESUME FROM: Phase 12B complete. Bounded bootstrap run 5 (code 8661c29) is finished and must not be repeated as unfinished work. DATA_UNAVAILABLE: zero genuinely newer eligible soloRanked matches. Next independent task is Phase 5A source/coverage inventory under D-006; no more collection, model tuning, freeze or evaluation in this experiment. Inspect this status, the committed BOOTSTRAP_EXPERIMENT_2026-09-23.json and the local tree before resuming.
 
 # Drafter V2 Status
 
 Overall:
 - Active/default engine: frozen Legacy `3a565bd`; no runtime/API/UI switch.
-- Starting revision for this task: `b818313`, clean isolated feature/drafter-v2 worktree.
-- Implemented D-008: persistent tagged frontier, official ranking seed provenance,
-  observed soloRanked graph edges, shared player cooldowns and bounded request budget.
-- Additive migration 0019 creates only TaggedPlayer and TaggedPlayerObservation;
-  no data migration, historical tag backfill, deletion, aggregation or model change.
-- Distinct sampling `tagged_frontier_v1`; no change to broad_high_rank selection.
-- Frontier admission needs new raw evidence; the existing 205 queue entries are
-  not silently adopted. Each source has exact raw JSON/run/parent provenance.
-- Six-hour revisit and durable pre-request claim; depth bounds new request hops
-  within a run, while boundary discoveries persist for future runs. No scheduler.
-- Master/PLAN/DECISIONS/runbook describe the explicit revised bootstrap authorization.
-- The root cause remains established: all 61,146 historical Ranked player rows
-  lack tags. Their identities remain UNKNOWN and will never be reconstructed.
+- Started this task from clean `b818313`; implementation milestone `8661c29`
+  committed and pushed to feature/drafter-v2 before the real experiment.
+- Completed D-008: persistent tagged frontier, official-ranking seed provenance,
+  observed soloRanked graph-edge support, shared cooldowns and strict HTTP budgets.
+- Additive migration 0019 applied only to isolated DB: TaggedPlayer and
+  TaggedPlayerObservation. No historical tag migration, deletion or reaggregation.
+- Distinct sampling `tagged_frontier_v1`; broad_high_rank selection is unchanged.
+- Membership requires fresh raw evidence. Ranking and query observations coexist;
+  first source is preserved, subsequent sightings never reset fetch timestamps.
+- The official rankings endpoint supplied usable tags. Its trophy position and
+  trophies are not Ranked/skill labels. Missing skill/loadout fields stay UNKNOWN.
+- Root cause remains irreversible: all 61,146 historical Ranked player rows
+  still lack tags. No reconstruction or inferred identity linkage was attempted.
 - Worktree: `/home/alex/alex-django-drafter-v2`, branch `feature/drafter-v2`.
   Live checkout, live credential and live database remain out of scope.
 
-Pre-experiment validation:
-- Focused initial 74 tests passed (7.214 s); expanded 138 collector, API, parser,
-  sampling, UNKNOWN, growth, V2 search/model and Praxisfall regressions passed
-  (16.146 s). Synthetic test data only, normal settings, system check clean.
-- Additional 38 existing importer/robustness tests passed (5.123 s); final
-  24 frontier tests passed (2.835 s), including frozen-boundary fingerprint
-  collision protection. Migration drift check passed; migration plan contains
-  only the two new tables. Migration remains unapplied before the experiment.
-- No API credential loaded for tests; only disposable isolated test_postgres used.
-- The existing API client documents verified global trophy-ranking tag responses;
-  current isolated credential acceptance and current schema still require the
-  bounded real experiment. No model-level benefit is asserted by unit tests.
-- Isolated DB mount/network reverified: worktree data/db only,
-  drafter-v2-isolated_backend only. Compose uses --no-deps one-off containers.
+Completed bounded experiment:
+- Run 5, `2026-09-23T17:39:14.691736Z` to `17:39:20.965188Z`, finished.
+- Exact source revision: `8661c291af4ced3e29e12522a34fc0f2ca1356dd`.
+- One ranking HTTP attempt, 200 distinct valid returned tag strings, three
+  admitted seeds, all three due under existing shared cooldowns.
+- Three battlelogs / 75 entries queried; four total HTTP 200 responses,
+  zero retries/errors/rate-limit headers. Budget was at most five battlelog
+  HTTP attempts including retries, one new request hop; unused budget not spent.
+- All 75 entries were trophy `ranked`. Fifty newer unique matches imported;
+  25 entries at/before the cutoff retained raw only. Zero imported duplicates
+  or conflicts. Zero new eligible soloRanked matches and zero discovered frontier tags.
+- Frontier persists three ranking seeds, three ranking observations and three
+  query observations. The raw battlelogs preserve 393 distinct observed team tags;
+  trophy-only neighbors were not promoted into the Ranked discovery frontier.
+- Four complete RawPayloads retained (IDs 925–928). Hashes, schema, run parameters
+  and all counts are committed in BOOTSTRAP_EXPERIMENT_2026-09-23.json; no raw
+  bodies, player identifiers or credential values committed.
+- Isolated credential file loaded only in the bounded collection subprocess.
+  HTTP 200 establishes acceptance for this run, not future validity or quota.
 
-Latest real-data evidence (pre-bootstrap, unchanged):
-- Runs 1–4 remain final. Run 4 at 2026-09-22T18:13:43.707390Z (cd6481e)
-  queried zero players and made zero requests because broad provenance was absent.
-- 18,322 matches, 112,776 match players, 877 payload rows, 205 tracked players,
-  four collector runs, 98 maps. Ranked 10,191 total / 10,162 countable.
-- Zero conflicts/reconstructed-fingerprint duplicates. Growth DATA_UNAVAILABLE:
-  no eligible API soloRanked after 2026-09-18T15:04:42Z; 76 newer API matches
-  consist of 75 trophy ranked and one friendly.
-- Read-only reproduction on 2026-09-23T17:11:57.566647Z: 205 old queue players
-  due, zero tagged Ranked rows and zero broad-qualified candidates. Waiting
-  cannot repair anonymization. See collection_queue_audit.py and D-007.
+Latest read-only validation:
+- Post-run frontier audit at `2026-09-23T17:40:46.697857Z`: three frontier members,
+  zero due, all historical Ranked tags still blank. Six-hour cooldown retained.
+- Isolated inventory: 18,372 matches, 113,276 match players, 881 payload rows,
+  205 tracked players, five collector runs, 98 maps. Ranked remains 10,191
+  total / 10,162 countable. Zero conflicts/reconstructed-fingerprint duplicates.
+- Growth against unchanged exclusive cutoff `2026-09-18T15:04:42Z`: 126 newer
+  API matches (125 trophy ranked, one friendly), zero soloRanked, DATA_UNAVAILABLE.
+- Tests: expanded 138 collector/API/parser/sampling/UNKNOWN/growth/search/model/
+  Praxisfall regressions passed (16.146 s); 38 existing importer/robustness tests
+  passed (5.123 s); final 24 frontier tests passed (2.835 s), including frozen-row
+  fingerprint collision protection. Normal isolated settings; no API credential
+  loaded for tests; system check clean. Migration drift check passed.
+- Discovery through actual soloRanked graph edges was NOT observed in this small
+  real run. That branch has synthetic regression coverage, not an empirical growth
+  claim. No model-level quality improvement or sampling correction is established.
+- Earlier full suites (692 Drafter/four skipped; 253 Fitness) are historical,
+  not newly run for this patch. Completed runs 1–4 are retained in DATA_AUDIT.
 
 Sealed evaluation (final, unchanged):
 - Manifest `v2-dataset-freeze-1`, digest `2bb8222b9025a5da7daadea8b9a252c39b16bcda8b07b9bc2df69315ea4dcf9e`.
@@ -56,22 +68,24 @@ Sealed evaluation (final, unchanged):
 - Provenance limitation: Legacy benchmark uses stored aggregates without enforcing train-only input. See EVALUATION.md; final numbers retained, not treated as proof of leakage-free generalization.
 
 Data integrity and recovery:
-- No real bootstrap API calls or imports at this implementation milestone.
-- Raw responses persist before parsing. Records at/before the sealed cutoff are
-  retained raw only; newer duplicates use the existing fingerprint/importer.
-- Failure evidence and claims survive interruption. Inspect CollectorRun and
-  raw payloads before resuming; never reset timestamps or refetch to hide failure.
-- No credentials, raw bodies or player identities committed. UNKNOWN stays UNKNOWN.
-- Earlier full suites (692 Drafter/four skipped; 253 Fitness) are historical,
-  not newly run or claims about this patch.
+- Raw responses persist before parsing; exact JSON pointers/run/query provenance
+  are durable. Records at/before the cutoff and newer sightings colliding with
+  frozen rows remain raw-only. Historical labels, links and player tags stay intact.
+- No live access, Legacy modification, sealed-holdout evaluation, model training,
+  aggregate update, unbounded recursion, forced timestamps or recurring job.
+- Future revisits are supported with ranking-seeds 0 and unchanged six-hour gates,
+  but no further run is started by this completed experiment. Concurrent frontier
+  runs are locked; failed claims/payloads survive interruption.
+- All important evidence is committed in docs/drafter-v2 and persisted in the
+  isolated CollectorRun/RawPayload/frontier, not dependent on /tmp files.
 
 Next:
-1. Follow the RESUME FROM line and exact runbook; one bounded real experiment only.
-2. Run PostgreSQL read-only frontier_audit.py, drafter_v2_audit and drafter_v2_growth.
-   Record run/revision, actual seed/request/status/retry/discovery/match/duplicate
-   counts and resulting frontier. Missing ranking tags is a concrete stop condition.
-3. If zero new eligible Ranked observations, record DATA_UNAVAILABLE and stop
-   collection. No expanded population, request budget, model freeze or tuning.
-4. Independent future task: Phase 5A source/coverage inventory under D-006. Any
-   model experiment needs a preregistered new immutable temporal protocol and
-   training-only statistical inputs; the historical holdout stays closed.
+1. Do not rerun completed bootstrap 5 or the empty broad run 4. Retain
+   DATA_UNAVAILABLE for new Ranked/model evidence; trophy tags cannot fill that gap.
+2. Continue independent Phase 5A allowed-source and mechanics coverage inventory
+   under D-006 and PLAN. Establish actual source/patch/condition coverage before
+   schema/features; no hand ratings, LLM-filled mechanics or historical loadout guesses.
+3. Any future collection experiment needs a documented bounded plan (sample, timing,
+   request/depth budget, cooldowns and stop conditions). Preserve the current frontier.
+4. Before any model experiment, preregister immutable new temporal membership and
+   training-only statistical inputs. Historical holdout/shared subset remain closed.
