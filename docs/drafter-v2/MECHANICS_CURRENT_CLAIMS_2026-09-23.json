@@ -1,0 +1,108 @@
+{
+  "artifact_kind": "reviewed evidence annotations, not runtime mechanics",
+  "authority": "official current support documentation as retrieved; not server measurement",
+  "gate_A": "CONDITIONAL_EXPLANATIONS_ONLY",
+  "gate_B": "NOT_PASSED",
+  "claims": [
+    {
+      "id": "gear-shield-capacity",
+      "subject": "Shield gear",
+      "property": "consumable shield health",
+      "value": 900,
+      "unit": "HP",
+      "requirements": [
+        "Shield gear equipped"
+      ],
+      "limitations": [
+        "Current remaining shield UNKNOWN",
+        "Mode overrides UNKNOWN",
+        "No base-HP or power-level conversion"
+      ],
+      "classification": "CONDITIONAL",
+      "source_url": "https://support.supercell.com/brawl-stars/en/articles/gears-8.html",
+      "source_sha256": "8e26ccb4efd9ca128a8d4f2c4ee46e1e2e967ffee202c3cf5b9954cbad380d73",
+      "source_section": "Super Rare Gears / Shield",
+      "observed_at": "2026-09-23T18:42:56.031066+00:00",
+      "valid_from": null,
+      "valid_to": null,
+      "intended_use": "source-attributed conditional explanation only",
+      "numeric_inference_allowed": false,
+      "historical_training_allowed": false
+    },
+    {
+      "id": "gear-shield-recovery",
+      "subject": "Shield gear",
+      "property": "documented shield regeneration duration",
+      "value": 10,
+      "unit": "seconds",
+      "requirements": [
+        "Shield gear equipped",
+        "Brawler at full health"
+      ],
+      "limitations": [
+        "Tick rate, interruption and restart rules UNKNOWN",
+        "No inferred linear regeneration rate",
+        "Mode overrides UNKNOWN"
+      ],
+      "classification": "CONDITIONAL",
+      "source_url": "https://support.supercell.com/brawl-stars/en/articles/gears-8.html",
+      "source_sha256": "8e26ccb4efd9ca128a8d4f2c4ee46e1e2e967ffee202c3cf5b9954cbad380d73",
+      "source_section": "Super Rare Gears / Shield",
+      "observed_at": "2026-09-23T18:42:56.031066+00:00",
+      "valid_from": null,
+      "valid_to": null,
+      "intended_use": "source-attributed conditional explanation only",
+      "numeric_inference_allowed": false,
+      "historical_training_allowed": false
+    },
+    {
+      "id": "gear-speed-condition",
+      "subject": "Speed gear",
+      "property": "documented activation condition",
+      "value": "moving in bushes",
+      "unit": null,
+      "requirements": [
+        "Speed gear equipped"
+      ],
+      "limitations": [
+        "Boost magnitude and stacking not supplied by this claim",
+        "Mode overrides UNKNOWN"
+      ],
+      "classification": "CONDITIONAL",
+      "source_url": "https://support.supercell.com/brawl-stars/en/articles/gears-8.html",
+      "source_sha256": "8e26ccb4efd9ca128a8d4f2c4ee46e1e2e967ffee202c3cf5b9954cbad380d73",
+      "source_section": "Super Rare Gears / Speed",
+      "observed_at": "2026-09-23T18:42:56.031066+00:00",
+      "valid_from": null,
+      "valid_to": null,
+      "intended_use": "source-attributed conditional explanation only",
+      "numeric_inference_allowed": false,
+      "historical_training_allowed": false
+    },
+    {
+      "id": "gene-gear-range",
+      "subject": "Gene / Talk to the Hand gear",
+      "property": "documented Magic Hand range increment",
+      "value": 1,
+      "unit": "tile",
+      "requirements": [
+        "Gene",
+        "Talk to the Hand gear equipped"
+      ],
+      "limitations": [
+        "No generic raw range/radius/speed conversion",
+        "Mode overrides UNKNOWN"
+      ],
+      "classification": "CONDITIONAL",
+      "source_url": "https://support.supercell.com/brawl-stars/en/articles/gears-8.html",
+      "source_sha256": "8e26ccb4efd9ca128a8d4f2c4ee46e1e2e967ffee202c3cf5b9954cbad380d73",
+      "source_section": "Mythic Gears / Talk to the Hand",
+      "observed_at": "2026-09-23T18:42:56.031066+00:00",
+      "valid_from": null,
+      "valid_to": null,
+      "intended_use": "source-attributed conditional explanation only",
+      "numeric_inference_allowed": false,
+      "historical_training_allowed": false
+    }
+  ]
+}

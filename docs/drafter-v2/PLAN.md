@@ -12,7 +12,7 @@
 3. Phase 2: eingefrorener zeitbasierter Split, Baselines B0-B5, Log-Loss/Brier/Kalibrierung, Leakage-Prüfungen und Runner. **Historical freeze and baseline measurements complete; sealed and closed to further tuning. See EVALUATION.md.**
 4. Phase 3: Legacy auf identischem Holdout benchmarken; keine Legacy-Scoringänderung. **Erledigt in `5c3d7bf`; Recorded metrics favor Legacy; statistical-input timing limitation documented in EVALUATION.md.**
 5. Phase 4: regularisiertes probabilistisches V-Modell, Manifest, Persistenz, Training/Evaluation und Model Card. **Kandidat evaluiert, aber nicht promotet; Legacy bleibt Default.**
-6. Phase 5: strukturierte, versionierte Rohmechaniken, deterministische Ableitungen und validierte strategische Konzepte strikt trennen. **Phase 5A Inventar abgeschlossen (D-009); Phase-5B-Implementierungsgate NOT PASSED.**
+6. Phase 5: strukturierte, versionierte Rohmechaniken, deterministische Ableitungen und validierte strategische Konzepte strikt trennen. **Phase 5A und begrenzte Folgeprüfung abgeschlossen (D-010); aktuelle quellengebundene Erklärungen eingeschränkt freigegeben, numerische/historische Mechaniken weiter gesperrt.**
    Phase 6: bedingte und patchbezogene Kompositions-Matchups, jede Interaktionshypothese separat ablatierbar. **Keine aktive Featureauswahl ohne neue Evaluation.**
    Phase 7: Faktorisierung nur bei empirisch belegtem Bedarf; keine automatische Erweiterung.
 7. Phase 8-9: legaler Last-Pick aus V, dokumentierte Mid-/First-Search, faktenbasierte Erklärungen. **Prototypen vorhanden; nicht akzeptiert, solange V nicht validiert ist.**
@@ -113,3 +113,26 @@ this dated inventory and add new snapshots instead of changing its denominator o
 source hashes. Gate can be revisited only after evidence supports a narrowly
 specified contract. Historical loadout/time gaps and new Ranked DATA_UNAVAILABLE
 remain separately blocking model work. No follow-up collection is part of 5A.
+
+
+## Bounded source follow-up result (D-010, after 33c570c)
+
+Complete: focused currency/units/dependency/Bolt investigation and patch-event
+contract proposal. Original 5A inventory frozen; no new roster coverage run.
+Sources, budget accounting limitation, exact replay and classifications are in
+MECHANICS_FOLLOWUP.md and MECHANICS_FOLLOWUP_* evidence artifacts.
+
+| Next gate / workstream | State and acceptance |
+|---|---|
+| A: Current factual explanations | CONDITIONAL limited pass for four official gear claims; source/as-of, equipment/context, unknown mode overrides and future revalidation required. Historical reconstruction is not a prerequisite. |
+| A: Computed current mechanics/features | NOT PASSED; current baseline, unit and behavior evidence missing for requested broad composition reasoning. A smaller independently evidenced subset may qualify later. |
+| B: Historical mechanics features | NOT PASSED; effective UTC intervals and observed loadouts absent. No timestamp join, old holdout or training. |
+| Patch/source claim contract | Design complete, not implemented: snapshots, raw scopes, change events, nullable temporal validity, conditions/dependencies, conflict status and independent usage flags. |
+
+Do not start schema/features automatically from this source-research task. A next
+implementation task may narrowly build source-claim/provenance storage and
+conditional attributed explanations, using only the D-010 allowlist. Numeric
+mechanics require source evidence first; a universal interpreter is unjustified.
+Normal implementation failures can be fixed autonomously, but missing units,
+server validity or loadouts must remain UNKNOWN. Preserve prior runs/probes;
+no additional collection or replay of the sealed comparison is part of this plan.

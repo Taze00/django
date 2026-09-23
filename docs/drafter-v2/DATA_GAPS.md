@@ -1,6 +1,6 @@
 # Drafter V2 Data Gaps
 
-Current status after Phase 5A mechanics source inventory (2026-09-23, D-009); completed tagged-frontier run 5 remains unchanged. No replacement values are introduced.
+Current status after bounded source follow-up (2026-09-23, D-010); completed tagged-frontier run 5 remains unchanged. No replacement values are introduced.
 
 | Gap | Status | Legitimate next step |
 |---|---|---|
@@ -9,7 +9,7 @@ Current status after Phase 5A mechanics source inventory (2026-09-23, D-009); co
 | Official API capability matrix | PARTIAL, confirmed by bounded HTTP-200 audit plus fixture | Do not infer fields absent from observed responses |
 | Valid player-skill control variable | UNKNOWN | Search observed API fields and provenance; do not use rank/trophies as skill without validation |
 | Pick order / bans in official match history | UNKNOWN | Use observed payload fields only; current model comments indicate these are absent |
-| Structured conditional mechanics and patch coverage | PARTIAL raw inventory; Phase 5B gate NOT PASSED | Phase 5A audited 108 Brawlers and 47 categories; 107 corroborated identities, Bolt conflict. Pinned raw values demonstrably predate September 16 changes. See MECHANICS_SOURCES/COVERAGE and D-009; no current/historical feature import |
+| Structured conditional mechanics and patch coverage | PARTIAL; current explanations CONDITIONAL; computed current/historical gates NOT PASSED | D-010 separates current claim use from historical joins. Ten new dependency tables expose structure but not a complete effect specification; retain frozen 5A counts and Bolt quarantine |
 | Validated team-composition feature benefit | UNAVAILABLE | Needs sourced mechanics and a new preregistered evaluation window; historical holdout is closed; no hand-set anti-tank/team weights |
 | Isolated API credential | VERIFIED for run 5: four HTTP 200 responses | Independent mode-600 file loaded only for bounded collection; no live credentials. Future validity and hourly quota remain UNKNOWN |
 | Tagged Ranked provenance for broad_high_rank | UNAVAILABLE | All 61,146 historical Ranked player rows remain blank; bootstrap returned trophy matches only. Never reconstruct identities or relabel trophy neighbors as Ranked |
@@ -59,3 +59,25 @@ source/coverage inventory may continue. See committed bootstrap JSON and DATA_AU
 These are data/semantics gaps, not reasons to fabricate mechanics or weaken gates.
 The smallest proposed contract and exact evidence are in MECHANICS_SOURCES.md.
 New Ranked evidence is still DATA_UNAVAILABLE; no collection/model task was run.
+
+
+## Follow-up disposition (D-010; supersedes “not yet body-verified” above)
+
+| Item | Classification | Concrete remaining gap / legitimate next step |
+|---|---|---|
+| Explicit source reference graph | SUPPORTED structurally | Native continuation rows, AND links and named targets verified; persist unresolved leaves instead of evaluating opcodes |
+| Current official gear explanations | CONDITIONAL, allowlisted | Four explicit claims; preserve source/as-of, loadout and mode caveats, revalidate against later relevant changes before reuse; no current scoring or history |
+| Current numeric mechanics | PARTIAL | No verified post-September-16 baseline or broad unit/behavior rules; seek a new immutable source or a narrowly evidenced independent subset |
+| Source folder versus fingerprint | CONFLICT | 69.230 versus 69.229.1; no observed authoritative equivalence/effective window |
+| Bolt identity translation | SUPPORTED | Rock→BOLT and RocketGirl→BROCK explicit TID translations; this does not clear kit membership |
+| Bolt public kit | CONFLICT | Wrong-target gadget IDs persist; two builds have stable distinct mappings; upstream assembly cause UNKNOWN, retain quarantine |
+| Broad units/parameter semantics | PARTIAL | Milliseconds explicitly identified can divide by 1000; generic timings, ticks, distance/speed and power scaling remain UNKNOWN; no guessed conversions |
+| Historical feature validity | UNAVAILABLE | UTC effective intervals, hotfix applicability and equipped loadouts absent; no historical join or new model experiment |
+| Complete current snapshot availability | UNAVAILABLE in inspected sources | Latest mirror branch unchanged, fingerprint mismatch and stale cells; not a proof such a snapshot can never exist |
+| Timestamp/prose-based automatic backfill | UNRELIABLE | Change events are not a complete current snapshot; calendar day/commit time is not server activation |
+| Probe wire-request count | PARTIAL | 21 top-level fetches recorded, one redirected; redirect hops were not counted separately, exact wire exchanges UNKNOWN. No further request; future probes disable/count redirects |
+
+The source-structure gap narrowed; effect semantics and deployment boundaries did
+not become known. The limited current explanation pass is deliberately independent
+of the historical gate. Nothing here authorizes a numeric team feature, collection,
+Legacy change or sealed-holdout work. See MECHANICS_FOLLOWUP and evidence JSON.

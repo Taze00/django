@@ -71,3 +71,12 @@ Phase 5A offline inventory additions (D-009):
 - `docs/drafter-v2/MECHANICS_SOURCES.md`, `MECHANICS_COVERAGE.md`, `MECHANICS_*json`:
   source register, frozen catalog/minimized identities, request hashes and
   reproducible aggregate/per-Brawler evidence. No final mechanics schema.
+
+
+D-010 bounded follow-up additions:
+- `drafter/services/v2_mechanics_followup.py`: offline continuation-aware source
+  structure/identity report, no patch application, feature or runtime consumer.
+- `drafter/tests/test_v2_mechanics_followup.py`: nine synthetic source contracts.
+- `docs/drafter-v2/MECHANICS_FOLLOWUP*`, `MECHANICS_CURRENT_CLAIMS*`,
+  `MECHANICS_PATCH_EVENTS*`: bounded evidence and independent current/historical
+  gates; the original 5A JSONs remain frozen.

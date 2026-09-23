@@ -179,3 +179,30 @@ unresolved counts include missing/depth-limited edges, so zero observed fragment
 | WENDY | base.hp, base.movement_speed, attack.damage, attack.projectile_count, attack.damage_instances, attack.reload, attack.ammo, attack.range, attack.projectile_speed, ability.damage, ability.damage_reduction, ability.dash, ability.summons, kit.gadgets, kit.star_powers, kit.hypercharge, kit.nanopower, condition.cooldown, condition.duration, condition.radius_area, condition.charges | gadget, hypercharge, nanopower, star_power, super, super/hypercharge | CORROBORATED_SOURCE_CLAIM / 0 |
 | COSMO | base.hp, base.movement_speed, attack.damage, attack.projectile_count, attack.damage_instances, attack.reload, attack.ammo, attack.range, attack.projectile_speed, attack.pierce, attack.wall_penetration, ability.damage, ability.damage_reduction, ability.knockback, kit.gadgets, kit.star_powers, condition.cooldown, condition.duration, condition.radius_area, condition.charges | gadget, hypercharge, star_power, super | CORROBORATED_SOURCE_CLAIM / 0 |
 | VINCE | base.hp, base.movement_speed, attack.damage, attack.projectile_count, attack.damage_instances, attack.reload, attack.ammo, attack.range, attack.projectile_speed, ability.damage, ability.damage_reduction, kit.gadgets, kit.star_powers, condition.cooldown, condition.duration, condition.radius_area, condition.charges | gadget, hypercharge, star_power, super | CORROBORATED_SOURCE_CLAIM / 0 |
+
+
+## Follow-up after 33c570c: separate current and historical qualification
+
+The generated 5A table above and its inventory JSON are frozen; no roster audit
+was rerun and no raw-fragment numerators were changed. D-010 adds focused source
+structure evidence in [MECHANICS_FOLLOWUP.md](MECHANICS_FOLLOWUP.md).
+
+| Qualification | Result | Scope |
+|---|---|---|
+| Current source-attributed explanations | CONDITIONAL, limited pass | Four explicit official gear claims with visible source/as-of and equipment/context requirements; not a 108-Brawler completeness claim |
+| Computed current mechanics / composition features | PARTIAL, NOT PASSED | Current raw baseline, units and execution semantics still insufficient; independent of historical gaps |
+| Historical training features | UNAVAILABLE, NOT PASSED | Unknown effective intervals and loadouts prohibit historical joins |
+| Bolt kit | CONFLICT | Explicit identity translation resolved, inconsistent gadget assembly not resolved; quarantine remains |
+
+New evidence: 410 named statuses, 57 components, 135 buddies, 654 roguelite cards,
+208 decks, 1,276 traits, 19 gear records, 52 globals, 17 actions and one condition.
+These are source records, not Brawler coverage. Some records span multiple CSV
+rows; only 1/57 component records provides parameter names. Twelve bounded roots
+verify explicit links, not complete effects or active loadouts. Numeric opcodes,
+tick rate, HP/damage scaling and generic distance units remain unresolved.
+
+The four current claims are separately preserved in
+[MECHANICS_CURRENT_CLAIMS_2026-09-23.json](MECHANICS_CURRENT_CLAIMS_2026-09-23.json).
+No current claim enters historical training or a numeric score. A sufficiently
+sourced current subset does not need historical completeness; other current
+mechanics remain gated by their own missing evidence.

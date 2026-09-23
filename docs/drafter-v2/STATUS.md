@@ -1,8 +1,52 @@
-RESUME FROM: Phase 5A source/coverage inventory completed after a0242b9; D-009. Phase 5B implementation gate NOT PASSED. Read MECHANICS_SOURCES.md, MECHANICS_COVERAGE.md and the committed MECHANICS_* evidence before further work. Next legitimate independent task is a documented bounded source follow-up for current patch/units/opaque conditional dependencies and Bolt identity conflict; preserve this dated snapshot. Do not repeat bootstrap run 5, restart collection, implement speculative mechanics, reopen the sealed evaluation or train/tune a model. New Ranked evidence remains DATA_UNAVAILABLE.
+RESUME FROM: Bounded source follow-up after 33c570c completed (D-010). Phase 5A and this follow-up must not be repeated. Read MECHANICS_FOLLOWUP.md and its committed evidence/claims/events. Gate A: CONDITIONAL limited pass for four source-attributed current gear explanations only; computed current composition mechanics remain NOT PASSED. Gate B: historical training NOT PASSED. No Phase 5B schema/features implemented. Next safe implementation scope, if subsequently requested, is reviewed source-claim/provenance storage and conditional explanations only. Numeric mechanics require new current/unit/behavior evidence; historical joins require independent temporal/loadout evidence. No collection, Legacy change, sealed evaluation or model work.
 
 # Drafter V2 Status
 
-Latest completed milestone — Phase 5A (2026-09-23):
+Latest completed milestone — bounded source follow-up (2026-09-23, D-010):
+- Started from clean 33c570c in isolated feature/drafter-v2 worktree. Previous
+  5A catalog/identity/probe/inventory JSONs preserved; no repeated roster audit.
+- Protocol recorded before fetching: at most 24 public calls, 3 MB per body,
+  12 MB retained total, no retries. Actual: 21 top-level fetches, 20 final 200,
+  one 404, 3,542,689 bytes. One observed redirect; helper did not instrument
+  intermediate redirect hops, so exact wire-attempt count UNKNOWN. This budget
+  accounting limitation is documented; future fetchers must count/disable redirects.
+- Eight search queries/eight targeted opens separately bounded. Retained old
+  bodies verified by hash. No DB opened, API credential loaded or player request.
+- Latest mirror head/only branch remains cc307ffd; no newer snapshot found in
+  inspected sources. Folder 69.230 versus fingerprint 69.229.1 is an unresolved
+  version-label conflict, not an effective patch interval. No claim of global
+  impossibility or proof that no unlisted/server hotfix exists.
+- Ten missing tables inspected; 12 bounded graph roots, max six edges/400 nodes
+  per root. Named links and AND connective are structurally representable.
+  Continuation cells preserve order/positions; blanks never become zero/false.
+  Only 1/57 components has ValueNames. No opcode, tick-rate or effect interpreter.
+- Bolt identity links explicitly translate Rock→BOLT, RocketGirl→BROCK. Selected
+  character/gadget row-ID claims are stable in 68.250/69.230. Public Bolt detail
+  still includes Brock-target gadget IDs. Kit quarantine remains; no manual repair.
+- Units: directly documented seconds/HP/tiles and explicitly millisecond fields
+  can retain their stated units; no general power, distance, speed, generic
+  cooldown/reload or tick conversion was established.
+- Gate A CONDITIONAL allowlist: Shield gear capacity, its full-health regeneration
+  duration, Speed gear movement/bush condition, Gene gear range increment. Source,
+  observed-at, equipment/context and unknown mode overrides are preserved. This
+  permits factual attributed explanations only, not numeric team features/scoring.
+  It does not require historical completeness. Revalidate against newer source
+  evidence before later reuse; no perpetual validity window is invented.
+- Computed current mechanics remain PARTIAL / NOT PASSED on their own current
+  evidence. Gate B remains UNAVAILABLE / NOT PASSED: no effective UTC intervals
+  or historical equipped loadouts. No old-match join, training or promotion.
+- Six reviewed patch-change examples and a minimal provenance/condition/temporal
+  contract are documented, not implemented as schema/applicator. Relative-only
+  changes retain unknown absolute values; raw snapshots are not overwritten.
+- Validation: nine new source-structure tests plus all 15 existing 5A contracts,
+  24 total passed (0.006 s). Focused evidence replay byte-identical. No Django
+  runtime change or DB test run needed for these standard-library offline tools.
+- Durable files: MECHANICS_FOLLOWUP.md, FOLLOWUP_PROBE/METADATA/EVIDENCE JSON,
+  CURRENT_CLAIMS and PATCH_EVENTS JSON. Exact resume/replay and source limitations
+  are committed under docs/drafter-v2; mutable public metadata has a minimized
+  hash-bound projection, so replay does not require it to stay unchanged.
+
+Previous completed milestone — Phase 5A (2026-09-23):
 - Started from clean a0242b9 on feature/drafter-v2; preserved 8661c29/run-5 work.
 - Fixed catalog: 108 Brawlers / 106 Ranked-available. Read-only isolated queries;
   no live checkout/DB/credential access, collector requests or model experiment.
@@ -114,19 +158,20 @@ Data integrity and recovery:
   isolated CollectorRun/RawPayload/frontier, not dependent on /tmp files.
 
 Next:
-1. Preserve completed Phase 5A artifacts and bootstrap runs 1–5. The public
-   source inventory is complete for its bounded scope; do not repeat its probes
-   merely because earlier /tmp files are gone. Use committed replay instructions.
-2. A subsequent source follow-up should prerecord small request/size limits and
-   test needed status/component/buddy/gear/deck definitions, current hotfix
-   evidence and explicit unit semantics. Resolve identity conflicts through
-   observed authoritative links, never manual aliases/defaults. Update D-009
-   only with concrete evidence; do not declare the gate passed by availability alone.
-3. Phase 5B schema/features remain gated. The smallest defensible future proposal
-   is in MECHANICS_SOURCES; unknown units, conditions, timestamps and historical
-   loadouts remain nullable/UNKNOWN. No unsupported feature or strategic score.
-4. New soloRanked/model evidence is still DATA_UNAVAILABLE. Any future collection
-   needs its own bounded plan and existing cooldowns; current task authorizes none.
-5. Before model work, preregister immutable independent temporal membership and
-   training-only statistics. Historical holdout/shared subset stay sealed;
-   Legacy remains active/default. No promotion follows a source-coverage audit.
+1. Preserve completed 5A/follow-up artifacts and bootstrap runs 1–5. Do not repeat
+   inventory, source probes, failed old documentation URLs or collector runs.
+2. A subsequent narrowly scoped implementation may store reviewed current claims
+   with source snapshots, explicit conditions, as-of attribution and quarantine,
+   using the four D-010 allowlisted statements. No automatic implementation in
+   this completed research task; no change to active/default Legacy behavior.
+3. Broader computed current mechanics require verified current source values,
+   units and execution/dependency semantics. Historical completeness is not a
+   prerequisite for an independently supported current subset. Do not guess missing
+   values or demand all-roster coverage before considering such a bounded subset.
+4. Historical mechanics still require valid time boundaries and equipped-loadout
+   evidence. Null dates are UNKNOWN, not UTC midnight/open-ended validity.
+   Current support or patch announcements never enter old training rows by default.
+5. New soloRanked/model evidence remains DATA_UNAVAILABLE. Any future collection
+   requires its own bounded plan and cooldowns; none is authorized by this source
+   task. The sealed evaluation/shared-subset comparison remains final; new model
+   work would require independent preregistered data and train-only statistics.

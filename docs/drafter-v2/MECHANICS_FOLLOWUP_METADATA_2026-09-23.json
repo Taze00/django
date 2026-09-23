@@ -1,0 +1,76 @@
+{
+  "source_files": [
+    "latest.json",
+    "branches.json",
+    "bolt.json",
+    "conditions-v2.json"
+  ],
+  "archive_head": "cc307ffd36678ac463cc2ca9373a08b0a2d2b0b7",
+  "branches": [
+    {
+      "name": "master",
+      "sha": "cc307ffd36678ac463cc2ca9373a08b0a2d2b0b7"
+    }
+  ],
+  "bolt": {
+    "id": 16000106,
+    "name": "Bolt",
+    "gadgets": [
+      {
+        "id": 23000245
+      },
+      {
+        "id": 23000316
+      },
+      {
+        "id": 23001281
+      },
+      {
+        "id": 23001282
+      }
+    ]
+  },
+  "conditions_response": {
+    "metadata": {
+      "file": "csv_logic/conditions.csv",
+      "generatedAt": "2026-09-01T14:57:21.186Z",
+      "rowCount": 1,
+      "columns": [
+        "Name",
+        "Type",
+        "Values",
+        "Projectiles",
+        "AreaEffects",
+        "Characters",
+        "Skills",
+        "StatusEffects"
+      ],
+      "types": {
+        "Name": "string",
+        "Type": "string",
+        "Values": "int",
+        "Projectiles": "string",
+        "AreaEffects": "string",
+        "Characters": "string",
+        "Skills": "string",
+        "StatusEffects": "string"
+      },
+      "hasId": false
+    },
+    "data": {
+      "MenderFacingDirectionUlti": {
+        "Name": "MenderFacingDirectionUlti",
+        "Type": "FacingDirectionAngleTargetAndSource",
+        "Values": [
+          270,
+          90
+        ],
+        "Projectiles": null,
+        "AreaEffects": null,
+        "Characters": null,
+        "Skills": null,
+        "StatusEffects": null
+      }
+    }
+  }
+}

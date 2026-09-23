@@ -1,0 +1,6139 @@
+{
+  "schema": "drafter-mechanics-followup-1",
+  "baseline_commit": "33c570c",
+  "fetch_status_counts": {
+    "200": 20,
+    "404": 1
+  },
+  "wire_http_exchange_count": null,
+  "observed_redirected_fetches": 1,
+  "response_bytes": 3542689,
+  "new_table_shapes": {
+    "status_effects_logic": {
+      "physical_rows": 410,
+      "named_records": 410,
+      "continuation_rows": 0
+    },
+    "components_logic": {
+      "physical_rows": 168,
+      "named_records": 57,
+      "continuation_rows": 111
+    },
+    "buddies": {
+      "physical_rows": 138,
+      "named_records": 135,
+      "continuation_rows": 3
+    },
+    "roguelite_cards": {
+      "physical_rows": 654,
+      "named_records": 654,
+      "continuation_rows": 0
+    },
+    "roguelite_decks": {
+      "physical_rows": 208,
+      "named_records": 208,
+      "continuation_rows": 0
+    },
+    "traits": {
+      "physical_rows": 1276,
+      "named_records": 1276,
+      "continuation_rows": 0
+    },
+    "gear_boosts": {
+      "physical_rows": 41,
+      "named_records": 19,
+      "continuation_rows": 22
+    },
+    "globals": {
+      "physical_rows": 52,
+      "named_records": 52,
+      "continuation_rows": 0
+    },
+    "actions": {
+      "physical_rows": 24,
+      "named_records": 17,
+      "continuation_rows": 7
+    },
+    "conditions": {
+      "physical_rows": 2,
+      "named_records": 1,
+      "continuation_rows": 1
+    }
+  },
+  "archive_head": "cc307ffd36678ac463cc2ca9373a08b0a2d2b0b7",
+  "archive_folder": "69.230",
+  "fingerprint_version": "69.229.1",
+  "fingerprint_sha_claim": "aae658958962a2d46c263bb823df63b7484184f3",
+  "public_conditions_metadata": {
+    "file": "csv_logic/conditions.csv",
+    "generatedAt": "2026-09-01T14:57:21.186Z",
+    "rowCount": 1,
+    "columns": [
+      "Name",
+      "Type",
+      "Values",
+      "Projectiles",
+      "AreaEffects",
+      "Characters",
+      "Skills",
+      "StatusEffects"
+    ],
+    "types": {
+      "Name": "string",
+      "Type": "string",
+      "Values": "int",
+      "Projectiles": "string",
+      "AreaEffects": "string",
+      "Characters": "string",
+      "Skills": "string",
+      "StatusEffects": "string"
+    },
+    "hasId": false
+  },
+  "identity_history": {
+    "68.250": {
+      "characters": [
+        {
+          "source_row_id_claim": 16000003,
+          "name": "RocketGirl",
+          "tid": [
+            "TID_ROCKET_GIRL"
+          ]
+        },
+        {
+          "source_row_id_claim": 16000106,
+          "name": "Rock",
+          "tid": [
+            "TID_ROCK"
+          ]
+        }
+      ],
+      "cards": [
+        {
+          "source_row_id_claim": 23000245,
+          "name": "RocketGirl_Jump",
+          "target": [
+            "RocketGirl"
+          ]
+        },
+        {
+          "source_row_id_claim": 23000316,
+          "name": "RocketGirl_MegaRocket",
+          "target": [
+            "RocketGirl"
+          ]
+        },
+        {
+          "source_row_id_claim": 23001281,
+          "name": "Rock_gadget",
+          "target": [
+            "Rock"
+          ]
+        },
+        {
+          "source_row_id_claim": 23001282,
+          "name": "Rock_gadget_1",
+          "target": [
+            "Rock"
+          ]
+        }
+      ]
+    },
+    "69.230": {
+      "characters": [
+        {
+          "source_row_id_claim": 16000003,
+          "name": "RocketGirl",
+          "tid": [
+            "TID_ROCKET_GIRL"
+          ]
+        },
+        {
+          "source_row_id_claim": 16000106,
+          "name": "Rock",
+          "tid": [
+            "TID_ROCK"
+          ]
+        }
+      ],
+      "cards": [
+        {
+          "source_row_id_claim": 23000245,
+          "name": "RocketGirl_Jump",
+          "target": [
+            "RocketGirl"
+          ]
+        },
+        {
+          "source_row_id_claim": 23000316,
+          "name": "RocketGirl_MegaRocket",
+          "target": [
+            "RocketGirl"
+          ]
+        },
+        {
+          "source_row_id_claim": 23001281,
+          "name": "Rock_gadget",
+          "target": [
+            "Rock"
+          ]
+        },
+        {
+          "source_row_id_claim": 23001282,
+          "name": "Rock_gadget_1",
+          "target": [
+            "Rock"
+          ]
+        }
+      ]
+    }
+  },
+  "identity_translations": {
+    "TID_ROCKET_GIRL": "BROCK",
+    "TID_ROCK": "BOLT"
+  },
+  "bolt_public_gadget_ids": [
+    23000245,
+    23000316,
+    23001281,
+    23001282
+  ],
+  "bolt_status": "CONFLICT",
+  "bolt_conflicts": [
+    {
+      "id": 23000245,
+      "observed_targets": [
+        "RocketGirl"
+      ],
+      "expected_target": "Rock"
+    },
+    {
+      "id": 23000316,
+      "observed_targets": [
+        "RocketGirl"
+      ],
+      "expected_target": "Rock"
+    }
+  ],
+  "named_component_parameter_records": 1,
+  "graphs": [
+    {
+      "root": [
+        "cards",
+        "ShotgunGirl_Dash",
+        "gadget"
+      ],
+      "max_depth": 6,
+      "max_nodes": 400,
+      "nodes": [
+        {
+          "table": "cards",
+          "name": "ShotgunGirl_Dash",
+          "fields": {
+            "Name": [
+              {
+                "record": 258,
+                "value": "ShotgunGirl_Dash"
+              }
+            ],
+            "LinkedCard": [
+              {
+                "record": 258,
+                "value": "ShotgunGirl_Buddy_Gadgets"
+              }
+            ],
+            "IconSWF": [
+              {
+                "record": 258,
+                "value": "sc/ui.sc"
+              }
+            ],
+            "IconExportName": [
+              {
+                "record": 258,
+                "value": "icon_item_shelly_1"
+              }
+            ],
+            "Target": [
+              {
+                "record": 258,
+                "value": "ShotgunGirl"
+              }
+            ],
+            "MetaType": [
+              {
+                "record": 258,
+                "value": "5"
+              }
+            ],
+            "Type": [
+              {
+                "record": 258,
+                "value": "accessory"
+              }
+            ],
+            "SubType": [
+              {
+                "record": 258,
+                "value": "subtype_aimable_accessory"
+              }
+            ],
+            "Skill": [
+              {
+                "record": 258,
+                "value": "ShotgunGirl_Dash"
+              }
+            ],
+            "Value": [
+              {
+                "record": 258,
+                "value": "-1"
+              }
+            ],
+            "Rarity": [
+              {
+                "record": 258,
+                "value": "common"
+              }
+            ],
+            "TID": [
+              {
+                "record": 258,
+                "value": "TID_ACCESSORY_SHELLY_DASH"
+              }
+            ],
+            "PowerIcon1ExportName": [
+              {
+                "record": 258,
+                "value": "genicon_health"
+              }
+            ],
+            "DirectPurchasePrice": [
+              {
+                "record": 258,
+                "value": "1000"
+              }
+            ],
+            "Buddies": [
+              {
+                "record": 258,
+                "value": "ShotgunGirl_Gadget_1"
+              }
+            ]
+          },
+          "physical_records": [
+            258
+          ]
+        },
+        {
+          "table": "buddies",
+          "name": "ShotgunGirl_Gadget_1",
+          "fields": {
+            "Name": [
+              {
+                "record": 3,
+                "value": "ShotgunGirl_Gadget_1"
+              }
+            ],
+            "Accessory": [
+              {
+                "record": 3,
+                "value": "ShotgunGirl_Dash_Buddy"
+              }
+            ],
+            "DescriptionTID": [
+              {
+                "record": 3,
+                "value": "TID_SHOTGUNGIRL_BUDDY_GADGET_1_DESC"
+              }
+            ],
+            "DifferenceTID": [
+              {
+                "record": 3,
+                "value": "TID_SHOTGUNGIRL_BUDDY_GADGET_1_DIFF"
+              }
+            ]
+          },
+          "physical_records": [
+            3
+          ]
+        },
+        {
+          "table": "accessories",
+          "name": "ShotgunGirl_Dash",
+          "fields": {
+            "Name": [
+              {
+                "record": 17,
+                "value": "ShotgunGirl_Dash"
+              }
+            ],
+            "Skill": [
+              {
+                "record": 17,
+                "value": "ShotgungirlGadgetSkillReload"
+              }
+            ]
+          },
+          "physical_records": [
+            17
+          ]
+        },
+        {
+          "table": "accessories",
+          "name": "ShotgunGirl_Dash_Buddy",
+          "fields": {
+            "Name": [
+              {
+                "record": 222,
+                "value": "ShotgunGirl_Dash_Buddy"
+              }
+            ],
+            "Skill": [
+              {
+                "record": 222,
+                "value": "ShotgungirlGadgetSkillReloadBuddy"
+              }
+            ]
+          },
+          "physical_records": [
+            222
+          ]
+        },
+        {
+          "table": "skills",
+          "name": "ShotgungirlGadgetSkillReload",
+          "fields": {
+            "Name": [
+              {
+                "record": 484,
+                "value": "ShotgungirlGadgetSkillReload"
+              }
+            ],
+            "BehaviorType": [
+              {
+                "record": 484,
+                "value": "Charge"
+              }
+            ],
+            "EquipType": [
+              {
+                "record": 484,
+                "value": "bonusSkill"
+              }
+            ],
+            "Targeted": [
+              {
+                "record": 484,
+                "value": "true"
+              }
+            ],
+            "AutoAttackTargetingType": [
+              {
+                "record": 484,
+                "value": "MovementBased"
+              }
+            ],
+            "Cooldown": [
+              {
+                "record": 484,
+                "value": "0"
+              }
+            ],
+            "BonusSkillCooldown": [
+              {
+                "record": 484,
+                "value": "16000"
+              }
+            ],
+            "CastingRange": [
+              {
+                "record": 484,
+                "value": "8"
+              }
+            ],
+            "RechargeTime": [
+              {
+                "record": 484,
+                "value": "2400"
+              }
+            ],
+            "MaxCharge": [
+              {
+                "record": 484,
+                "value": "1"
+              }
+            ],
+            "Damage": [
+              {
+                "record": 484,
+                "value": "0"
+              }
+            ],
+            "DamageForUlti": [
+              {
+                "record": 484,
+                "value": "-1"
+              }
+            ],
+            "ChargeSpeed": [
+              {
+                "record": 484,
+                "value": "2500"
+              }
+            ],
+            "ChargeType": [
+              {
+                "record": 484,
+                "value": "4"
+              }
+            ],
+            "AlwaysCastAtMaxRange": [
+              {
+                "record": 484,
+                "value": "true"
+              }
+            ],
+            "DontTriggerAreaAtEndOfCharge": [
+              {
+                "record": 484,
+                "value": "true"
+              }
+            ],
+            "ButtonSWF": [
+              {
+                "record": 484,
+                "value": "sc/ui.sc"
+              }
+            ],
+            "ButtonExportName": [
+              {
+                "record": 484,
+                "value": "icon_item_shelly_1"
+              }
+            ],
+            "LoopEffect": [
+              {
+                "record": 484,
+                "value": "gadget_max_dash"
+              }
+            ],
+            "BooleanAttributes": [
+              {
+                "record": 484,
+                "value": "Reload"
+              }
+            ],
+            "CustomValue": [
+              {
+                "record": 484,
+                "value": "300"
+              }
+            ]
+          },
+          "physical_records": [
+            484
+          ]
+        },
+        {
+          "table": "skills",
+          "name": "ShotgungirlGadgetSkillReloadBuddy",
+          "fields": {
+            "Name": [
+              {
+                "record": 485,
+                "value": "ShotgungirlGadgetSkillReloadBuddy"
+              }
+            ],
+            "BehaviorType": [
+              {
+                "record": 485,
+                "value": "Charge"
+              }
+            ],
+            "EquipType": [
+              {
+                "record": 485,
+                "value": "bonusSkill"
+              }
+            ],
+            "Targeted": [
+              {
+                "record": 485,
+                "value": "true"
+              }
+            ],
+            "AutoAttackTargetingType": [
+              {
+                "record": 485,
+                "value": "MovementBased"
+              }
+            ],
+            "Cooldown": [
+              {
+                "record": 485,
+                "value": "0"
+              }
+            ],
+            "BonusSkillCooldown": [
+              {
+                "record": 485,
+                "value": "16000"
+              }
+            ],
+            "CastingRange": [
+              {
+                "record": 485,
+                "value": "8"
+              }
+            ],
+            "RechargeTime": [
+              {
+                "record": 485,
+                "value": "2400"
+              }
+            ],
+            "MaxCharge": [
+              {
+                "record": 485,
+                "value": "1"
+              }
+            ],
+            "Damage": [
+              {
+                "record": 485,
+                "value": "0"
+              }
+            ],
+            "DamageForUlti": [
+              {
+                "record": 485,
+                "value": "-1"
+              }
+            ],
+            "ChargeSpeed": [
+              {
+                "record": 485,
+                "value": "2500"
+              }
+            ],
+            "ChargeType": [
+              {
+                "record": 485,
+                "value": "4"
+              }
+            ],
+            "AlwaysCastAtMaxRange": [
+              {
+                "record": 485,
+                "value": "true"
+              }
+            ],
+            "DontTriggerAreaAtEndOfCharge": [
+              {
+                "record": 485,
+                "value": "true"
+              }
+            ],
+            "ButtonSWF": [
+              {
+                "record": 485,
+                "value": "sc/ui.sc"
+              }
+            ],
+            "ButtonExportName": [
+              {
+                "record": 485,
+                "value": "icon_item_shelly_1"
+              }
+            ],
+            "LoopEffect": [
+              {
+                "record": 485,
+                "value": "shelly_def_buddy_gadget_dash"
+              }
+            ],
+            "ActivationSelfStatusEffects": [
+              {
+                "record": 485,
+                "value": "ShotgunGirlGadgetSkillImmunityShieldBuddy"
+              }
+            ],
+            "BooleanAttributes": [
+              {
+                "record": 485,
+                "value": "Reload"
+              }
+            ],
+            "CustomValue": [
+              {
+                "record": 485,
+                "value": "300"
+              }
+            ]
+          },
+          "physical_records": [
+            485
+          ]
+        },
+        {
+          "table": "status_effects_logic",
+          "name": "ShotgunGirlGadgetSkillImmunityShieldBuddy",
+          "fields": {
+            "Name": [
+              {
+                "record": 275,
+                "value": "ShotgunGirlGadgetSkillImmunityShieldBuddy"
+              }
+            ],
+            "DurationTicks": [
+              {
+                "record": 275,
+                "value": "8"
+              }
+            ],
+            "TriggerOnFirstTick": [
+              {
+                "record": 275,
+                "value": "TRUE"
+              }
+            ],
+            "ShieldPercent": [
+              {
+                "record": 275,
+                "value": "100"
+              }
+            ]
+          },
+          "physical_records": [
+            275
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "from": [
+            "cards",
+            "ShotgunGirl_Dash",
+            "Buddies",
+            258
+          ],
+          "to": [
+            "buddies",
+            "ShotgunGirl_Gadget_1"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "cards",
+            "ShotgunGirl_Dash",
+            "Skill",
+            258
+          ],
+          "to": [
+            "accessories",
+            "ShotgunGirl_Dash"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "buddies",
+            "ShotgunGirl_Gadget_1",
+            "Accessory",
+            3
+          ],
+          "to": [
+            "accessories",
+            "ShotgunGirl_Dash_Buddy"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "accessories",
+            "ShotgunGirl_Dash",
+            "Skill",
+            17
+          ],
+          "to": [
+            "skills",
+            "ShotgungirlGadgetSkillReload"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "accessories",
+            "ShotgunGirl_Dash_Buddy",
+            "Skill",
+            222
+          ],
+          "to": [
+            "skills",
+            "ShotgungirlGadgetSkillReloadBuddy"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "skills",
+            "ShotgungirlGadgetSkillReloadBuddy",
+            "ActivationSelfStatusEffects",
+            485
+          ],
+          "to": [
+            "status_effects_logic",
+            "ShotgunGirlGadgetSkillImmunityShieldBuddy"
+          ],
+          "explicit_overcharged_column": false
+        }
+      ],
+      "unresolved": [],
+      "effect_semantics": "UNKNOWN",
+      "scope_inheritance": "ROOT_AND_EDGE_PATH_REQUIRED"
+    },
+    {
+      "root": [
+        "cards",
+        "ShotgunGirl_unique",
+        "star_power"
+      ],
+      "max_depth": 6,
+      "max_nodes": 400,
+      "nodes": [
+        {
+          "table": "cards",
+          "name": "ShotgunGirl_unique",
+          "fields": {
+            "Name": [
+              {
+                "record": 79,
+                "value": "ShotgunGirl_unique"
+              }
+            ],
+            "LinkedCard": [
+              {
+                "record": 79,
+                "value": "ShotgunGirl_Buddy_Starpowers"
+              }
+            ],
+            "IconSWF": [
+              {
+                "record": 79,
+                "value": "sc/ui.sc"
+              }
+            ],
+            "Target": [
+              {
+                "record": 79,
+                "value": "ShotgunGirl"
+              }
+            ],
+            "MetaType": [
+              {
+                "record": 79,
+                "value": "4"
+              }
+            ],
+            "Type": [
+              {
+                "record": 79,
+                "value": "ulti_give_status_effect_enemy"
+              }
+            ],
+            "Value": [
+              {
+                "record": 79,
+                "value": "40"
+              }
+            ],
+            "Value2": [
+              {
+                "record": 79,
+                "value": "350"
+              }
+            ],
+            "StatusEffect": [
+              {
+                "record": 79,
+                "value": "ShotgunGirlStarPowerUltiProjectileSlow"
+              }
+            ],
+            "Rarity": [
+              {
+                "record": 79,
+                "value": "common"
+              }
+            ],
+            "TID": [
+              {
+                "record": 79,
+                "value": "TID_SPEC_ABI_FREEZE"
+              }
+            ],
+            "PowerIcon1ExportName": [
+              {
+                "record": 79,
+                "value": "genicon_health"
+              }
+            ],
+            "DirectPurchasePrice": [
+              {
+                "record": 79,
+                "value": "2000"
+              }
+            ],
+            "Buddies": [
+              {
+                "record": 79,
+                "value": "ShotgunGirl_Starpower_1"
+              }
+            ]
+          },
+          "physical_records": [
+            79
+          ]
+        },
+        {
+          "table": "status_effects_logic",
+          "name": "ShotgunGirlStarPowerUltiProjectileSlow",
+          "fields": {
+            "Name": [
+              {
+                "record": 34,
+                "value": "ShotgunGirlStarPowerUltiProjectileSlow"
+              }
+            ],
+            "DurationTicks": [
+              {
+                "record": 34,
+                "value": "40"
+              }
+            ],
+            "Refreshable": [
+              {
+                "record": 34,
+                "value": "TRUE"
+              }
+            ],
+            "SpeedReducePercent": [
+              {
+                "record": 34,
+                "value": "55"
+              }
+            ],
+            "IsDebuff": [
+              {
+                "record": 34,
+                "value": "TRUE"
+              }
+            ]
+          },
+          "physical_records": [
+            34
+          ]
+        },
+        {
+          "table": "buddies",
+          "name": "ShotgunGirl_Starpower_1",
+          "fields": {
+            "Name": [
+              {
+                "record": 5,
+                "value": "ShotgunGirl_Starpower_1"
+              }
+            ],
+            "Traits": [
+              {
+                "record": 5,
+                "value": "ShelllyBuddySp1"
+              }
+            ],
+            "DescriptionTID": [
+              {
+                "record": 5,
+                "value": "TID_SHOTGUNGIRL_BUDDY_STARPOWER_1_DESC"
+              }
+            ],
+            "DifferenceTID": [
+              {
+                "record": 5,
+                "value": "TID_SHOTGUNGIRL_BUDDY_STARPOWER_1_DIFF"
+              }
+            ]
+          },
+          "physical_records": [
+            5
+          ]
+        },
+        {
+          "table": "traits",
+          "name": "ShelllyBuddySp1",
+          "fields": {
+            "Name": [
+              {
+                "record": 628,
+                "value": "ShelllyBuddySp1"
+              }
+            ],
+            "ServerOnly": [
+              {
+                "record": 628,
+                "value": "TRUE"
+              }
+            ],
+            "NeverRemove": [
+              {
+                "record": 628,
+                "value": "TRUE"
+              }
+            ],
+            "Type": [
+              {
+                "record": 628,
+                "value": "AddChainAreaEffectToUltiProjectileMod"
+              }
+            ],
+            "Value": [
+              {
+                "record": 628,
+                "value": "4"
+              }
+            ],
+            "AreaEffect": [
+              {
+                "record": 628,
+                "value": "ShellyBuddySPBurnArea"
+              }
+            ]
+          },
+          "physical_records": [
+            628
+          ]
+        },
+        {
+          "table": "areas",
+          "name": "ShellyBuddySPBurnArea",
+          "fields": {
+            "Name": [
+              {
+                "record": 590,
+                "value": "ShellyBuddySPBurnArea"
+              }
+            ],
+            "TimeMs": [
+              {
+                "record": 590,
+                "value": "2900"
+              }
+            ],
+            "Radius": [
+              {
+                "record": 590,
+                "value": "300"
+              }
+            ],
+            "Type": [
+              {
+                "record": 590,
+                "value": "Dot"
+              }
+            ],
+            "DelayFirstTick": [
+              {
+                "record": 590,
+                "value": "true"
+              }
+            ]
+          },
+          "physical_records": [
+            590
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "from": [
+            "cards",
+            "ShotgunGirl_unique",
+            "StatusEffect",
+            79
+          ],
+          "to": [
+            "status_effects_logic",
+            "ShotgunGirlStarPowerUltiProjectileSlow"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "cards",
+            "ShotgunGirl_unique",
+            "Buddies",
+            79
+          ],
+          "to": [
+            "buddies",
+            "ShotgunGirl_Starpower_1"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "buddies",
+            "ShotgunGirl_Starpower_1",
+            "Traits",
+            5
+          ],
+          "to": [
+            "traits",
+            "ShelllyBuddySp1"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "traits",
+            "ShelllyBuddySp1",
+            "AreaEffect",
+            628
+          ],
+          "to": [
+            "areas",
+            "ShellyBuddySPBurnArea"
+          ],
+          "explicit_overcharged_column": false
+        }
+      ],
+      "unresolved": [],
+      "effect_semantics": "UNKNOWN",
+      "scope_inheritance": "ROOT_AND_EDGE_PATH_REQUIRED"
+    },
+    {
+      "root": [
+        "cards",
+        "ShotgunGirl_overcharge",
+        "hypercharge"
+      ],
+      "max_depth": 6,
+      "max_nodes": 400,
+      "nodes": [
+        {
+          "table": "cards",
+          "name": "ShotgunGirl_overcharge",
+          "fields": {
+            "Name": [
+              {
+                "record": 616,
+                "value": "ShotgunGirl_overcharge"
+              }
+            ],
+            "LinkedCard": [
+              {
+                "record": 616,
+                "value": "ShotgunGirl_Buddy_Overcharge"
+              }
+            ],
+            "IconSWF": [
+              {
+                "record": 616,
+                "value": "sc/ui.sc"
+              }
+            ],
+            "IconExportName": [
+              {
+                "record": 616,
+                "value": "icon_overcharge_shelly_1"
+              }
+            ],
+            "Target": [
+              {
+                "record": 616,
+                "value": "ShotgunGirl"
+              }
+            ],
+            "MetaType": [
+              {
+                "record": 616,
+                "value": "6"
+              }
+            ],
+            "Type": [
+              {
+                "record": 616,
+                "value": "overcharge_weapon_spread"
+              }
+            ],
+            "Value": [
+              {
+                "record": 616,
+                "value": "33"
+              }
+            ],
+            "Value2": [
+              {
+                "record": 616,
+                "value": "3"
+              }
+            ],
+            "Rarity": [
+              {
+                "record": 616,
+                "value": "common"
+              }
+            ],
+            "TID": [
+              {
+                "record": 616,
+                "value": "TID_SHOTGUNGIRL_OVERCHARGE"
+              }
+            ],
+            "PowerIcon1ExportName": [
+              {
+                "record": 616,
+                "value": "genicon_health"
+              }
+            ],
+            "DirectPurchasePrice": [
+              {
+                "record": 616,
+                "value": "5000"
+              }
+            ],
+            "Buddies": [
+              {
+                "record": 616,
+                "value": "ShotgunGirl_Overcharge"
+              }
+            ]
+          },
+          "physical_records": [
+            616
+          ]
+        },
+        {
+          "table": "buddies",
+          "name": "ShotgunGirl_Overcharge",
+          "fields": {
+            "Name": [
+              {
+                "record": 7,
+                "value": "ShotgunGirl_Overcharge"
+              }
+            ],
+            "DescriptionTID": [
+              {
+                "record": 7,
+                "value": "TID_SHOTGUNGIRL_BUDDY_OVERCHARGE_DESC"
+              }
+            ],
+            "DifferenceTID": [
+              {
+                "record": 7,
+                "value": "TID_SHOTGUNGIRL_BUDDY_OVERCHARGE_DIFF"
+              }
+            ],
+            "OverchargeExtendTicks": [
+              {
+                "record": 7,
+                "value": "40"
+              }
+            ]
+          },
+          "physical_records": [
+            7
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "from": [
+            "cards",
+            "ShotgunGirl_overcharge",
+            "Buddies",
+            616
+          ],
+          "to": [
+            "buddies",
+            "ShotgunGirl_Overcharge"
+          ],
+          "explicit_overcharged_column": false
+        }
+      ],
+      "unresolved": [],
+      "effect_semantics": "UNKNOWN",
+      "scope_inheritance": "ROOT_AND_EDGE_PATH_REQUIRED"
+    },
+    {
+      "root": [
+        "cards",
+        "ShotgunGirl_Buddy_Gadgets",
+        "buffy/gadget"
+      ],
+      "max_depth": 6,
+      "max_nodes": 400,
+      "nodes": [
+        {
+          "table": "cards",
+          "name": "ShotgunGirl_Buddy_Gadgets",
+          "fields": {
+            "Name": [
+              {
+                "record": 1196,
+                "value": "ShotgunGirl_Buddy_Gadgets"
+              }
+            ],
+            "IconSWF": [
+              {
+                "record": 1196,
+                "value": "sc/buddy.sc"
+              }
+            ],
+            "IconExportName": [
+              {
+                "record": 1196,
+                "value": "buddy_icon_shelly_gadget"
+              }
+            ],
+            "Target": [
+              {
+                "record": 1196,
+                "value": "ShotgunGirl"
+              }
+            ],
+            "MetaType": [
+              {
+                "record": 1196,
+                "value": "13"
+              }
+            ],
+            "Type": [
+              {
+                "record": 1196,
+                "value": "buddy"
+              }
+            ],
+            "Value": [
+              {
+                "record": 1196,
+                "value": "0"
+              }
+            ],
+            "Rarity": [
+              {
+                "record": 1196,
+                "value": "common"
+              }
+            ],
+            "TID": [
+              {
+                "record": 1196,
+                "value": "TID_BUDDY_SHELLY_GADGETS_UNLOCK"
+              }
+            ],
+            "PowerIcon1ExportName": [
+              {
+                "record": 1196,
+                "value": "genicon_health"
+              }
+            ],
+            "DirectPurchasePrice": [
+              {
+                "record": 1196,
+                "value": "1000"
+              }
+            ],
+            "Buddies": [
+              {
+                "record": 1196,
+                "value": "ShotgunGirl_Gadget_1;ShotgunGirl_Gadget_2;"
+              }
+            ]
+          },
+          "physical_records": [
+            1196
+          ]
+        },
+        {
+          "table": "buddies",
+          "name": "ShotgunGirl_Gadget_1",
+          "fields": {
+            "Name": [
+              {
+                "record": 3,
+                "value": "ShotgunGirl_Gadget_1"
+              }
+            ],
+            "Accessory": [
+              {
+                "record": 3,
+                "value": "ShotgunGirl_Dash_Buddy"
+              }
+            ],
+            "DescriptionTID": [
+              {
+                "record": 3,
+                "value": "TID_SHOTGUNGIRL_BUDDY_GADGET_1_DESC"
+              }
+            ],
+            "DifferenceTID": [
+              {
+                "record": 3,
+                "value": "TID_SHOTGUNGIRL_BUDDY_GADGET_1_DIFF"
+              }
+            ]
+          },
+          "physical_records": [
+            3
+          ]
+        },
+        {
+          "table": "buddies",
+          "name": "ShotgunGirl_Gadget_2",
+          "fields": {
+            "Name": [
+              {
+                "record": 4,
+                "value": "ShotgunGirl_Gadget_2"
+              }
+            ],
+            "Accessory": [
+              {
+                "record": 4,
+                "value": "ShotgunGirl_Focus_Buddy"
+              }
+            ],
+            "DescriptionTID": [
+              {
+                "record": 4,
+                "value": "TID_SHOTGUNGIRL_BUDDY_GADGET_2_DESC"
+              }
+            ],
+            "DifferenceTID": [
+              {
+                "record": 4,
+                "value": "TID_SHOTGUNGIRL_BUDDY_GADGET_2_DIFF"
+              }
+            ]
+          },
+          "physical_records": [
+            4
+          ]
+        },
+        {
+          "table": "accessories",
+          "name": "ShotgunGirl_Dash_Buddy",
+          "fields": {
+            "Name": [
+              {
+                "record": 222,
+                "value": "ShotgunGirl_Dash_Buddy"
+              }
+            ],
+            "Skill": [
+              {
+                "record": 222,
+                "value": "ShotgungirlGadgetSkillReloadBuddy"
+              }
+            ]
+          },
+          "physical_records": [
+            222
+          ]
+        },
+        {
+          "table": "accessories",
+          "name": "ShotgunGirl_Focus_Buddy",
+          "fields": {
+            "Name": [
+              {
+                "record": 227,
+                "value": "ShotgunGirl_Focus_Buddy"
+              }
+            ],
+            "Skill": [
+              {
+                "record": 227,
+                "value": "ShotgunGirlBuddyClayPigeons"
+              }
+            ]
+          },
+          "physical_records": [
+            227
+          ]
+        },
+        {
+          "table": "skills",
+          "name": "ShotgungirlGadgetSkillReloadBuddy",
+          "fields": {
+            "Name": [
+              {
+                "record": 485,
+                "value": "ShotgungirlGadgetSkillReloadBuddy"
+              }
+            ],
+            "BehaviorType": [
+              {
+                "record": 485,
+                "value": "Charge"
+              }
+            ],
+            "EquipType": [
+              {
+                "record": 485,
+                "value": "bonusSkill"
+              }
+            ],
+            "Targeted": [
+              {
+                "record": 485,
+                "value": "true"
+              }
+            ],
+            "AutoAttackTargetingType": [
+              {
+                "record": 485,
+                "value": "MovementBased"
+              }
+            ],
+            "Cooldown": [
+              {
+                "record": 485,
+                "value": "0"
+              }
+            ],
+            "BonusSkillCooldown": [
+              {
+                "record": 485,
+                "value": "16000"
+              }
+            ],
+            "CastingRange": [
+              {
+                "record": 485,
+                "value": "8"
+              }
+            ],
+            "RechargeTime": [
+              {
+                "record": 485,
+                "value": "2400"
+              }
+            ],
+            "MaxCharge": [
+              {
+                "record": 485,
+                "value": "1"
+              }
+            ],
+            "Damage": [
+              {
+                "record": 485,
+                "value": "0"
+              }
+            ],
+            "DamageForUlti": [
+              {
+                "record": 485,
+                "value": "-1"
+              }
+            ],
+            "ChargeSpeed": [
+              {
+                "record": 485,
+                "value": "2500"
+              }
+            ],
+            "ChargeType": [
+              {
+                "record": 485,
+                "value": "4"
+              }
+            ],
+            "AlwaysCastAtMaxRange": [
+              {
+                "record": 485,
+                "value": "true"
+              }
+            ],
+            "DontTriggerAreaAtEndOfCharge": [
+              {
+                "record": 485,
+                "value": "true"
+              }
+            ],
+            "ButtonSWF": [
+              {
+                "record": 485,
+                "value": "sc/ui.sc"
+              }
+            ],
+            "ButtonExportName": [
+              {
+                "record": 485,
+                "value": "icon_item_shelly_1"
+              }
+            ],
+            "LoopEffect": [
+              {
+                "record": 485,
+                "value": "shelly_def_buddy_gadget_dash"
+              }
+            ],
+            "ActivationSelfStatusEffects": [
+              {
+                "record": 485,
+                "value": "ShotgunGirlGadgetSkillImmunityShieldBuddy"
+              }
+            ],
+            "BooleanAttributes": [
+              {
+                "record": 485,
+                "value": "Reload"
+              }
+            ],
+            "CustomValue": [
+              {
+                "record": 485,
+                "value": "300"
+              }
+            ]
+          },
+          "physical_records": [
+            485
+          ]
+        },
+        {
+          "table": "skills",
+          "name": "ShotgunGirlBuddyClayPigeons",
+          "fields": {
+            "Name": [
+              {
+                "record": 448,
+                "value": "ShotgunGirlBuddyClayPigeons"
+              }
+            ],
+            "BehaviorType": [
+              {
+                "record": 448,
+                "value": "Attack"
+              }
+            ],
+            "EquipType": [
+              {
+                "record": 448,
+                "value": "bonusSkill"
+              }
+            ],
+            "CanMoveAtSameTime": [
+              {
+                "record": 448,
+                "value": "true"
+              }
+            ],
+            "Targeted": [
+              {
+                "record": 448,
+                "value": "true"
+              }
+            ],
+            "Cooldown": [
+              {
+                "record": 448,
+                "value": "250"
+              }
+            ],
+            "BonusSkillCooldown": [
+              {
+                "record": 448,
+                "value": "18000"
+              }
+            ],
+            "ActiveTime": [
+              {
+                "record": 448,
+                "value": "150"
+              }
+            ],
+            "CastingRange": [
+              {
+                "record": 448,
+                "value": "30"
+              }
+            ],
+            "RechargeTime": [
+              {
+                "record": 448,
+                "value": "1500"
+              }
+            ],
+            "MaxCharge": [
+              {
+                "record": 448,
+                "value": "3"
+              }
+            ],
+            "Damage": [
+              {
+                "record": 448,
+                "value": "300"
+              }
+            ],
+            "DamageForUlti": [
+              {
+                "record": 448,
+                "value": "-1"
+              }
+            ],
+            "MsBetweenAttacks": [
+              {
+                "record": 448,
+                "value": "100"
+              }
+            ],
+            "Spread": [
+              {
+                "record": 448,
+                "value": "30"
+              }
+            ],
+            "NumBulletsInOneAttack": [
+              {
+                "record": 448,
+                "value": "5"
+              }
+            ],
+            "ExecuteFirstAttackImmediately": [
+              {
+                "record": 448,
+                "value": "true"
+              }
+            ],
+            "Projectiles": [
+              {
+                "record": 448,
+                "value": "ShotgunGirlProjectileGadgetSkillBuddy"
+              }
+            ],
+            "ButtonSWF": [
+              {
+                "record": 448,
+                "value": "sc/ui.sc"
+              }
+            ],
+            "ButtonExportName": [
+              {
+                "record": 448,
+                "value": "icon_item_shelly_2"
+              }
+            ],
+            "AttackEffect": [
+              {
+                "record": 448,
+                "value": "shelly_def_buddy_atk"
+              }
+            ],
+            "OverchargedAttackEffect": [
+              {
+                "record": 448,
+                "value": "shelly_def_buddy_atk"
+              }
+            ],
+            "BooleanAttributes": [
+              {
+                "record": 448,
+                "value": "UseWeaponAmmo"
+              }
+            ]
+          },
+          "physical_records": [
+            448
+          ]
+        },
+        {
+          "table": "status_effects_logic",
+          "name": "ShotgunGirlGadgetSkillImmunityShieldBuddy",
+          "fields": {
+            "Name": [
+              {
+                "record": 275,
+                "value": "ShotgunGirlGadgetSkillImmunityShieldBuddy"
+              }
+            ],
+            "DurationTicks": [
+              {
+                "record": 275,
+                "value": "8"
+              }
+            ],
+            "TriggerOnFirstTick": [
+              {
+                "record": 275,
+                "value": "TRUE"
+              }
+            ],
+            "ShieldPercent": [
+              {
+                "record": 275,
+                "value": "100"
+              }
+            ]
+          },
+          "physical_records": [
+            275
+          ]
+        },
+        {
+          "table": "projectiles",
+          "name": "ShotgunGirlProjectileGadgetSkillBuddy",
+          "fields": {
+            "Name": [
+              {
+                "record": 580,
+                "value": "ShotgunGirlProjectileGadgetSkillBuddy"
+              }
+            ],
+            "Speed": [
+              {
+                "record": 580,
+                "value": "4300"
+              }
+            ],
+            "Radius": [
+              {
+                "record": 580,
+                "value": "0"
+              }
+            ],
+            "Gravity": [
+              {
+                "record": 580,
+                "value": "0"
+              }
+            ],
+            "EarlyTicks": [
+              {
+                "record": 580,
+                "value": "2"
+              }
+            ],
+            "ShotByHero": [
+              {
+                "record": 580,
+                "value": "true"
+              }
+            ],
+            "StatusEffectEnemy": [
+              {
+                "record": 580,
+                "value": "ShotgunGirlClayPigeonsBuddyProjectileStatusEffect"
+              }
+            ]
+          },
+          "physical_records": [
+            580
+          ]
+        },
+        {
+          "table": "status_effects_logic",
+          "name": "ShotgunGirlClayPigeonsBuddyProjectileStatusEffect",
+          "fields": {
+            "Name": [
+              {
+                "record": 271,
+                "value": "ShotgunGirlClayPigeonsBuddyProjectileStatusEffect"
+              }
+            ],
+            "DurationTicks": [
+              {
+                "record": 271,
+                "value": "10"
+              }
+            ],
+            "TriggerOnFirstTick": [
+              {
+                "record": 271,
+                "value": "TRUE"
+              }
+            ],
+            "Refreshable": [
+              {
+                "record": 271,
+                "value": "TRUE"
+              }
+            ],
+            "SpeedReducePercent": [
+              {
+                "record": 271,
+                "value": "30"
+              }
+            ],
+            "IsDebuff": [
+              {
+                "record": 271,
+                "value": "TRUE"
+              }
+            ],
+            "BooleanAttributes": [
+              {
+                "record": 271,
+                "value": "AdditiveDurationTicksOnRefresh"
+              }
+            ]
+          },
+          "physical_records": [
+            271
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "from": [
+            "cards",
+            "ShotgunGirl_Buddy_Gadgets",
+            "Buddies",
+            1196
+          ],
+          "to": [
+            "buddies",
+            "ShotgunGirl_Gadget_1"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "cards",
+            "ShotgunGirl_Buddy_Gadgets",
+            "Buddies",
+            1196
+          ],
+          "to": [
+            "buddies",
+            "ShotgunGirl_Gadget_2"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "buddies",
+            "ShotgunGirl_Gadget_1",
+            "Accessory",
+            3
+          ],
+          "to": [
+            "accessories",
+            "ShotgunGirl_Dash_Buddy"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "buddies",
+            "ShotgunGirl_Gadget_2",
+            "Accessory",
+            4
+          ],
+          "to": [
+            "accessories",
+            "ShotgunGirl_Focus_Buddy"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "accessories",
+            "ShotgunGirl_Dash_Buddy",
+            "Skill",
+            222
+          ],
+          "to": [
+            "skills",
+            "ShotgungirlGadgetSkillReloadBuddy"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "accessories",
+            "ShotgunGirl_Focus_Buddy",
+            "Skill",
+            227
+          ],
+          "to": [
+            "skills",
+            "ShotgunGirlBuddyClayPigeons"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "skills",
+            "ShotgungirlGadgetSkillReloadBuddy",
+            "ActivationSelfStatusEffects",
+            485
+          ],
+          "to": [
+            "status_effects_logic",
+            "ShotgunGirlGadgetSkillImmunityShieldBuddy"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "skills",
+            "ShotgunGirlBuddyClayPigeons",
+            "Projectiles",
+            448
+          ],
+          "to": [
+            "projectiles",
+            "ShotgunGirlProjectileGadgetSkillBuddy"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "projectiles",
+            "ShotgunGirlProjectileGadgetSkillBuddy",
+            "StatusEffectEnemy",
+            580
+          ],
+          "to": [
+            "status_effects_logic",
+            "ShotgunGirlClayPigeonsBuddyProjectileStatusEffect"
+          ],
+          "explicit_overcharged_column": false
+        }
+      ],
+      "unresolved": [],
+      "effect_semantics": "UNKNOWN",
+      "scope_inheritance": "ROOT_AND_EDGE_PATH_REQUIRED"
+    },
+    {
+      "root": [
+        "cards",
+        "ShotgunGirl_Buddy_Starpowers",
+        "buffy/star_power"
+      ],
+      "max_depth": 6,
+      "max_nodes": 400,
+      "nodes": [
+        {
+          "table": "cards",
+          "name": "ShotgunGirl_Buddy_Starpowers",
+          "fields": {
+            "Name": [
+              {
+                "record": 1197,
+                "value": "ShotgunGirl_Buddy_Starpowers"
+              }
+            ],
+            "IconSWF": [
+              {
+                "record": 1197,
+                "value": "sc/buddy.sc"
+              }
+            ],
+            "IconExportName": [
+              {
+                "record": 1197,
+                "value": "buddy_icon_shelly_star_power"
+              }
+            ],
+            "Target": [
+              {
+                "record": 1197,
+                "value": "ShotgunGirl"
+              }
+            ],
+            "MetaType": [
+              {
+                "record": 1197,
+                "value": "15"
+              }
+            ],
+            "Type": [
+              {
+                "record": 1197,
+                "value": "buddy"
+              }
+            ],
+            "Value": [
+              {
+                "record": 1197,
+                "value": "0"
+              }
+            ],
+            "Rarity": [
+              {
+                "record": 1197,
+                "value": "common"
+              }
+            ],
+            "TID": [
+              {
+                "record": 1197,
+                "value": "TID_BUDDY_SHELLY_STARPOWERS_UNLOCK"
+              }
+            ],
+            "PowerIcon1ExportName": [
+              {
+                "record": 1197,
+                "value": "genicon_health"
+              }
+            ],
+            "DirectPurchasePrice": [
+              {
+                "record": 1197,
+                "value": "1000"
+              }
+            ],
+            "Buddies": [
+              {
+                "record": 1197,
+                "value": "ShotgunGirl_Starpower_1;ShotgunGirl_Starpower_2"
+              }
+            ]
+          },
+          "physical_records": [
+            1197
+          ]
+        },
+        {
+          "table": "buddies",
+          "name": "ShotgunGirl_Starpower_1",
+          "fields": {
+            "Name": [
+              {
+                "record": 5,
+                "value": "ShotgunGirl_Starpower_1"
+              }
+            ],
+            "Traits": [
+              {
+                "record": 5,
+                "value": "ShelllyBuddySp1"
+              }
+            ],
+            "DescriptionTID": [
+              {
+                "record": 5,
+                "value": "TID_SHOTGUNGIRL_BUDDY_STARPOWER_1_DESC"
+              }
+            ],
+            "DifferenceTID": [
+              {
+                "record": 5,
+                "value": "TID_SHOTGUNGIRL_BUDDY_STARPOWER_1_DIFF"
+              }
+            ]
+          },
+          "physical_records": [
+            5
+          ]
+        },
+        {
+          "table": "buddies",
+          "name": "ShotgunGirl_Starpower_2",
+          "fields": {
+            "Name": [
+              {
+                "record": 6,
+                "value": "ShotgunGirl_Starpower_2"
+              }
+            ],
+            "Traits": [
+              {
+                "record": 6,
+                "value": "ShelllyBuddySp2"
+              }
+            ],
+            "DescriptionTID": [
+              {
+                "record": 6,
+                "value": "TID_SHOTGUNGIRL_BUDDY_STARPOWER_2_DESC"
+              }
+            ],
+            "DifferenceTID": [
+              {
+                "record": 6,
+                "value": "TID_SHOTGUNGIRL_BUDDY_STARPOWER_2_DIFF"
+              }
+            ]
+          },
+          "physical_records": [
+            6
+          ]
+        },
+        {
+          "table": "traits",
+          "name": "ShelllyBuddySp1",
+          "fields": {
+            "Name": [
+              {
+                "record": 628,
+                "value": "ShelllyBuddySp1"
+              }
+            ],
+            "ServerOnly": [
+              {
+                "record": 628,
+                "value": "TRUE"
+              }
+            ],
+            "NeverRemove": [
+              {
+                "record": 628,
+                "value": "TRUE"
+              }
+            ],
+            "Type": [
+              {
+                "record": 628,
+                "value": "AddChainAreaEffectToUltiProjectileMod"
+              }
+            ],
+            "Value": [
+              {
+                "record": 628,
+                "value": "4"
+              }
+            ],
+            "AreaEffect": [
+              {
+                "record": 628,
+                "value": "ShellyBuddySPBurnArea"
+              }
+            ]
+          },
+          "physical_records": [
+            628
+          ]
+        },
+        {
+          "table": "traits",
+          "name": "ShelllyBuddySp2",
+          "fields": {
+            "Name": [
+              {
+                "record": 629,
+                "value": "ShelllyBuddySp2"
+              }
+            ],
+            "ServerOnly": [
+              {
+                "record": 629,
+                "value": "TRUE"
+              }
+            ],
+            "NeverRemove": [
+              {
+                "record": 629,
+                "value": "TRUE"
+              }
+            ],
+            "Type": [
+              {
+                "record": 629,
+                "value": "ApplyStatusEffectOnMedikit"
+              }
+            ],
+            "StatusEffect": [
+              {
+                "record": 629,
+                "value": "ShelllyBuddySp2"
+              }
+            ]
+          },
+          "physical_records": [
+            629
+          ]
+        },
+        {
+          "table": "areas",
+          "name": "ShellyBuddySPBurnArea",
+          "fields": {
+            "Name": [
+              {
+                "record": 590,
+                "value": "ShellyBuddySPBurnArea"
+              }
+            ],
+            "TimeMs": [
+              {
+                "record": 590,
+                "value": "2900"
+              }
+            ],
+            "Radius": [
+              {
+                "record": 590,
+                "value": "300"
+              }
+            ],
+            "Type": [
+              {
+                "record": 590,
+                "value": "Dot"
+              }
+            ],
+            "DelayFirstTick": [
+              {
+                "record": 590,
+                "value": "true"
+              }
+            ]
+          },
+          "physical_records": [
+            590
+          ]
+        },
+        {
+          "table": "status_effects_logic",
+          "name": "ShelllyBuddySp2",
+          "fields": {
+            "Name": [
+              {
+                "record": 276,
+                "value": "ShelllyBuddySp2"
+              }
+            ],
+            "DurationTicks": [
+              {
+                "record": 276,
+                "value": "60"
+              }
+            ],
+            "Stacking": [
+              {
+                "record": 276,
+                "value": "TRUE"
+              }
+            ],
+            "SpeedBoostPercent": [
+              {
+                "record": 276,
+                "value": "15"
+              }
+            ]
+          },
+          "physical_records": [
+            276
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "from": [
+            "cards",
+            "ShotgunGirl_Buddy_Starpowers",
+            "Buddies",
+            1197
+          ],
+          "to": [
+            "buddies",
+            "ShotgunGirl_Starpower_1"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "cards",
+            "ShotgunGirl_Buddy_Starpowers",
+            "Buddies",
+            1197
+          ],
+          "to": [
+            "buddies",
+            "ShotgunGirl_Starpower_2"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "buddies",
+            "ShotgunGirl_Starpower_1",
+            "Traits",
+            5
+          ],
+          "to": [
+            "traits",
+            "ShelllyBuddySp1"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "buddies",
+            "ShotgunGirl_Starpower_2",
+            "Traits",
+            6
+          ],
+          "to": [
+            "traits",
+            "ShelllyBuddySp2"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "traits",
+            "ShelllyBuddySp1",
+            "AreaEffect",
+            628
+          ],
+          "to": [
+            "areas",
+            "ShellyBuddySPBurnArea"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "traits",
+            "ShelllyBuddySp2",
+            "StatusEffect",
+            629
+          ],
+          "to": [
+            "status_effects_logic",
+            "ShelllyBuddySp2"
+          ],
+          "explicit_overcharged_column": false
+        }
+      ],
+      "unresolved": [],
+      "effect_semantics": "UNKNOWN",
+      "scope_inheritance": "ROOT_AND_EDGE_PATH_REQUIRED"
+    },
+    {
+      "root": [
+        "cards",
+        "ShotgunGirl_Buddy_Overcharge",
+        "buffy/hypercharge"
+      ],
+      "max_depth": 6,
+      "max_nodes": 400,
+      "nodes": [
+        {
+          "table": "cards",
+          "name": "ShotgunGirl_Buddy_Overcharge",
+          "fields": {
+            "Name": [
+              {
+                "record": 1198,
+                "value": "ShotgunGirl_Buddy_Overcharge"
+              }
+            ],
+            "IconSWF": [
+              {
+                "record": 1198,
+                "value": "sc/buddy.sc"
+              }
+            ],
+            "IconExportName": [
+              {
+                "record": 1198,
+                "value": "buddy_icon_shelly_hypercharge"
+              }
+            ],
+            "Target": [
+              {
+                "record": 1198,
+                "value": "ShotgunGirl"
+              }
+            ],
+            "MetaType": [
+              {
+                "record": 1198,
+                "value": "16"
+              }
+            ],
+            "Type": [
+              {
+                "record": 1198,
+                "value": "buddy"
+              }
+            ],
+            "Value": [
+              {
+                "record": 1198,
+                "value": "0"
+              }
+            ],
+            "Rarity": [
+              {
+                "record": 1198,
+                "value": "common"
+              }
+            ],
+            "TID": [
+              {
+                "record": 1198,
+                "value": "TID_BUDDY_SHELLY_OVERCHARGE_UNLOCK"
+              }
+            ],
+            "PowerIcon1ExportName": [
+              {
+                "record": 1198,
+                "value": "genicon_health"
+              }
+            ],
+            "DirectPurchasePrice": [
+              {
+                "record": 1198,
+                "value": "1000"
+              }
+            ],
+            "Buddies": [
+              {
+                "record": 1198,
+                "value": "ShotgunGirl_Overcharge"
+              }
+            ]
+          },
+          "physical_records": [
+            1198
+          ]
+        },
+        {
+          "table": "buddies",
+          "name": "ShotgunGirl_Overcharge",
+          "fields": {
+            "Name": [
+              {
+                "record": 7,
+                "value": "ShotgunGirl_Overcharge"
+              }
+            ],
+            "DescriptionTID": [
+              {
+                "record": 7,
+                "value": "TID_SHOTGUNGIRL_BUDDY_OVERCHARGE_DESC"
+              }
+            ],
+            "DifferenceTID": [
+              {
+                "record": 7,
+                "value": "TID_SHOTGUNGIRL_BUDDY_OVERCHARGE_DIFF"
+              }
+            ],
+            "OverchargeExtendTicks": [
+              {
+                "record": 7,
+                "value": "40"
+              }
+            ]
+          },
+          "physical_records": [
+            7
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "from": [
+            "cards",
+            "ShotgunGirl_Buddy_Overcharge",
+            "Buddies",
+            1198
+          ],
+          "to": [
+            "buddies",
+            "ShotgunGirl_Overcharge"
+          ],
+          "explicit_overcharged_column": false
+        }
+      ],
+      "unresolved": [],
+      "effect_semantics": "UNKNOWN",
+      "scope_inheritance": "ROOT_AND_EDGE_PATH_REQUIRED"
+    },
+    {
+      "root": [
+        "cards",
+        "nano_shelly_deck",
+        "mode/nanopower"
+      ],
+      "max_depth": 6,
+      "max_nodes": 400,
+      "nodes": [
+        {
+          "table": "cards",
+          "name": "nano_shelly_deck",
+          "fields": {
+            "Name": [
+              {
+                "record": 1410,
+                "value": "nano_shelly_deck"
+              }
+            ],
+            "IconSWF": [
+              {
+                "record": 1410,
+                "value": "sc/ui.sc"
+              }
+            ],
+            "Target": [
+              {
+                "record": 1410,
+                "value": "ShotgunGirl"
+              }
+            ],
+            "MetaType": [
+              {
+                "record": 1410,
+                "value": "19"
+              }
+            ],
+            "Type": [
+              {
+                "record": 1410,
+                "value": "roguelite"
+              }
+            ],
+            "Rarity": [
+              {
+                "record": 1410,
+                "value": "common"
+              }
+            ],
+            "RogueliteDeck": [
+              {
+                "record": 1410,
+                "value": "nano_shelly_deck"
+              }
+            ]
+          },
+          "physical_records": [
+            1410
+          ]
+        },
+        {
+          "table": "roguelite_decks",
+          "name": "nano_shelly_deck",
+          "fields": {
+            "Name": [
+              {
+                "record": 88,
+                "value": "nano_shelly_deck"
+              }
+            ],
+            "RogueliteCard1": [
+              {
+                "record": 88,
+                "value": "nano_shelly_1"
+              }
+            ],
+            "RogueliteCard2": [
+              {
+                "record": 88,
+                "value": "nano_shelly_2"
+              }
+            ],
+            "RogueliteCard3": [
+              {
+                "record": 88,
+                "value": "nano_shelly_3"
+              }
+            ]
+          },
+          "physical_records": [
+            88
+          ]
+        },
+        {
+          "table": "roguelite_cards",
+          "name": "nano_shelly_1",
+          "fields": {
+            "Name": [
+              {
+                "record": 594,
+                "value": "nano_shelly_1"
+              }
+            ],
+            "Traits": [
+              {
+                "record": 594,
+                "value": "Nano_Shelly_Attack_Range;Nano_Shelly_Attack_Spread"
+              }
+            ],
+            "Rarity": [
+              {
+                "record": 594,
+                "value": "rare"
+              }
+            ],
+            "DescriptionTID": [
+              {
+                "record": 594,
+                "value": "TID_NANO_SHELLY_1_DESC"
+              }
+            ],
+            "SWF": [
+              {
+                "record": 594,
+                "value": "sc/ui_roguelite.sc"
+              }
+            ],
+            "IconExportName": [
+              {
+                "record": 594,
+                "value": "icon_power_card_range"
+              }
+            ]
+          },
+          "physical_records": [
+            594
+          ]
+        },
+        {
+          "table": "roguelite_cards",
+          "name": "nano_shelly_2",
+          "fields": {
+            "Name": [
+              {
+                "record": 595,
+                "value": "nano_shelly_2"
+              }
+            ],
+            "Traits": [
+              {
+                "record": 595,
+                "value": "Nano_Shelly_Super_Double_1;Nano_Shelly_Super_Double_2"
+              }
+            ],
+            "Rarity": [
+              {
+                "record": 595,
+                "value": "rare"
+              }
+            ],
+            "DescriptionTID": [
+              {
+                "record": 595,
+                "value": "TID_NANO_SHELLY_2_DESC"
+              }
+            ],
+            "SWF": [
+              {
+                "record": 595,
+                "value": "sc/ui_roguelite.sc"
+              }
+            ],
+            "IconExportName": [
+              {
+                "record": 595,
+                "value": "icon_power_card_projectile_double"
+              }
+            ]
+          },
+          "physical_records": [
+            595
+          ]
+        },
+        {
+          "table": "roguelite_cards",
+          "name": "nano_shelly_3",
+          "fields": {
+            "Name": [
+              {
+                "record": 596,
+                "value": "nano_shelly_3"
+              }
+            ],
+            "Traits": [
+              {
+                "record": 596,
+                "value": "Nano_Shelly_Heal"
+              }
+            ],
+            "Rarity": [
+              {
+                "record": 596,
+                "value": "rare"
+              }
+            ],
+            "DescriptionTID": [
+              {
+                "record": 596,
+                "value": "TID_NANO_SHELLY_3_DESC"
+              }
+            ],
+            "SWF": [
+              {
+                "record": 596,
+                "value": "sc/ui_roguelite.sc"
+              }
+            ],
+            "IconExportName": [
+              {
+                "record": 596,
+                "value": "icon_power_card_heal"
+              }
+            ]
+          },
+          "physical_records": [
+            596
+          ]
+        },
+        {
+          "table": "traits",
+          "name": "Nano_Shelly_Attack_Range",
+          "fields": {
+            "Name": [
+              {
+                "record": 929,
+                "value": "Nano_Shelly_Attack_Range"
+              }
+            ],
+            "Type": [
+              {
+                "record": 929,
+                "value": "AddCastingRangeNormalAttack"
+              }
+            ],
+            "Value": [
+              {
+                "record": 929,
+                "value": "1"
+              }
+            ]
+          },
+          "physical_records": [
+            929
+          ]
+        },
+        {
+          "table": "traits",
+          "name": "Nano_Shelly_Attack_Spread",
+          "fields": {
+            "Name": [
+              {
+                "record": 930,
+                "value": "Nano_Shelly_Attack_Spread"
+              }
+            ],
+            "Type": [
+              {
+                "record": 930,
+                "value": "AddSpreadBasicAttackPercent"
+              }
+            ],
+            "Value": [
+              {
+                "record": 930,
+                "value": "-25"
+              }
+            ]
+          },
+          "physical_records": [
+            930
+          ]
+        },
+        {
+          "table": "traits",
+          "name": "Nano_Shelly_Super_Double_1",
+          "fields": {
+            "Name": [
+              {
+                "record": 931,
+                "value": "Nano_Shelly_Super_Double_1"
+              }
+            ],
+            "Type": [
+              {
+                "record": 931,
+                "value": "AddActiveTimeUltiAttackPercentage"
+              }
+            ],
+            "Value": [
+              {
+                "record": 931,
+                "value": "200"
+              }
+            ]
+          },
+          "physical_records": [
+            931
+          ]
+        },
+        {
+          "table": "traits",
+          "name": "Nano_Shelly_Super_Double_2",
+          "fields": {
+            "Name": [
+              {
+                "record": 932,
+                "value": "Nano_Shelly_Super_Double_2"
+              }
+            ],
+            "Type": [
+              {
+                "record": 932,
+                "value": "OverrideMsBetweenAttackUlti"
+              }
+            ],
+            "Value": [
+              {
+                "record": 932,
+                "value": "250"
+              }
+            ]
+          },
+          "physical_records": [
+            932
+          ]
+        },
+        {
+          "table": "traits",
+          "name": "Nano_Shelly_Heal",
+          "fields": {
+            "Name": [
+              {
+                "record": 935,
+                "value": "Nano_Shelly_Heal"
+              }
+            ],
+            "Type": [
+              {
+                "record": 935,
+                "value": "HealWhileMoving"
+              }
+            ],
+            "Value": [
+              {
+                "record": 935,
+                "value": "800;0.25"
+              }
+            ]
+          },
+          "physical_records": [
+            935
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "from": [
+            "cards",
+            "nano_shelly_deck",
+            "RogueliteDeck",
+            1410
+          ],
+          "to": [
+            "roguelite_decks",
+            "nano_shelly_deck"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "roguelite_decks",
+            "nano_shelly_deck",
+            "RogueliteCard1",
+            88
+          ],
+          "to": [
+            "roguelite_cards",
+            "nano_shelly_1"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "roguelite_decks",
+            "nano_shelly_deck",
+            "RogueliteCard2",
+            88
+          ],
+          "to": [
+            "roguelite_cards",
+            "nano_shelly_2"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "roguelite_decks",
+            "nano_shelly_deck",
+            "RogueliteCard3",
+            88
+          ],
+          "to": [
+            "roguelite_cards",
+            "nano_shelly_3"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "roguelite_cards",
+            "nano_shelly_1",
+            "Traits",
+            594
+          ],
+          "to": [
+            "traits",
+            "Nano_Shelly_Attack_Range"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "roguelite_cards",
+            "nano_shelly_1",
+            "Traits",
+            594
+          ],
+          "to": [
+            "traits",
+            "Nano_Shelly_Attack_Spread"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "roguelite_cards",
+            "nano_shelly_2",
+            "Traits",
+            595
+          ],
+          "to": [
+            "traits",
+            "Nano_Shelly_Super_Double_1"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "roguelite_cards",
+            "nano_shelly_2",
+            "Traits",
+            595
+          ],
+          "to": [
+            "traits",
+            "Nano_Shelly_Super_Double_2"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "roguelite_cards",
+            "nano_shelly_3",
+            "Traits",
+            596
+          ],
+          "to": [
+            "traits",
+            "Nano_Shelly_Heal"
+          ],
+          "explicit_overcharged_column": false
+        }
+      ],
+      "unresolved": [],
+      "effect_semantics": "UNKNOWN",
+      "scope_inheritance": "ROOT_AND_EDGE_PATH_REQUIRED"
+    },
+    {
+      "root": [
+        "skills",
+        "MechanicUlti",
+        "super/summon"
+      ],
+      "max_depth": 6,
+      "max_nodes": 400,
+      "nodes": [
+        {
+          "table": "skills",
+          "name": "MechanicUlti",
+          "fields": {
+            "Name": [
+              {
+                "record": 18,
+                "value": "MechanicUlti"
+              }
+            ],
+            "BehaviorType": [
+              {
+                "record": 18,
+                "value": "Attack"
+              }
+            ],
+            "EquipType": [
+              {
+                "record": 18,
+                "value": "ulti"
+              }
+            ],
+            "CanMoveAtSameTime": [
+              {
+                "record": 18,
+                "value": "true"
+              }
+            ],
+            "Targeted": [
+              {
+                "record": 18,
+                "value": "true"
+              }
+            ],
+            "Cooldown": [
+              {
+                "record": 18,
+                "value": "50"
+              }
+            ],
+            "ActiveTime": [
+              {
+                "record": 18,
+                "value": "250"
+              }
+            ],
+            "CastingRange": [
+              {
+                "record": 18,
+                "value": "15"
+              }
+            ],
+            "ForceValidTile": [
+              {
+                "record": 18,
+                "value": "1"
+              }
+            ],
+            "DamageForUlti": [
+              {
+                "record": 18,
+                "value": "-1"
+              }
+            ],
+            "MsBetweenAttacks": [
+              {
+                "record": 18,
+                "value": "200"
+              }
+            ],
+            "NumBulletsInOneAttack": [
+              {
+                "record": 18,
+                "value": "1"
+              }
+            ],
+            "ExecuteFirstAttackImmediately": [
+              {
+                "record": 18,
+                "value": "true"
+              }
+            ],
+            "NumSpawns": [
+              {
+                "record": 18,
+                "value": "1"
+              }
+            ],
+            "MaxSpawns": [
+              {
+                "record": 18,
+                "value": "1"
+              }
+            ],
+            "Projectiles": [
+              {
+                "record": 18,
+                "value": "MechanicUltiProjectile"
+              }
+            ],
+            "OverchargedProjectiles": [
+              {
+                "record": 18,
+                "value": "MechanicOverchargedUltiProjectile"
+              }
+            ],
+            "SummonedCharacters": [
+              {
+                "record": 18,
+                "value": "MechanicTurret"
+              }
+            ],
+            "AttackEffect": [
+              {
+                "record": 18,
+                "value": "mechanic_ulti"
+              }
+            ]
+          },
+          "physical_records": [
+            18
+          ]
+        },
+        {
+          "table": "characters",
+          "name": "MechanicTurret",
+          "fields": {
+            "Name": [
+              {
+                "record": 116,
+                "value": "MechanicTurret"
+              }
+            ],
+            "InstanceID": [
+              {
+                "record": 116,
+                "value": "113"
+              }
+            ],
+            "Hitpoints": [
+              {
+                "record": 116,
+                "value": "3600"
+              }
+            ],
+            "AutoAttackSpeedMs": [
+              {
+                "record": 116,
+                "value": "300"
+              }
+            ],
+            "AutoAttackDamage": [
+              {
+                "record": 116,
+                "value": "300"
+              }
+            ],
+            "AutoAttackProjectileSpread": [
+              {
+                "record": 116,
+                "value": "30"
+              }
+            ],
+            "AutoAttackProjectile": [
+              {
+                "record": 116,
+                "value": "MechanicTurretProjectile"
+              }
+            ],
+            "OverchargedAutoAttackProjectile": [
+              {
+                "record": 116,
+                "value": "MechanicOverchargedTurretProjectile"
+              }
+            ],
+            "AutoAttackRange": [
+              {
+                "record": 116,
+                "value": "27"
+              }
+            ],
+            "UltiChargeMul": [
+              {
+                "record": 116,
+                "value": "1"
+              }
+            ],
+            "Type": [
+              {
+                "record": 116,
+                "value": "Minion_Building"
+              }
+            ],
+            "DefaultSkin": [
+              {
+                "record": 116,
+                "value": "TurretDefault"
+              }
+            ],
+            "OverchargedEffect": [
+              {
+                "record": 116,
+                "value": "overchargeactivepet"
+              }
+            ],
+            "TakeDamageEffect": [
+              {
+                "record": 116,
+                "value": "nuts_bolts_metal_small"
+              }
+            ],
+            "DeathEffect": [
+              {
+                "record": 116,
+                "value": "nuts_bolts_metal_explosion"
+              }
+            ],
+            "SpawnEffect": [
+              {
+                "record": 116,
+                "value": "spawnturret"
+              }
+            ],
+            "AutoAttackStartEffect": [
+              {
+                "record": 116,
+                "value": "jessie_def_turret_atk"
+              }
+            ],
+            "AttackStartEffectOffset": [
+              {
+                "record": 116,
+                "value": "35"
+              }
+            ],
+            "TwoWeaponAttackEffectOffset": [
+              {
+                "record": 116,
+                "value": "125"
+              }
+            ],
+            "ShadowScaleX": [
+              {
+                "record": 116,
+                "value": "75"
+              }
+            ],
+            "ShadowScaleY": [
+              {
+                "record": 116,
+                "value": "75"
+              }
+            ],
+            "ShadowSkew": [
+              {
+                "record": 116,
+                "value": "25"
+              }
+            ],
+            "Scale": [
+              {
+                "record": 116,
+                "value": "116"
+              }
+            ],
+            "HeroScreenScale": [
+              {
+                "record": 116,
+                "value": "220"
+              }
+            ],
+            "FitToBoxScale": [
+              {
+                "record": 116,
+                "value": "297"
+              }
+            ],
+            "HomeScreenScale": [
+              {
+                "record": 116,
+                "value": "270"
+              }
+            ],
+            "BattleIntroScale": [
+              {
+                "record": 116,
+                "value": "270"
+              }
+            ],
+            "HeroScreenXOffset": [
+              {
+                "record": 116,
+                "value": "1000"
+              }
+            ],
+            "HeroScreenZOffset": [
+              {
+                "record": 116,
+                "value": "-400"
+              }
+            ],
+            "CollisionRadius": [
+              {
+                "record": 116,
+                "value": "120"
+              }
+            ],
+            "HealthBar": [
+              {
+                "record": 116,
+                "value": "Medium"
+              }
+            ],
+            "HealthBarOffsetY": [
+              {
+                "record": 116,
+                "value": "-32"
+              }
+            ],
+            "ProjectileStartZ": [
+              {
+                "record": 116,
+                "value": "220"
+              }
+            ],
+            "FootstepClip": [
+              {
+                "record": 116,
+                "value": "footstep"
+              }
+            ],
+            "DifferentFootstepOffset": [
+              {
+                "record": 116,
+                "value": "25"
+              }
+            ],
+            "FootstepIntervalMS": [
+              {
+                "record": 116,
+                "value": "400"
+              }
+            ],
+            "AttackingWeaponScale": [
+              {
+                "record": 116,
+                "value": "160"
+              }
+            ],
+            "SpecialEventType2": [
+              {
+                "record": 116,
+                "value": "turret_canon_s"
+              }
+            ]
+          },
+          "physical_records": [
+            116
+          ]
+        },
+        {
+          "table": "projectiles",
+          "name": "MechanicUltiProjectile",
+          "fields": {
+            "Name": [
+              {
+                "record": 22,
+                "value": "MechanicUltiProjectile"
+              }
+            ],
+            "Speed": [
+              {
+                "record": 22,
+                "value": "1196"
+              }
+            ],
+            "Radius": [
+              {
+                "record": 22,
+                "value": "0"
+              }
+            ],
+            "Indirect": [
+              {
+                "record": 22,
+                "value": "true"
+              }
+            ],
+            "Gravity": [
+              {
+                "record": 22,
+                "value": "170"
+              }
+            ],
+            "EarlyTicks": [
+              {
+                "record": 22,
+                "value": "1"
+              }
+            ],
+            "ShotByHero": [
+              {
+                "record": 22,
+                "value": "true"
+              }
+            ]
+          },
+          "physical_records": [
+            22
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "from": [
+            "skills",
+            "MechanicUlti",
+            "SummonedCharacters",
+            18
+          ],
+          "to": [
+            "characters",
+            "MechanicTurret"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "skills",
+            "MechanicUlti",
+            "Projectiles",
+            18
+          ],
+          "to": [
+            "projectiles",
+            "MechanicUltiProjectile"
+          ],
+          "explicit_overcharged_column": false
+        }
+      ],
+      "unresolved": [],
+      "effect_semantics": "UNKNOWN",
+      "scope_inheritance": "ROOT_AND_EDGE_PATH_REQUIRED"
+    },
+    {
+      "root": [
+        "skills",
+        "MechaDudeUlti",
+        "super/transformation"
+      ],
+      "max_depth": 6,
+      "max_nodes": 400,
+      "nodes": [
+        {
+          "table": "skills",
+          "name": "MechaDudeUlti",
+          "fields": {
+            "Name": [
+              {
+                "record": 156,
+                "value": "MechaDudeUlti"
+              }
+            ],
+            "BehaviorType": [
+              {
+                "record": 156,
+                "value": "ChangeCharacter"
+              }
+            ],
+            "EquipType": [
+              {
+                "record": 156,
+                "value": "ulti"
+              }
+            ],
+            "Cooldown": [
+              {
+                "record": 156,
+                "value": "50"
+              }
+            ],
+            "ActiveTime": [
+              {
+                "record": 156,
+                "value": "1100"
+              }
+            ],
+            "CastingTime": [
+              {
+                "record": 156,
+                "value": "1000"
+              }
+            ],
+            "DamageForUlti": [
+              {
+                "record": 156,
+                "value": "-1"
+              }
+            ],
+            "SummonedCharacters": [
+              {
+                "record": 156,
+                "value": "MechaDudeBig"
+              }
+            ],
+            "AttackEffect": [
+              {
+                "record": 156,
+                "value": "tick_def_atk"
+              }
+            ],
+            "UseEffect": [
+              {
+                "record": 156,
+                "value": "dummy_effect"
+              }
+            ]
+          },
+          "physical_records": [
+            156
+          ]
+        },
+        {
+          "table": "characters",
+          "name": "MechaDudeBig",
+          "fields": {
+            "Name": [
+              {
+                "record": 204,
+                "value": "MechaDudeBig"
+              }
+            ],
+            "InstanceID": [
+              {
+                "record": 204,
+                "value": "201"
+              }
+            ],
+            "WeaponSkill": [
+              {
+                "record": 204,
+                "value": "MechaDudeBigWeapon"
+              }
+            ],
+            "UltimateSkill": [
+              {
+                "record": 204,
+                "value": "MechaDudeBigUlti"
+              }
+            ],
+            "OverchargedUltimateSkill": [
+              {
+                "record": 204,
+                "value": "MechaDudeBigOverchargedUlti"
+              }
+            ],
+            "Speed": [
+              {
+                "record": 204,
+                "value": "750"
+              }
+            ],
+            "Hitpoints": [
+              {
+                "record": 204,
+                "value": "3700"
+              }
+            ],
+            "Components": [
+              {
+                "record": 204,
+                "value": "Brawler_MechaDude"
+              }
+            ],
+            "AutoAttackRange": [
+              {
+                "record": 204,
+                "value": "12"
+              }
+            ],
+            "OverchargeChargeMul": [
+              {
+                "record": 204,
+                "value": "40"
+              }
+            ],
+            "OverchargeDamagePercent": [
+              {
+                "record": 204,
+                "value": "5"
+              }
+            ],
+            "OverchargeSpeedPercent": [
+              {
+                "record": 204,
+                "value": "20"
+              }
+            ],
+            "OverchargeShieldPercent": [
+              {
+                "record": 204,
+                "value": "5"
+              }
+            ],
+            "Type": [
+              {
+                "record": 204,
+                "value": "Hero"
+              }
+            ],
+            "DefaultSkin": [
+              {
+                "record": 204,
+                "value": "MechaDudeBigDefault"
+              }
+            ],
+            "TakeDamageEffect": [
+              {
+                "record": 204,
+                "value": "takedamage_gen"
+              }
+            ],
+            "DeathEffect": [
+              {
+                "record": 204,
+                "value": "mecha_def_ulti2_death"
+              }
+            ],
+            "AllowDeathEffectOverride": [
+              {
+                "record": 204,
+                "value": "true"
+              }
+            ],
+            "MoveEffect": [
+              {
+                "record": 204,
+                "value": "gen_move_fx"
+              }
+            ],
+            "ReloadEffect": [
+              {
+                "record": 204,
+                "value": "meg_reload"
+              }
+            ],
+            "OutOfAmmoEffect": [
+              {
+                "record": 204,
+                "value": "no_ammo_shotgungirl"
+              }
+            ],
+            "DryFireEffect": [
+              {
+                "record": 204,
+                "value": "meg_dryfire"
+              }
+            ],
+            "KillCelebrationSoundVO": [
+              {
+                "record": 204,
+                "value": "Meg_kill_vo"
+              }
+            ],
+            "InLeadCelebrationSoundVO": [
+              {
+                "record": 204,
+                "value": "Meg_lead_vo"
+              }
+            ],
+            "StartSoundVO": [
+              {
+                "record": 204,
+                "value": "Meg_start_vo"
+              }
+            ],
+            "UseUltiSoundVO": [
+              {
+                "record": 204,
+                "value": "Meg_ulti_vo"
+              }
+            ],
+            "TakeDamageSoundVO": [
+              {
+                "record": 204,
+                "value": "Meg_hurt_vo"
+              }
+            ],
+            "DeathSoundVO": [
+              {
+                "record": 204,
+                "value": "Meg_die_vo"
+              }
+            ],
+            "UnlockVO": [
+              {
+                "record": 204,
+                "value": "Meg_start_vo"
+              }
+            ],
+            "AttackStartEffectOffset": [
+              {
+                "record": 204,
+                "value": "45"
+              }
+            ],
+            "TwoWeaponAttackEffectOffset": [
+              {
+                "record": 204,
+                "value": "200"
+              }
+            ],
+            "ShadowScaleX": [
+              {
+                "record": 204,
+                "value": "80"
+              }
+            ],
+            "ShadowScaleY": [
+              {
+                "record": 204,
+                "value": "80"
+              }
+            ],
+            "ShadowSkew": [
+              {
+                "record": 204,
+                "value": "35"
+              }
+            ],
+            "Scale": [
+              {
+                "record": 204,
+                "value": "116"
+              }
+            ],
+            "HeroScreenScale": [
+              {
+                "record": 204,
+                "value": "190"
+              }
+            ],
+            "FitToBoxScale": [
+              {
+                "record": 204,
+                "value": "300"
+              }
+            ],
+            "EndScreenScale": [
+              {
+                "record": 204,
+                "value": "80"
+              }
+            ],
+            "GatchaScreenScale": [
+              {
+                "record": 204,
+                "value": "150"
+              }
+            ],
+            "HomeScreenScale": [
+              {
+                "record": 204,
+                "value": "270"
+              }
+            ],
+            "BattleIntroScale": [
+              {
+                "record": 204,
+                "value": "270"
+              }
+            ],
+            "HeroScreenXOffset": [
+              {
+                "record": 204,
+                "value": "200"
+              }
+            ],
+            "HeroScreenZOffset": [
+              {
+                "record": 204,
+                "value": "-1000"
+              }
+            ],
+            "HeroScreenEmoteY": [
+              {
+                "record": 204,
+                "value": "80"
+              }
+            ],
+            "CollisionRadius": [
+              {
+                "record": 204,
+                "value": "145"
+              }
+            ],
+            "HealthBar": [
+              {
+                "record": 204,
+                "value": "Medium"
+              }
+            ],
+            "HealthBarOffsetY": [
+              {
+                "record": 204,
+                "value": "-80"
+              }
+            ],
+            "ProjectileStartZ": [
+              {
+                "record": 204,
+                "value": "450"
+              }
+            ],
+            "TID": [
+              {
+                "record": 204,
+                "value": "TID_MECHA_DUDE"
+              }
+            ],
+            "ClassArchetype": [
+              {
+                "record": 204,
+                "value": "tank"
+              }
+            ],
+            "IconSWF": [
+              {
+                "record": 204,
+                "value": "sc/hero_portraits.sc"
+              }
+            ],
+            "IconExportName": [
+              {
+                "record": 204,
+                "value": "hero_icon_meg"
+              }
+            ],
+            "RecoilAmount": [
+              {
+                "record": 204,
+                "value": "100"
+              }
+            ],
+            "FootstepClip": [
+              {
+                "record": 204,
+                "value": "footstep"
+              }
+            ],
+            "DifferentFootstepOffset": [
+              {
+                "record": 204,
+                "value": "35"
+              }
+            ],
+            "FootstepIntervalMS": [
+              {
+                "record": 204,
+                "value": "350"
+              }
+            ],
+            "AttackingWeaponScale": [
+              {
+                "record": 204,
+                "value": "160"
+              }
+            ],
+            "CommonSetUpgradeBonus": [
+              {
+                "record": 204,
+                "value": "2"
+              }
+            ],
+            "RareSetUpgradeBonus": [
+              {
+                "record": 204,
+                "value": "3"
+              }
+            ],
+            "SuperRareSetUpgradeBonus": [
+              {
+                "record": 204,
+                "value": "1"
+              }
+            ],
+            "OffenseRating": [
+              {
+                "record": 204,
+                "value": "4"
+              }
+            ],
+            "DefenseRating": [
+              {
+                "record": 204,
+                "value": "3"
+              }
+            ],
+            "UtilityRating": [
+              {
+                "record": 204,
+                "value": "2"
+              }
+            ],
+            "UniqueProperty": [
+              {
+                "record": 204,
+                "value": "IS_MECHA"
+              }
+            ]
+          },
+          "physical_records": [
+            204
+          ]
+        },
+        {
+          "table": "components_logic",
+          "name": "Brawler_MechaDude",
+          "fields": {
+            "Name": [
+              {
+                "record": 99,
+                "value": "Brawler_MechaDude"
+              }
+            ],
+            "Type": [
+              {
+                "record": 99,
+                "value": "Brawler_MechaDude"
+              }
+            ],
+            "Values": [
+              {
+                "record": 99,
+                "value": "0"
+              },
+              {
+                "record": 100,
+                "value": "120"
+              },
+              {
+                "record": 101,
+                "value": "0"
+              },
+              {
+                "record": 102,
+                "value": "0"
+              }
+            ],
+            "AreaEffects": [
+              {
+                "record": 99,
+                "value": "MechaDudeUltiSpawnExplosion"
+              },
+              {
+                "record": 100,
+                "value": "MechaDudeUltiSpawnExplosionHyperCharged"
+              },
+              {
+                "record": 101,
+                "value": "MechaDudeUltiSpawnExplosionHyperChargedStatusArea"
+              },
+              {
+                "record": 102,
+                "value": "MechaDudeBulletHitExplosionOvercharged"
+              }
+            ]
+          },
+          "physical_records": [
+            99,
+            100,
+            101,
+            102
+          ]
+        },
+        {
+          "table": "skills",
+          "name": "MechaDudeBigWeapon",
+          "fields": {
+            "Name": [
+              {
+                "record": 157,
+                "value": "MechaDudeBigWeapon"
+              }
+            ],
+            "BehaviorType": [
+              {
+                "record": 157,
+                "value": "Attack"
+              }
+            ],
+            "EquipType": [
+              {
+                "record": 157,
+                "value": "weapon"
+              }
+            ],
+            "OverchargedVersion": [
+              {
+                "record": 157,
+                "value": "MechaDudeBigWeaponBuddy"
+              }
+            ],
+            "CanMoveAtSameTime": [
+              {
+                "record": 157,
+                "value": "true"
+              }
+            ],
+            "Targeted": [
+              {
+                "record": 157,
+                "value": "true"
+              }
+            ],
+            "Cooldown": [
+              {
+                "record": 157,
+                "value": "50"
+              }
+            ],
+            "ActiveTime": [
+              {
+                "record": 157,
+                "value": "850"
+              }
+            ],
+            "CastingRange": [
+              {
+                "record": 157,
+                "value": "22"
+              }
+            ],
+            "RechargeTime": [
+              {
+                "record": 157,
+                "value": "1100"
+              }
+            ],
+            "MaxCharge": [
+              {
+                "record": 157,
+                "value": "3"
+              }
+            ],
+            "Damage": [
+              {
+                "record": 157,
+                "value": "150"
+              }
+            ],
+            "DamageForUlti": [
+              {
+                "record": 157,
+                "value": "-1"
+              }
+            ],
+            "MsBetweenAttacks": [
+              {
+                "record": 157,
+                "value": "100"
+              }
+            ],
+            "Spread": [
+              {
+                "record": 157,
+                "value": "20"
+              }
+            ],
+            "NumBulletsInOneAttack": [
+              {
+                "record": 157,
+                "value": "2"
+              }
+            ],
+            "TwoGuns": [
+              {
+                "record": 157,
+                "value": "true"
+              }
+            ],
+            "ExecuteFirstAttackImmediately": [
+              {
+                "record": 157,
+                "value": "true"
+              }
+            ],
+            "Projectiles": [
+              {
+                "record": 157,
+                "value": "MechaDudeBigProjectile"
+              }
+            ],
+            "AttackEffect": [
+              {
+                "record": 157,
+                "value": "colt_def_atk"
+              }
+            ],
+            "UsableInShadowRealm": [
+              {
+                "record": 157,
+                "value": "true"
+              }
+            ]
+          },
+          "physical_records": [
+            157
+          ]
+        },
+        {
+          "table": "skills",
+          "name": "MechaDudeBigUlti",
+          "fields": {
+            "Name": [
+              {
+                "record": 158,
+                "value": "MechaDudeBigUlti"
+              }
+            ],
+            "BehaviorType": [
+              {
+                "record": 158,
+                "value": "Attack"
+              }
+            ],
+            "EquipType": [
+              {
+                "record": 158,
+                "value": "ulti"
+              }
+            ],
+            "CanMoveAtSameTime": [
+              {
+                "record": 158,
+                "value": "true"
+              }
+            ],
+            "Targeted": [
+              {
+                "record": 158,
+                "value": "true"
+              }
+            ],
+            "Cooldown": [
+              {
+                "record": 158,
+                "value": "50"
+              }
+            ],
+            "ActiveTime": [
+              {
+                "record": 158,
+                "value": "350"
+              }
+            ],
+            "CastingRange": [
+              {
+                "record": 158,
+                "value": "13"
+              }
+            ],
+            "Damage": [
+              {
+                "record": 158,
+                "value": "1700"
+              }
+            ],
+            "DamageForUlti": [
+              {
+                "record": 158,
+                "value": "-1"
+              }
+            ],
+            "MsBetweenAttacks": [
+              {
+                "record": 158,
+                "value": "200"
+              }
+            ],
+            "Spread": [
+              {
+                "record": 158,
+                "value": "300"
+              }
+            ],
+            "NumBulletsInOneAttack": [
+              {
+                "record": 158,
+                "value": "1"
+              }
+            ],
+            "ButtonSWF": [
+              {
+                "record": 158,
+                "value": "sc/ui.sc"
+              }
+            ],
+            "ButtonExportName": [
+              {
+                "record": 158,
+                "value": "button_ulti_meg"
+              }
+            ],
+            "ButtonExportNameBlue": [
+              {
+                "record": 158,
+                "value": "button_ulti_blue_meg"
+              }
+            ],
+            "AttackEffect": [
+              {
+                "record": 158,
+                "value": "bibi_def_atk"
+              }
+            ],
+            "UseEffect": [
+              {
+                "record": 158,
+                "value": "mecha_swing"
+              }
+            ]
+          },
+          "physical_records": [
+            158
+          ]
+        },
+        {
+          "table": "areas",
+          "name": "MechaDudeUltiSpawnExplosion",
+          "fields": {
+            "Name": [
+              {
+                "record": 768,
+                "value": "MechaDudeUltiSpawnExplosion"
+              }
+            ],
+            "TimeMs": [
+              {
+                "record": 768,
+                "value": "100"
+              }
+            ],
+            "Radius": [
+              {
+                "record": 768,
+                "value": "1000"
+              }
+            ],
+            "Damage": [
+              {
+                "record": 768,
+                "value": "1500"
+              }
+            ],
+            "DamageScaleType": [
+              {
+                "record": 768,
+                "value": "5"
+              }
+            ],
+            "Type": [
+              {
+                "record": 768,
+                "value": "Damage"
+              }
+            ],
+            "DestroysEnvironment": [
+              {
+                "record": 768,
+                "value": "FALSE"
+              }
+            ],
+            "PushbackStrength": [
+              {
+                "record": 768,
+                "value": "250"
+              }
+            ],
+            "PushbackStrengthSelf": [
+              {
+                "record": 768,
+                "value": "250"
+              }
+            ]
+          },
+          "physical_records": [
+            768
+          ]
+        },
+        {
+          "table": "areas",
+          "name": "MechaDudeUltiSpawnExplosionHyperCharged",
+          "fields": {
+            "Name": [
+              {
+                "record": 769,
+                "value": "MechaDudeUltiSpawnExplosionHyperCharged"
+              }
+            ],
+            "TimeMs": [
+              {
+                "record": 769,
+                "value": "100"
+              }
+            ],
+            "Radius": [
+              {
+                "record": 769,
+                "value": "1000"
+              }
+            ],
+            "Damage": [
+              {
+                "record": 769,
+                "value": "1500"
+              }
+            ],
+            "DamageScaleType": [
+              {
+                "record": 769,
+                "value": "5"
+              }
+            ],
+            "Type": [
+              {
+                "record": 769,
+                "value": "Damage"
+              }
+            ],
+            "DestroysEnvironment": [
+              {
+                "record": 769,
+                "value": "FALSE"
+              }
+            ],
+            "PushbackStrength": [
+              {
+                "record": 769,
+                "value": "250"
+              }
+            ],
+            "PushbackStrengthSelf": [
+              {
+                "record": 769,
+                "value": "250"
+              }
+            ]
+          },
+          "physical_records": [
+            769
+          ]
+        },
+        {
+          "table": "areas",
+          "name": "MechaDudeUltiSpawnExplosionHyperChargedStatusArea",
+          "fields": {
+            "Name": [
+              {
+                "record": 772,
+                "value": "MechaDudeUltiSpawnExplosionHyperChargedStatusArea"
+              }
+            ],
+            "TimeMs": [
+              {
+                "record": 772,
+                "value": "500"
+              }
+            ],
+            "Radius": [
+              {
+                "record": 772,
+                "value": "1000"
+              }
+            ],
+            "Type": [
+              {
+                "record": 772,
+                "value": "StatusEffect"
+              }
+            ],
+            "StatusEffectEnemy": [
+              {
+                "record": 772,
+                "value": "MechaDudeUltiSpawnExplosionHyperChargedStatusEffect"
+              }
+            ]
+          },
+          "physical_records": [
+            772
+          ]
+        },
+        {
+          "table": "areas",
+          "name": "MechaDudeBulletHitExplosionOvercharged",
+          "fields": {
+            "Name": [
+              {
+                "record": 784,
+                "value": "MechaDudeBulletHitExplosionOvercharged"
+              }
+            ],
+            "TimeMs": [
+              {
+                "record": 784,
+                "value": "100"
+              }
+            ],
+            "Radius": [
+              {
+                "record": 784,
+                "value": "600"
+              }
+            ],
+            "Damage": [
+              {
+                "record": 784,
+                "value": "200"
+              }
+            ],
+            "DamageScaleType": [
+              {
+                "record": 784,
+                "value": "5"
+              }
+            ],
+            "Type": [
+              {
+                "record": 784,
+                "value": "Damage"
+              }
+            ],
+            "TargetEnemiesOnly": [
+              {
+                "record": 784,
+                "value": "True"
+              }
+            ],
+            "SuperChargeScalePercent": [
+              {
+                "record": 784,
+                "value": "30"
+              }
+            ]
+          },
+          "physical_records": [
+            784
+          ]
+        },
+        {
+          "table": "projectiles",
+          "name": "MechaDudeBigProjectile",
+          "fields": {
+            "Name": [
+              {
+                "record": 234,
+                "value": "MechaDudeBigProjectile"
+              }
+            ],
+            "Speed": [
+              {
+                "record": 234,
+                "value": "4500"
+              }
+            ],
+            "Radius": [
+              {
+                "record": 234,
+                "value": "100"
+              }
+            ],
+            "IgnoreCloseWalls": [
+              {
+                "record": 234,
+                "value": "true"
+              }
+            ],
+            "Gravity": [
+              {
+                "record": 234,
+                "value": "0"
+              }
+            ],
+            "EarlyTicks": [
+              {
+                "record": 234,
+                "value": "2"
+              }
+            ],
+            "ShotByHero": [
+              {
+                "record": 234,
+                "value": "true"
+              }
+            ],
+            "UltiChargeChangePercent": [
+              {
+                "record": 234,
+                "value": "-60"
+              }
+            ]
+          },
+          "physical_records": [
+            234
+          ]
+        },
+        {
+          "table": "status_effects_logic",
+          "name": "MechaDudeUltiSpawnExplosionHyperChargedStatusEffect",
+          "fields": {
+            "Name": [
+              {
+                "record": 366,
+                "value": "MechaDudeUltiSpawnExplosionHyperChargedStatusEffect"
+              }
+            ],
+            "DurationTicks": [
+              {
+                "record": 366,
+                "value": "20"
+              }
+            ],
+            "Refreshable": [
+              {
+                "record": 366,
+                "value": "TRUE"
+              }
+            ],
+            "SpeedReducePercent": [
+              {
+                "record": 366,
+                "value": "25"
+              }
+            ],
+            "IsDebuff": [
+              {
+                "record": 366,
+                "value": "TRUE"
+              }
+            ]
+          },
+          "physical_records": [
+            366
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "from": [
+            "skills",
+            "MechaDudeUlti",
+            "SummonedCharacters",
+            156
+          ],
+          "to": [
+            "characters",
+            "MechaDudeBig"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "characters",
+            "MechaDudeBig",
+            "Components",
+            204
+          ],
+          "to": [
+            "components_logic",
+            "Brawler_MechaDude"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "characters",
+            "MechaDudeBig",
+            "WeaponSkill",
+            204
+          ],
+          "to": [
+            "skills",
+            "MechaDudeBigWeapon"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "characters",
+            "MechaDudeBig",
+            "UltimateSkill",
+            204
+          ],
+          "to": [
+            "skills",
+            "MechaDudeBigUlti"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "components_logic",
+            "Brawler_MechaDude",
+            "AreaEffects",
+            99
+          ],
+          "to": [
+            "areas",
+            "MechaDudeUltiSpawnExplosion"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "components_logic",
+            "Brawler_MechaDude",
+            "AreaEffects",
+            100
+          ],
+          "to": [
+            "areas",
+            "MechaDudeUltiSpawnExplosionHyperCharged"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "components_logic",
+            "Brawler_MechaDude",
+            "AreaEffects",
+            101
+          ],
+          "to": [
+            "areas",
+            "MechaDudeUltiSpawnExplosionHyperChargedStatusArea"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "components_logic",
+            "Brawler_MechaDude",
+            "AreaEffects",
+            102
+          ],
+          "to": [
+            "areas",
+            "MechaDudeBulletHitExplosionOvercharged"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "skills",
+            "MechaDudeBigWeapon",
+            "Projectiles",
+            157
+          ],
+          "to": [
+            "projectiles",
+            "MechaDudeBigProjectile"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "areas",
+            "MechaDudeUltiSpawnExplosionHyperChargedStatusArea",
+            "StatusEffectEnemy",
+            772
+          ],
+          "to": [
+            "status_effects_logic",
+            "MechaDudeUltiSpawnExplosionHyperChargedStatusEffect"
+          ],
+          "explicit_overcharged_column": false
+        }
+      ],
+      "unresolved": [],
+      "effect_semantics": "UNKNOWN",
+      "scope_inheritance": "ROOT_AND_EDGE_PATH_REQUIRED"
+    },
+    {
+      "root": [
+        "actions",
+        "MenderUltiFearAction",
+        "super/target_condition"
+      ],
+      "max_depth": 6,
+      "max_nodes": 400,
+      "nodes": [
+        {
+          "table": "actions",
+          "name": "MenderUltiFearAction",
+          "fields": {
+            "Name": [
+              {
+                "record": 3,
+                "value": "MenderUltiFearAction"
+              }
+            ],
+            "Type": [
+              {
+                "record": 3,
+                "value": "TriggerStatusTarget"
+              }
+            ],
+            "Conditions": [
+              {
+                "record": 3,
+                "value": "MenderFacingDirectionUlti"
+              }
+            ],
+            "ConditionCompareAndOr": [
+              {
+                "record": 3,
+                "value": "And"
+              }
+            ],
+            "StatusEffects": [
+              {
+                "record": 3,
+                "value": "MenderUltiFear"
+              }
+            ]
+          },
+          "physical_records": [
+            3
+          ]
+        },
+        {
+          "table": "conditions",
+          "name": "MenderFacingDirectionUlti",
+          "fields": {
+            "Name": [
+              {
+                "record": 3,
+                "value": "MenderFacingDirectionUlti"
+              }
+            ],
+            "Type": [
+              {
+                "record": 3,
+                "value": "FacingDirectionAngleTargetAndSource"
+              }
+            ],
+            "Values": [
+              {
+                "record": 3,
+                "value": "270"
+              },
+              {
+                "record": 4,
+                "value": "90"
+              }
+            ]
+          },
+          "physical_records": [
+            3,
+            4
+          ]
+        },
+        {
+          "table": "status_effects_logic",
+          "name": "MenderUltiFear",
+          "fields": {
+            "Name": [
+              {
+                "record": 261,
+                "value": "MenderUltiFear"
+              }
+            ],
+            "DurationTicks": [
+              {
+                "record": 261,
+                "value": "40"
+              }
+            ],
+            "TriggerOnFirstTick": [
+              {
+                "record": 261,
+                "value": "TRUE"
+              }
+            ],
+            "Refreshable": [
+              {
+                "record": 261,
+                "value": "TRUE"
+              }
+            ],
+            "IsDebuff": [
+              {
+                "record": 261,
+                "value": "TRUE"
+              }
+            ],
+            "BooleanAttributes": [
+              {
+                "record": 261,
+                "value": "Fear"
+              }
+            ]
+          },
+          "physical_records": [
+            261
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "from": [
+            "actions",
+            "MenderUltiFearAction",
+            "Conditions",
+            3
+          ],
+          "to": [
+            "conditions",
+            "MenderFacingDirectionUlti"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "actions",
+            "MenderUltiFearAction",
+            "StatusEffects",
+            3
+          ],
+          "to": [
+            "status_effects_logic",
+            "MenderUltiFear"
+          ],
+          "explicit_overcharged_column": false
+        }
+      ],
+      "unresolved": [],
+      "effect_semantics": "UNKNOWN",
+      "scope_inheritance": "ROOT_AND_EDGE_PATH_REQUIRED"
+    },
+    {
+      "root": [
+        "characters",
+        "Rock",
+        "quarantined_identity_probe"
+      ],
+      "max_depth": 6,
+      "max_nodes": 400,
+      "nodes": [
+        {
+          "table": "characters",
+          "name": "Rock",
+          "fields": {
+            "Name": [
+              {
+                "record": 109,
+                "value": "Rock"
+              }
+            ],
+            "InstanceID": [
+              {
+                "record": 109,
+                "value": "106"
+              }
+            ],
+            "ItemName": [
+              {
+                "record": 109,
+                "value": "bolt"
+              }
+            ],
+            "WeaponSkill": [
+              {
+                "record": 109,
+                "value": "RockWeapon"
+              }
+            ],
+            "UltimateSkill": [
+              {
+                "record": 109,
+                "value": "RockUlti"
+              }
+            ],
+            "Speed": [
+              {
+                "record": 109,
+                "value": "545"
+              }
+            ],
+            "Hitpoints": [
+              {
+                "record": 109,
+                "value": "5000"
+              }
+            ],
+            "Traits": [
+              {
+                "record": 109,
+                "value": "RockChargeUltiOnMove"
+              }
+            ],
+            "Components": [
+              {
+                "record": 109,
+                "value": "Brawler_Rock"
+              }
+            ],
+            "AutoAttackRange": [
+              {
+                "record": 109,
+                "value": "20"
+              }
+            ],
+            "UltiChargeMul": [
+              {
+                "record": 109,
+                "value": "25"
+              }
+            ],
+            "UltiChargeUltiMul": [
+              {
+                "record": 109,
+                "value": "90"
+              }
+            ],
+            "OverchargeChargeMul": [
+              {
+                "record": 109,
+                "value": "30"
+              }
+            ],
+            "OverchargeDamagePercent": [
+              {
+                "record": 109,
+                "value": "5"
+              }
+            ],
+            "OverchargeSpeedPercent": [
+              {
+                "record": 109,
+                "value": "20"
+              }
+            ],
+            "OverchargeShieldPercent": [
+              {
+                "record": 109,
+                "value": "5"
+              }
+            ],
+            "Type": [
+              {
+                "record": 109,
+                "value": "Hero"
+              }
+            ],
+            "DefaultSkin": [
+              {
+                "record": 109,
+                "value": "RockDefault"
+              }
+            ],
+            "Mastery": [
+              {
+                "record": 109,
+                "value": "MasteryRock"
+              }
+            ],
+            "BrawlerTrophyRewards": [
+              {
+                "record": 109,
+                "value": "TrophyRewardsRock"
+              }
+            ],
+            "TakeDamageEffect": [
+              {
+                "record": 109,
+                "value": "takedamage_gen"
+              }
+            ],
+            "DeathEffect": [
+              {
+                "record": 109,
+                "value": "death_arcade"
+              }
+            ],
+            "AllowDeathEffectOverride": [
+              {
+                "record": 109,
+                "value": "true"
+              }
+            ],
+            "ReloadEffect": [
+              {
+                "record": 109,
+                "value": "najia_reload"
+              }
+            ],
+            "OutOfAmmoEffect": [
+              {
+                "record": 109,
+                "value": "no_ammo_shotgungirl"
+              }
+            ],
+            "DryFireEffect": [
+              {
+                "record": 109,
+                "value": "najia_dryfire"
+              }
+            ],
+            "KillCelebrationSoundVO": [
+              {
+                "record": 109,
+                "value": "Bolt_Kill_VO"
+              }
+            ],
+            "InLeadCelebrationSoundVO": [
+              {
+                "record": 109,
+                "value": "Bolt_Lead_VO"
+              }
+            ],
+            "StartSoundVO": [
+              {
+                "record": 109,
+                "value": "Bolt_Start_VO"
+              }
+            ],
+            "UseUltiSoundVO": [
+              {
+                "record": 109,
+                "value": "Bolt_Ulti_VO"
+              }
+            ],
+            "TakeDamageSoundVO": [
+              {
+                "record": 109,
+                "value": "Bolt_Hurt_VO"
+              }
+            ],
+            "DeathSoundVO": [
+              {
+                "record": 109,
+                "value": "Bolt_Die_VO"
+              }
+            ],
+            "UnlockVO": [
+              {
+                "record": 109,
+                "value": "Bolt_Start_VO"
+              }
+            ],
+            "UnlockVOIndex": [
+              {
+                "record": 109,
+                "value": "1"
+              }
+            ],
+            "AttackStartEffectOffset": [
+              {
+                "record": 109,
+                "value": "40"
+              }
+            ],
+            "ShadowScaleX": [
+              {
+                "record": 109,
+                "value": "80"
+              }
+            ],
+            "ShadowScaleY": [
+              {
+                "record": 109,
+                "value": "80"
+              }
+            ],
+            "ShadowSkew": [
+              {
+                "record": 109,
+                "value": "35"
+              }
+            ],
+            "Scale": [
+              {
+                "record": 109,
+                "value": "85"
+              }
+            ],
+            "HeroScreenScale": [
+              {
+                "record": 109,
+                "value": "150"
+              }
+            ],
+            "FitToBoxScale": [
+              {
+                "record": 109,
+                "value": "210"
+              }
+            ],
+            "EndScreenScale": [
+              {
+                "record": 109,
+                "value": "95"
+              }
+            ],
+            "GatchaScreenScale": [
+              {
+                "record": 109,
+                "value": "170"
+              }
+            ],
+            "HomeScreenScale": [
+              {
+                "record": 109,
+                "value": "170"
+              }
+            ],
+            "BattleIntroScale": [
+              {
+                "record": 109,
+                "value": "140"
+              }
+            ],
+            "BattleIntroXOffset": [
+              {
+                "record": 109,
+                "value": "-50"
+              }
+            ],
+            "BattleIntroZOffset": [
+              {
+                "record": 109,
+                "value": "400"
+              }
+            ],
+            "CollisionRadius": [
+              {
+                "record": 109,
+                "value": "120"
+              }
+            ],
+            "HealthBar": [
+              {
+                "record": 109,
+                "value": "Medium"
+              }
+            ],
+            "HealthBarOffsetY": [
+              {
+                "record": 109,
+                "value": "-53"
+              }
+            ],
+            "ProjectileStartZ": [
+              {
+                "record": 109,
+                "value": "450"
+              }
+            ],
+            "TID": [
+              {
+                "record": 109,
+                "value": "TID_ROCK"
+              }
+            ],
+            "ClassArchetype": [
+              {
+                "record": 109,
+                "value": "tank"
+              }
+            ],
+            "IconSWF": [
+              {
+                "record": 109,
+                "value": "sc/hero_portraits.sc"
+              }
+            ],
+            "IconExportName": [
+              {
+                "record": 109,
+                "value": "hero_icon_bolder"
+              }
+            ],
+            "EmblemExportName": [
+              {
+                "record": 109,
+                "value": "mastery_brawler_icon_bolt"
+              }
+            ],
+            "RecoilAmount": [
+              {
+                "record": 109,
+                "value": "400"
+              }
+            ],
+            "DifferentFootstepOffset": [
+              {
+                "record": 109,
+                "value": "30"
+              }
+            ],
+            "FootstepIntervalMS": [
+              {
+                "record": 109,
+                "value": "400"
+              }
+            ],
+            "AttackingWeaponScale": [
+              {
+                "record": 109,
+                "value": "130"
+              }
+            ],
+            "CommonSetUpgradeBonus": [
+              {
+                "record": 109,
+                "value": "1"
+              }
+            ],
+            "RareSetUpgradeBonus": [
+              {
+                "record": 109,
+                "value": "3"
+              }
+            ],
+            "SuperRareSetUpgradeBonus": [
+              {
+                "record": 109,
+                "value": "2"
+              }
+            ],
+            "VideoLink": [
+              {
+                "record": 109,
+                "value": "PamTutorial"
+              }
+            ],
+            "OffenseRating": [
+              {
+                "record": 109,
+                "value": "3"
+              }
+            ],
+            "DefenseRating": [
+              {
+                "record": 109,
+                "value": "4"
+              }
+            ],
+            "UtilityRating": [
+              {
+                "record": 109,
+                "value": "4"
+              }
+            ],
+            "UniqueProperty": [
+              {
+                "record": 109,
+                "value": "IS_ROCK"
+              }
+            ],
+            "ArenaOverrideDmgBuff": [
+              {
+                "record": 109,
+                "value": "3"
+              }
+            ]
+          },
+          "physical_records": [
+            109
+          ]
+        },
+        {
+          "table": "traits",
+          "name": "RockChargeUltiOnMove",
+          "fields": {
+            "Name": [
+              {
+                "record": 694,
+                "value": "RockChargeUltiOnMove"
+              }
+            ],
+            "ServerOnly": [
+              {
+                "record": 694,
+                "value": "TRUE"
+              }
+            ],
+            "NeverRemove": [
+              {
+                "record": 694,
+                "value": "TRUE"
+              }
+            ],
+            "Type": [
+              {
+                "record": 694,
+                "value": "ChargeUltiOnMove"
+              }
+            ],
+            "Value": [
+              {
+                "record": 694,
+                "value": "18;1"
+              }
+            ]
+          },
+          "physical_records": [
+            694
+          ]
+        },
+        {
+          "table": "components_logic",
+          "name": "Brawler_Rock",
+          "fields": {
+            "Name": [
+              {
+                "record": 86,
+                "value": "Brawler_Rock"
+              }
+            ],
+            "Type": [
+              {
+                "record": 86,
+                "value": "Brawler_Rock"
+              }
+            ],
+            "Values": [
+              {
+                "record": 86,
+                "value": "900"
+              },
+              {
+                "record": 87,
+                "value": "11"
+              },
+              {
+                "record": 88,
+                "value": "500"
+              },
+              {
+                "record": 89,
+                "value": "740"
+              },
+              {
+                "record": 90,
+                "value": "4"
+              },
+              {
+                "record": 91,
+                "value": "21"
+              },
+              {
+                "record": 92,
+                "value": "75"
+              },
+              {
+                "record": 93,
+                "value": "490"
+              }
+            ],
+            "AreaEffects": [
+              {
+                "record": 86,
+                "value": "RockUltiTrail"
+              }
+            ],
+            "StatusEffects": [
+              {
+                "record": 86,
+                "value": "RockSpeedUpMovement"
+              },
+              {
+                "record": 87,
+                "value": "RockUltiOverchargedWallPass"
+              }
+            ]
+          },
+          "physical_records": [
+            86,
+            87,
+            88,
+            89,
+            90,
+            91,
+            92,
+            93
+          ]
+        },
+        {
+          "table": "skills",
+          "name": "RockWeapon",
+          "fields": {
+            "Name": [
+              {
+                "record": 592,
+                "value": "RockWeapon"
+              }
+            ],
+            "BehaviorType": [
+              {
+                "record": 592,
+                "value": "StatusEffect"
+              }
+            ],
+            "EquipType": [
+              {
+                "record": 592,
+                "value": "weapon"
+              }
+            ],
+            "CanMoveAtSameTime": [
+              {
+                "record": 592,
+                "value": "true"
+              }
+            ],
+            "Cooldown": [
+              {
+                "record": 592,
+                "value": "300"
+              }
+            ],
+            "ActiveTime": [
+              {
+                "record": 592,
+                "value": "150"
+              }
+            ],
+            "RechargeTime": [
+              {
+                "record": 592,
+                "value": "2200"
+              }
+            ],
+            "MaxCharge": [
+              {
+                "record": 592,
+                "value": "2"
+              }
+            ],
+            "DamageForUlti": [
+              {
+                "record": 592,
+                "value": "-1"
+              }
+            ],
+            "UseEffect": [
+              {
+                "record": 592,
+                "value": "crow_ulti"
+              }
+            ],
+            "UsableInShadowRealm": [
+              {
+                "record": 592,
+                "value": "true"
+              }
+            ],
+            "ActivationSelfStatusEffects": [
+              {
+                "record": 592,
+                "value": "RockWeaponDamageBoost"
+              }
+            ]
+          },
+          "physical_records": [
+            592
+          ]
+        },
+        {
+          "table": "skills",
+          "name": "RockUlti",
+          "fields": {
+            "Name": [
+              {
+                "record": 593,
+                "value": "RockUlti"
+              }
+            ],
+            "BehaviorType": [
+              {
+                "record": 593,
+                "value": "StatusEffect"
+              }
+            ],
+            "EquipType": [
+              {
+                "record": 593,
+                "value": "ulti"
+              }
+            ],
+            "CanMoveAtSameTime": [
+              {
+                "record": 593,
+                "value": "true"
+              }
+            ],
+            "Cooldown": [
+              {
+                "record": 593,
+                "value": "50"
+              }
+            ],
+            "ActiveTime": [
+              {
+                "record": 593,
+                "value": "150"
+              }
+            ],
+            "DamageForUlti": [
+              {
+                "record": 593,
+                "value": "-1"
+              }
+            ],
+            "UseEffect": [
+              {
+                "record": 593,
+                "value": "bolt_def_ulti"
+              }
+            ],
+            "OverchargedUseEffect": [
+              {
+                "record": 593,
+                "value": "bolt_def_oc_ulti"
+              }
+            ],
+            "ActivationSelfStatusEffects": [
+              {
+                "record": 593,
+                "value": "RockUltiDamageReduction"
+              }
+            ]
+          },
+          "physical_records": [
+            593
+          ]
+        },
+        {
+          "table": "status_effects_logic",
+          "name": "RockSpeedUpMovement",
+          "fields": {
+            "Name": [
+              {
+                "record": 339,
+                "value": "RockSpeedUpMovement"
+              }
+            ],
+            "DurationTicks": [
+              {
+                "record": 339,
+                "value": "2"
+              }
+            ],
+            "Refreshable": [
+              {
+                "record": 339,
+                "value": "TRUE"
+              }
+            ],
+            "SpeedBoostPercent": [
+              {
+                "record": 339,
+                "value": "20"
+              }
+            ]
+          },
+          "physical_records": [
+            339
+          ]
+        },
+        {
+          "table": "status_effects_logic",
+          "name": "RockUltiOverchargedWallPass",
+          "fields": {
+            "Name": [
+              {
+                "record": 342,
+                "value": "RockUltiOverchargedWallPass"
+              }
+            ],
+            "DurationTicks": [
+              {
+                "record": 342,
+                "value": "80"
+              }
+            ],
+            "Refreshable": [
+              {
+                "record": 342,
+                "value": "TRUE"
+              }
+            ],
+            "MoveThroughWalls": [
+              {
+                "record": 342,
+                "value": "TRUE"
+              }
+            ]
+          },
+          "physical_records": [
+            342
+          ]
+        },
+        {
+          "table": "areas",
+          "name": "RockUltiTrail",
+          "fields": {
+            "Name": [
+              {
+                "record": 757,
+                "value": "RockUltiTrail"
+              }
+            ],
+            "TimeMs": [
+              {
+                "record": 757,
+                "value": "3900"
+              }
+            ],
+            "Radius": [
+              {
+                "record": 757,
+                "value": "300"
+              }
+            ],
+            "Type": [
+              {
+                "record": 757,
+                "value": "StatusEffect"
+              }
+            ],
+            "StatusEffectEnemy": [
+              {
+                "record": 757,
+                "value": "RockUltiTrailStatus"
+              }
+            ],
+            "StatusEffectTickInterval": [
+              {
+                "record": 757,
+                "value": "10"
+              }
+            ]
+          },
+          "physical_records": [
+            757
+          ]
+        },
+        {
+          "table": "status_effects_logic",
+          "name": "RockWeaponDamageBoost",
+          "fields": {
+            "Name": [
+              {
+                "record": 340,
+                "value": "RockWeaponDamageBoost"
+              }
+            ],
+            "DurationTicks": [
+              {
+                "record": 340,
+                "value": "16"
+              }
+            ],
+            "Refreshable": [
+              {
+                "record": 340,
+                "value": "TRUE"
+              }
+            ],
+            "UltiChargeBoostPercent": [
+              {
+                "record": 340,
+                "value": "50"
+              }
+            ],
+            "DamageBoostPercent": [
+              {
+                "record": 340,
+                "value": "100"
+              }
+            ]
+          },
+          "physical_records": [
+            340
+          ]
+        },
+        {
+          "table": "status_effects_logic",
+          "name": "RockUltiDamageReduction",
+          "fields": {
+            "Name": [
+              {
+                "record": 341,
+                "value": "RockUltiDamageReduction"
+              }
+            ],
+            "DurationTicks": [
+              {
+                "record": 341,
+                "value": "80"
+              }
+            ],
+            "Refreshable": [
+              {
+                "record": 341,
+                "value": "TRUE"
+              }
+            ],
+            "ShieldPercent": [
+              {
+                "record": 341,
+                "value": "30"
+              }
+            ]
+          },
+          "physical_records": [
+            341
+          ]
+        },
+        {
+          "table": "status_effects_logic",
+          "name": "RockUltiTrailStatus",
+          "fields": {
+            "Name": [
+              {
+                "record": 344,
+                "value": "RockUltiTrailStatus"
+              }
+            ],
+            "DurationTicks": [
+              {
+                "record": 344,
+                "value": "20"
+              }
+            ],
+            "TriggerRate": [
+              {
+                "record": 344,
+                "value": "21"
+              }
+            ],
+            "TriggerOnFirstTick": [
+              {
+                "record": 344,
+                "value": "TRUE"
+              }
+            ],
+            "Refreshable": [
+              {
+                "record": 344,
+                "value": "TRUE"
+              }
+            ],
+            "Damage": [
+              {
+                "record": 344,
+                "value": "700"
+              }
+            ],
+            "UltiChargePercent": [
+              {
+                "record": 344,
+                "value": "30"
+              }
+            ],
+            "ScaleWithUpgrades": [
+              {
+                "record": 344,
+                "value": "TRUE"
+              }
+            ],
+            "IsDebuff": [
+              {
+                "record": 344,
+                "value": "TRUE"
+              }
+            ]
+          },
+          "physical_records": [
+            344
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "from": [
+            "characters",
+            "Rock",
+            "Traits",
+            109
+          ],
+          "to": [
+            "traits",
+            "RockChargeUltiOnMove"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "characters",
+            "Rock",
+            "Components",
+            109
+          ],
+          "to": [
+            "components_logic",
+            "Brawler_Rock"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "characters",
+            "Rock",
+            "WeaponSkill",
+            109
+          ],
+          "to": [
+            "skills",
+            "RockWeapon"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "characters",
+            "Rock",
+            "UltimateSkill",
+            109
+          ],
+          "to": [
+            "skills",
+            "RockUlti"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "components_logic",
+            "Brawler_Rock",
+            "StatusEffects",
+            86
+          ],
+          "to": [
+            "status_effects_logic",
+            "RockSpeedUpMovement"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "components_logic",
+            "Brawler_Rock",
+            "StatusEffects",
+            87
+          ],
+          "to": [
+            "status_effects_logic",
+            "RockUltiOverchargedWallPass"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "components_logic",
+            "Brawler_Rock",
+            "AreaEffects",
+            86
+          ],
+          "to": [
+            "areas",
+            "RockUltiTrail"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "skills",
+            "RockWeapon",
+            "ActivationSelfStatusEffects",
+            592
+          ],
+          "to": [
+            "status_effects_logic",
+            "RockWeaponDamageBoost"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "skills",
+            "RockUlti",
+            "ActivationSelfStatusEffects",
+            593
+          ],
+          "to": [
+            "status_effects_logic",
+            "RockUltiDamageReduction"
+          ],
+          "explicit_overcharged_column": false
+        },
+        {
+          "from": [
+            "areas",
+            "RockUltiTrail",
+            "StatusEffectEnemy",
+            757
+          ],
+          "to": [
+            "status_effects_logic",
+            "RockUltiTrailStatus"
+          ],
+          "explicit_overcharged_column": false
+        }
+      ],
+      "unresolved": [],
+      "effect_semantics": "UNKNOWN",
+      "scope_inheritance": "ROOT_AND_EDGE_PATH_REQUIRED"
+    },
+    {
+      "root": [
+        "gear_boosts",
+        "ForestSpeed",
+        "equipped_gear/activation_unknown"
+      ],
+      "max_depth": 6,
+      "max_nodes": 400,
+      "nodes": [
+        {
+          "table": "gear_boosts",
+          "name": "ForestSpeed",
+          "fields": {
+            "Name": [
+              {
+                "record": 3,
+                "value": "ForestSpeed"
+              }
+            ],
+            "Rarity": [
+              {
+                "record": 3,
+                "value": "RareGear"
+              }
+            ],
+            "LogicType": [
+              {
+                "record": 3,
+                "value": "0"
+              }
+            ],
+            "ModifierValue": [
+              {
+                "record": 3,
+                "value": "15"
+              }
+            ],
+            "ModifierType": [
+              {
+                "record": 3,
+                "value": "percent"
+              }
+            ],
+            "StatusEffect": [
+              {
+                "record": 3,
+                "value": "GearSpeedBoostInBush"
+              }
+            ],
+            "OldTokenResource": [
+              {
+                "record": 3,
+                "value": "GearTokensSpeed"
+              }
+            ],
+            "IconSWF": [
+              {
+                "record": 3,
+                "value": "sc/ui.sc"
+              }
+            ],
+            "IconExportName": [
+              {
+                "record": 3,
+                "value": "icon_gear_speed"
+              }
+            ],
+            "TID": [
+              {
+                "record": 3,
+                "value": "TID_GEAR_FOREST_SPEED_TITLE"
+              }
+            ],
+            "InfoTID": [
+              {
+                "record": 3,
+                "value": "TID_GEAR_FOREST_SPEED_INFO"
+              }
+            ],
+            "UpgradeInfoTID": [
+              {
+                "record": 3,
+                "value": "TID_GEAR_FOREST_SPEED_UPGRADE_INFO"
+              }
+            ],
+            "UpgradeTargetTID": [
+              {
+                "record": 3,
+                "value": "TID_GEAR_FOREST_SPEED_UPGRADE_TARGET"
+              }
+            ]
+          },
+          "physical_records": [
+            3
+          ]
+        },
+        {
+          "table": "status_effects_logic",
+          "name": "GearSpeedBoostInBush",
+          "fields": {
+            "Name": [
+              {
+                "record": 39,
+                "value": "GearSpeedBoostInBush"
+              }
+            ],
+            "DurationTicks": [
+              {
+                "record": 39,
+                "value": "2"
+              }
+            ],
+            "TriggerOnFirstTick": [
+              {
+                "record": 39,
+                "value": "TRUE"
+              }
+            ],
+            "Stacking": [
+              {
+                "record": 39,
+                "value": "TRUE"
+              }
+            ],
+            "Refreshable": [
+              {
+                "record": 39,
+                "value": "TRUE"
+              }
+            ],
+            "BaseSpeedIncreasePercent": [
+              {
+                "record": 39,
+                "value": "15"
+              }
+            ]
+          },
+          "physical_records": [
+            39
+          ]
+        }
+      ],
+      "edges": [
+        {
+          "from": [
+            "gear_boosts",
+            "ForestSpeed",
+            "StatusEffect",
+            3
+          ],
+          "to": [
+            "status_effects_logic",
+            "GearSpeedBoostInBush"
+          ],
+          "explicit_overcharged_column": false
+        }
+      ],
+      "unresolved": [],
+      "effect_semantics": "UNKNOWN",
+      "scope_inheritance": "ROOT_AND_EDGE_PATH_REQUIRED"
+    }
+  ],
+  "current_explanation_gate": "CONDITIONAL_ALLOWLIST_ONLY",
+  "computed_current_mechanics_gate": "NOT_PASSED",
+  "historical_training_gate": "NOT_PASSED",
+  "patch_applied": false,
+  "historical_join_enabled": false
+}

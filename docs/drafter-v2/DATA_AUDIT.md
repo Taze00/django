@@ -364,3 +364,33 @@ No Legacy change, holdout access/evaluation, training, tuning, API credential
 load, gameplay collection, runtime integration or data/ modification. No current
 mechanics or missing historical loadouts were fabricated. Modern source coverage
 is not evidence of predictive benefit. New Ranked evidence stays DATA_UNAVAILABLE.
+
+
+## Bounded mechanics follow-up after 33c570c (D-010, 2026-09-23)
+
+No DB query, credential, player request or re-run of the completed 5A inventory.
+21 top-level unauthenticated public fetches: 20 final 200, one 404, 3,542,689
+retained bytes, zero retries. One redirected fetch; exact wire-hop count UNKNOWN
+because urllib redirects were not instrumented. The recorded 24-attempt protocol
+therefore has an accounting limitation, explicitly retained rather than claiming
+21 wire requests. No more probes; future helpers must count/disable redirects.
+Eight bounded search queries/eight opens supplied primary-source discovery.
+
+Ten native tables preserve continuation rows; 12 graph roots explore named
+references and explicit AND without execution, max depth six/nodes 400 per root.
+Only 1/57 component records has parameter names. Mirror head unchanged; source
+folder/fingerprint 69.230/69.229.1 conflict. Stable sampled Bolt/Brock IDs across
+two builds and explicit localization prove distinct names, while public Bolt kit
+still references Brock gadgets. No unquarantine or automatic alias repair.
+
+Current Gate A is CONDITIONAL for four directly sourced gear explanations,
+independent of history. Broad computed current mechanics remain NOT PASSED;
+historical Gate B remains NOT PASSED for its additional temporal/loadout gaps.
+Six publisher patch-event examples retain unknown units/scales/absolute baselines
+where needed. No prose patch applied, feature/schema implemented or model run.
+
+24 offline tests passed (nine new plus 15 existing 5A, 0.006 s). Focused report
+replay byte-identical; frozen Phase-5A evidence JSONs unchanged. Full provenance,
+unit table, dependency graphs, gate scope, future contract and exact recovery
+are in MECHANICS_FOLLOWUP and its committed evidence artifacts. No complete source
+tables or localization text imported into the database or committed wholesale.

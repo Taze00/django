@@ -369,3 +369,56 @@ Revisit only with bounded evidence resolving source freshness, identity, units,
 opaque dependencies and availability. Historical mechanics additionally require
 validity intervals and observed loadout context. New model work needs independent
 preregistered data; the old holdout/shared-subset comparison remains final.
+
+
+## D-010: Separate current explanation eligibility from numeric and historical mechanics
+
+User clarification: a safe current mechanics subset may qualify without complete
+historical reconstruction. Phase 5A at 33c570c stays complete; this is its bounded
+source follow-up, not a rerun or speculative mechanics implementation.
+
+Evidence: 21 public top-level fetches, 20 final HTTP 200/one 404, zero retries,
+3,542,689 retained response bytes; one observed redirect, wire-hop count UNKNOWN.
+Ten missing dependency tables reveal named statuses/traits/buddies/decks, explicit
+AND predicates and ordered continuation values. Twelve roots are traversed with
+six-edge/400-node caps; no effect execution. Only 1/57 components has ValueNames.
+Mirror head/only branch unchanged; folder 69.230 and fingerprint 69.229.1 disagree.
+BrawlAPI conditions generatedAt is September 1, not a server validity interval.
+Bolt and Brock have explicit distinct TID translations and stable sampled IDs in
+68.250/69.230; the current Bolt detail endpoint still includes Brock's gadgets.
+Current official support separately supplies four narrowly usable gear statements.
+
+Decision A: CONDITIONAL, limited pass for those four source-attributed current
+explanations only, with explicit equipment/activation/context/as-of qualification.
+The whitelist is MECHANICS_CURRENT_CLAIMS_2026-09-23.json. Unknown loadout cannot
+become an active team capability; mode overrides stay UNKNOWN. Revalidate before
+later reuse and invalidate affected claims on new/conflicting evidence. No old
+validity interval is required merely to report a current documented statement.
+Computed current composition mechanics remain PARTIAL / NOT PASSED because of
+their own current baseline, unit and execution gaps, not because history is absent.
+
+Decision B: historical training remains UNAVAILABLE / NOT PASSED. Null validity
+boundaries are not an open-ended interval; retrieval/build dates cannot substitute
+for server activation. Historical loadouts remain UNKNOWN; no new join/training.
+
+Patch model: immutable source snapshot, scoped raw observation, separate reviewed
+change event, explicit conditional/dependency graph, nullable precise validity and
+conflict/use status. Exact replacement and relative-only event examples are saved;
+none is applied to raw data. Calendar-day facts are preserved without invented UTC
+midnights. Missing relative baselines stay unknown. Proposal is in MECHANICS_FOLLOWUP.
+
+Rejected: universal opcode interpreter; tick/power/range conversion guessed from
+plausibility or one fitted ratio; repairing Bolt by dropping inconvenient gadgets;
+claiming server-only flags prove impossible completeness; blanket history barrier
+for current facts; treating current explanation eligibility as model promotion.
+
+Validation: new offline audit tests plus existing 5A regression contracts; exact
+replay and tests recorded in STATUS. No DB, credential, match collection, Legacy,
+holdout, model, schema or runtime consumer touched. Original 5A JSONs unchanged.
+
+Next: a separately scoped current source-claim storage/explanation implementation
+can use only the reviewed allowlist and contract; no automatic start in this
+research task. Numeric mechanics require new evidence; historical work requires
+its independent temporal/loadout evidence and future data protocol. Preserve all
+completed probes and quarantine actual conflicts rather than requesting normal
+milestone approvals or manufacturing missing facts.

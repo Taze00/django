@@ -1,5 +1,11 @@
 # Phase 5A: mechanics sources and decision gate
 
+Follow-up after `33c570c`: [MECHANICS_FOLLOWUP.md](MECHANICS_FOLLOWUP.md), D-010.
+The original 5A inventory below remains dated/frozen. Gate A now has a limited
+CONDITIONAL pass for four official source-attributed gear explanations; computed
+current mechanics and historical training remain NOT PASSED. Historical
+completeness is not a prerequisite for a sufficiently evidenced current claim.
+
 Audit date: 2026-09-23. Started from clean `a0242b9`, following completed
 `8661c29` implementation and bootstrap run 5. **Phase 5A inventory complete;
 Phase 5B implementation gate NOT PASSED.** This is an evidence inventory,
@@ -253,7 +259,9 @@ cmp /tmp/mechanics-inventory-reproduced.json \
   docs/drafter-v2/MECHANICS_INVENTORY_2026-09-23.json
 ```
 
-Add `--format markdown` for the coverage document. The utility imports neither
+Add `--format markdown` for the original 5A generated coverage body (identical
+to `33c570c:docs/drafter-v2/MECHANICS_COVERAGE.md`). The current coverage document
+also contains a separately dated follow-up appendix; the original JSON is unchanged. The utility imports neither
 Django nor a client, reads files only and writes stdout. It rejects modified input
 hashes, duplicate identities, malformed CSV widths/headers and ambiguous targets.
 It neither repairs source data nor recomputes the catalog from a changing database.
@@ -340,3 +348,28 @@ usage and stable archiving appropriate to the next scope. Historical features
 additionally require defensible match-time validity and observed loadouts.
 A new independently preregistered dataset would still be required for model work.
 The sealed holdout and final shared-subset comparison remain closed.
+
+
+## Follow-up source assessment (D-010)
+
+The completed bounded follow-up adds ten native dependency tables, build
+fingerprint comparison, historical Bolt card IDs, explicit localization links,
+current official gear claims and separate patch-event design examples. Full
+source/units/dependency/Bolt results and exact replay are in MECHANICS_FOLLOWUP.md.
+The original source catalog, identity projection and inventory JSON are preserved.
+
+- SUPPORTED: explicit Rock→BOLT/RocketGirl→BROCK TID linkage; symbolic source
+  references and explicit AND connective; exact publisher patch-change statements.
+- CONDITIONAL: four reviewed current support-page gear statements may support
+  attributed explanations with equipment/context/as-of qualification. They cannot
+  be consumed as computed model features or silently reused as historical facts.
+- PARTIAL: parameter semantics/units/current baseline. Only 1/57 named components
+  exposes ValueNames. Continuations and positional relationships must survive.
+- UNAVAILABLE: newer immutable post-maintenance snapshot in inspected sources,
+  complete hotfix/deployment intervals and historical equipped loadouts.
+- UNRELIABLE: using commit/retrieval/generatedAt as effective dates, inferring
+  tick rate or power scaling, deriving generic range conversion from one pair.
+- CONFLICT: folder 69.230 versus fingerprint 69.229.1; persistent Bolt metadata
+  includes Brock-target gadgets despite stable IDs in the two inspected builds.
+
+No broad mechanics import, schema, interpreter or active/default-engine change.
