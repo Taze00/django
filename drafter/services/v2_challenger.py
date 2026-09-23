@@ -10,7 +10,7 @@ from django.db.models import Q
 
 from drafter.models import Brawler
 from drafter.services.context import DraftFehler
-from drafter.services.v2_model import CompositionLogitModel, FEATURE_VERSION, _feature_counts
+from drafter.services.v2_model import CompositionLogitModel, FEATURE_VERSIONS, _feature_counts
 from drafter.services.v2_explanation import contributions
 from drafter.services.v2_search import _row, legal_candidates
 
@@ -31,7 +31,7 @@ def load_artifact():
         model = CompositionLogitModel.from_dict(data['model'])
         if (data['schema'] != 'drafter-v2-challenger-1'
                 or data['status'] != 'EXPERIMENTAL_NOT_PROMOTED'
-                or model.feature_version != FEATURE_VERSION
+                or model.feature_version not in FEATURE_VERSIONS
                 or not model.manifest or len(model.manifest) != len(model.weights)
                 or set(model.manifest.values()) != set(range(len(model.weights)))
                 or any(type(i) is not int for i in model.manifest.values())
@@ -80,7 +80,7 @@ def recommend(ctx):
             unavailable.append(brawler.slug)
             continue
         row = _row(own + (candidate,), enemy, **context)
-        features = _feature_counts(row)
+        features = _feature_counts(row, model.feature_version)
         unknown = sorted(set(features) - set(model.manifest))
         result.append({
             'slug': brawler.slug, 'name': brawler.name, 'p_win': model.predict(row),

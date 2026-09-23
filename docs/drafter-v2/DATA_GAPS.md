@@ -97,3 +97,7 @@ was recovered against its known aggregate digest without loading holdout example
 This enables experimental Train/Validation work, not independent validation or
 current-patch confidence. A fresh uninspected test window remains necessary for
 promotion. No new mechanics or player/loadout facts were added.
+
+D-013: no validation benefit from the tested opponent terms. Missing independent
+future evidence still prevents a promotion claim; no fabricated mechanics added
+to compensate for the negative result.

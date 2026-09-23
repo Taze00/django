@@ -1,8 +1,13 @@
-RESUME FROM: D-012 functional experimental Last-Pick challenger implemented and validated. Continue D-013 preregistered Train/Validation-only opponent-interaction experiment, then complete-state Mid/First planning and side-by-side UI. See CHALLENGER_PROTOCOL.md. Mechanics research is complete and deferred. Legacy default; sealed holdout stays closed.
+RESUME FROM: D-012 pushed as 7229fd9. D-013 fixed Train/Validation opponent-interaction experiment complete; all candidates worse, original model retained. Continue D-014 complete-composition Mid/First planning, then side-by-side and logging. No old holdout or mechanics research.
+
 
 
 
 # Drafter V2 Status
+
+D-013 complete: 12 focused tests passed; fixed three-candidate experiment failed
+to improve validation. Existing model stays selected. Full report in
+CHALLENGER_OPPONENT_EXPERIMENT.json; no held-out evaluation.
 
 D-012 complete: experimental Last-Pick UI/API, validated model loader and
 Train/Validation-only trainer. 35 focused tests passed; isolated real page/API

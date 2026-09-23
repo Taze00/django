@@ -157,3 +157,8 @@ Train/Validation-only development. Promotion and the sealed holdout stay gated.
 4. Then experimental side-by-side Legacy comparison and versioned draft snapshots.
 5. Broad regressions, operational documentation, honest final evidence limitations.
 Continue after test/document/commit/push; no routine milestone approval.
+
+D-013 complete: fixed opponent-interaction experiment produced no validation
+improvement; retain existing V. Next D-014: bounded full-composition Mid/First
+planning, followed by side-by-side UI and snapshots. No more mechanics research
+or unbounded hyperparameter search on this validation set.

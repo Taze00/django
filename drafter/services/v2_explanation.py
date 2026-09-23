@@ -5,7 +5,7 @@ from drafter.services.v2_model import _feature_counts
 
 def contributions(model, row, limit=5):
     facts = []
-    for name, amount in _feature_counts(row).items():
+    for name, amount in _feature_counts(row, model.feature_version).items():
         index = model.manifest.get(name)
         if index is None:
             continue
@@ -24,7 +24,7 @@ def contributions(model, row, limit=5):
 
 def explain(model, row, search=None, limit=5):
     result = {
-        "model_version": "v2-composition-logit-1",
+        "model_version": model.feature_version,
         "feature_version": model.feature_version,
         "p_win": model.predict(row),
         "contributions": contributions(model, row, limit=limit),

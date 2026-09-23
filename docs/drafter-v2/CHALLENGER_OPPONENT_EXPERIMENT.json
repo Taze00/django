@@ -1,0 +1,173 @@
+{
+  "artifact_sha256": "5233b9209a6b5545a2d8b68ee72e02e5b09c00afc2cd3eaeabc00258a2ba060d",
+  "experiment": {
+    "candidates": [
+      {
+        "l2": 1,
+        "training_seconds": 10.450006531000327,
+        "validation": {
+          "brier": 0.24774078927297735,
+          "calibration": [
+            {
+              "lower": 0.2,
+              "mean_predicted": 0.3933045631688641,
+              "n": 9,
+              "observed_rate": 0.6666666666666666
+            },
+            {
+              "lower": 0.4,
+              "mean_predicted": 0.5059642585261973,
+              "n": 2001,
+              "observed_rate": 0.49375312343828087
+            },
+            {
+              "lower": 0.6,
+              "mean_predicted": 0.6179805317006303,
+              "n": 21,
+              "observed_rate": 0.7619047619047619
+            }
+          ],
+          "log_loss": 0.6886038069604661,
+          "n": 2031,
+          "status": "ok"
+        },
+        "version": "v2-composition-logit-1"
+      },
+      {
+        "validation": {
+          "brier": 0.25,
+          "calibration": [
+            {
+              "lower": 0.4,
+              "mean_predicted": 0.5,
+              "n": 2031,
+              "observed_rate": 0.49729197439684886
+            }
+          ],
+          "log_loss": 0.693147180559911,
+          "n": 2031,
+          "status": "ok"
+        },
+        "version": "B0"
+      },
+      {
+        "l2": 1.0,
+        "training_seconds": 14.413799014999768,
+        "validation": {
+          "brier": 0.24777221228897045,
+          "calibration": [
+            {
+              "lower": 0.2,
+              "mean_predicted": 0.3829198839162419,
+              "n": 9,
+              "observed_rate": 0.6666666666666666
+            },
+            {
+              "lower": 0.4,
+              "mean_predicted": 0.5052621312763047,
+              "n": 1980,
+              "observed_rate": 0.4919191919191919
+            },
+            {
+              "lower": 0.6,
+              "mean_predicted": 0.614927876566752,
+              "n": 42,
+              "observed_rate": 0.7142857142857143
+            }
+          ],
+          "log_loss": 0.6886719231008386,
+          "n": 2031,
+          "status": "ok"
+        },
+        "validation_seconds": 0.07079811899984634,
+        "version": "v2-composition-opponent-2"
+      },
+      {
+        "l2": 10.0,
+        "training_seconds": 14.521460471999944,
+        "validation": {
+          "brier": 0.24777509877144444,
+          "calibration": [
+            {
+              "lower": 0.2,
+              "mean_predicted": 0.3839562401618679,
+              "n": 9,
+              "observed_rate": 0.6666666666666666
+            },
+            {
+              "lower": 0.4,
+              "mean_predicted": 0.5055502277012047,
+              "n": 1987,
+              "observed_rate": 0.4921992954202315
+            },
+            {
+              "lower": 0.6,
+              "mean_predicted": 0.6167555128925306,
+              "n": 35,
+              "observed_rate": 0.7428571428571429
+            }
+          ],
+          "log_loss": 0.6886778157250804,
+          "n": 2031,
+          "status": "ok"
+        },
+        "validation_seconds": 0.06787644199994247,
+        "version": "v2-composition-opponent-2"
+      },
+      {
+        "l2": 100.0,
+        "training_seconds": 15.57977783899969,
+        "validation": {
+          "brier": 0.2478180859501198,
+          "calibration": [
+            {
+              "lower": 0.2,
+              "mean_predicted": 0.38774694493889506,
+              "n": 6,
+              "observed_rate": 0.6666666666666666
+            },
+            {
+              "lower": 0.4,
+              "mean_predicted": 0.5054491687400119,
+              "n": 2001,
+              "observed_rate": 0.4942528735632184
+            },
+            {
+              "lower": 0.6,
+              "mean_predicted": 0.6125673983729483,
+              "n": 24,
+              "observed_rate": 0.7083333333333334
+            }
+          ],
+          "log_loss": 0.6887654888985226,
+          "n": 2031,
+          "status": "ok"
+        },
+        "validation_seconds": 0.09080407400006152,
+        "version": "v2-composition-opponent-2"
+      }
+    ],
+    "promotion": "NOT_EVALUATED_NO_NEW_HOLDOUT",
+    "protocol": "D-013",
+    "selected_l2": 1.0,
+    "selected_version": "v2-composition-logit-1"
+  },
+  "implementation_note": "Base commit 7229fd9 plus D-013 implementation committed with this report.",
+  "provenance": {
+    "freeze_sha256": "2bb8222b9025a5da7daadea8b9a252c39b16bcda8b07b9bc2df69315ea4dcf9e",
+    "holdout_access": "membership_digest_only_no_examples_or_predictions",
+    "revision": "7229fd9",
+    "train": {
+      "examples_sha256": "5e8ff094ad9f93ed565bcaed9f725ffd7d78dd67c22e31c7b6aaed6cd2cec447",
+      "first": "2026-08-29T00:48:08+00:00",
+      "last": "2026-09-17T21:43:04+00:00",
+      "n": 6094
+    },
+    "validation": {
+      "examples_sha256": "4b2806db07d35e20dd8a0e6e76bef74dd928706b90e6615a3b2f64776c3df797",
+      "first": "2026-09-17T21:43:13+00:00",
+      "last": "2026-09-18T08:34:00+00:00",
+      "n": 2031
+    }
+  }
+}

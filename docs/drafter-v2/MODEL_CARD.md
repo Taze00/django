@@ -32,3 +32,7 @@ active” only for the experimental surface, not production promotion. Training:
 6,094 examples through 2026-09-17T21:43:04Z; validation: 2,031 through
 2026-09-18T08:34:00Z. Actual matchup uncertainty/current patch applicability remain
 UNKNOWN. Candidate features without training support are exposed, not fabricated.
+
+D-013: jointly fitted opponent interactions failed the fixed validation comparison.
+The opt-in runtime retains `v2-composition-logit-1`; no feature activation. This
+negative result does not establish all possible interaction models are useless.

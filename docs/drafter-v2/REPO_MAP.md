@@ -98,3 +98,8 @@ partitions and model/provenance/support artifact (ignored data/brawl_reports).
 `views/challenger.py`, Drafter URLs, `templates/drafter/challenger.html` and
 `static/drafter/challenger.js`: separate opt-in UI/API; Legacy flow untouched.
 `test_v2_challenger.py`: endpoint/model/legality/holdout access regression contracts.
+
+D-013: `drafter_v2_challenger_experiment` runs the fixed Train/Validation-only
+grid. `v2_model`/`v2_explanation` support versioned antisymmetric opponent terms;
+current runtime artifact remains the original model. Report in
+CHALLENGER_OPPONENT_EXPERIMENT.json; candidate artifact stays local/ignored.

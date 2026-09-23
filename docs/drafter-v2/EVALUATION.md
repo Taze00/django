@@ -142,3 +142,17 @@ CHALLENGER_BASELINE.json. Validation reproduced LogLoss 0.6886038069604661,
 Brier 0.24774078927297735 (n=2,031); no new holdout metric.
 Train example digest: 5e8ff094ad9f93ed565bcaed9f725ffd7d78dd67c22e31c7b6aaed6cd2cec447.
 Validation digest: 4b2806db07d35e20dd8a0e6e76bef74dd928706b90e6615a3b2f64776c3df797.
+
+## D-013 bounded development experiment
+
+| Candidate | L2 | Validation LogLoss | Validation Brier |
+|---|---:|---:|---:|
+| Existing | 1 | 0.688603807 | 0.247740789 |
+| Opponent interactions | 1 | 0.688671923 | 0.247772212 |
+| Opponent interactions | 10 | 0.688677816 | 0.247775099 |
+| Opponent interactions | 100 | 0.688765489 | 0.247818086 |
+
+All n=2,031. Existing selected under preregistered rule; no improvement claimed.
+The same train/validation canonical digests were reproduced. Full calibration,
+fit/inference times and artifact digest in CHALLENGER_OPPONENT_EXPERIMENT.json.
+Independent test/promotion remains unavailable; old sealed results untouched.

@@ -460,3 +460,16 @@ Validation: 35 focused model/search/API/recovery tests passed (7.134 s); real is
 page/API smoke returned 200/200, 100 legal recommendations, 43.606 ms measured
 service time in one request. This is a smoke timing, not a production percentile.
 No live rollout, DB mutation, collector, mechanics features or held-out evaluation.
+
+## D-013 — opponent interactions rejected by development validation
+
+Fixed protocol D-012 tested antisymmetric cross-team pair coefficients jointly
+with existing terms, L2 1/10/100, 300 epochs, learning rate 0.05. All three are
+worse than the existing model on validation LogLoss and Brier. Keep the existing
+artifact/runtime model; no opponent terms activated. Implemented version remains
+an experimental candidate, not a learned mechanic or promoted feature.
+12 model/explanation/runtime tests passed (0.677 s). Actual training times:
+baseline 10.45 s; candidate fits 14.41/14.52/15.58 s. Full metrics/calibration and
+unchanged development digests: CHALLENGER_OPPONENT_EXPERIMENT.json. No holdout
+examples/outcomes/predictions, new split or mechanics facts. Do not enlarge the
+grid after seeing results; move to usable search rather than tune indefinitely.
