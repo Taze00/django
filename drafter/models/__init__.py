@@ -25,5 +25,8 @@ __all__ = [
     "UserBrawlerPreference",
     "RawPayload", "Match", "MatchPlayer", "MatchBan",
     "TrackedPlayer", "CollectorRun", "TaggedPlayer", "TaggedPlayerObservation",
+    "DiscoveryPlayer", "DiscoveryObservation",
     "Praxisfall", "Ergebnis", "Fehlerklasse",
 ]
+
+from drafter.models.discovery import DiscoveryPlayer, DiscoveryObservation

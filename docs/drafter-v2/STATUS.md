@@ -1,3 +1,7 @@
+RESUME FROM: D-023 discovery/query frontier design implemented and preregistered; single pilot still PENDING. Run DISCOVERY_PILOT_PROTOCOL.json exactly once after the committed checks, using the isolated credential, ten total battlelog attempts, no rankings, depth one. D-022/V2 byte hashes verified unchanged; no bundle rebuild. Future evaluation remains NOT REGISTERED. See DISCOVERY_PILOT.md. Earlier collection prohibitions apply to completed D-020–D-022 tasks, not this newly authorized pilot.
+
+Validation: 50 combined discovery/old-frontier/growth/future-window tests passed (6.084 s). Final 11 discovery/command/cutoff tests passed (1.948 s). Separate discovery tables retain raw pointers, graph edges and battle types; the old frontier is not silently broadened. A linked eligible soloRanked match is required for Ranked-evidence membership. Pilot provenance is excluded from prospective membership even with later accepted sightings. No real API call made yet.
+
 RESUME FROM: D-022 VERIFIED frozen Legacy evaluation bundle. The manual-prior policy blocker is resolved; empirical inputs are rebuilt strictly from Train and priors are frozen B constants. Future window remains NOT REGISTERED. Latest collection evidence is still DATA_UNAVAILABLE (run 6); no collector retry authorized or performed in this task. Read LEGACY_BUNDLE_RUNBOOK.md and FUTURE_EVALUATION_PROTOCOL.md.
 
 D-022 verification complete. Two fresh builds produced identical canonical content

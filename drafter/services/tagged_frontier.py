@@ -63,12 +63,25 @@ class TaggedFrontierCollector:
     moeglich. TrackedPlayer liefert den strategieuebergreifenden Cooldown.
     """
 
+    sampling = SAMPLING
+    budget_limit = 5
+    discovered_origin = TrackedPlayer.Origin.DISCOVERED
+    frontier_model = TaggedPlayer
+    observation_model = TaggedPlayerObservation
+    frontier_relation = "tagged_frontier"
+
+    def _prepare_frontier(self):
+        pass
+
+    def _extra_report(self):
+        return {}
+
     def __init__(self, *, after, ranking_seeds=0, max_battlelogs=5, max_depth=1,
                  client=None, now=None, code_revision="UNKNOWN"):
         if after is None or after.utcoffset() is None:
             raise ValueError("after requires an explicit timezone")
-        if not 0 <= ranking_seeds <= 5 or not 0 <= max_battlelogs <= 5:
-            raise ValueError("seed and battlelog budgets must be between 0 and 5")
+        if not 0 <= ranking_seeds <= 5 or not 0 <= max_battlelogs <= self.budget_limit:
+            raise ValueError("invalid bounded seed or battlelog budget")
         if max_depth not in (0, 1):
             raise ValueError("max_depth must be 0 or 1 for this bounded experiment")
         self.after = after
@@ -83,7 +96,7 @@ class TaggedFrontierCollector:
         self.depths = {}
         self.new_match_ids = set()
         self.metrics = {
-            "report_version": SAMPLING, "ranking_attempts": 0, "battlelog_attempts": 0,
+            "report_version": self.sampling, "ranking_attempts": 0, "battlelog_attempts": 0,
             "ranking_entries": 0, "ranking_valid_unique_tags": 0,
             "ranking_seeds_admitted": 0, "ranking_seeds_due": 0,
             "ranking_duplicate_tags": 0, "ranking_invalid_tags": 0,
@@ -111,16 +124,17 @@ class TaggedFrontierCollector:
 
     def _execute(self):
         self.run = CollectorRun.objects.create(started_at=self.now(), parameters={
-            "strategie": SAMPLING, "ranking_seeds": self.ranking_seeds,
+            "strategie": self.sampling, "ranking_seeds": self.ranking_seeds,
             "ranking_http_budget": int(bool(self.ranking_seeds)),
             "battlelog_http_budget": self.max_battlelogs, "max_tiefe": self.max_depth,
             "depth_semantics": "new_request_hops_per_run",
             "abruf_abstand_stunden": 6, "after_exclusive": self.after.isoformat(),
             "code_revision": self.code_revision, "catalog_requests": 0,
         })
-        self.depths = dict.fromkeys(TaggedPlayer.objects.values_list("player_id", flat=True), 0)
-        self.metrics["frontier_before"] = len(self.depths)
         try:
+            self._prepare_frontier()
+            self.depths = dict.fromkeys(self.frontier_model.objects.values_list("player_id", flat=True), 0)
+            self.metrics["frontier_before"] = len(self.depths)
             if self.ranking_seeds:
                 self._ranking()
             self._battlelogs()
@@ -134,12 +148,12 @@ class TaggedFrontierCollector:
             raise
         finally:
             self.summary.api = self.client.statistik.als_dict()
-            self.metrics["frontier_size"] = TaggedPlayer.objects.count()
+            self.metrics["frontier_size"] = self.frontier_model.objects.count()
             self.metrics["new_eligible_solo_ranked_matches"] = sum(
                 eligible(match) for match in Match.objects.filter(
                     pk__in=self.new_match_ids).prefetch_related("players")
             )
-            report = {**self.summary.als_dict(), **self.metrics, "run_id": self.run.pk}
+            report = {**self.summary.als_dict(), **self.metrics, **self._extra_report(), "run_id": self.run.pk}
             report["data_status"] = ("OBSERVATIONS_AVAILABLE" if
                 report["new_eligible_solo_ranked_matches"] else "DATA_UNAVAILABLE")
             self.run.finished_at = self.now()
@@ -167,7 +181,7 @@ class TaggedFrontierCollector:
         payload, _ = RawPayload.objects.get_or_create(content_hash=inhalts_hash(envelope), defaults={
             "source": Datenquelle.API, "format": format_name, "reference": reference,
             "payload": envelope, "fetched_at": answer.abgerufen_am,
-            "sampling": SAMPLING, "collector_run": self.run,
+            "sampling": self.sampling, "collector_run": self.run,
             "parse_status": RawPayload.ParseStatus.UNSUPPORTED,
             "parse_message": "Persisted before parsing by tagged frontier",
         })
@@ -178,7 +192,7 @@ class TaggedFrontierCollector:
         seen = payload.fetched_at
         with transaction.atomic():
             defaults = {"origin": (TrackedPlayer.Origin.RANKING if source == "ranking"
-                                    else TrackedPlayer.Origin.DISCOVERED),
+                                    else self.discovered_origin),
                         "discovered_from": parent.player.tag if parent else ""}
             if ranking:
                 for key, field in (("rank", "ranking_position"), ("trophies", "ranking_trophies")):
@@ -186,18 +200,18 @@ class TaggedFrontierCollector:
                     defaults[field] = value if type(value) is int and value >= 0 else None
             tracked, _ = TrackedPlayer.objects.get_or_create(tag=tag, defaults=defaults)
             depth = parent.discovery_depth + 1 if parent else 0
-            frontier, new = TaggedPlayer.objects.get_or_create(player=tracked, defaults={
+            frontier, new = self.frontier_model.objects.get_or_create(player=tracked, defaults={
                 "first_source": source, "first_seen": seen, "last_seen": seen,
                 "discovery_depth": depth, "first_run": self.run,
             })
             if not new:
-                frontier = TaggedPlayer.objects.select_for_update().get(pk=frontier.pk)
+                frontier = self.frontier_model.objects.select_for_update().get(pk=frontier.pk)
                 frontier.last_seen = max(frontier.last_seen, seen)
                 if source != "query":
                     frontier.discovery_depth = min(frontier.discovery_depth, depth)
                 frontier.save(update_fields=["last_seen", "discovery_depth"])
                 self.metrics["duplicate_player_observations"] += 1
-            TaggedPlayerObservation.objects.get_or_create(
+            self.observation_model.objects.get_or_create(
                 player=frontier, source=source, payload=payload, run=self.run,
                 json_pointer=pointer, defaults={"observed_at": seen, "match": match,
                     "queried_player": parent.player if parent else None},
@@ -258,7 +272,7 @@ class TaggedFrontierCollector:
         allowed = [pk for pk, depth in self.depths.items() if depth <= self.max_depth]
         with transaction.atomic():
             player = self._due().filter(pk__in=allowed).exclude(pk__in=queried).order_by(
-                F("last_fetched_at").asc(nulls_first=True), "tagged_frontier__first_seen", "tag"
+                F("last_fetched_at").asc(nulls_first=True), self.frontier_relation + "__first_seen", "tag"
             ).select_for_update(of=("self",), skip_locked=True).first()
             if player is None:
                 return None
@@ -306,7 +320,7 @@ class TaggedFrontierCollector:
 
     def _battlelog(self, player, answer):
         payload = self._raw(answer, player.tag, FORMAT_OFFIZIELLER_BATTLELOG)
-        parent = TaggedPlayer.objects.select_related("player").get(player=player)
+        parent = self.frontier_model.objects.select_related("player").get(player=player)
         self._observe(player.tag, "query", payload, "/referenz", parent=parent)
         # Der erfolgreiche HTTP-Abruf bleibt auch bei Parserfehlern dokumentiert.
         player.last_fetched_at = self.now()
@@ -330,7 +344,7 @@ class TaggedFrontierCollector:
             referenz=player.tag, format=FORMAT_OFFIZIELLER_BATTLELOG,
             rohdaten=payload.payload, source=Datenquelle.API, matches=recent,
             fehler=parsed.fehler, uebersprungen=parsed.uebersprungen,
-            sampling=SAMPLING, collector_run_id=self.run.pk,
+            sampling=self.sampling, collector_run_id=self.run.pk,
         )
         importer = MatchImporter(_EineLieferung(delivery))
         # Selbst eine neu datierte Sichtung darf durch Fingerprint-Toleranz

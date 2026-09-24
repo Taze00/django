@@ -74,6 +74,15 @@ class FutureWindowTests(SimpleTestCase):
         sealed['members'][0]['has_conflict']=True
         with self.assertRaises(ValueError): verify_membership(self.protocol,sealed,self.rows)
 
+    def test_pilot_origin_is_excluded_even_with_later_acceptable_provenance(self):
+        changed = copy.deepcopy(self.rows)
+        changed[0]['origins'].append({**changed[0]['origins'][0], 'sampling':'observed_discovery_pilot_v1'})
+        with self.assertRaisesRegex(ValueError, 'Insufficient'):
+            seal(self.protocol, changed, self.now)
+        sealed = seal(self.protocol, self.rows, self.now)
+        with self.assertRaisesRegex(ValueError, 'pilot'):
+            verify_membership(self.protocol, sealed, changed)
+
     def test_atomic_publication_never_overwrites(self):
         with tempfile.TemporaryDirectory() as directory:
             path=Path(directory)/'protocol.json';publish(path,self.protocol)

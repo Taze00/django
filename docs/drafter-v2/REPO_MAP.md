@@ -143,3 +143,6 @@ D-021 services/v2_legacy_bundle.py and drafter_v2_legacy_bundle_audit command im
 
 
 D-022: management/commands/drafter_v2_legacy_export.py exports only pinned Train and frozen B constants under read-only repeatable read. offline/legacy_bundle.py configures standalone temporary SQLite and uses original aggregation/scoring; offline/verify_legacy_bundle.py independently audits counts/membership and binds rebuild/replay receipts. gzip data are private ignored local artifacts. Future protocol schema 2 requires verified receipt.
+
+
+D-023: models/discovery.py and migration 0021 hold separate query/provenance state; services/discovery_frontier.py reuses bounded tagged-frontier safeguards; collect_discovery_pilot accepts a pinned single-use pilot protocol. DISCOVERY_PILOT.md documents it.

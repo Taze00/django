@@ -1,0 +1,36 @@
+{
+  "after_exclusive": "2026-09-18T15:04:42Z",
+  "cooldown_hours": 6,
+  "future_test_eligible": false,
+  "implementation_sha256": {
+    "drafter/management/commands/collect_discovery_pilot.py": "1461b06a5a807c0872d14cddaaed08eec2923567775ce280c15181390c8d69d0",
+    "drafter/services/brawl_api_client.py": "ef255638ff4450f88325ce01ce07645b8e9f169b316b006f3a95c8b36e332d0f",
+    "drafter/services/discovery_frontier.py": "8471e6aa445bb5796c502820511ad0ac8ae312f12120b099f755702a6bcc795c",
+    "drafter/services/ingest/importer.py": "6363d4c81c4f11cc8f9df1ca7a0f72a52b1354e05802162609668e850ec767b1",
+    "drafter/services/ingest/parser.py": "736f05f3bce3e7e50f2c62c911b1f00964077f4c70bf759b03eb83232bd0ed93",
+    "drafter/services/providers/official_api.py": "ee96164037a6dc5b601965a8ddc9ecff94b7973d0696a07ad4fcc80a8efb5c09",
+    "drafter/services/tagged_frontier.py": "7a303fdcf25a86ce06216ba53f8d2c3e830e00b6d23c90fec3f08418e31a1eae"
+  },
+  "max_depth": 1,
+  "max_http_attempts": 10,
+  "pilot_id": "D-023-single-observed-frontier-pilot",
+  "preregistered_at": "2026-09-24T16:19:16.897264+00:00",
+  "purpose": "pre_registration_development_pilot",
+  "ranking_requests": 0,
+  "schema": "discovery-pilot-1",
+  "selection": "due_active; last_fetched ASC NULLS FIRST; discovery_first_seen ASC; tag ASC",
+  "source_payloads": [
+    {
+      "content_hash": "67cd8895e72fb5aecc726a29c8836d190116cd15b75e3a2cd47e56395aa4e1fc",
+      "id": 929
+    },
+    {
+      "content_hash": "d7166c324d65affe235a6ad117635a13569371fcb538532fadc56bbe660d77b8",
+      "id": 930
+    },
+    {
+      "content_hash": "af0b99da775a832505ac8b184c76b83dc46018f264848c20250587aa7f5dfd05",
+      "id": 931
+    }
+  ]
+}

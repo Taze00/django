@@ -22,6 +22,7 @@ POLICY = {
     'v2_prediction': 'frozen_complete_3v3_not_hypothetical_search',
     'comparison': 'paired_common_eligible_matches_report_all_exclusions',
     'late_arrivals': 'exclude_after_seal_no_replacement',
+    'acquisition_pilot_eligible': False,
 }
 
 
@@ -93,6 +94,8 @@ def seal(protocol, inventory, now):
         if not row.get('complete_unique_3v3') or not row.get('known_context'):
             reject('incomplete_duplicate_or_unknown_context'); continue
         origins = row.get('origins', [])
+        if any(o['sampling'] == 'observed_discovery_pilot_v1' for o in origins):
+            reject('pre_registration_acquisition_pilot'); continue
         if not any(o['sampling'] == POLICY['sampling'] and o['source'] == 'api'
                    and o['format'] == 'brawlstars.battlelog.raw' and o['run_id'] is not None
                    and at <= timestamp(o['fetched_at']) <= now and _sha(o['content_hash']) for o in origins):
@@ -139,6 +142,8 @@ def verify_membership(protocol, membership, inventory):
         observed = current.get(row['fingerprint'])
         if observed is None or any(observed.get(k) != v for k,v in row.items() if k != 'origins'):
             raise ValueError('Sealed match content/eligibility changed')
+        if any(o['sampling'] == 'observed_discovery_pilot_v1' for o in observed['origins']):
+            raise ValueError('Acquisition pilot observation cannot enter prospective membership')
         if not all(origin in observed['origins'] for origin in row['origins']):
             raise ValueError('Sealed source provenance changed')
     return {'status': 'VERIFIED_NOT_EVALUATED', 'n': len(membership['members']),

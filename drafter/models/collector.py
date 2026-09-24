@@ -21,6 +21,7 @@ class TrackedPlayer(Zeitstempel):
     class Origin(models.TextChoices):
         RANKING = "ranking", "Globale Trophäen-Rangliste"
         DISCOVERED = "discovered", "Aus einem soloRanked-Battlelog entdeckt"
+        OFFICIAL_OBSERVED = "official_observed", "Direkt in offizieller API beobachtet (kein Ranked-Nachweis)"
         MANUAL = "manual", "Manuell angegeben"
 
     tag = models.CharField(max_length=20, unique=True)

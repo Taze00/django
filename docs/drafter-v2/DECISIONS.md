@@ -573,3 +573,14 @@ D-022: user explicitly allows the exact 137 pre-existing priors as B algorithmic
 
 
 D-022 result: VERIFIED bundle 23069ec9ec9cbbc8b7475e590c18e9548c4666395834886e12c0cd8436830527. 94,302 empirical rows from 6,094 Train; 137 identical B priors; two identical builds, independent all-row counts/membership and 28 archive-only scoring replays passed. 20 focused tests passed (4.342 s). No future window registered; independent soloRanked evidence remains unavailable in the latest collection report. Exact contracts/limits: LEGACY_BUNDLE_RUNBOOK.md and verification/artifact JSONs.
+
+
+D-023: the user explicitly separates official observed identity/query eligibility
+from Ranked evidence. Add a separate discovery frontier; reuse shared player
+cooldowns/locking/budget/retry/import safeguards. Retain trophy/soloRanked/other
+raw discovery source and teammate/opponent metadata, without converting any of it
+into an eligible match. Existing frontier strategy remains unchanged. Pin run-6
+payload hashes for one single-use ten-attempt pilot, zero leaderboard calls,
+depth one. All pilot observations are development/acquisition only, never future
+test or automatic training. No prospective registration before actual acquisition
+feasibility. Protocol, tests and operational limits: DISCOVERY_PILOT.md.

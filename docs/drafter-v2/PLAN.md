@@ -210,3 +210,6 @@ D-022: explicit prior policy permits unchanged pre-existing B constants. Build t
 
 
 D-022 result: VERIFIED bundle 23069ec9ec9cbbc8b7475e590c18e9548c4666395834886e12c0cd8436830527. 94,302 empirical rows from 6,094 Train; 137 identical B priors; two identical builds, independent all-row counts/membership and 28 archive-only scoring replays passed. 20 focused tests passed (4.342 s). No future window registered; independent soloRanked evidence remains unavailable in the latest collection report. Exact contracts/limits: LEGACY_BUNDLE_RUNBOOK.md and verification/artifact JSONs.
+
+
+D-023 current continuation: test the separate observed-tag query frontier, commit the preregistered single acquisition pilot, execute once within ten total battlelog attempts, audit feasibility. Do not register a prospective window until the gate passes.

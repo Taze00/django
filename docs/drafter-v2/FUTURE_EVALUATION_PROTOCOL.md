@@ -185,3 +185,20 @@ aggregator formulas, default runtime and V2 artifact are unchanged. No model fit
 quality evaluation, mechanics research, collector retry or real window registration.
 The initial unused shared-raw-body prefetch and its corrected export are disclosed
 in LEGACY_BUNDLE_RUNBOOK.md; no non-Train observations entered empirical aggregates.
+
+
+## D-023 acquisition gate (supersedes earlier collection-readiness instructions)
+
+Before prospective registration, establish actual acquisition feasibility using
+the separately preregistered single discovery pilot. Query eligibility accepts
+real directly observed official team tags, including trophy discoveries; Ranked
+evidence still requires eligible soloRanked. See DISCOVERY_PILOT.md and its pinned
+protocol. D-022 remains frozen and verified; no rebuild is needed.
+
+Pilot observations are pre-registration/development only. Their sampling marker
+is explicitly rejected even if an additional accepted raw origin later appears.
+Future start must be strictly after pilot completion and registration. Zero
+eligible yield means DATA_UNAVAILABLE and diagnosis, not immediate retry or
+registration. A successful pilot still requires a frozen prospective acquisition
+policy, dates, retention plan, code/V2/D-022 pins and exact map/mode/Brawler/patch
+common-subset exclusions. No real window is currently registered.
