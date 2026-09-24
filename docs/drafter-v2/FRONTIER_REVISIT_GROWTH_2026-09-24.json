@@ -1,0 +1,145 @@
+{
+  "after_exclusive": "2026-09-18T15:04:42+00:00",
+  "eligible_new_ranked_matches": 0,
+  "eligible_range": {
+    "first": null,
+    "last": null
+  },
+  "excluded": {},
+  "filter": {
+    "ranked_types": [
+      "soloRanked"
+    ],
+    "source": "api"
+  },
+  "holdout_evaluated": false,
+  "latest_api_ranked_at": "2026-09-18T15:04:42+00:00",
+  "new_api_by_battle_type": [
+    {
+      "battle_type": "friendly",
+      "n": 1
+    },
+    {
+      "battle_type": "ranked",
+      "n": 175
+    }
+  ],
+  "new_api_matches": 176,
+  "new_api_ranked_matches": 0,
+  "promotion": "NOT_ASSESSED",
+  "read_only": true,
+  "recent_collector_runs": [
+    {
+      "api": {
+        "anfragen": 3,
+        "status": {
+          "200": 3
+        },
+        "wiederholungen": 0
+      },
+      "counts": {
+        "duplikate": 0,
+        "duplikate_nach_typ": {},
+        "konflikte": 0,
+        "neu": 50,
+        "neu_nach_typ": {
+          "ranked": 50
+        },
+        "spieler_abgefragt": 3
+      },
+      "id": 6,
+      "started_at": "2026-09-24T04:23:01.615410+00:00",
+      "status": "finished"
+    },
+    {
+      "api": {
+        "anfragen": 4,
+        "status": {
+          "200": 4
+        },
+        "wiederholungen": 0
+      },
+      "counts": {
+        "duplikate": 0,
+        "duplikate_nach_typ": {},
+        "konflikte": 0,
+        "neu": 50,
+        "neu_nach_typ": {
+          "ranked": 50
+        },
+        "spieler_abgefragt": 3
+      },
+      "id": 5,
+      "started_at": "2026-09-23T17:39:14.691736+00:00",
+      "status": "finished"
+    },
+    {
+      "api": {
+        "anfragen": 0,
+        "status": {},
+        "wiederholungen": 0
+      },
+      "counts": {
+        "duplikate": 0,
+        "duplikate_nach_typ": {},
+        "konflikte": 0,
+        "neu": 0,
+        "neu_nach_typ": {},
+        "spieler_abgefragt": 0
+      },
+      "id": 4,
+      "started_at": "2026-09-22T18:13:43.707390+00:00",
+      "status": "finished"
+    },
+    {
+      "api": {
+        "anfragen": 5,
+        "status": {
+          "200": 5
+        },
+        "wiederholungen": 0
+      },
+      "counts": {
+        "duplikate": 125,
+        "duplikate_nach_typ": {
+          "ranked": 125
+        },
+        "konflikte": 0,
+        "neu": 0,
+        "neu_nach_typ": {},
+        "spieler_abgefragt": 5
+      },
+      "id": 3,
+      "started_at": "2026-09-22T17:23:07.863989+00:00",
+      "status": "finished"
+    },
+    {
+      "api": {
+        "anfragen": 5,
+        "status": {
+          "200": 5
+        },
+        "wiederholungen": 0
+      },
+      "counts": {
+        "duplikate": 25,
+        "duplikate_nach_typ": {
+          "ranked": 25
+        },
+        "konflikte": 0,
+        "neu": 100,
+        "neu_nach_typ": {
+          "ranked": 100
+        },
+        "spieler_abgefragt": 5
+      },
+      "id": 2,
+      "started_at": "2026-09-22T17:22:24.712073+00:00",
+      "status": "finished"
+    }
+  ],
+  "report_version": "v2-growth-1",
+  "sampling_counts_overlap": true,
+  "sampling_match_counts": {},
+  "status": "DATA_UNAVAILABLE"
+}

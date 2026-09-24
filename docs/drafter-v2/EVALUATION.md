@@ -194,3 +194,6 @@ D-018: shadow capture is descriptive observation only; no LogLoss/Brier claims f
 
 
 D-019 future protocol is prepared, not executed: separate official soloRanked cohort, frozen Train-only inputs, immutable temporal membership, paired complete-team LogLoss/Brier and fixed-bin calibration. Descriptive ranking only with observed order/legal alternatives; no counterfactual optimal-pick claims. New command never trains/predicts or reads old rows. See FUTURE_EVALUATION_PROTOCOL.md.
+
+
+D-020 collected no qualifying Ranked test evidence. No window registered, no outcome evaluation or model fit. Independent growth audit and run evidence committed.

@@ -138,3 +138,6 @@ D-018: shadow entries have no verified real-match identity, played-at time, outc
 
 
 D-019 readiness: zero new API soloRanked, three frontier members/zero due at 21:51:32 UTC; earliest next_fetch_after 23:39:17 UTC. Zero real shadow records; no outcomes fabricated. Frozen restorable Train-only Legacy inputs are not yet established: context hashes do not prove lineage. No new independent evaluation window is registered or claimed ready.
+
+
+D-020: real run 6 again yielded zero eligible soloRanked; 50 new trophy observations are not Ranked evidence. DATA_UNAVAILABLE, no retry or bootstrap expansion.

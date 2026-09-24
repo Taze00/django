@@ -561,3 +561,6 @@ D-018: reuse additive Praxisfall metadata for opt-in pre-choice capture and appe
 
 
 D-019: keep self-selected shadow reports separate from official future soloRanked admission. Pure preregistration contract plus read-only temporal DB adapter, exclusive manifest publication, content/raw provenance hashes and verification without metrics. Minimum 1,000 is a preregistered operational floor, not evidence of power. No real registration until input lineage and frozen bundles are audited; current Legacy receipt is insufficient. Calendar dates remain unregistered rather than invented. Tests and actual cooldown evidence: FUTURE_EVALUATION_PROTOCOL.md.
+
+
+D-020: revisit existing three due frontier players once, zero ranking seeds, five-attempt cap/depth one unchanged. Actual three HTTP 200, no retries, 75 entries, 25 older raw-only, 50 new trophy ranked, zero new eligible soloRanked/neighbors. Raw/provenance retained; no model/holdout/live data access. 31 regressions passed; see FRONTIER_REVISIT_2026-09-24.json.

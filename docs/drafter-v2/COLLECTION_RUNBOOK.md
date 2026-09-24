@@ -253,3 +253,6 @@ Regression command (disposable isolated test database, no credential loaded):
 `manage.py test drafter.tests.test_tagged_frontier drafter.tests.test_collector
  drafter.tests.test_api_client drafter.tests.test_offizieller_battlelog
  drafter.tests.test_v2_growth drafter.tests.test_stichprobe --noinput`.
+
+
+D-020 authorized revisit completed 2026-09-24 as run 6 (zero ranking seeds). Do not repeat it. Three HTTP 200, 50 new trophy matches, zero eligible soloRanked. Preserved raw hashes and exact run budget: FRONTIER_REVISIT_2026-09-24.json.

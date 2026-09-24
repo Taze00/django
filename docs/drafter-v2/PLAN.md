@@ -198,3 +198,6 @@ D-018 complete: opt-in pre-choice shadow persistence and audited reports. Next D
 
 
 D-019 complete: future-only protocol/membership preparation, atomic publication and integrity verification. No real registration/test seal. Collection blocked by zero due frontier players at audit; future evaluation blocked by absent new eligible Ranked evidence. Before arming, verified Train-only Legacy bundle and prospective dates are required. See FUTURE_EVALUATION_PROTOCOL.md.
+
+
+D-020 complete: exactly one authorized zero-seed frontier revisit, run 6, DATA_UNAVAILABLE; no immediate retry. Next frozen Legacy bundle lineage audit.
