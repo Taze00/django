@@ -140,3 +140,6 @@ D-019: services/v2_future_window.py supplies pure preregistration/seal/publicati
 
 
 D-021 services/v2_legacy_bundle.py and drafter_v2_legacy_bundle_audit command implement read-only fail-closed Train/prior preflight, not aggregation/export/promotion. Explicit Train key predicate avoids Validation and holdout examples. Provenance metadata only; no raw bodies or credentials logged.
+
+
+D-022: management/commands/drafter_v2_legacy_export.py exports only pinned Train and frozen B constants under read-only repeatable read. offline/legacy_bundle.py configures standalone temporary SQLite and uses original aggregation/scoring; offline/verify_legacy_bundle.py independently audits counts/membership and binds rebuild/replay receipts. gzip data are private ignored local artifacts. Future protocol schema 2 requires verified receipt.

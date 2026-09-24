@@ -567,3 +567,9 @@ D-020: revisit existing three due frontier players once, zero ranking seeds, fiv
 
 
 D-021: fail the exact all-inputs-Train-only Legacy gate on actual demo prior lineage. Direct artifact Train fingerprints/content verify without Validation/holdout reads. All 137 demo priors resolve in Hideout prior tables. No silent removal, replacement, source relabeling or scoring change. Record BLOCKED_PRIOR_LINEAGE, not a certified bundle. Both possible future protocol distinctions are documented, neither automatically chosen. 14 regressions passed; real evidence in LEGACY_TRAIN_BUNDLE_PREFLIGHT.json.
+
+
+D-022: user explicitly allows the exact 137 pre-existing priors as B algorithmic constants, not Train-derived data. Freeze complete contents and code/config/catalog before any future window. Rebuild A empirical inputs in fresh standalone SQLite databases using the unchanged aggregator. Pin aggregation date to Train end and scoring clock to export UTC date. Separate receipt binds independent reconstruction, raw-count audit and archive-only direct/injected Legacy probability/ranking replay. Future schema 2 requires this receipt; no automatic registration or model selection. Details and limitations: LEGACY_BUNDLE_RUNBOOK.md.
+
+
+D-022 result: VERIFIED bundle 23069ec9ec9cbbc8b7475e590c18e9548c4666395834886e12c0cd8436830527. 94,302 empirical rows from 6,094 Train; 137 identical B priors; two identical builds, independent all-row counts/membership and 28 archive-only scoring replays passed. 20 focused tests passed (4.342 s). No future window registered; independent soloRanked evidence remains unavailable in the latest collection report. Exact contracts/limits: LEGACY_BUNDLE_RUNBOOK.md and verification/artifact JSONs.

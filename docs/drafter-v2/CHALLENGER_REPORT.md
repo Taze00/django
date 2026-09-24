@@ -139,3 +139,31 @@ legal picks may be recorded without an invented V2 rank. No automatic training.
 Future-window admission/sealing infrastructure and protocol are prepared, not a
 registered/evaluated test. Current data/cooldown evidence and prerequisites:
 SHADOW_EVALUATION.md, FUTURE_EVALUATION_PROTOCOL.md and STATUS.md.
+
+
+## D-022 frozen comparison baseline
+
+D-022 verification complete. Two fresh builds produced identical canonical content
+SHA-256 `23069ec9ec9cbbc8b7475e590c18e9548c4666395834886e12c0cd8436830527`.
+6,094 pinned Train matches produced 94,302 empirical rows: 10,772 Brawler,
+45,698 Counter and 37,832 Synergy; zero empirical Build rows. All 137 prior
+records remain content-identical. Independent raw-count/membership verification
+passed for every empirical row; archive-only replay passed all 28 complete-team
+probability/Last-Pick ranking contexts with zero Match and RawPayload rows.
+
+The verified artifact is persisted privately as
+`data/brawl_reports/legacy-evaluation-23069ec9ec9cbbc8b7475e590c18e9548c4666395834886e12c0cd8436830527.json.gz`
+(4,728,874 compressed bytes). Input archive, second rebuild and replay receipt are
+also retained. `LEGACY_BUNDLE_ARTIFACTS.json` pins their byte/content hashes and
+builder hashes; `LEGACY_BUNDLE_VERIFICATION.json` is the independent successful
+receipt. `LEGACY_BUNDLE_CLASSIFICATION.json` records field-level A/B classification
+and explicit optional unknowns; required unknown inputs are absent within the
+verified scoring scope. Runtime aggregate hashes were not used as lineage proof.
+
+Final focused tests: 20 passed (4.342 s), covering archive tampering, metadata-only
+provenance queries, Train tampering, exact Legacy parity, verification failure
+guards and schema-2 prospective registration gates. Legacy implementation,
+aggregator formulas, default runtime and V2 artifact are unchanged. No model fit,
+quality evaluation, mechanics research, collector retry or real window registration.
+The initial unused shared-raw-body prefetch and its corrected export are disclosed
+in LEGACY_BUNDLE_RUNBOOK.md; no non-Train observations entered empirical aggregates.

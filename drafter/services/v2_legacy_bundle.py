@@ -1,4 +1,8 @@
-"""Fail-closed exact Legacy bundle preflight. Never publishes a verified bundle.
+"""Historical strict D-021 preflight. Never publishes a verified bundle.
+
+D-022 permits frozen manual constants; use drafter_v2_legacy_export and the
+offline builder/verifier for that versioned policy. This older gate remains
+a diagnostic that demo rows are not Train-derived, not the current blocker.
 
 Measured inputs may be rebuilt from Train; demo/manual priors cannot acquire
 Train lineage by being frozen, hashed or copied into a scratch database.

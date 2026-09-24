@@ -1,0 +1,79 @@
+{
+  "bundle_sha256": "23069ec9ec9cbbc8b7475e590c18e9548c4666395834886e12c0cd8436830527",
+  "checks": {
+    "independent_raw_counts": true,
+    "independent_rebuild": true,
+    "prior_identity": true,
+    "scoring_replay": true,
+    "train_membership": true
+  },
+  "classification": {
+    "A": [
+      "matches",
+      "players",
+      "bans",
+      "empirical_aggregates",
+      "empirical_hierarchical_priors"
+    ],
+    "B": [
+      "catalog",
+      "configuration",
+      "code",
+      "priors",
+      "reference_date"
+    ],
+    "B_meaning": "pre-existing frozen algorithmic/catalog constants, not measured mechanics or Train-derived",
+    "C": [],
+    "unknown_values": "preserved; required unresolved identities fail replay; optional UNKNOWN keeps Legacy semantics"
+  },
+  "consumed_tables": [
+    "drafter_brawler",
+    "drafter_brawlerbalancechange",
+    "drafter_brawleritem",
+    "drafter_brawlerstat",
+    "drafter_brawlmap",
+    "drafter_buildstat",
+    "drafter_counterstat",
+    "drafter_gamemode",
+    "drafter_patch",
+    "drafter_synergystat"
+  ],
+  "empirical_n": 94302,
+  "empirical_sha256": "d9a5c20cfa4cff92021c2456bc59bbc0b8ca82f82e9e9f43208831f6bfcd49ab",
+  "environment": {
+    "django": "5.2.17",
+    "python": "3.11.14",
+    "sqlite": "3.46.1"
+  },
+  "frozen_at": "2026-09-24T15:36:50.133163+00:00",
+  "input_sha256": "8ff01088841777cbf150544f381fdee645854cb1aa428cd238a5ba2325863de3",
+  "partitions": {
+    "alle/30d": 6094,
+    "alle/7d": 6080,
+    "alle/90d": 6094,
+    "alle/seit_patch": 4985,
+    "legendary/30d": 0,
+    "legendary/7d": 0,
+    "legendary/90d": 0,
+    "legendary/seit_patch": 0,
+    "masters/30d": 0,
+    "masters/7d": 0,
+    "masters/90d": 0,
+    "masters/seit_patch": 0,
+    "pro/30d": 0,
+    "pro/7d": 0,
+    "pro/90d": 0,
+    "pro/seit_patch": 0
+  },
+  "policy": "train_empirical_frozen_manual_constants_v1",
+  "prior_d021_sha256": "8f0560ee751038bfdbb14595bc8bf2534f105bbd68ae5c3bdfe33192610b81b1",
+  "prior_n": 137,
+  "prior_sha256": "0fda7cc9c6fa5aefae89cc2e262c4948f65f40d56aa7976fdeced3b752ccff8a",
+  "probe_n": 28,
+  "probe_sha256": "0fccb7c8589cb2a6488572b13b7d4bed07f1ddd4ab96658ea4aead4cd6fed899",
+  "required_unknown_inputs": [],
+  "schema": "legacy-bundle-verification-1",
+  "status": "VERIFIED",
+  "train_content_sha256": "5e8ff094ad9f93ed565bcaed9f725ffd7d78dd67c22e31c7b6aaed6cd2cec447",
+  "train_n": 6094
+}

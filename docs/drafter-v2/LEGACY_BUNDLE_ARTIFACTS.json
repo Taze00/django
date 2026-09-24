@@ -1,0 +1,35 @@
+{
+  "artifacts": [
+    {
+      "compressed_bytes": 1226123,
+      "content_sha256": "8ff01088841777cbf150544f381fdee645854cb1aa428cd238a5ba2325863de3",
+      "file_sha256": "a2d99d0167578c1e62c9b7f90c42aa9aa396645592d8ac065cc311d19f6b5734",
+      "path": "data/brawl_reports/legacy-input-final.json.gz"
+    },
+    {
+      "compressed_bytes": 4728874,
+      "content_sha256": "23069ec9ec9cbbc8b7475e590c18e9548c4666395834886e12c0cd8436830527",
+      "file_sha256": "879c8e73449280deeeb364ebcb2ed4f8997c091237175c6c006358f2eb89dede",
+      "path": "data/brawl_reports/legacy-evaluation-23069ec9ec9cbbc8b7475e590c18e9548c4666395834886e12c0cd8436830527.json.gz"
+    },
+    {
+      "compressed_bytes": 4728874,
+      "content_sha256": "23069ec9ec9cbbc8b7475e590c18e9548c4666395834886e12c0cd8436830527",
+      "file_sha256": "879c8e73449280deeeb364ebcb2ed4f8997c091237175c6c006358f2eb89dede",
+      "path": "data/brawl_reports/legacy-bundle-verified-b.json.gz"
+    },
+    {
+      "compressed_bytes": 202,
+      "content_sha256": "50bb6cc9f7badfa445604168c1151de72f77d4520bcf62193cd6b466ac2b022d",
+      "file_sha256": "d9a71ebb313a50ab80e40d6bc28f46000027b2243a3d97afc1bd03f71bec25be",
+      "path": "data/brawl_reports/legacy-bundle-replay.json.gz"
+    }
+  ],
+  "builder_code_sha256": {
+    "drafter/management/commands/drafter_v2_legacy_export.py": "7168e130388028d32c30605a29df54da57b1da5bbd958358e80699e996441a31",
+    "drafter/offline/legacy_bundle.py": "44cc5a766db0c0f1381c926fdce1139f284f116b6834d523ef67f24a7de353c8",
+    "drafter/offline/verify_legacy_bundle.py": "4f43b5635cb05c4eb92eaf0d1de92f7ae681f457fdb9770f98191c9c993ff209"
+  },
+  "schema": "legacy-bundle-artifacts-1",
+  "verification_receipt_sha256": "3f8bb0901209bf35e8e554ec39366a6b83abc78e6f79de40fbc28a3848117369"
+}

@@ -8,11 +8,18 @@ from drafter.services.v2_future_window import register, seal, publish, digest, v
 UTC = timezone.utc
 
 
+def fixture_receipt():
+    return {'schema':'legacy-bundle-verification-1','status':'VERIFIED','bundle_sha256':'b'*64,
+            'policy':'train_empirical_frozen_manual_constants_v1','frozen_at':'2026-09-23T00:00:00Z',
+            'required_unknown_inputs':[], 'checks':dict.fromkeys(
+                ('independent_rebuild','independent_raw_counts','prior_identity','train_membership','scoring_replay'),True)}
+
+
 class FutureWindowTests(SimpleTestCase):
     def setUp(self):
         self.protocol = register(now=datetime(2026,9,24,tzinfo=UTC), development_end='2026-09-23T00:00:00Z',
                                  start='2026-09-25T00:00:00Z', end='2026-10-09T00:00:00Z',
-                                 v2_hash='a'*64, legacy_hash='b'*64, development_hash='c'*64, revision='fixture-only')
+                                 v2_hash='a'*64, legacy_hash='b'*64, development_hash='c'*64, revision='fixture-only',legacy_verification=fixture_receipt())
         self.now = datetime(2026,10,10,tzinfo=UTC)
         self.rows = [{'fingerprint':digest(i), 'reconstructed_fingerprint':digest(['reconstructed',i]),
                       'content_sha256':digest(['content',i]), 'played_at':'2026-09-26T00:00:00Z',
@@ -27,6 +34,12 @@ class FutureWindowTests(SimpleTestCase):
                             ('legacy_bundle_sha256','UNKNOWN'),('legacy_input_policy','live_provider')]:
             p={**self.protocol,field:value}
             with self.subTest(field=field),self.assertRaises(ValueError): validate(p)
+
+    def test_unverified_or_changed_bundle_receipt_cannot_register(self):
+        for changes in ({'status':'BUILT'}, {'bundle_sha256':'d'*64}, {'required_unknown_inputs':['unknown']},
+                        {'frozen_at':'2026-09-26T00:00:00Z'}, {'checks':{}}):
+            with self.subTest(changes=changes),self.assertRaises(ValueError):
+                validate({**self.protocol,'legacy_verification':{**fixture_receipt(),**changes}})
 
     def test_old_development_end_is_allowed_without_relaxing_future_boundary(self):
         validate({**self.protocol, 'development_end':'2026-09-10T00:00:00Z'})
@@ -80,7 +93,7 @@ class FutureInventoryTests(DrafterTest):
     def test_database_predicate_excludes_old_rows_before_content_loading(self):
         protocol = register(now=datetime(2026,9,24,tzinfo=UTC), development_end='2026-09-23T00:00:00Z',
                             start='2026-09-25T00:00:00Z',end='2026-10-09T00:00:00Z',
-                            v2_hash='a'*64,legacy_hash='b'*64,development_hash='c'*64,revision='fixture')
+                            v2_hash='a'*64,legacy_hash='b'*64,development_hash='c'*64,revision='fixture',legacy_verification=fixture_receipt())
         old=Match.objects.create(fingerprint=digest('old-sealed'),played_at=datetime(2026,9,18,tzinfo=UTC),source='api',battle_type='soloRanked')
         new=Match.objects.create(fingerprint=digest('new'),played_at=datetime(2026,9,26,tzinfo=UTC),source='api',battle_type='soloRanked',winner_side='a')
         brawlers=list(Brawler.objects.order_by('id')[:5])

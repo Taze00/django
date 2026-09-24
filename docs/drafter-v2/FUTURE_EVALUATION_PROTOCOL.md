@@ -1,6 +1,6 @@
 # Next independent window — prepared protocol, NOT REGISTERED
 
-D-019 implements admission/membership infrastructure. No real window has been
+D-019 implements admission/membership infrastructure; D-022 schema 2 binds the verified Legacy bundle receipt. No real window has been
 registered, sealed, evaluated or added to training. Example timestamps/hashes in
 tests are synthetic fixtures. Do not substitute them into a real registration.
 Old holdout and recorded comparisons remain permanently closed to development.
@@ -29,19 +29,21 @@ Before choosing prospective start/end timestamps, freeze and archive:
   timestamp. All candidate/feature/hyperparameter decisions use Train/Validation
   only. Rejected opponent models remain rejected. New candidate work needs its
   own preregistered development protocol and must finish before registration.
-- An independently audited **Train-only Legacy input bundle**, including catalog,
-  provider statistics, priors, configuration, patch/map/mode resolution and source
+- An independently audited **Legacy bundle with Train-only empirical inputs and frozen manual constants**, including catalog,
+  provider statistics, separately labeled fixed priors, configuration, patch/map/mode resolution and source
   membership. Use the unchanged Legacy scorer/probability path. Freeze its hash
   before the future window. No online post-window aggregates may enter scoring.
 
 The current runtime Legacy loaded-input digest is NOT such a bundle: it is a
 context-specific hash, not restorable statistics nor verified Train-only lineage.
-Historical Legacy aggregate timing is not repaired by labeling it frozen. This
-bundle remains a prerequisite; infrastructure does not manufacture or verify its
-lineage from a hash. `register()` is a low-level contract called only after that
-independent bundle audit. Its `frozen_train_only_verified` field records the
-caller's established prerequisite, not a computed audit result. No real call has
-been made, and no fair-comparison readiness claim is made here.
+Historical Legacy aggregate timing is not repaired by labeling it frozen. D-022 has now independently verified this prerequisite; the successful receipt
+is LEGACY_BUNDLE_VERIFICATION.json and artifact identities are pinned in
+LEGACY_BUNDLE_ARTIFACTS.json. A runtime digest alone still cannot prove lineage. `register()` is a low-level contract called only after that
+independent bundle audit. Schema 2 requires the independently verified bundle receipt, bound to its
+content hash, under `train_empirical_frozen_manual_constants_v1`. Manual priors
+are algorithmic constants, never Train-derived observations. No real registration call has been made. Bundle readiness is established within
+its documented frozen context; prospective dates, acquisition and common-context/
+patch eligibility rules still need to be pinned before opening a window.
 
 After prerequisites, choose a fixed prospective calendar window (planned 14 days)
 strictly after registration and every development observation. Freeze dates and
@@ -138,3 +140,48 @@ true-development-end coverage passed (1.027 s). Fixtures are explicitly syntheti
 
 
 D-021 prerequisite audit: current exact Legacy overlay has 137 demo priors, including all 137 resolved for Hideout. Train content verified independently, but an exact all-inputs-Train-only bundle is scientifically blocked. No real register() call is allowed. LEGACY_TRAIN_BUNDLE.md records the input-policy decision needed; no silent conversion/removal of priors.
+
+
+## D-022 authorized baseline policy
+The exact 20 Brawler/90 Counter/27 Synergy priors are now permitted as frozen
+pre-existing B constants. All empirical statistics must be rebuilt solely from
+pinned Train. This supersedes the D-021 all-inputs-Train-only blocker, preserving
+its historical audit. Operational build, independent raw-count verification,
+archive-only exact-path replay, A/B/C classification and freeze clock are in
+LEGACY_BUNDLE_RUNBOOK.md. No production/default scoring or V2 change.
+
+Registration schema 2 rejects missing/failed receipts, mismatched bundle hashes,
+required unknown inputs, missing verification checks and a freeze later than
+registration. Keep the original receipt and digest pinned outside the bundle;
+receipts are evidence from the verifier, not a trusted claim merely because a
+caller supplies a JSON object. No real registration occurs as part of bundle
+construction. Current evidence still contains zero independent new soloRanked;
+no collector retry is authorized in D-022.
+
+
+## D-022 verification result
+
+D-022 verification complete. Two fresh builds produced identical canonical content
+SHA-256 `23069ec9ec9cbbc8b7475e590c18e9548c4666395834886e12c0cd8436830527`.
+6,094 pinned Train matches produced 94,302 empirical rows: 10,772 Brawler,
+45,698 Counter and 37,832 Synergy; zero empirical Build rows. All 137 prior
+records remain content-identical. Independent raw-count/membership verification
+passed for every empirical row; archive-only replay passed all 28 complete-team
+probability/Last-Pick ranking contexts with zero Match and RawPayload rows.
+
+The verified artifact is persisted privately as
+`data/brawl_reports/legacy-evaluation-23069ec9ec9cbbc8b7475e590c18e9548c4666395834886e12c0cd8436830527.json.gz`
+(4,728,874 compressed bytes). Input archive, second rebuild and replay receipt are
+also retained. `LEGACY_BUNDLE_ARTIFACTS.json` pins their byte/content hashes and
+builder hashes; `LEGACY_BUNDLE_VERIFICATION.json` is the independent successful
+receipt. `LEGACY_BUNDLE_CLASSIFICATION.json` records field-level A/B classification
+and explicit optional unknowns; required unknown inputs are absent within the
+verified scoring scope. Runtime aggregate hashes were not used as lineage proof.
+
+Final focused tests: 20 passed (4.342 s), covering archive tampering, metadata-only
+provenance queries, Train tampering, exact Legacy parity, verification failure
+guards and schema-2 prospective registration gates. Legacy implementation,
+aggregator formulas, default runtime and V2 artifact are unchanged. No model fit,
+quality evaluation, mechanics research, collector retry or real window registration.
+The initial unused shared-raw-body prefetch and its corrected export are disclosed
+in LEGACY_BUNDLE_RUNBOOK.md; no non-Train observations entered empirical aggregates.

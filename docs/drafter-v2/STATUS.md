@@ -1,3 +1,32 @@
+RESUME FROM: D-022 VERIFIED frozen Legacy evaluation bundle. The manual-prior policy blocker is resolved; empirical inputs are rebuilt strictly from Train and priors are frozen B constants. Future window remains NOT REGISTERED. Latest collection evidence is still DATA_UNAVAILABLE (run 6); no collector retry authorized or performed in this task. Read LEGACY_BUNDLE_RUNBOOK.md and FUTURE_EVALUATION_PROTOCOL.md.
+
+D-022 verification complete. Two fresh builds produced identical canonical content
+SHA-256 `23069ec9ec9cbbc8b7475e590c18e9548c4666395834886e12c0cd8436830527`.
+6,094 pinned Train matches produced 94,302 empirical rows: 10,772 Brawler,
+45,698 Counter and 37,832 Synergy; zero empirical Build rows. All 137 prior
+records remain content-identical. Independent raw-count/membership verification
+passed for every empirical row; archive-only replay passed all 28 complete-team
+probability/Last-Pick ranking contexts with zero Match and RawPayload rows.
+
+The verified artifact is persisted privately as
+`data/brawl_reports/legacy-evaluation-23069ec9ec9cbbc8b7475e590c18e9548c4666395834886e12c0cd8436830527.json.gz`
+(4,728,874 compressed bytes). Input archive, second rebuild and replay receipt are
+also retained. `LEGACY_BUNDLE_ARTIFACTS.json` pins their byte/content hashes and
+builder hashes; `LEGACY_BUNDLE_VERIFICATION.json` is the independent successful
+receipt. `LEGACY_BUNDLE_CLASSIFICATION.json` records field-level A/B classification
+and explicit optional unknowns; required unknown inputs are absent within the
+verified scoring scope. Runtime aggregate hashes were not used as lineage proof.
+
+Final focused tests: 20 passed (4.342 s), covering archive tampering, metadata-only
+provenance queries, Train tampering, exact Legacy parity, verification failure
+guards and schema-2 prospective registration gates. Legacy implementation,
+aggregator formulas, default runtime and V2 artifact are unchanged. No model fit,
+quality evaluation, mechanics research, collector retry or real window registration.
+The initial unused shared-raw-body prefetch and its corrected export are disclosed
+in LEGACY_BUNDLE_RUNBOOK.md; no non-Train observations entered empirical aggregates.
+
+Next valid continuation: pin the successful receipt/code/V2 hashes and preregister the prospective acquisition/retention plan, fixed dates and exact common-context/patch exclusion rules before any future test window starts. Eligibility requires genuine independent soloRanked; shadow reports/trophy matches cannot replace it. No collection may run under this completed task. Continue using the existing Challenger with Legacy default while evidence is unavailable. Historical resume lines below are superseded.
+
 RESUME FROM: D-021 BLOCKED_PRIOR_LINEAGE. Exact Legacy overlay resolves 137 demo priors (20 Brawler/90 Counter/27 Synergy), which cannot be certified Train-only. All 6,094 Train examples independently match the pinned content hash. No verified bundle built/published; no window registered. Read LEGACY_TRAIN_BUNDLE.md for the precise prerequisite conflict. Resolving it requires an explicit comparison-input policy decision, not another collector retry or fabricated lineage.
 
 Latest validation: 14 bundle/Legacy-parity/future-window regressions passed (5.024 s); read-only real Train/prior audit reproduced. Collection run 6 is complete: three HTTP 200, zero ranking requests/retries, 50 new trophy matches, zero eligible soloRanked (DATA_UNAVAILABLE). 31 collector/growth tests passed (12.849 s). No immediate collection retry. Legacy, V2 weights, live data and closed holdout unchanged. Worktree artifacts: FRONTIER_REVISIT_2026-09-24.json and LEGACY_TRAIN_BUNDLE_PREFLIGHT.json.

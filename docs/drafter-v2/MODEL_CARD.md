@@ -78,3 +78,9 @@ D-019: active V unchanged; opponent feature rejection retained. Shadow and futur
 
 
 D-021 active V2 artifact byte hash unchanged; no training or model search. Exact Legacy Train-only bundle remains blocked on curated demo priors. Default Legacy provider/scorer unchanged.
+
+
+D-022: V2 artifact unchanged. Fair future Legacy comparison permits frozen pre-existing manual constants alongside empirical Train-only statistics. No model fitting, tuning, activation or default change.
+
+
+D-022 result: VERIFIED bundle 23069ec9ec9cbbc8b7475e590c18e9548c4666395834886e12c0cd8436830527. 94,302 empirical rows from 6,094 Train; 137 identical B priors; two identical builds, independent all-row counts/membership and 28 archive-only scoring replays passed. 20 focused tests passed (4.342 s). No future window registered; independent soloRanked evidence remains unavailable in the latest collection report. Exact contracts/limits: LEGACY_BUNDLE_RUNBOOK.md and verification/artifact JSONs.

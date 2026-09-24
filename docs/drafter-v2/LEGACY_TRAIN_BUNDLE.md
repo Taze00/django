@@ -1,3 +1,8 @@
+> Historical D-021 audit. The user superseded its all-inputs-Train-only policy
+> in D-022: the 137 existing priors may be frozen B constants. See
+> LEGACY_BUNDLE_RUNBOOK.md for the new empirical-Train-only build and verification.
+> The original finding that these priors are not Train-derived remains correct.
+
 # Exact Train-only Legacy bundle — BLOCKED_PRIOR_LINEAGE
 
 The collection prerequisite was attempted exactly once as run 6. The separate

@@ -10,7 +10,7 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-SCHEMA = 'drafter-future-window-1'
+SCHEMA = 'drafter-future-window-2'
 OLD_END = datetime(2026, 9, 18, 15, 4, 42, tzinfo=timezone.utc)
 POLICY = {
     'source': 'api', 'battle_type': 'soloRanked', 'sampling': 'tagged_frontier_v1',
@@ -47,19 +47,29 @@ def validate(protocol):
         raise ValueError('Frozen model, Legacy input bundle and development membership hashes required')
     if not isinstance(protocol.get('code_revision'), str) or not protocol['code_revision'].strip() or protocol['code_revision'] == 'UNKNOWN':
         raise ValueError('Code revision required')
+    receipt=protocol.get('legacy_verification', {})
+    if (receipt.get('schema')!='legacy-bundle-verification-1' or receipt.get('status')!='VERIFIED'
+            or receipt.get('bundle_sha256')!=protocol['legacy_bundle_sha256']
+            or receipt.get('policy')!='train_empirical_frozen_manual_constants_v1'
+            or receipt.get('required_unknown_inputs')!=[]
+            or any(receipt.get('checks',{}).get(key) is not True for key in
+                   ('independent_rebuild','independent_raw_counts','prior_identity','train_membership','scoring_replay'))):
+        raise ValueError('Verified Legacy bundle receipt required')
     registered, development, start, end = (timestamp(protocol[k]) for k in ('registered_at','development_end','start_exclusive','end_inclusive'))
+    if timestamp(receipt['frozen_at'])>registered:
+        raise ValueError('Legacy inputs must be frozen before registration')
     if not (development <= registered < start < end and start > OLD_END):
         raise ValueError('Future window must follow registration and all development data')
-    if protocol.get('legacy_input_policy') != 'frozen_train_only_verified':
-        raise ValueError('Legacy bundle must have verified Train-only input lineage')
+    if protocol.get('legacy_input_policy') != 'train_empirical_frozen_manual_constants_v1':
+        raise ValueError('Legacy bundle requires Train-only empirical inputs and frozen manual constants')
 
 
-def register(*, now, development_end, start, end, v2_hash, legacy_hash, development_hash, revision):
-    value = {'schema': SCHEMA, 'policy': POLICY.copy(), 'registered_at': now.isoformat(),
+def register(*, now, development_end, start, end, v2_hash, legacy_hash, development_hash, revision, legacy_verification):
+    value = {'schema': SCHEMA, 'policy': POLICY.copy(), 'legacy_verification': legacy_verification, 'registered_at': now.isoformat(),
              'development_end': development_end, 'start_exclusive': start, 'end_inclusive': end,
              'v2_artifact_sha256': v2_hash, 'legacy_bundle_sha256': legacy_hash,
              'development_membership_sha256': development_hash, 'code_revision': revision,
-             'legacy_input_policy': 'frozen_train_only_verified'}
+             'legacy_input_policy': 'train_empirical_frozen_manual_constants_v1'}
     validate(value)
     return value
 
