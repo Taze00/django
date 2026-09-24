@@ -212,3 +212,6 @@ D-023 acquisition pilot is not an evaluation. Pilot sampling is excluded from pr
 
 
 D-023 pilot completed (run 7, 2026-09-24T16:22:13Z–16:24:00Z): acquisition feasibility demonstrated. Ten battlelog HTTP 200, zero retries/ranking requests. 340 authentic observed query roots; 250 raw entries: 201 trophy ranked, 33 soloRanked, 16 type UNKNOWN. Parser retained all 33 soloRanked; 60 unsupported/non-3v3 entries skipped, zero parser errors or future-dated records. 185 newly imported matches: 152 trophy and 33 eligible soloRanked; five trophy duplicates, zero conflicts. 1,031 additional query tags; discovery frontier 1,371, eligible Ranked-evidence frontier 56. Independent raw/parser/import audit agrees. Pilot matches remain permanently excluded from future test membership and automatic training.
+
+
+D-024: schema 3 freezes common coverage (28 map/mode pairs, 106 supported Ranked-available Brawlers), canonical side orientation and frozen Legacy patch convention. Reject mismatched catalog/protocol/code provenance. No prospective metrics until immutable post-window sealing; minimum 1,000 is operational, not power.

@@ -87,3 +87,6 @@ D-022 result: VERIFIED bundle 23069ec9ec9cbbc8b7475e590c18e9548c4666395834886e12
 
 
 D-023 preserves model weights and Legacy default. Discovery/query frontier expansion is an acquisition test only; trophy discoveries are not Ranked model evidence and pilot matches are not future test membership.
+
+
+D-024: future baseline uses unchanged verified D-022 scoring clock/configuration and algorithmic patch ID 1. Actual prospective game patch remains UNKNOWN. 33 pilot matches demonstrate acquisition only; no quality/promotional claim or model change.

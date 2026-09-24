@@ -1,0 +1,1921 @@
+{
+  "common_context": {
+    "actual_game_patch": "UNKNOWN_not_supplied_by_battlelog_no_patch_specific_claim",
+    "allowed_import_patch_ids": [
+      1
+    ],
+    "brawler_ids": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106
+    ],
+    "catalog_identity": [
+      {
+        "external_id": "16000035",
+        "model": "drafter.brawler",
+        "name": "Gale",
+        "pk": 1,
+        "slug": "gale"
+      },
+      {
+        "external_id": "16000046",
+        "model": "drafter.brawler",
+        "name": "Belle",
+        "pk": 2,
+        "slug": "belle"
+      },
+      {
+        "external_id": "16000032",
+        "model": "drafter.brawler",
+        "name": "Max",
+        "pk": 3,
+        "slug": "max"
+      },
+      {
+        "external_id": "16000062",
+        "model": "drafter.brawler",
+        "name": "Buster",
+        "pk": 4,
+        "slug": "buster"
+      },
+      {
+        "external_id": "16000021",
+        "model": "drafter.brawler",
+        "name": "Gene",
+        "pk": 5,
+        "slug": "gene"
+      },
+      {
+        "external_id": "16000022",
+        "model": "drafter.brawler",
+        "name": "Tick",
+        "pk": 6,
+        "slug": "tick"
+      },
+      {
+        "external_id": "16000039",
+        "model": "drafter.brawler",
+        "name": "Colette",
+        "pk": 7,
+        "slug": "colette"
+      },
+      {
+        "external_id": "16000015",
+        "model": "drafter.brawler",
+        "name": "Piper",
+        "pk": 8,
+        "slug": "piper"
+      },
+      {
+        "external_id": "16000011",
+        "model": "drafter.brawler",
+        "name": "Mortis",
+        "pk": 9,
+        "slug": "mortis"
+      },
+      {
+        "external_id": "16000002",
+        "model": "drafter.brawler",
+        "name": "Bull",
+        "pk": 10,
+        "slug": "bull"
+      },
+      {
+        "external_id": "16000018",
+        "model": "drafter.brawler",
+        "name": "Darryl",
+        "pk": 11,
+        "slug": "darryl"
+      },
+      {
+        "external_id": "16000028",
+        "model": "drafter.brawler",
+        "name": "Sandy",
+        "pk": 12,
+        "slug": "sandy"
+      },
+      {
+        "external_id": "16000038",
+        "model": "drafter.brawler",
+        "name": "Surge",
+        "pk": 13,
+        "slug": "surge"
+      },
+      {
+        "external_id": "16000045",
+        "model": "drafter.brawler",
+        "name": "Stu",
+        "pk": 14,
+        "slug": "stu"
+      },
+      {
+        "external_id": "16000013",
+        "model": "drafter.brawler",
+        "name": "Poco",
+        "pk": 15,
+        "slug": "poco"
+      },
+      {
+        "external_id": "16000003",
+        "model": "drafter.brawler",
+        "name": "Brock",
+        "pk": 16,
+        "slug": "brock"
+      },
+      {
+        "external_id": "16000016",
+        "model": "drafter.brawler",
+        "name": "Pam",
+        "pk": 17,
+        "slug": "pam"
+      },
+      {
+        "external_id": "16000020",
+        "model": "drafter.brawler",
+        "name": "Frank",
+        "pk": 18,
+        "slug": "frank"
+      },
+      {
+        "external_id": "16000006",
+        "model": "drafter.brawler",
+        "name": "Barley",
+        "pk": 19,
+        "slug": "barley"
+      },
+      {
+        "external_id": "16000024",
+        "model": "drafter.brawler",
+        "name": "Rosa",
+        "pk": 20,
+        "slug": "rosa"
+      },
+      {
+        "external_id": "16000000",
+        "model": "drafter.brawler",
+        "name": "SHELLY",
+        "pk": 21,
+        "slug": "shelly"
+      },
+      {
+        "external_id": "16000001",
+        "model": "drafter.brawler",
+        "name": "COLT",
+        "pk": 22,
+        "slug": "colt"
+      },
+      {
+        "external_id": "16000004",
+        "model": "drafter.brawler",
+        "name": "RICO",
+        "pk": 23,
+        "slug": "rico"
+      },
+      {
+        "external_id": "16000005",
+        "model": "drafter.brawler",
+        "name": "SPIKE",
+        "pk": 24,
+        "slug": "spike"
+      },
+      {
+        "external_id": "16000007",
+        "model": "drafter.brawler",
+        "name": "JESSIE",
+        "pk": 25,
+        "slug": "jessie"
+      },
+      {
+        "external_id": "16000008",
+        "model": "drafter.brawler",
+        "name": "NITA",
+        "pk": 26,
+        "slug": "nita"
+      },
+      {
+        "external_id": "16000009",
+        "model": "drafter.brawler",
+        "name": "DYNAMIKE",
+        "pk": 27,
+        "slug": "dynamike"
+      },
+      {
+        "external_id": "16000010",
+        "model": "drafter.brawler",
+        "name": "EL PRIMO",
+        "pk": 28,
+        "slug": "el-primo"
+      },
+      {
+        "external_id": "16000012",
+        "model": "drafter.brawler",
+        "name": "CROW",
+        "pk": 29,
+        "slug": "crow"
+      },
+      {
+        "external_id": "16000014",
+        "model": "drafter.brawler",
+        "name": "BO",
+        "pk": 30,
+        "slug": "bo"
+      },
+      {
+        "external_id": "16000017",
+        "model": "drafter.brawler",
+        "name": "TARA",
+        "pk": 31,
+        "slug": "tara"
+      },
+      {
+        "external_id": "16000019",
+        "model": "drafter.brawler",
+        "name": "PENNY",
+        "pk": 32,
+        "slug": "penny"
+      },
+      {
+        "external_id": "16000023",
+        "model": "drafter.brawler",
+        "name": "LEON",
+        "pk": 33,
+        "slug": "leon"
+      },
+      {
+        "external_id": "16000025",
+        "model": "drafter.brawler",
+        "name": "CARL",
+        "pk": 34,
+        "slug": "carl"
+      },
+      {
+        "external_id": "16000026",
+        "model": "drafter.brawler",
+        "name": "BIBI",
+        "pk": 35,
+        "slug": "bibi"
+      },
+      {
+        "external_id": "16000027",
+        "model": "drafter.brawler",
+        "name": "8-BIT",
+        "pk": 36,
+        "slug": "8-bit"
+      },
+      {
+        "external_id": "16000029",
+        "model": "drafter.brawler",
+        "name": "BEA",
+        "pk": 37,
+        "slug": "bea"
+      },
+      {
+        "external_id": "16000030",
+        "model": "drafter.brawler",
+        "name": "EMZ",
+        "pk": 38,
+        "slug": "emz"
+      },
+      {
+        "external_id": "16000031",
+        "model": "drafter.brawler",
+        "name": "MR. P",
+        "pk": 39,
+        "slug": "mr-p"
+      },
+      {
+        "external_id": "16000034",
+        "model": "drafter.brawler",
+        "name": "JACKY",
+        "pk": 40,
+        "slug": "jacky"
+      },
+      {
+        "external_id": "16000036",
+        "model": "drafter.brawler",
+        "name": "NANI",
+        "pk": 41,
+        "slug": "nani"
+      },
+      {
+        "external_id": "16000037",
+        "model": "drafter.brawler",
+        "name": "SPROUT",
+        "pk": 42,
+        "slug": "sprout"
+      },
+      {
+        "external_id": "16000040",
+        "model": "drafter.brawler",
+        "name": "AMBER",
+        "pk": 43,
+        "slug": "amber"
+      },
+      {
+        "external_id": "16000041",
+        "model": "drafter.brawler",
+        "name": "LOU",
+        "pk": 44,
+        "slug": "lou"
+      },
+      {
+        "external_id": "16000042",
+        "model": "drafter.brawler",
+        "name": "BYRON",
+        "pk": 45,
+        "slug": "byron"
+      },
+      {
+        "external_id": "16000043",
+        "model": "drafter.brawler",
+        "name": "EDGAR",
+        "pk": 46,
+        "slug": "edgar"
+      },
+      {
+        "external_id": "16000044",
+        "model": "drafter.brawler",
+        "name": "RUFFS",
+        "pk": 47,
+        "slug": "ruffs"
+      },
+      {
+        "external_id": "16000047",
+        "model": "drafter.brawler",
+        "name": "SQUEAK",
+        "pk": 48,
+        "slug": "squeak"
+      },
+      {
+        "external_id": "16000048",
+        "model": "drafter.brawler",
+        "name": "GROM",
+        "pk": 49,
+        "slug": "grom"
+      },
+      {
+        "external_id": "16000049",
+        "model": "drafter.brawler",
+        "name": "BUZZ",
+        "pk": 50,
+        "slug": "buzz"
+      },
+      {
+        "external_id": "16000050",
+        "model": "drafter.brawler",
+        "name": "GRIFF",
+        "pk": 51,
+        "slug": "griff"
+      },
+      {
+        "external_id": "16000051",
+        "model": "drafter.brawler",
+        "name": "ASH",
+        "pk": 52,
+        "slug": "ash"
+      },
+      {
+        "external_id": "16000052",
+        "model": "drafter.brawler",
+        "name": "MEG",
+        "pk": 53,
+        "slug": "meg"
+      },
+      {
+        "external_id": "16000053",
+        "model": "drafter.brawler",
+        "name": "LOLA",
+        "pk": 54,
+        "slug": "lola"
+      },
+      {
+        "external_id": "16000054",
+        "model": "drafter.brawler",
+        "name": "FANG",
+        "pk": 55,
+        "slug": "fang"
+      },
+      {
+        "external_id": "16000056",
+        "model": "drafter.brawler",
+        "name": "EVE",
+        "pk": 56,
+        "slug": "eve"
+      },
+      {
+        "external_id": "16000057",
+        "model": "drafter.brawler",
+        "name": "JANET",
+        "pk": 57,
+        "slug": "janet"
+      },
+      {
+        "external_id": "16000058",
+        "model": "drafter.brawler",
+        "name": "BONNIE",
+        "pk": 58,
+        "slug": "bonnie"
+      },
+      {
+        "external_id": "16000059",
+        "model": "drafter.brawler",
+        "name": "OTIS",
+        "pk": 59,
+        "slug": "otis"
+      },
+      {
+        "external_id": "16000060",
+        "model": "drafter.brawler",
+        "name": "SAM",
+        "pk": 60,
+        "slug": "sam"
+      },
+      {
+        "external_id": "16000061",
+        "model": "drafter.brawler",
+        "name": "GUS",
+        "pk": 61,
+        "slug": "gus"
+      },
+      {
+        "external_id": "16000063",
+        "model": "drafter.brawler",
+        "name": "CHESTER",
+        "pk": 62,
+        "slug": "chester"
+      },
+      {
+        "external_id": "16000064",
+        "model": "drafter.brawler",
+        "name": "GRAY",
+        "pk": 63,
+        "slug": "gray"
+      },
+      {
+        "external_id": "16000065",
+        "model": "drafter.brawler",
+        "name": "MANDY",
+        "pk": 64,
+        "slug": "mandy"
+      },
+      {
+        "external_id": "16000066",
+        "model": "drafter.brawler",
+        "name": "R-T",
+        "pk": 65,
+        "slug": "r-t"
+      },
+      {
+        "external_id": "16000067",
+        "model": "drafter.brawler",
+        "name": "WILLOW",
+        "pk": 66,
+        "slug": "willow"
+      },
+      {
+        "external_id": "16000068",
+        "model": "drafter.brawler",
+        "name": "MAISIE",
+        "pk": 67,
+        "slug": "maisie"
+      },
+      {
+        "external_id": "16000069",
+        "model": "drafter.brawler",
+        "name": "HANK",
+        "pk": 68,
+        "slug": "hank"
+      },
+      {
+        "external_id": "16000070",
+        "model": "drafter.brawler",
+        "name": "CORDELIUS",
+        "pk": 69,
+        "slug": "cordelius"
+      },
+      {
+        "external_id": "16000071",
+        "model": "drafter.brawler",
+        "name": "DOUG",
+        "pk": 70,
+        "slug": "doug"
+      },
+      {
+        "external_id": "16000072",
+        "model": "drafter.brawler",
+        "name": "PEARL",
+        "pk": 71,
+        "slug": "pearl"
+      },
+      {
+        "external_id": "16000073",
+        "model": "drafter.brawler",
+        "name": "CHUCK",
+        "pk": 72,
+        "slug": "chuck"
+      },
+      {
+        "external_id": "16000074",
+        "model": "drafter.brawler",
+        "name": "CHARLIE",
+        "pk": 73,
+        "slug": "charlie"
+      },
+      {
+        "external_id": "16000075",
+        "model": "drafter.brawler",
+        "name": "MICO",
+        "pk": 74,
+        "slug": "mico"
+      },
+      {
+        "external_id": "16000076",
+        "model": "drafter.brawler",
+        "name": "KIT",
+        "pk": 75,
+        "slug": "kit"
+      },
+      {
+        "external_id": "16000077",
+        "model": "drafter.brawler",
+        "name": "LARRY & LAWRIE",
+        "pk": 76,
+        "slug": "larry-lawrie"
+      },
+      {
+        "external_id": "16000078",
+        "model": "drafter.brawler",
+        "name": "MELODIE",
+        "pk": 77,
+        "slug": "melodie"
+      },
+      {
+        "external_id": "16000079",
+        "model": "drafter.brawler",
+        "name": "ANGELO",
+        "pk": 78,
+        "slug": "angelo"
+      },
+      {
+        "external_id": "16000080",
+        "model": "drafter.brawler",
+        "name": "DRACO",
+        "pk": 79,
+        "slug": "draco"
+      },
+      {
+        "external_id": "16000081",
+        "model": "drafter.brawler",
+        "name": "LILY",
+        "pk": 80,
+        "slug": "lily"
+      },
+      {
+        "external_id": "16000082",
+        "model": "drafter.brawler",
+        "name": "BERRY",
+        "pk": 81,
+        "slug": "berry"
+      },
+      {
+        "external_id": "16000083",
+        "model": "drafter.brawler",
+        "name": "CLANCY",
+        "pk": 82,
+        "slug": "clancy"
+      },
+      {
+        "external_id": "16000084",
+        "model": "drafter.brawler",
+        "name": "MOE",
+        "pk": 83,
+        "slug": "moe"
+      },
+      {
+        "external_id": "16000085",
+        "model": "drafter.brawler",
+        "name": "KENJI",
+        "pk": 84,
+        "slug": "kenji"
+      },
+      {
+        "external_id": "16000086",
+        "model": "drafter.brawler",
+        "name": "SHADE",
+        "pk": 85,
+        "slug": "shade"
+      },
+      {
+        "external_id": "16000087",
+        "model": "drafter.brawler",
+        "name": "JUJU",
+        "pk": 86,
+        "slug": "juju"
+      },
+      {
+        "external_id": "16000089",
+        "model": "drafter.brawler",
+        "name": "MEEPLE",
+        "pk": 87,
+        "slug": "meeple"
+      },
+      {
+        "external_id": "16000090",
+        "model": "drafter.brawler",
+        "name": "OLLIE",
+        "pk": 88,
+        "slug": "ollie"
+      },
+      {
+        "external_id": "16000091",
+        "model": "drafter.brawler",
+        "name": "LUMI",
+        "pk": 89,
+        "slug": "lumi"
+      },
+      {
+        "external_id": "16000092",
+        "model": "drafter.brawler",
+        "name": "FINX",
+        "pk": 90,
+        "slug": "finx"
+      },
+      {
+        "external_id": "16000093",
+        "model": "drafter.brawler",
+        "name": "JAE-YONG",
+        "pk": 91,
+        "slug": "jae-yong"
+      },
+      {
+        "external_id": "16000094",
+        "model": "drafter.brawler",
+        "name": "KAZE",
+        "pk": 92,
+        "slug": "kaze"
+      },
+      {
+        "external_id": "16000095",
+        "model": "drafter.brawler",
+        "name": "ALLI",
+        "pk": 93,
+        "slug": "alli"
+      },
+      {
+        "external_id": "16000096",
+        "model": "drafter.brawler",
+        "name": "TRUNK",
+        "pk": 94,
+        "slug": "trunk"
+      },
+      {
+        "external_id": "16000097",
+        "model": "drafter.brawler",
+        "name": "MINA",
+        "pk": 95,
+        "slug": "mina"
+      },
+      {
+        "external_id": "16000098",
+        "model": "drafter.brawler",
+        "name": "ZIGGY",
+        "pk": 96,
+        "slug": "ziggy"
+      },
+      {
+        "external_id": "16000099",
+        "model": "drafter.brawler",
+        "name": "PIERCE",
+        "pk": 97,
+        "slug": "pierce"
+      },
+      {
+        "external_id": "16000100",
+        "model": "drafter.brawler",
+        "name": "GIGI",
+        "pk": 98,
+        "slug": "gigi"
+      },
+      {
+        "external_id": "16000101",
+        "model": "drafter.brawler",
+        "name": "GLOWY",
+        "pk": 99,
+        "slug": "glowy"
+      },
+      {
+        "external_id": "16000102",
+        "model": "drafter.brawler",
+        "name": "SIRIUS",
+        "pk": 100,
+        "slug": "sirius"
+      },
+      {
+        "external_id": "16000103",
+        "model": "drafter.brawler",
+        "name": "NAJIA",
+        "pk": 101,
+        "slug": "najia"
+      },
+      {
+        "external_id": "16000104",
+        "model": "drafter.brawler",
+        "name": "DAMIAN",
+        "pk": 102,
+        "slug": "damian"
+      },
+      {
+        "external_id": "16000105",
+        "model": "drafter.brawler",
+        "name": "STARR NOVA",
+        "pk": 103,
+        "slug": "starr-nova"
+      },
+      {
+        "external_id": "16000106",
+        "model": "drafter.brawler",
+        "name": "BOLT",
+        "pk": 104,
+        "slug": "bolt"
+      },
+      {
+        "external_id": "16000107",
+        "model": "drafter.brawler",
+        "name": "NORI",
+        "pk": 105,
+        "slug": "nori"
+      },
+      {
+        "external_id": "16000108",
+        "model": "drafter.brawler",
+        "name": "WENDY",
+        "pk": 106,
+        "slug": "wendy"
+      },
+      {
+        "external_id": "16000109",
+        "model": "drafter.brawler",
+        "name": "COSMO",
+        "pk": 107,
+        "slug": "cosmo"
+      },
+      {
+        "external_id": "16000110",
+        "model": "drafter.brawler",
+        "name": "VINCE",
+        "pk": 108,
+        "slug": "vince"
+      },
+      {
+        "external_id": "0",
+        "model": "drafter.gamemode",
+        "name": "Gem Grab",
+        "pk": 1,
+        "slug": "gem-grab"
+      },
+      {
+        "external_id": "5",
+        "model": "drafter.gamemode",
+        "name": "Brawl Ball",
+        "pk": 2,
+        "slug": "brawl-ball"
+      },
+      {
+        "external_id": "20",
+        "model": "drafter.gamemode",
+        "name": "Knockout",
+        "pk": 3,
+        "slug": "knockout"
+      },
+      {
+        "external_id": "2",
+        "model": "drafter.gamemode",
+        "name": "Heist",
+        "pk": 4,
+        "slug": "heist"
+      },
+      {
+        "external_id": "3",
+        "model": "drafter.gamemode",
+        "name": "Bounty",
+        "pk": 5,
+        "slug": "bounty"
+      },
+      {
+        "external_id": "17",
+        "model": "drafter.gamemode",
+        "name": "Hot Zone",
+        "pk": 6,
+        "slug": "hot-zone"
+      },
+      {
+        "external_id": "31",
+        "model": "drafter.gamemode",
+        "name": "Wipeout",
+        "pk": 7,
+        "slug": "wipeout"
+      },
+      {
+        "external_id": "32",
+        "model": "drafter.gamemode",
+        "name": "Brawl Ball (32)",
+        "pk": 8,
+        "slug": "brawl-ball-32"
+      },
+      {
+        "external_id": "25",
+        "model": "drafter.gamemode",
+        "name": "Wipeout (25)",
+        "pk": 9,
+        "slug": "wipeout-25"
+      },
+      {
+        "external_id": "45",
+        "model": "drafter.gamemode",
+        "name": "Brawl Ball (45)",
+        "pk": 10,
+        "slug": "brawl-ball-45"
+      },
+      {
+        "external_id": "22",
+        "model": "drafter.gamemode",
+        "name": "Basket Brawl",
+        "pk": 11,
+        "slug": "basket-brawl"
+      },
+      {
+        "external_id": "48",
+        "model": "drafter.gamemode",
+        "name": "Siege",
+        "pk": 12,
+        "slug": "siege"
+      },
+      {
+        "external_id": "35",
+        "model": "drafter.gamemode",
+        "name": "Knockout (35)",
+        "pk": 13,
+        "slug": "knockout-35"
+      },
+      {
+        "external_id": "57",
+        "model": "drafter.gamemode",
+        "name": "Brawl Ball (57)",
+        "pk": 14,
+        "slug": "brawl-ball-57"
+      },
+      {
+        "external_id": "33",
+        "model": "drafter.gamemode",
+        "name": "Gem Grab (33)",
+        "pk": 15,
+        "slug": "gem-grab-33"
+      },
+      {
+        "external_id": "15000007",
+        "game_mode_id": 1,
+        "model": "drafter.brawlmap",
+        "name": "Hard Rock Mine",
+        "pk": 1,
+        "slug": "hard-rock-mine"
+      },
+      {
+        "external_id": "15000011",
+        "game_mode_id": 1,
+        "model": "drafter.brawlmap",
+        "name": "Undermine",
+        "pk": 2,
+        "slug": "undermine"
+      },
+      {
+        "external_id": "15000024",
+        "game_mode_id": 2,
+        "model": "drafter.brawlmap",
+        "name": "Backyard Bowl",
+        "pk": 3,
+        "slug": "backyard-bowl"
+      },
+      {
+        "external_id": "15000132",
+        "game_mode_id": 2,
+        "model": "drafter.brawlmap",
+        "name": "Center Stage",
+        "pk": 4,
+        "slug": "center-stage"
+      },
+      {
+        "external_id": "15000368",
+        "game_mode_id": 3,
+        "model": "drafter.brawlmap",
+        "name": "Belle's Rock",
+        "pk": 5,
+        "slug": "belles-rock"
+      },
+      {
+        "external_id": "15000367",
+        "game_mode_id": 3,
+        "model": "drafter.brawlmap",
+        "name": "Goldarm Gulch",
+        "pk": 6,
+        "slug": "goldarm-gulch"
+      },
+      {
+        "external_id": "15000019",
+        "game_mode_id": 4,
+        "model": "drafter.brawlmap",
+        "name": "Safe Zone",
+        "pk": 7,
+        "slug": "safe-zone"
+      },
+      {
+        "external_id": null,
+        "game_mode_id": 5,
+        "model": "drafter.brawlmap",
+        "name": "Snake Prairie",
+        "pk": 8,
+        "slug": "snake-prairie"
+      },
+      {
+        "external_id": "15000440",
+        "game_mode_id": 3,
+        "model": "drafter.brawlmap",
+        "name": "Flaring Phoenix",
+        "pk": 9,
+        "slug": "flaring-phoenix"
+      },
+      {
+        "external_id": "15000292",
+        "game_mode_id": 6,
+        "model": "drafter.brawlmap",
+        "name": "Open Business",
+        "pk": 10,
+        "slug": "open-business"
+      },
+      {
+        "external_id": "15000293",
+        "game_mode_id": 6,
+        "model": "drafter.brawlmap",
+        "name": "Parallel Plays",
+        "pk": 11,
+        "slug": "parallel-plays"
+      },
+      {
+        "external_id": "15000115",
+        "game_mode_id": 1,
+        "model": "drafter.brawlmap",
+        "name": "Double Swoosh",
+        "pk": 12,
+        "slug": "double-swoosh"
+      },
+      {
+        "external_id": "15001021",
+        "game_mode_id": 2,
+        "model": "drafter.brawlmap",
+        "name": "Spiraling Out",
+        "pk": 13,
+        "slug": "spiraling-out"
+      },
+      {
+        "external_id": "15000005",
+        "game_mode_id": 5,
+        "model": "drafter.brawlmap",
+        "name": "Shooting Star",
+        "pk": 14,
+        "slug": "shooting-star"
+      },
+      {
+        "external_id": "15000300",
+        "game_mode_id": 6,
+        "model": "drafter.brawlmap",
+        "name": "Ring of Fire",
+        "pk": 15,
+        "slug": "ring-of-fire"
+      },
+      {
+        "external_id": "15000018",
+        "game_mode_id": 4,
+        "model": "drafter.brawlmap",
+        "name": "Kaboom Canyon",
+        "pk": 16,
+        "slug": "kaboom-canyon"
+      },
+      {
+        "external_id": "15001050",
+        "game_mode_id": 7,
+        "model": "drafter.brawlmap",
+        "name": "Island Of Finality",
+        "pk": 17,
+        "slug": "island-of-finality"
+      },
+      {
+        "external_id": "15000144",
+        "game_mode_id": 2,
+        "model": "drafter.brawlmap",
+        "name": "Sunny Soccer",
+        "pk": 18,
+        "slug": "sunny-soccer"
+      },
+      {
+        "external_id": "15000025",
+        "game_mode_id": 2,
+        "model": "drafter.brawlmap",
+        "name": "Triple Dribble",
+        "pk": 19,
+        "slug": "triple-dribble"
+      },
+      {
+        "external_id": "15000082",
+        "game_mode_id": 5,
+        "model": "drafter.brawlmap",
+        "name": "Layer Cake",
+        "pk": 20,
+        "slug": "layer-cake"
+      },
+      {
+        "external_id": "15001127",
+        "game_mode_id": 3,
+        "model": "drafter.brawlmap",
+        "name": "Chivalry",
+        "pk": 21,
+        "slug": "chivalry"
+      },
+      {
+        "external_id": "15000306",
+        "game_mode_id": 6,
+        "model": "drafter.brawlmap",
+        "name": "Dueling Beetles",
+        "pk": 22,
+        "slug": "dueling-beetles"
+      },
+      {
+        "external_id": "15000050",
+        "game_mode_id": 2,
+        "model": "drafter.brawlmap",
+        "name": "Sneaky Fields",
+        "pk": 23,
+        "slug": "sneaky-fields"
+      },
+      {
+        "external_id": "15001019",
+        "game_mode_id": 3,
+        "model": "drafter.brawlmap",
+        "name": "Streets with No Name",
+        "pk": 24,
+        "slug": "streets-with-no-name"
+      },
+      {
+        "external_id": "15000118",
+        "game_mode_id": 2,
+        "model": "drafter.brawlmap",
+        "name": "Pinball Dreams",
+        "pk": 25,
+        "slug": "pinball-dreams"
+      },
+      {
+        "external_id": "15000919",
+        "game_mode_id": 8,
+        "model": "drafter.brawlmap",
+        "name": "Stockpile Stadium",
+        "pk": 26,
+        "slug": "stockpile-stadium"
+      },
+      {
+        "external_id": "15001244",
+        "game_mode_id": 9,
+        "model": "drafter.brawlmap",
+        "name": "Attrition",
+        "pk": 27,
+        "slug": "attrition"
+      },
+      {
+        "external_id": "15001249",
+        "game_mode_id": 10,
+        "model": "drafter.brawlmap",
+        "name": "Arabesque",
+        "pk": 28,
+        "slug": "arabesque"
+      },
+      {
+        "external_id": "15001043",
+        "game_mode_id": 8,
+        "model": "drafter.brawlmap",
+        "name": "Insane Streamer",
+        "pk": 29,
+        "slug": "insane-streamer"
+      },
+      {
+        "external_id": "15001247",
+        "game_mode_id": 3,
+        "model": "drafter.brawlmap",
+        "name": "Please Remain Standing",
+        "pk": 30,
+        "slug": "please-remain-standing"
+      },
+      {
+        "external_id": "15001331",
+        "game_mode_id": 2,
+        "model": "drafter.brawlmap",
+        "name": "Pump It Up",
+        "pk": 31,
+        "slug": "pump-it-up"
+      },
+      {
+        "external_id": "15000053",
+        "game_mode_id": 4,
+        "model": "drafter.brawlmap",
+        "name": "Hot Potato",
+        "pk": 32,
+        "slug": "hot-potato"
+      },
+      {
+        "external_id": "15000022",
+        "game_mode_id": 5,
+        "model": "drafter.brawlmap",
+        "name": "Hideout",
+        "pk": 33,
+        "slug": "hideout"
+      },
+      {
+        "external_id": "15000026",
+        "game_mode_id": 2,
+        "model": "drafter.brawlmap",
+        "name": "Pinhole Punt",
+        "pk": 34,
+        "slug": "pinhole-punt"
+      },
+      {
+        "external_id": "15001103",
+        "game_mode_id": 9,
+        "model": "drafter.brawlmap",
+        "name": "Catacombs",
+        "pk": 35,
+        "slug": "catacombs"
+      },
+      {
+        "external_id": "15000386",
+        "game_mode_id": 11,
+        "model": "drafter.brawlmap",
+        "name": "Pocket Pass",
+        "pk": 36,
+        "slug": "pocket-pass"
+      },
+      {
+        "external_id": "15000051",
+        "game_mode_id": 2,
+        "model": "drafter.brawlmap",
+        "name": "Super Beach",
+        "pk": 37,
+        "slug": "super-beach"
+      },
+      {
+        "external_id": "15001020",
+        "game_mode_id": 2,
+        "model": "drafter.brawlmap",
+        "name": "Grass Knot",
+        "pk": 38,
+        "slug": "grass-knot"
+      },
+      {
+        "external_id": "15001054",
+        "game_mode_id": 2,
+        "model": "drafter.brawlmap",
+        "name": "Match 1123581321",
+        "pk": 39,
+        "slug": "match-1123581321"
+      },
+      {
+        "external_id": "15001163",
+        "game_mode_id": 9,
+        "model": "drafter.brawlmap",
+        "name": "WALKING ON HOT SAND",
+        "pk": 40,
+        "slug": "walking-on-hot-sand"
+      },
+      {
+        "external_id": "15000010",
+        "game_mode_id": 1,
+        "model": "drafter.brawlmap",
+        "name": "Gem Fort",
+        "pk": 41,
+        "slug": "gem-fort"
+      },
+      {
+        "external_id": "15000083",
+        "game_mode_id": 5,
+        "model": "drafter.brawlmap",
+        "name": "Dry Season",
+        "pk": 42,
+        "slug": "dry-season"
+      },
+      {
+        "external_id": "15001241",
+        "game_mode_id": 12,
+        "model": "drafter.brawlmap",
+        "name": "Crimson Divide",
+        "pk": 43,
+        "slug": "crimson-divide"
+      },
+      {
+        "external_id": "15000350",
+        "game_mode_id": 6,
+        "model": "drafter.brawlmap",
+        "name": "Quick Travel",
+        "pk": 44,
+        "slug": "quick-travel"
+      },
+      {
+        "external_id": "15000403",
+        "game_mode_id": 1,
+        "model": "drafter.brawlmap",
+        "name": "Stardust Storm",
+        "pk": 45,
+        "slug": "stardust-storm"
+      },
+      {
+        "external_id": "15000387",
+        "game_mode_id": 11,
+        "model": "drafter.brawlmap",
+        "name": "Turnover",
+        "pk": 46,
+        "slug": "turnover"
+      },
+      {
+        "external_id": "15000548",
+        "game_mode_id": 3,
+        "model": "drafter.brawlmap",
+        "name": "Out in the Open",
+        "pk": 47,
+        "slug": "out-in-the-open"
+      },
+      {
+        "external_id": "15000703",
+        "game_mode_id": 3,
+        "model": "drafter.brawlmap",
+        "name": "New Horizons",
+        "pk": 48,
+        "slug": "new-horizons"
+      },
+      {
+        "external_id": "15001048",
+        "game_mode_id": 13,
+        "model": "drafter.brawlmap",
+        "name": "The Emptiness Machine",
+        "pk": 49,
+        "slug": "the-emptiness-machine"
+      },
+      {
+        "external_id": "15000072",
+        "game_mode_id": 4,
+        "model": "drafter.brawlmap",
+        "name": "Bridge Too Far",
+        "pk": 50,
+        "slug": "bridge-too-far"
+      },
+      {
+        "external_id": "15001270",
+        "game_mode_id": 2,
+        "model": "drafter.brawlmap",
+        "name": "Bustling Business",
+        "pk": 51,
+        "slug": "bustling-business"
+      },
+      {
+        "external_id": "15001336",
+        "game_mode_id": 5,
+        "model": "drafter.brawlmap",
+        "name": "Alchemy",
+        "pk": 52,
+        "slug": "alchemy"
+      },
+      {
+        "external_id": "15001056",
+        "game_mode_id": 9,
+        "model": "drafter.brawlmap",
+        "name": "Time Flies",
+        "pk": 53,
+        "slug": "time-flies"
+      },
+      {
+        "external_id": "15001265",
+        "game_mode_id": 10,
+        "model": "drafter.brawlmap",
+        "name": "Nullscapes",
+        "pk": 54,
+        "slug": "nullscapes"
+      },
+      {
+        "external_id": "15001324",
+        "game_mode_id": 12,
+        "model": "drafter.brawlmap",
+        "name": "Brawler's Rift",
+        "pk": 56,
+        "slug": "brawlers-rift"
+      },
+      {
+        "external_id": "15001266",
+        "game_mode_id": 10,
+        "model": "drafter.brawlmap",
+        "name": "Raging Ocean",
+        "pk": 57,
+        "slug": "raging-ocean"
+      },
+      {
+        "external_id": "15001065",
+        "game_mode_id": 12,
+        "model": "drafter.brawlmap",
+        "name": "The Smackdome",
+        "pk": 58,
+        "slug": "the-smackdome"
+      },
+      {
+        "external_id": "15000920",
+        "game_mode_id": 7,
+        "model": "drafter.brawlmap",
+        "name": "Big Battle Basin",
+        "pk": 59,
+        "slug": "big-battle-basin"
+      },
+      {
+        "external_id": "15001035",
+        "game_mode_id": 14,
+        "model": "drafter.brawlmap",
+        "name": "Frostbite Rink",
+        "pk": 60,
+        "slug": "frostbite-rink"
+      },
+      {
+        "external_id": "15001044",
+        "game_mode_id": 8,
+        "model": "drafter.brawlmap",
+        "name": "Pocket Pleasures",
+        "pk": 61,
+        "slug": "pocket-pleasures"
+      },
+      {
+        "external_id": "15001162",
+        "game_mode_id": 13,
+        "model": "drafter.brawlmap",
+        "name": "Rastermind",
+        "pk": 62,
+        "slug": "rastermind"
+      },
+      {
+        "external_id": "15001046",
+        "game_mode_id": 15,
+        "model": "drafter.brawlmap",
+        "name": "Public Transport",
+        "pk": 63,
+        "slug": "public-transport"
+      },
+      {
+        "external_id": "15001314",
+        "game_mode_id": 8,
+        "model": "drafter.brawlmap",
+        "name": "Siberian Stand Off",
+        "pk": 64,
+        "slug": "siberian-stand-off"
+      },
+      {
+        "external_id": "15000980",
+        "game_mode_id": 15,
+        "model": "drafter.brawlmap",
+        "name": "Treasure Island",
+        "pk": 65,
+        "slug": "treasure-island"
+      },
+      {
+        "external_id": "15000143",
+        "game_mode_id": 2,
+        "model": "drafter.brawlmap",
+        "name": "Beach Ball",
+        "pk": 66,
+        "slug": "beach-ball"
+      },
+      {
+        "external_id": "15001329",
+        "game_mode_id": 6,
+        "model": "drafter.brawlmap",
+        "name": "Tread Carefully",
+        "pk": 67,
+        "slug": "tread-carefully"
+      },
+      {
+        "external_id": "15000528",
+        "game_mode_id": 3,
+        "model": "drafter.brawlmap",
+        "name": "New Perspective",
+        "pk": 68,
+        "slug": "new-perspective"
+      },
+      {
+        "external_id": "15001275",
+        "game_mode_id": 1,
+        "model": "drafter.brawlmap",
+        "name": "Let Me Dance",
+        "pk": 69,
+        "slug": "let-me-dance"
+      },
+      {
+        "external_id": "15001023",
+        "game_mode_id": 6,
+        "model": "drafter.brawlmap",
+        "name": "In the Liminal",
+        "pk": 70,
+        "slug": "in-the-liminal"
+      },
+      {
+        "external_id": "15001101",
+        "game_mode_id": 13,
+        "model": "drafter.brawlmap",
+        "name": "Crescendo",
+        "pk": 71,
+        "slug": "crescendo"
+      },
+      {
+        "external_id": "15000581",
+        "game_mode_id": 3,
+        "model": "drafter.brawlmap",
+        "name": "Healthy Middle Ground",
+        "pk": 72,
+        "slug": "healthy-middle-ground"
+      },
+      {
+        "external_id": "15000429",
+        "game_mode_id": 3,
+        "model": "drafter.brawlmap",
+        "name": "Deep End",
+        "pk": 73,
+        "slug": "deep-end"
+      },
+      {
+        "external_id": "15000853",
+        "game_mode_id": 10,
+        "model": "drafter.brawlmap",
+        "name": "Below Zero",
+        "pk": 74,
+        "slug": "below-zero"
+      },
+      {
+        "external_id": "15001272",
+        "game_mode_id": 4,
+        "model": "drafter.brawlmap",
+        "name": "Hot Tubs",
+        "pk": 75,
+        "slug": "hot-tubs"
+      },
+      {
+        "external_id": "15001242",
+        "game_mode_id": 12,
+        "model": "drafter.brawlmap",
+        "name": "Silver Highlands",
+        "pk": 76,
+        "slug": "silver-highlands"
+      },
+      {
+        "external_id": "15000362",
+        "game_mode_id": 3,
+        "model": "drafter.brawlmap",
+        "name": "Close Call",
+        "pk": 77,
+        "slug": "close-call"
+      },
+      {
+        "external_id": "15000080",
+        "game_mode_id": 5,
+        "model": "drafter.brawlmap",
+        "name": "Bull Pen",
+        "pk": 78,
+        "slug": "bull-pen"
+      },
+      {
+        "external_id": "15000163",
+        "game_mode_id": 2,
+        "model": "drafter.brawlmap",
+        "name": "Coarse Course",
+        "pk": 79,
+        "slug": "coarse-course"
+      },
+      {
+        "external_id": "15000343",
+        "game_mode_id": 1,
+        "model": "drafter.brawlmap",
+        "name": "Rustic Arcade",
+        "pk": 80,
+        "slug": "rustic-arcade"
+      },
+      {
+        "external_id": "15001202",
+        "game_mode_id": 6,
+        "model": "drafter.brawlmap",
+        "name": "Golden Bay",
+        "pk": 81,
+        "slug": "golden-bay"
+      },
+      {
+        "external_id": "15000009",
+        "game_mode_id": 1,
+        "model": "drafter.brawlmap",
+        "name": "Deathcap Trap",
+        "pk": 82,
+        "slug": "deathcap-trap"
+      },
+      {
+        "external_id": "15000499",
+        "game_mode_id": 1,
+        "model": "drafter.brawlmap",
+        "name": "Open Space",
+        "pk": 83,
+        "slug": "open-space"
+      },
+      {
+        "external_id": "15000384",
+        "game_mode_id": 11,
+        "model": "drafter.brawlmap",
+        "name": "Ball Hog",
+        "pk": 84,
+        "slug": "ball-hog"
+      },
+      {
+        "external_id": "15000851",
+        "game_mode_id": 10,
+        "model": "drafter.brawlmap",
+        "name": "Slippery Slap",
+        "pk": 85,
+        "slug": "slippery-slap"
+      },
+      {
+        "external_id": "15000295",
+        "game_mode_id": 5,
+        "model": "drafter.brawlmap",
+        "name": "No Excuses",
+        "pk": 86,
+        "slug": "no-excuses"
+      },
+      {
+        "external_id": "15001018",
+        "game_mode_id": 3,
+        "model": "drafter.brawlmap",
+        "name": "Double Decker",
+        "pk": 87,
+        "slug": "double-decker"
+      },
+      {
+        "external_id": "15001273",
+        "game_mode_id": 4,
+        "model": "drafter.brawlmap",
+        "name": "Jedna",
+        "pk": 88,
+        "slug": "jedna"
+      },
+      {
+        "external_id": "15000031",
+        "game_mode_id": 1,
+        "model": "drafter.brawlmap",
+        "name": "Sapphire Plains",
+        "pk": 89,
+        "slug": "sapphire-plains"
+      },
+      {
+        "external_id": "15000008",
+        "game_mode_id": 1,
+        "model": "drafter.brawlmap",
+        "name": "Crystal Arcade",
+        "pk": 90,
+        "slug": "crystal-arcade"
+      },
+      {
+        "external_id": "15001176",
+        "game_mode_id": 5,
+        "model": "drafter.brawlmap",
+        "name": "Choral Chambers",
+        "pk": 91,
+        "slug": "choral-chambers"
+      },
+      {
+        "external_id": "15000975",
+        "game_mode_id": 13,
+        "model": "drafter.brawlmap",
+        "name": "Survival of the Meanest",
+        "pk": 92,
+        "slug": "survival-of-the-meanest"
+      },
+      {
+        "external_id": "15001059",
+        "game_mode_id": 3,
+        "model": "drafter.brawlmap",
+        "name": "Call of the Water",
+        "pk": 93,
+        "slug": "call-of-the-water"
+      },
+      {
+        "external_id": "15000734",
+        "game_mode_id": 3,
+        "model": "drafter.brawlmap",
+        "name": "Four Levels",
+        "pk": 94,
+        "slug": "four-levels"
+      },
+      {
+        "external_id": "15000137",
+        "game_mode_id": 4,
+        "model": "drafter.brawlmap",
+        "name": "Pit Stop",
+        "pk": 95,
+        "slug": "pit-stop"
+      },
+      {
+        "external_id": "15001323",
+        "game_mode_id": 12,
+        "model": "drafter.brawlmap",
+        "name": "Triple Threat",
+        "pk": 96,
+        "slug": "triple-threat"
+      },
+      {
+        "external_id": "15001333",
+        "game_mode_id": 3,
+        "model": "drafter.brawlmap",
+        "name": "Stroke of Luck",
+        "pk": 97,
+        "slug": "stroke-of-luck"
+      },
+      {
+        "external_id": "15000997",
+        "game_mode_id": 12,
+        "model": "drafter.brawlmap",
+        "name": "Mirage Arena",
+        "pk": 98,
+        "slug": "mirage-arena"
+      },
+      {
+        "external_id": "15001313",
+        "game_mode_id": 8,
+        "model": "drafter.brawlmap",
+        "name": "Insane Streamer",
+        "pk": 99,
+        "slug": "insane-streamer-brawl-ball-32"
+      },
+      {
+        "datum_bestaetigt": false,
+        "datum_quelle": "",
+        "is_current": false,
+        "model": "drafter.patch",
+        "name": "Demo-Patch",
+        "pk": 1,
+        "released_on": "2026-09-19"
+      },
+      {
+        "datum_bestaetigt": true,
+        "datum_quelle": "Official Supercell Brawl Stars Release Notes \u2013 Maintenance September 16 2026",
+        "is_current": true,
+        "model": "drafter.patch",
+        "name": "Balance Changes 2026-09-16",
+        "pk": 2,
+        "released_on": "2026-09-16"
+      }
+    ],
+    "catalog_identity_sha256": "6fef1eaf46d4ad146eb9d45c58769ee84f4a1af5f0bf51dafc0d463ead560247",
+    "legacy_patch_id": 1,
+    "legacy_reference_date": "2026-09-17",
+    "legacy_source_revision": "223574b",
+    "map_mode_pairs": [
+      [
+        1,
+        1
+      ],
+      [
+        2,
+        1
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        5,
+        3
+      ],
+      [
+        7,
+        4
+      ],
+      [
+        9,
+        3
+      ],
+      [
+        10,
+        6
+      ],
+      [
+        11,
+        6
+      ],
+      [
+        12,
+        1
+      ],
+      [
+        13,
+        2
+      ],
+      [
+        14,
+        5
+      ],
+      [
+        15,
+        6
+      ],
+      [
+        16,
+        4
+      ],
+      [
+        19,
+        2
+      ],
+      [
+        20,
+        5
+      ],
+      [
+        22,
+        6
+      ],
+      [
+        23,
+        2
+      ],
+      [
+        25,
+        2
+      ],
+      [
+        32,
+        4
+      ],
+      [
+        33,
+        5
+      ],
+      [
+        41,
+        1
+      ],
+      [
+        42,
+        5
+      ],
+      [
+        44,
+        6
+      ],
+      [
+        47,
+        3
+      ],
+      [
+        48,
+        3
+      ],
+      [
+        50,
+        4
+      ],
+      [
+        66,
+        2
+      ],
+      [
+        70,
+        6
+      ]
+    ],
+    "own_team_first_pick": true,
+    "patch_policy": "frozen_algorithmic_context_not_observed_game_patch",
+    "rank_pool": "alle",
+    "side_orientation": "stored_canonical_a_vs_b",
+    "unknown_map_mode_brawler_or_import_patch": "exclude_no_fallback_no_catalog_refresh"
+  },
+  "development": {
+    "automatic_training": false,
+    "old_holdout": "permanently_closed_not_read",
+    "pilot_completed_at": "2026-09-24T16:24:00.212810+00:00",
+    "pilot_eligible_n": 33,
+    "pilot_linked_membership_sha256": "f345c353ae988d1042b6e920ef26a8962e049ce3efa1c7d701cf01add2f3a43d",
+    "pilot_linked_n": 190,
+    "pilot_result_file_sha256": "36d642868506a0181e3406b01be3c6d1f856ef69e1a41033c25f871b639ad806",
+    "v2_train_examples_sha256": "5e8ff094ad9f93ed565bcaed9f725ffd7d78dd67c22e31c7b6aaed6cd2cec447",
+    "v2_validation_examples_sha256": "4b2806db07d35e20dd8a0e6e76bef74dd928706b90e6615a3b2f64776c3df797"
+  },
+  "development_sha256": "d79d501c0857a84432953e7f29080572cf3dc5963e7b2a0c21cfd02b80f312c5",
+  "pilot_common_eligible": 33,
+  "pilot_import_patch_counts": {
+    "1": 33
+  },
+  "prediction_or_outcome_metrics_computed": false
+}

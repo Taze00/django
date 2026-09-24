@@ -68,7 +68,7 @@ class DiscoveryFrontierCollector(TaggedFrontierCollector):
         envelope = payload.payload
         if (payload.source != Datenquelle.API or payload.format != FORMAT_OFFIZIELLER_BATTLELOG
                 or not payload.collector_run_id or payload.fetched_at is None
-                or payload.collector_run.parameters.get("strategie") not in ("tagged_frontier_v1", SAMPLING)
+                or payload.collector_run.parameters.get("strategie") not in ("tagged_frontier_v1", SAMPLING, self.sampling)
                 or payload.sampling != payload.collector_run.parameters.get("strategie")
                 or not isinstance(envelope, dict)
                 or inhalts_hash(envelope) != payload.content_hash

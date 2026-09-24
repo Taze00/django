@@ -202,3 +202,16 @@ eligible yield means DATA_UNAVAILABLE and diagnosis, not immediate retry or
 registration. A successful pilot still requires a frozen prospective acquisition
 policy, dates, retention plan, code/V2/D-022 pins and exact map/mode/Brawler/patch
 common-subset exclusions. No real window is currently registered.
+
+
+## D-024 schema 3 and frozen prospective acquisition
+
+D-023 demonstrated access to 33 genuinely new eligible soloRanked observations.
+The independently audited preflight places all 33 in the exact frozen common
+subset. Schema 3 supersedes unregistered schema-2 preparation: it requires the
+positive pilot receipt/hash, completion before registration, frozen acquisition
+policy/implementation, exact common catalog and the D-022 verification receipt.
+Prospective provenance must bind purpose, code and protocol digest. Full rules,
+patch-convention limitations and bounded commands: PROSPECTIVE_RUNBOOK.md.
+Actual game patch remains UNKNOWN; Demo-Patch is the unchanged verified Legacy
+algorithmic input, not fabricated patch evidence. Pilot observations are excluded.

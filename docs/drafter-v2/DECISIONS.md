@@ -587,3 +587,15 @@ feasibility. Protocol, tests and operational limits: DISCOVERY_PILOT.md.
 
 
 D-023 pilot completed (run 7, 2026-09-24T16:22:13Z–16:24:00Z): acquisition feasibility demonstrated. Ten battlelog HTTP 200, zero retries/ranking requests. 340 authentic observed query roots; 250 raw entries: 201 trophy ranked, 33 soloRanked, 16 type UNKNOWN. Parser retained all 33 soloRanked; 60 unsupported/non-3v3 entries skipped, zero parser errors or future-dated records. 185 newly imported matches: 152 trophy and 33 eligible soloRanked; five trophy duplicates, zero conflicts. 1,031 additional query tags; discovery frontier 1,371, eligible Ranked-evidence frontier 56. Independent raw/parser/import audit agrees. Pilot matches remain permanently excluded from future test membership and automatic training.
+
+
+D-024: acquisition feasibility passed. Freeze prospective_discovery_v1 with ten
+HTTP attempts/run, one run/six hours, 56 runs maximum, no recurring job or ranking
+requests. Schema 3 binds feasibility, code, D-022/V2 and exact common identities.
+D-022 verified replay uses patch ID 1 (Demo-Patch); retain it as an algorithmic
+baseline context, never as actual game-patch evidence. Actual patch is UNKNOWN.
+Exclude unsupported imported patch/map/mode/Brawler contexts, retain whole-window
+drift limitations, and prohibit patch-specific claims. No bundle/scorer change.
+All 70 archived Legacy source files match 223574b exactly. Pilot common-context
+preflight: 33/33 eligible, no predictions or metrics. Prospective dates are pinned
+only after checks pass; see PROSPECTIVE_RUNBOOK.md.

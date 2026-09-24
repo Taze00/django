@@ -3,7 +3,7 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from django.test import SimpleTestCase
-from drafter.services.v2_future_window import register, seal, publish, digest, verify_membership, validate
+from drafter.services.v2_future_window import register, seal, publish, digest, verify_membership, validate, ACQUISITION
 
 UTC = timezone.utc
 
@@ -15,23 +15,38 @@ def fixture_receipt():
                 ('independent_rebuild','independent_raw_counts','prior_identity','train_membership','scoring_replay'),True)}
 
 
+def fixture_acquisition():
+    return {'policy': ACQUISITION.copy(), 'pilot_result_sha256':'d'*64,
+            'pilot_new_eligible':1, 'pilot_finished_at':'2026-09-23T12:00:00Z',
+            'implementation_sha256':{'synthetic.py':'e'*64}}
+
+
+def fixture_context():
+    return {'patch_policy':'frozen_algorithmic_context_not_observed_game_patch',
+            'legacy_patch_id':1, 'allowed_import_patch_ids':[1],
+            'map_mode_pairs':[[1,1]], 'brawler_ids':[1,2,3,4,5,6],
+            'catalog_identity_sha256':'f'*64}
+
+
 class FutureWindowTests(SimpleTestCase):
     def setUp(self):
         self.protocol = register(now=datetime(2026,9,24,tzinfo=UTC), development_end='2026-09-23T00:00:00Z',
                                  start='2026-09-25T00:00:00Z', end='2026-10-09T00:00:00Z',
-                                 v2_hash='a'*64, legacy_hash='b'*64, development_hash='c'*64, revision='fixture-only',legacy_verification=fixture_receipt())
+                                 v2_hash='a'*64, legacy_hash='b'*64, development_hash='c'*64, revision='fixture-only',legacy_verification=fixture_receipt(), acquisition=fixture_acquisition(), common_context=fixture_context())
         self.now = datetime(2026,10,10,tzinfo=UTC)
         self.rows = [{'fingerprint':digest(i), 'reconstructed_fingerprint':digest(['reconstructed',i]),
+                      'map_id':1, 'mode_id':1, 'patch_id':1, 'brawler_ids':[1,2,3,4,5,6],
                       'content_sha256':digest(['content',i]), 'played_at':'2026-09-26T00:00:00Z',
                       'source':'api','battle_type':'soloRanked','is_ranked':True,'has_conflict':False,
                       'result_known':True,'complete_unique_3v3':True,'known_context':True,
-                      'origins':[{'sampling':'tagged_frontier_v1','source':'api','format':'brawlstars.battlelog.raw',
+                      'origins':[{'sampling':'prospective_discovery_v1','source':'api','format':'brawlstars.battlelog.raw',
+                                  'protocol_sha256':digest(self.protocol),'purpose':'prospective_test','code_revision':'fixture-only',
                                   'run_id':1,'fetched_at':'2026-09-27T00:00:00Z','content_hash':digest(['raw',i])}]}
                      for i in range(1000)]
 
     def test_preregistration_rejects_old_or_overlapping_window_and_unknown_inputs(self):
         for field,value in [('start_exclusive','2026-09-18T15:04:42Z'),('development_end','2026-09-26T00:00:00Z'),
-                            ('legacy_bundle_sha256','UNKNOWN'),('legacy_input_policy','live_provider')]:
+                            ('legacy_bundle_sha256','UNKNOWN'),('legacy_input_policy','live_provider'), ('acquisition',{}), ('common_context',{})]:
             p={**self.protocol,field:value}
             with self.subTest(field=field),self.assertRaises(ValueError): validate(p)
 
@@ -54,7 +69,7 @@ class FutureWindowTests(SimpleTestCase):
 
     def test_trophy_shadow_unknown_conflict_and_unprovenanced_rows_excluded(self):
         for changes in ({'battle_type':'ranked'}, {'source':'user_report'}, {'result_known':False},
-                        {'has_conflict':True},{'origins':[]},{'complete_unique_3v3':False}):
+                        {'has_conflict':True},{'origins':[]},{'complete_unique_3v3':False}, {'map_id':999}, {'patch_id':None}, {'brawler_ids':[999]*6}):
             with self.subTest(changes=changes),self.assertRaises(ValueError):
                 seal(self.protocol,[{**r,**changes} for r in self.rows],self.now)
 
@@ -102,7 +117,7 @@ class FutureInventoryTests(DrafterTest):
     def test_database_predicate_excludes_old_rows_before_content_loading(self):
         protocol = register(now=datetime(2026,9,24,tzinfo=UTC), development_end='2026-09-23T00:00:00Z',
                             start='2026-09-25T00:00:00Z',end='2026-10-09T00:00:00Z',
-                            v2_hash='a'*64,legacy_hash='b'*64,development_hash='c'*64,revision='fixture',legacy_verification=fixture_receipt())
+                            v2_hash='a'*64,legacy_hash='b'*64,development_hash='c'*64,revision='fixture',legacy_verification=fixture_receipt(), acquisition=fixture_acquisition(), common_context=fixture_context())
         old=Match.objects.create(fingerprint=digest('old-sealed'),played_at=datetime(2026,9,18,tzinfo=UTC),source='api',battle_type='soloRanked')
         new=Match.objects.create(fingerprint=digest('new'),played_at=datetime(2026,9,26,tzinfo=UTC),source='api',battle_type='soloRanked',winner_side='a')
         brawlers=list(Brawler.objects.order_by('id')[:5])

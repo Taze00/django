@@ -146,3 +146,6 @@ D-022: management/commands/drafter_v2_legacy_export.py exports only pinned Train
 
 
 D-023: models/discovery.py and migration 0021 hold separate query/provenance state; services/discovery_frontier.py reuses bounded tagged-frontier safeguards; collect_discovery_pilot accepts a pinned single-use pilot protocol. DISCOVERY_PILOT.md documents it.
+
+
+D-024: services/prospective_acquisition.py and collect_prospective_frontier provide one bounded run; v2_future_window schema 3 binds feasibility, fixed common catalog and purpose/code/protocol provenance. prospective_preflight.py audits only frozen catalog and run-7 examples; no predictions.

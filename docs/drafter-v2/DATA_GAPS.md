@@ -156,3 +156,6 @@ D-023: previous three-seed frontier could not expand through trophy-discovered i
 
 
 D-023 pilot completed (run 7, 2026-09-24T16:22:13Z–16:24:00Z): acquisition feasibility demonstrated. Ten battlelog HTTP 200, zero retries/ranking requests. 340 authentic observed query roots; 250 raw entries: 201 trophy ranked, 33 soloRanked, 16 type UNKNOWN. Parser retained all 33 soloRanked; 60 unsupported/non-3v3 entries skipped, zero parser errors or future-dated records. 185 newly imported matches: 152 trophy and 33 eligible soloRanked; five trophy duplicates, zero conflicts. 1,031 additional query tags; discovery frontier 1,371, eligible Ranked-evidence frontier 56. Independent raw/parser/import audit agrees. Pilot matches remain permanently excluded from future test membership and automatic training.
+
+
+D-024: access to eligible soloRanked is demonstrated, sustained yield remains unknown. Actual game patch is not supplied; frozen Legacy Demo-Patch input is an algorithmic convention only. No patch-specific claim. Prospective temporal evidence has not yet accumulated.

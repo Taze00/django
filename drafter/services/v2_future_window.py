@@ -10,10 +10,10 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-SCHEMA = 'drafter-future-window-2'
+SCHEMA = 'drafter-future-window-3'
 OLD_END = datetime(2026, 9, 18, 15, 4, 42, tzinfo=timezone.utc)
 POLICY = {
-    'source': 'api', 'battle_type': 'soloRanked', 'sampling': 'tagged_frontier_v1',
+    'source': 'api', 'battle_type': 'soloRanked', 'sampling': 'prospective_discovery_v1',
     'shadow_eligible': False, 'training_eligible': False, 'tuning_on_test': False,
     'metrics': ['log_loss', 'brier', 'calibration_10_equal_width_bins'],
     'ranking': 'descriptive_only_when_actual_order_bans_and_choice_observed',
@@ -23,6 +23,16 @@ POLICY = {
     'comparison': 'paired_common_eligible_matches_report_all_exclusions',
     'late_arrivals': 'exclude_after_seal_no_replacement',
     'acquisition_pilot_eligible': False,
+}
+
+
+ACQUISITION = {
+    'strategy': 'prospective_discovery_v1', 'ranking_requests': 0,
+    'max_http_attempts_per_run': 10, 'max_depth': 1, 'cooldown_hours': 6,
+    'max_runs': 56, 'max_window_http_attempts': 560, 'recurring_collector': False,
+    'selection': 'due_active; last_fetched ASC NULLS FIRST; discovery_first_seen ASC; tag ASC',
+    'sampling_bias': 'graph_discovered_not_independent_no_sampling_weights',
+    'raw_retention': 'retain_all_no_deletion', 'automatic_training': False,
 }
 
 
@@ -61,12 +71,27 @@ def validate(protocol):
         raise ValueError('Legacy inputs must be frozen before registration')
     if not (development <= registered < start < end and start > OLD_END):
         raise ValueError('Future window must follow registration and all development data')
+    acquisition = protocol.get('acquisition', {})
+    if acquisition.get('policy') != ACQUISITION:
+        raise ValueError('Frozen bounded acquisition policy required')
+    if (not _sha(acquisition.get('pilot_result_sha256'))
+            or acquisition.get('pilot_new_eligible', 0) <= 0
+            or not timestamp(acquisition['pilot_finished_at']) <= registered
+            or not acquisition.get('implementation_sha256')
+            or not all(_sha(v) for v in acquisition['implementation_sha256'].values())):
+        raise ValueError('Verified completed acquisition feasibility and implementation required')
+    common = protocol.get('common_context', {})
+    if (common.get('patch_policy') != 'frozen_algorithmic_context_not_observed_game_patch'
+            or common.get('legacy_patch_id') != 1 or common.get('allowed_import_patch_ids') != [1]
+            or not common.get('map_mode_pairs') or not common.get('brawler_ids')
+            or not _sha(common.get('catalog_identity_sha256'))):
+        raise ValueError('Exact common context and explicit frozen patch convention required')
     if protocol.get('legacy_input_policy') != 'train_empirical_frozen_manual_constants_v1':
         raise ValueError('Legacy bundle requires Train-only empirical inputs and frozen manual constants')
 
 
-def register(*, now, development_end, start, end, v2_hash, legacy_hash, development_hash, revision, legacy_verification):
-    value = {'schema': SCHEMA, 'policy': POLICY.copy(), 'legacy_verification': legacy_verification, 'registered_at': now.isoformat(),
+def register(*, now, development_end, start, end, v2_hash, legacy_hash, development_hash, revision, legacy_verification, acquisition, common_context):
+    value = {'acquisition': acquisition, 'common_context': common_context, 'schema': SCHEMA, 'policy': POLICY.copy(), 'legacy_verification': legacy_verification, 'registered_at': now.isoformat(),
              'development_end': development_end, 'start_exclusive': start, 'end_inclusive': end,
              'v2_artifact_sha256': v2_hash, 'legacy_bundle_sha256': legacy_hash,
              'development_membership_sha256': development_hash, 'code_revision': revision,
@@ -93,11 +118,20 @@ def seal(protocol, inventory, now):
             reject('unknown_or_conflicting_result'); continue
         if not row.get('complete_unique_3v3') or not row.get('known_context'):
             reject('incomplete_duplicate_or_unknown_context'); continue
+        common = protocol['common_context']
+        if ([row.get('map_id'), row.get('mode_id')] not in common['map_mode_pairs']
+                or any(b not in common['brawler_ids'] for b in row.get('brawler_ids', []))
+                or len(row.get('brawler_ids', [])) != 6
+                or row.get('patch_id') not in common['allowed_import_patch_ids']):
+            reject('outside_frozen_common_context'); continue
         origins = row.get('origins', [])
         if any(o['sampling'] == 'observed_discovery_pilot_v1' for o in origins):
             reject('pre_registration_acquisition_pilot'); continue
         if not any(o['sampling'] == POLICY['sampling'] and o['source'] == 'api'
                    and o['format'] == 'brawlstars.battlelog.raw' and o['run_id'] is not None
+                   and o.get('protocol_sha256') == digest(protocol)
+                   and o.get('purpose') == 'prospective_test'
+                   and o.get('code_revision') == protocol['code_revision']
                    and at <= timestamp(o['fetched_at']) <= now and _sha(o['content_hash']) for o in origins):
             reject('unverified_provenance'); continue
         fp, reconstructed_fp = row['fingerprint'], row.get('reconstructed_fingerprint')
