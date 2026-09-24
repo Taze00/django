@@ -1,0 +1,247 @@
+{
+  "discovery_frontier_size": 1371,
+  "finished_at": "2026-09-24T16:24:00.212810+00:00",
+  "future_test_eligible": false,
+  "future_window_registered": false,
+  "independent_raw_entry_count": 250,
+  "independent_raw_modes": {
+    "basketBrawl": 15,
+    "bounty": 2,
+    "brawlBall": 135,
+    "duels": 25,
+    "duoShowdown": 9,
+    "gemGrab": 7,
+    "heist": 11,
+    "hotZone": 2,
+    "knockout": 18,
+    "lastStand": 16,
+    "soloShowdown": 10
+  },
+  "independent_raw_types": {
+    "UNKNOWN": 16,
+    "ranked": 201,
+    "soloRanked": 33
+  },
+  "linked_conflicts": 0,
+  "linked_eligible_soloRanked": 33,
+  "linked_match_types": {
+    "ranked": 157,
+    "soloRanked": 33
+  },
+  "linked_post_cutoff_matches": 190,
+  "observed_battle_key_counts": {
+    "duration": 215,
+    "level": 16,
+    "mode": 250,
+    "players": 51,
+    "rank": 19,
+    "result": 231,
+    "starPlayer": 190,
+    "teams": 199,
+    "trophyChange": 173,
+    "type": 234
+  },
+  "parameters": {
+    "abruf_abstand_stunden": 6,
+    "after_exclusive": "2026-09-18T15:04:42+00:00",
+    "battlelog_http_budget": 10,
+    "catalog_requests": 0,
+    "code_revision": "382fe89a71aedd7074d61e3270134a64c6169e67",
+    "depth_semantics": "new_request_hops_per_run",
+    "future_test_eligible": false,
+    "max_tiefe": 1,
+    "pilot_id": "D-023-single-observed-frontier-pilot",
+    "protocol_hash": "78e2a6b3cc62fc344485fb9e3e75d04281f4db1aa348e8ec40880e063df4ac0d",
+    "purpose": "pre_registration_development_pilot",
+    "ranking_http_budget": 0,
+    "ranking_seeds": 0,
+    "source_payloads": [
+      {
+        "content_hash": "67cd8895e72fb5aecc726a29c8836d190116cd15b75e3a2cd47e56395aa4e1fc",
+        "id": 929
+      },
+      {
+        "content_hash": "d7166c324d65affe235a6ad117635a13569371fcb538532fadc56bbe660d77b8",
+        "id": 930
+      },
+      {
+        "content_hash": "af0b99da775a832505ac8b184c76b83dc46018f264848c20250587aa7f5dfd05",
+        "id": 931
+      }
+    ],
+    "strategie": "observed_discovery_pilot_v1"
+  },
+  "parsed_types": {
+    "ranked": 157,
+    "soloRanked": 33
+  },
+  "parser_error_count": 0,
+  "parser_skipped_count": 60,
+  "payloads": [
+    {
+      "content_hash": "6419367a2fdb52e8eee1cb97d7997323bdefa66a8388cf8eec24e2a2a59ed1f6",
+      "fetched_at": "2026-09-24T16:22:35.720641+00:00",
+      "format": "brawlstars.battlelog.raw",
+      "id": 932,
+      "parse_status": "parsed",
+      "sampling": "observed_discovery_pilot_v1"
+    },
+    {
+      "content_hash": "43cc6dcd9f55627991b3562734c29fbc801764761446122b79425110cb27bf2b",
+      "fetched_at": "2026-09-24T16:22:47.968725+00:00",
+      "format": "brawlstars.battlelog.raw",
+      "id": 933,
+      "parse_status": "parsed",
+      "sampling": "observed_discovery_pilot_v1"
+    },
+    {
+      "content_hash": "a6305e37c953cd84bd1585e4c5190b3053d28529568936d4ac3af2f3b8ac9fd1",
+      "fetched_at": "2026-09-24T16:22:49.005547+00:00",
+      "format": "brawlstars.battlelog.raw",
+      "id": 934,
+      "parse_status": "parsed",
+      "sampling": "observed_discovery_pilot_v1"
+    },
+    {
+      "content_hash": "0ed07b3ccb78110734b2990b1a2cc300ebfb11e9ce5ab13a12dc6e494f86d28c",
+      "fetched_at": "2026-09-24T16:22:59.174533+00:00",
+      "format": "brawlstars.battlelog.raw",
+      "id": 935,
+      "parse_status": "parsed",
+      "sampling": "observed_discovery_pilot_v1"
+    },
+    {
+      "content_hash": "25f884d2630731376893c331121221d75d0ab3e1055fcbf6ebd1eb875f3e6c01",
+      "fetched_at": "2026-09-24T16:23:07.198199+00:00",
+      "format": "brawlstars.battlelog.raw",
+      "id": 936,
+      "parse_status": "parsed",
+      "sampling": "observed_discovery_pilot_v1"
+    },
+    {
+      "content_hash": "25cdbab962ecce5c8efefe8e7b1daffa3a9859c53f6ed01adddb98217c89ad77",
+      "fetched_at": "2026-09-24T16:23:18.757081+00:00",
+      "format": "brawlstars.battlelog.raw",
+      "id": 937,
+      "parse_status": "parsed",
+      "sampling": "observed_discovery_pilot_v1"
+    },
+    {
+      "content_hash": "6a2dbf9f0f11aacaa9cfdfa739ea90ad8a36dc9b0406b7b944ba6424f37c4ddd",
+      "fetched_at": "2026-09-24T16:23:24.975590+00:00",
+      "format": "brawlstars.battlelog.raw",
+      "id": 938,
+      "parse_status": "parsed",
+      "sampling": "observed_discovery_pilot_v1"
+    },
+    {
+      "content_hash": "44d0556ce85b36ba2263dfc7eac9f772dff1905c80ac76615ac60ccef686c240",
+      "fetched_at": "2026-09-24T16:23:36.092718+00:00",
+      "format": "brawlstars.battlelog.raw",
+      "id": 939,
+      "parse_status": "parsed",
+      "sampling": "observed_discovery_pilot_v1"
+    },
+    {
+      "content_hash": "584a07d1705fc5f3328fa3b075abe64a5b01986368d5b6b2e2ee583be4f953a2",
+      "fetched_at": "2026-09-24T16:23:43.537763+00:00",
+      "format": "brawlstars.battlelog.raw",
+      "id": 940,
+      "parse_status": "parsed",
+      "sampling": "observed_discovery_pilot_v1"
+    },
+    {
+      "content_hash": "e5b09600bba550e1051a4c66b17b3391448f91e656eb58223e3189229c00f479",
+      "fetched_at": "2026-09-24T16:23:56.834626+00:00",
+      "format": "brawlstars.battlelog.raw",
+      "id": 941,
+      "parse_status": "parsed",
+      "sampling": "observed_discovery_pilot_v1"
+    }
+  ],
+  "played_after_fetch_count": 0,
+  "ranked_evidence_frontier_size": 56,
+  "report": {
+    "abbruch": "",
+    "api": {
+      "anfragen": 10,
+      "ratenlimit_header": [],
+      "retry_after": [],
+      "status": {
+        "200": 10
+      },
+      "wartezeit_sekunden": 0.0,
+      "wiederholungen": 0
+    },
+    "battlelog_attempts": 10,
+    "battlelog_eintraege": 250,
+    "battlelogs_ok": 10,
+    "bootstrap_raw_battle_types": {
+      "ranked": 75
+    },
+    "bootstrap_unique_observed_tags": 340,
+    "data_status": "OBSERVATIONS_AVAILABLE",
+    "datenlage": {},
+    "discovery_frontier_size": 1371,
+    "duplicate_player_observations": 1041,
+    "duplikate": 5,
+    "duplikate_nach_typ": {
+      "ranked": 5
+    },
+    "fehler": {},
+    "frontier_before": 340,
+    "frontier_size": 1371,
+    "future_test_eligible": false,
+    "historical_records_retained_raw_only": 0,
+    "holdout_evaluated": false,
+    "id_widersprueche": [],
+    "invalid_discovered_tags": 0,
+    "katalog": [],
+    "katalog_neu": [],
+    "katalog_verknuepft": [],
+    "konflikte": 0,
+    "neu": 185,
+    "neu_nach_typ": {
+      "ranked": 152,
+      "soloRanked": 33
+    },
+    "new_discovered_tags": 1371,
+    "new_eligible_solo_ranked_matches": 33,
+    "new_frontier_seeds": 0,
+    "partien_gelesen": 190,
+    "protected_historical_duplicates_raw_only": 0,
+    "purpose": "pre_registration_development_pilot",
+    "query_eligible_tags_available": 340,
+    "query_eligible_tags_due": 340,
+    "rangliste_gesehen": 0,
+    "rangliste_neu": 0,
+    "ranked_evidence_frontier_size": 56,
+    "ranked_evidence_matches": 33,
+    "ranking_attempts": 0,
+    "ranking_cooldown_skipped": false,
+    "ranking_duplicate_tags": 0,
+    "ranking_entries": 0,
+    "ranking_invalid_tags": 0,
+    "ranking_seeds_admitted": 0,
+    "ranking_seeds_due": 0,
+    "ranking_valid_unique_tags": 0,
+    "raw_battle_types": {
+      "UNKNOWN": 16,
+      "ranked": 201,
+      "soloRanked": 33
+    },
+    "report_version": "observed_discovery_pilot_v1",
+    "run_id": 7,
+    "skill_labels": "UNKNOWN",
+    "spieler_abgefragt": 10,
+    "spieler_entdeckt": 1371,
+    "uebersprungen": 60,
+    "unbekannte_brawler": [],
+    "ungueltig": 0,
+    "unique_response_player_tags": 1082,
+    "unique_response_tags_not_in_bootstrap": 1031
+  },
+  "run_id": 7,
+  "started_at": "2026-09-24T16:22:13.153550+00:00",
+  "status": "finished"
+}

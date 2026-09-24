@@ -74,3 +74,19 @@ aggregate, prior or default-engine behavior is changed.
 Validation before execution: 50 combined collector/discovery/growth/future-window
 tests passed (6.084 s); final 11 discovery tests including command hash and
 historical-cutoff guards passed (1.948 s). No API call during tests.
+
+## Observed result
+
+D-023 pilot completed (run 7, 2026-09-24T16:22:13Z–16:24:00Z): acquisition feasibility demonstrated. Ten battlelog HTTP 200, zero retries/ranking requests. 340 authentic observed query roots; 250 raw entries: 201 trophy ranked, 33 soloRanked, 16 type UNKNOWN. Parser retained all 33 soloRanked; 60 unsupported/non-3v3 entries skipped, zero parser errors or future-dated records. 185 newly imported matches: 152 trophy and 33 eligible soloRanked; five trophy duplicates, zero conflicts. 1,031 additional query tags; discovery frontier 1,371, eligible Ranked-evidence frontier 56. Independent raw/parser/import audit agrees. Pilot matches remain permanently excluded from future test membership and automatic training.
+
+The independent read-only reproducer is `discovery_pilot_audit.py`; complete
+counts, run/protocol/code identity and raw hashes are in DISCOVERY_PILOT_RESULT.json.
+All ten original raw responses remain private in the isolated database. No
+player tags are published in the report. The 16 UNKNOWN types were literal missing
+`type` fields in lastStand responses, not reinterpreted as Ranked.
+
+The pilot disproves an API-wide lack of useful soloRanked for this path: authentic
+trophy-discovered tags led to 33 eligible observations without changing the parser.
+It does not prove the original seeds never play Ranked; their finite observed
+logs were trophy-only. Population coverage and sustainable throughput remain
+unknown. Proceed to prospective registration prerequisites; do not repeat pilot.
