@@ -1,0 +1,15 @@
+{
+  "inventory_observed": 0,
+  "legacy_bundle_file_sha256": "879c8e73449280deeeb364ebcb2ed4f8997c091237175c6c006358f2eb89dede",
+  "pre_start_command": "rejected: Outside preregistered prospective acquisition interval",
+  "pre_start_created_run": false,
+  "pre_start_http_attempts": 0,
+  "predictions_or_metrics_computed": false,
+  "protocol_sha256": "70e55f3dde205e15b232814f98b4e00c34fac8238f2fe5bc8b190608891adac8",
+  "status": "VERIFIED_REGISTERED_NOT_STARTED",
+  "tests": {
+    "combined_regressions": 59,
+    "seconds": 8.696
+  },
+  "v2_file_sha256": "92e0b427bf9abce62e047419ea1008f740c9ee7b39b1458ae15692402b7cf52d"
+}

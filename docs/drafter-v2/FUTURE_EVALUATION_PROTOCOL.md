@@ -1,4 +1,12 @@
-# Next independent window — prepared protocol, NOT REGISTERED
+# Next independent window — REGISTERED, not started
+
+Current D-024 registration is PROSPECTIVE_WINDOW.json; the fixed interval is
+2026-09-25T00:00:00Z exclusive through 2026-10-09T00:00:00Z inclusive.
+Acquisition feasibility passed with 33 eligible pilot observations. All pilot
+observations remain excluded. See PROSPECTIVE_RUNBOOK.md for current rules.
+Earlier preparation/history below is superseded where stated.
+
+## Historical D-019–D-022 preparation
 
 D-019 implements admission/membership infrastructure; D-022 schema 2 binds the verified Legacy bundle receipt. No real window has been
 registered, sealed, evaluated or added to training. Example timestamps/hashes in
@@ -215,3 +223,6 @@ Prospective provenance must bind purpose, code and protocol digest. Full rules,
 patch-convention limitations and bounded commands: PROSPECTIVE_RUNBOOK.md.
 Actual game patch remains UNKNOWN; Demo-Patch is the unchanged verified Legacy
 algorithmic input, not fabricated patch evidence. Pilot observations are excluded.
+
+
+D-024 REGISTERED_NOT_STARTED. Fixed interval: (2026-09-25T00:00:00Z, 2026-10-09T00:00:00Z]. Registration: 2026-09-24T16:37:53.358317Z. Protocol digest 70e55f3dde205e15b232814f98b4e00c34fac8238f2fe5bc8b190608891adac8; implementation revision e9e6e7714409b566e86197abf01ddbe0957eaa9f. D-022 bundle and V2 artifact remain byte-identical. Fifty-nine combined tests passed (8.696 s). Real read-only pre-start collector check rejected before HTTP/run creation; inventory is zero. No predictions, metrics, training, promotion or recurring collector.

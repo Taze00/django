@@ -97,3 +97,14 @@ extension. LogLoss, Brier, ten fixed equal-width calibration bins, B0 comparison
 and defensible descriptive ranking diagnostics remain the prespecified analyses
 in FUTURE_EVALUATION_PROTOCOL.md. No causal pick-benefit claim from battlelogs or
 shadow win rates. Dependence/graph selection bias must remain explicit.
+
+## Actual registration and temporal gate
+
+D-024 REGISTERED_NOT_STARTED. Fixed interval: (2026-09-25T00:00:00Z, 2026-10-09T00:00:00Z]. Registration: 2026-09-24T16:37:53.358317Z. Protocol digest 70e55f3dde205e15b232814f98b4e00c34fac8238f2fe5bc8b190608891adac8; implementation revision e9e6e7714409b566e86197abf01ddbe0957eaa9f. D-022 bundle and V2 artifact remain byte-identical. Fifty-nine combined tests passed (8.696 s). Real read-only pre-start collector check rejected before HTTP/run creation; inventory is zero. No predictions, metrics, training, promotion or recurring collector.
+
+Protocol: `PROSPECTIVE_WINDOW.json`; digest receipt:
+`PROSPECTIVE_REGISTRATION.json`; actual pre-start check:
+`PROSPECTIVE_REGISTRATION_CHECK.json`. Start is 02:00 Europe/Berlin on
+25 September; end is 02:00 Europe/Berlin on 9 October. No prospective API
+request has been made. The fixed calendar boundary is the current external
+blocker; keep Legacy default and the existing Challenger usable while waiting.

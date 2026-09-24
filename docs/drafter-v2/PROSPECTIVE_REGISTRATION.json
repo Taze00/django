@@ -1,0 +1,11 @@
+{
+  "end_inclusive": "2026-10-09T00:00:00Z",
+  "implementation_revision": "e9e6e7714409b566e86197abf01ddbe0957eaa9f",
+  "old_holdout": "permanently_closed",
+  "pilot_excluded": true,
+  "protocol_sha256": "70e55f3dde205e15b232814f98b4e00c34fac8238f2fe5bc8b190608891adac8",
+  "recurring_collector": false,
+  "registered_at": "2026-09-24T16:37:53.358317+00:00",
+  "start_exclusive": "2026-09-25T00:00:00Z",
+  "status": "REGISTERED_NOT_STARTED_NOT_EVALUATED"
+}

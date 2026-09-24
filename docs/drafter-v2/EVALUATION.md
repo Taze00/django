@@ -215,3 +215,6 @@ D-023 pilot completed (run 7, 2026-09-24T16:22:13Z–16:24:00Z): acquisition fea
 
 
 D-024: schema 3 freezes common coverage (28 map/mode pairs, 106 supported Ranked-available Brawlers), canonical side orientation and frozen Legacy patch convention. Reject mismatched catalog/protocol/code provenance. No prospective metrics until immutable post-window sealing; minimum 1,000 is operational, not power.
+
+
+D-024 REGISTERED_NOT_STARTED. Fixed interval: (2026-09-25T00:00:00Z, 2026-10-09T00:00:00Z]. Registration: 2026-09-24T16:37:53.358317Z. Protocol digest 70e55f3dde205e15b232814f98b4e00c34fac8238f2fe5bc8b190608891adac8; implementation revision e9e6e7714409b566e86197abf01ddbe0957eaa9f. D-022 bundle and V2 artifact remain byte-identical. Fifty-nine combined tests passed (8.696 s). Real read-only pre-start collector check rejected before HTTP/run creation; inventory is zero. No predictions, metrics, training, promotion or recurring collector.
