@@ -141,3 +141,6 @@ D-019 readiness: zero new API soloRanked, three frontier members/zero due at 21:
 
 
 D-020: real run 6 again yielded zero eligible soloRanked; 50 new trophy observations are not Ranked evidence. DATA_UNAVAILABLE, no retry or bootstrap expansion.
+
+
+D-021: current Legacy demo priors are hand-set estimates, not Train-derived observations. All 137 resolve in the diagnostic context. Exact all-inputs-Train-only bundle cannot be certified. Runtime aggregate and catalog/configuration hashes are receipts, not source lineage. No complete restorable bundle or future registration exists.

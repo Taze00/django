@@ -1,3 +1,9 @@
+RESUME FROM: D-021 BLOCKED_PRIOR_LINEAGE. Exact Legacy overlay resolves 137 demo priors (20 Brawler/90 Counter/27 Synergy), which cannot be certified Train-only. All 6,094 Train examples independently match the pinned content hash. No verified bundle built/published; no window registered. Read LEGACY_TRAIN_BUNDLE.md for the precise prerequisite conflict. Resolving it requires an explicit comparison-input policy decision, not another collector retry or fabricated lineage.
+
+Latest validation: 14 bundle/Legacy-parity/future-window regressions passed (5.024 s); read-only real Train/prior audit reproduced. Collection run 6 is complete: three HTTP 200, zero ranking requests/retries, 50 new trophy matches, zero eligible soloRanked (DATA_UNAVAILABLE). 31 collector/growth tests passed (12.849 s). No immediate collection retry. Legacy, V2 weights, live data and closed holdout unchanged. Worktree artifacts: FRONTIER_REVISIT_2026-09-24.json and LEGACY_TRAIN_BUNDLE_PREFLIGHT.json.
+
+Earlier resume lines below are historical checkpoints.
+
 RESUME FROM: D-020 single frontier revisit complete (run 6): three battlelog HTTP 200, zero ranking requests/retries, 50 new trophy ranked matches, zero eligible soloRanked; DATA_UNAVAILABLE. Do not retry. Continue Train-only Legacy bundle provenance verification. 31 collector/growth tests passed (12.849 s).
 
 RESUME FROM: D-019 future-window preparation complete, not registered or evaluated. Shadow capture is usable. External collection gate: zero frontier players due at 2026-09-23T21:51:32Z; earliest stored cooldown 23:39:17Z. Scientific gate: no new eligible soloRanked evidence. Read FUTURE_EVALUATION_PROTOCOL.md before registration; a verified frozen Train-only Legacy input bundle remains required. No old-holdout/model work.

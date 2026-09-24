@@ -1,0 +1,150 @@
+{
+  "bundle_published": false,
+  "catalog_sha256": "cb8aa42993454184d09f949b56df15e079d6e7ebb24f89c1244b8f28f828fde0",
+  "code_sha256": {
+    "drafter/services/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "drafter/services/aggregation/__init__.py": "966d7efe7c8bba8668bd9e0b30eb4a1466f84243cf301468adf7377caca62e54",
+    "drafter/services/aggregation/aggregator.py": "d7f791f5a7ed79919e1ffe90a2b8e50d505f79896c07a21cdbabfa840711ea12",
+    "drafter/services/aggregation/rechnung.py": "bdb9fb31b5815b82eae9390061808a022fbe6d44d18562e4b978d0d43896f26c",
+    "drafter/services/analyse.py": "796dc2b81591e3eb6492cf9a6ca88ab3bf8e2c16274bb94418385a632ecd6c4f",
+    "drafter/services/anfrage.py": "e9d7866d1bb9edcddcb2a8d15a2c46ef582899092781314c35a8002dea439522",
+    "drafter/services/bans.py": "89e65350c164ad60e3e9cd0aeffde0d373e9d9a56c8222fd863bf012af74aaaf",
+    "drafter/services/brawl_api_client.py": "ef255638ff4450f88325ce01ce07645b8e9f169b316b006f3a95c8b36e332d0f",
+    "drafter/services/builds.py": "f940fe23b27efcd54e81f3d50b31819f8c335d94465b3c0195530486afbb7981",
+    "drafter/services/coach.py": "33aaf67e275b46b182d94382b1621dc5799c7ad8d08fa79f4f6e3a6f9ea35fae",
+    "drafter/services/collector.py": "d357ede5fa3aeb6b31d1b079f2f080c18cfc46dc321c8b779a2221776d755e7d",
+    "drafter/services/confidence.py": "e6304307a049d25fc8c779b506e11b9afbac7e6a3e2b2a60d9791430ec0ad958",
+    "drafter/services/context.py": "7e990304e4b7733e3fd89bca827143d6a94cec763bbe1a3d1d77bd1e0995ab27",
+    "drafter/services/counters.py": "3b5ab6bc5f9fff5221e793e12d27e1a91243fa3fe840646286d6ba546c1a024e",
+    "drafter/services/daten.py": "72bf2d52ef3c1be8c26e4a793f623ecd839dcf51d76a92e6d1afed964d1dff78",
+    "drafter/services/draft_engine.py": "6fc30415e126fe721caf4dabb6416a1756998ca50593ec2df58a04c074bc3b7c",
+    "drafter/services/draft_position.py": "15e0c334ad59534c2c154a8b5fe77a75b5995c4717a4e955ad8859f3b54b27d2",
+    "drafter/services/evaluation.py": "c2ffcfffec899ab354b64c0fdf317075fa5b4dad3548874f2509ff8d307d9c71",
+    "drafter/services/faehigkeiten.py": "09a30f39b9198e32c6c6e6df24e395330461fa5863169cf0da1df0bdcee38f60",
+    "drafter/services/identitaet.py": "88c3bdf36cf538a26990c7c75664e7b675bd45e92125908984eab26e7863ef6b",
+    "drafter/services/ingest/__init__.py": "dccfb3381d545afaaf87bd3f706f14a18e4ce1f506822045ad454e95fb14af2d",
+    "drafter/services/ingest/fingerprint.py": "69af44e8ff884c35fbb99baf2dd01012ef56bd8ff71b537d7b2fa056e862d0a4",
+    "drafter/services/ingest/importer.py": "6363d4c81c4f11cc8f9df1ca7a0f72a52b1354e05802162609668e850ec767b1",
+    "drafter/services/ingest/parser.py": "736f05f3bce3e7e50f2c62c911b1f00964077f4c70bf759b03eb83232bd0ed93",
+    "drafter/services/katalog.py": "ce4c055571537c06ca677c5dd14dab6ccd1941c81d951b825fafe453eae9145e",
+    "drafter/services/map_fit.py": "3d1a68eb95186c6b7f2de0e7519867ed548e70a3ab3a6835a4dc0447d7485926",
+    "drafter/services/mechanik.py": "ff6bed939c36428bd167cbcbdc42714a479e05343ec408c1bce716a1f48bb9df",
+    "drafter/services/meta.py": "07b14e91557415bf3cbf7002c3cd7f027b1da07f95678ab52273a157df68517e",
+    "drafter/services/objective.py": "48766622d084ae602d81850a3d806fd17b1d2c1f9dab3839a0b27791d303d62c",
+    "drafter/services/patch_weighting.py": "f39bb7ee0d86ab434a9efa28caa38ad97143b3f876b2be9bf2cd168ade8b8ffd",
+    "drafter/services/personal.py": "9a9237a13628e36fd20d883523fe398c07464173682083a742d704f0d30bae28",
+    "drafter/services/prioritaet.py": "78dc5fc411835622ed00794828047dfd983689cd5e9ec65d0470d2b3e3b3fdad",
+    "drafter/services/providers/__init__.py": "fcea2930935abcf38dd9d7f0b6cc5b65566a47a41b73897763e5653a09f1dd9e",
+    "drafter/services/providers/basis.py": "76d4d519bc1b108f9a029d38e8ef06f1ebc544eaf2e885f5eb19734a7c41fbe7",
+    "drafter/services/providers/datenbank.py": "b94b53fdff7fe3c65558cd54e4599465497992a9bf2cd6e16db1a6c104847eff",
+    "drafter/services/providers/demo.py": "9eed3001892bd6db6be5eb64d9c65d35a4492a0019e074ab69ecf16a7efa79b2",
+    "drafter/services/providers/fixture.py": "9c7635180343ed3fadb0950cafa83c169b9c42f79de2934464f1d9c42d4c0df6",
+    "drafter/services/providers/official_api.py": "ee96164037a6dc5b601965a8ddc9ecff94b7973d0696a07ad4fcc80a8efb5c09",
+    "drafter/services/providers/records.py": "f0afc23ff32458a8b2daa14da4a721dd42f44a833e1b714088c7fcc44be4a3bd",
+    "drafter/services/providers/registry.py": "80090d226e5b73a78b202e83c74a3103dbc25e86001807bdeb03d8bc6a26b0c5",
+    "drafter/services/providers/snapshot.py": "34517b7e57084e0bb625cb3061b07739184d3b92a13cadbefd81bffc784e4868",
+    "drafter/services/quellen.py": "ae8d95bef59e3b3857763048955ca739447c3dd318c90b7192588fe6c362eb0b",
+    "drafter/services/rollenwissen.py": "3275ebec271c7a987b51bb6155503a3e24eea1c6136b32d783a3008739a93214",
+    "drafter/services/scoring.py": "3d4cdd2cfdcf8c7c5acc1dee31ad26e371dcdeedfb7f42e5cf52809a0ebc22a7",
+    "drafter/services/staerke.py": "5ed15796531f44ea9cf51c8659b4bdc3aa9f9a0c27f946756b852487cd2bd448",
+    "drafter/services/stichprobe.py": "cfefd3cb31a6e2ae99b8119efb3a3a6c976b0156ef11c1e4f5644d65740ba836",
+    "drafter/services/synergies.py": "0f46d981c688730f9f042de43e53881d26e5076f47a6e212c2da98fec0bba638",
+    "drafter/services/tagged_frontier.py": "420b7794fad814472d253f2748db41bff35c4cd071e620e39769355f0a61b505",
+    "drafter/services/team_coverage.py": "c59cf3cfa19789e9b0bce3ef9e4697c60283824dd7691616b06a542069ba5567",
+    "drafter/services/team_need.py": "1b4ae45556f2067a6e0384260a7b2e22c7a59017c5ed5c2fb2ab2eeddc5601c6",
+    "drafter/services/v2_challenger.py": "3a5585c59e71791fc6ce1eede8cf4361532d00e6bfcba7b2ba38ea37c8dd17b3",
+    "drafter/services/v2_challenger_training.py": "68ab89941cbdb56ee58bb75ea68008c2904b97a93cd23b15eaf04564124411c9",
+    "drafter/services/v2_diagnostics.py": "430fd4549535efda7d6554a6cb6ff9d6e7012775600a614ee81acef14db65432",
+    "drafter/services/v2_explanation.py": "4cdfc8f5372c53af2f5b913c826a5c89cd9e926b43e83277bd2a772319daaf0f",
+    "drafter/services/v2_future_window.py": "ce78dcae4695e31b338743823283437a76464770ac733df4bbe7f0a1be3b8501",
+    "drafter/services/v2_legacy_bundle.py": "9516b7d843cf448caa79827e51905684a8ff2f541bc479687e6420204bf62dcc",
+    "drafter/services/v2_legacy_comparison.py": "c56b54a15dfdfa5ffb78d5a541b2f1dbbcfaa8082f397437155d6838e72127f0",
+    "drafter/services/v2_mechanics_audit.py": "f7b09ee592e67e25ddf5bfbc556a9558a71193d856d6557020a1fbfb9fe5209c",
+    "drafter/services/v2_mechanics_claims.py": "6b481239b8dc7fc220f8308bf35b1be34cef3e78462106175a4e55b61a5cd2d7",
+    "drafter/services/v2_mechanics_followup.py": "dc09a1a60c02c652af5f1072ad537f1c42ebf8fa810974e9b3c50f34836781f0",
+    "drafter/services/v2_model.py": "59d32cc1b9e2e7d19f5be0e276839dbb9756197e93d6db5768112dfa57312ac5",
+    "drafter/services/v2_planning.py": "3a6385292893ba4bd0977f64c2620a9c3f57e7f6d9cfac5ad19c0cc3ab1c4200",
+    "drafter/services/v2_search.py": "f9af15d06e14568cf4bcd56e65aa265eb580dc41a4de00ba33e84fbf04c97559",
+    "drafter/services/v2_snapshots.py": "7dd1f7510ccd2c79e847a7238918ec5c968aa7b200ad0cbf4f9f85fb979e8bfb",
+    "drafter/services/vertrauen.py": "bd49f4bc1be77d277e25f178b18ae2a2ebd7dccd4401379874ad7fb88a5fe6a6",
+    "drafter/services/win_probability.py": "69c6467f1b923dded5d624304cf31e9ae69baa17f0620f2e9f8435fb03c4718b"
+  },
+  "configuration_sha256": "4900c9891458b34f8bd94e6653dc417f1f8f99ca815cb057ddf71e021f1cdc92",
+  "holdout_access": false,
+  "non_train_priors": {
+    "BrawlerStat": {
+      "demo": 20
+    },
+    "CounterStat": {
+      "demo": 90
+    },
+    "SynergyStat": {
+      "demo": 27
+    }
+  },
+  "priors_sha256": "8f0560ee751038bfdbb14595bc8bf2534f105bbd68ae5c3bdfe33192610b81b1",
+  "provider": "OverlayStatProvider",
+  "reason": "Exact frozen provider priors have no Train observation lineage",
+  "resolved_hideout_priors": {
+    "brawler": {
+      "n": 20,
+      "sha256": "e5db25c1028f0a40bd207a24e76911733c7ca0064e0726c2eae4c42a9c3197b4",
+      "sources": {
+        "demo": 20
+      }
+    },
+    "build": {
+      "n": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "sources": {}
+    },
+    "counter": {
+      "n": 90,
+      "sha256": "654970bd0758bf44649d11cc1ffc11193a6875d4380642c75f2a9bb009cd7f2f",
+      "sources": {
+        "demo": 90
+      }
+    },
+    "synergy": {
+      "n": 27,
+      "sha256": "c4ee640a375c238c583f4a3eb9498493e3d604d11b1daf0ddaba684f34d5b74e",
+      "sources": {
+        "demo": 27
+      }
+    }
+  },
+  "runtime_stat_counts_not_lineage_proof": {
+    "BrawlerStat": {
+      "api": 11823,
+      "demo": 20
+    },
+    "BuildStat": {},
+    "CounterStat": {
+      "api": 57558,
+      "demo": 90
+    },
+    "SynergyStat": {
+      "api": 48528,
+      "demo": 27
+    }
+  },
+  "schema": "legacy-train-bundle-preflight-1",
+  "source_metadata_sha256": "918f5fd8fdea693e3f1d7374019747c06d7eb7e492d2f344014ecec8a068cfba",
+  "status": "BLOCKED_PRIOR_LINEAGE",
+  "train": {
+    "content_sha256": "5e8ff094ad9f93ed565bcaed9f725ffd7d78dd67c22e31c7b6aaed6cd2cec447",
+    "first": "2026-08-29T00:48:08+00:00",
+    "last": "2026-09-17T21:43:04+00:00",
+    "membership_sha256": "9f7ac1e764b15da79a1f92ce369c896d4d09d54efad316f3e48da44317e97117",
+    "n": 6094,
+    "sources": [
+      {
+        "n": 6094,
+        "source": "api"
+      }
+    ]
+  },
+  "validation_access": false,
+  "verified": false,
+  "window_registered": false
+}

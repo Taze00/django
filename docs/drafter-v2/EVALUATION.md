@@ -197,3 +197,6 @@ D-019 future protocol is prepared, not executed: separate official soloRanked co
 
 
 D-020 collected no qualifying Ranked test evidence. No window registered, no outcome evaluation or model fit. Independent growth audit and run evidence committed.
+
+
+D-021 fair-comparison prerequisite failed: exact overlay priors lack Train lineage. Future protocol remains unregistered. See LEGACY_TRAIN_BUNDLE.md for required explicit baseline input-policy distinction. No new metrics or model work.

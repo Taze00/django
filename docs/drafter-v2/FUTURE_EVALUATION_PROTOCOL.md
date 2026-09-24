@@ -135,3 +135,6 @@ run, record DATA_UNAVAILABLE and retain evidence rather than immediately retryin
 Validation: 46 combined future-contract/shadow/frontier tests passed (4.443 s),
 then eight focused future tests including SQL-boundary, content-change and
 true-development-end coverage passed (1.027 s). Fixtures are explicitly synthetic, not evidence accumulation.
+
+
+D-021 prerequisite audit: current exact Legacy overlay has 137 demo priors, including all 137 resolved for Hideout. Train content verified independently, but an exact all-inputs-Train-only bundle is scientifically blocked. No real register() call is allowed. LEGACY_TRAIN_BUNDLE.md records the input-policy decision needed; no silent conversion/removal of priors.

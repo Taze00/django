@@ -75,3 +75,6 @@ D-018: models unchanged. Optional shadow requests preserve both responses before
 
 
 D-019: active V unchanged; opponent feature rejection retained. Shadow and future membership code do not fit models or promote candidates. Future fair comparison requires a genuinely frozen Train-only Legacy input bundle; current runtime hashes do not establish it.
+
+
+D-021 active V2 artifact byte hash unchanged; no training or model search. Exact Legacy Train-only bundle remains blocked on curated demo priors. Default Legacy provider/scorer unchanged.

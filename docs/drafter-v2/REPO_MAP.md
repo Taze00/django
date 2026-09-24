@@ -137,3 +137,6 @@ D-018: v2_snapshots stores canonical response digest, context/bias provenance an
 
 
 D-019: services/v2_future_window.py supplies pure preregistration/seal/publication/integrity contracts; management/commands/drafter_v2_future_window.py supplies read-only temporal inventory and optional sealing/verification. docs shadow_frontier_readiness.py audits counts/cooldowns without credentials or holdout data. No evaluator, collector schedule, migration or shared-app change.
+
+
+D-021 services/v2_legacy_bundle.py and drafter_v2_legacy_bundle_audit command implement read-only fail-closed Train/prior preflight, not aggregation/export/promotion. Explicit Train key predicate avoids Validation and holdout examples. Provenance metadata only; no raw bodies or credentials logged.

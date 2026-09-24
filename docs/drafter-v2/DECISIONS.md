@@ -564,3 +564,6 @@ D-019: keep self-selected shadow reports separate from official future soloRanke
 
 
 D-020: revisit existing three due frontier players once, zero ranking seeds, five-attempt cap/depth one unchanged. Actual three HTTP 200, no retries, 75 entries, 25 older raw-only, 50 new trophy ranked, zero new eligible soloRanked/neighbors. Raw/provenance retained; no model/holdout/live data access. 31 regressions passed; see FRONTIER_REVISIT_2026-09-24.json.
+
+
+D-021: fail the exact all-inputs-Train-only Legacy gate on actual demo prior lineage. Direct artifact Train fingerprints/content verify without Validation/holdout reads. All 137 demo priors resolve in Hideout prior tables. No silent removal, replacement, source relabeling or scoring change. Record BLOCKED_PRIOR_LINEAGE, not a certified bundle. Both possible future protocol distinctions are documented, neither automatically chosen. 14 regressions passed; real evidence in LEGACY_TRAIN_BUNDLE_PREFLIGHT.json.

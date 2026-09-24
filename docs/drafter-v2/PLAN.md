@@ -201,3 +201,6 @@ D-019 complete: future-only protocol/membership preparation, atomic publication 
 
 
 D-020 complete: exactly one authorized zero-seed frontier revisit, run 6, DATA_UNAVAILABLE; no immediate retry. Next frozen Legacy bundle lineage audit.
+
+
+D-021 exact bundle prerequisite BLOCKED_PRIOR_LINEAGE. Verified pinned Train contents, but current overlay includes 137 hand-set demo priors. No bundle/window publication. Read LEGACY_TRAIN_BUNDLE.md; explicit input-policy resolution is required before empirical rebuild and independent replay can establish a fair frozen baseline.
