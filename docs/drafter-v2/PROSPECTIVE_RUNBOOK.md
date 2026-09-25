@@ -108,3 +108,18 @@ Protocol: `PROSPECTIVE_WINDOW.json`; digest receipt:
 25 September; end is 02:00 Europe/Berlin on 9 October. No prospective API
 request has been made. The fixed calendar boundary is the current external
 blocker; keep Legacy default and the existing Challenger usable while waiting.
+
+## Operational continuation: 25 September, run 8
+
+Run 8 completed 2026-09-25T14:12:18.440952+00:00–2026-09-25T14:16:42.334100+00:00: ten battlelog HTTP 200, zero retries/ranking requests, 250 raw entries (233 trophy ranked, one friendly, 16 UNKNOWN). No raw soloRanked and no newly eligible prospective observations: DATA_UNAVAILABLE for this run, not a final window verdict. 94 pre-start entries retained raw-only; 33 unsupported entries skipped. 105 new matches (104 trophy, one friendly), 18 trophy duplicates, zero conflicts. All 105 current-window rows are excluded as non-soloRanked. Current admissible prospective count is zero; no membership sealed.
+
+1,294 new query-eligible tags; discovery frontier 2,665. The cumulative Ranked-evidence frontier remains 56 tags/33 matches from the excluded pilot; these are not prospective observations. All ten raw content hashes, frozen implementation/artifacts and catalog identities verified. Preflight found 1,371 due existing tags and no earlier prospective run. Fourteen focused prospective/future-window regressions passed (3.759 s) on synthetic data.
+
+The window is now open. The pre-start checkpoint above is historical. No policy
+or registered JSON was changed. Next global run gate: 2026-09-25T20:12:18.440952+00:00.
+No immediate retry or recurring job. Acquisition/integrity evidence only:
+`PROSPECTIVE_RUN_008_2026-09-25.json`; reproducer:
+`prospective_acquisition_audit.py` through read-only `manage.py shell`.
+Its candidate count checks the frozen admission predicates but neither seals
+membership nor computes model performance. Source tags and response bodies
+remain private in the isolated database.

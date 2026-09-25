@@ -1,0 +1,217 @@
+{
+  "acquisition_status": "DATA_UNAVAILABLE_FOR_THIS_RUN_WINDOW_REMAINS_OPEN",
+  "audited_at": "2026-09-25T14:17:12.899182+00:00",
+  "automatic_training": false,
+  "collector_report": {
+    "abbruch": "",
+    "api": {
+      "anfragen": 10,
+      "ratenlimit_header": [],
+      "retry_after": [],
+      "status": {
+        "200": 10
+      },
+      "wartezeit_sekunden": 0.0,
+      "wiederholungen": 0
+    },
+    "battlelog_attempts": 10,
+    "battlelog_eintraege": 250,
+    "battlelogs_ok": 10,
+    "bootstrap_raw_battle_types": {},
+    "data_status": "DATA_UNAVAILABLE",
+    "datenlage": {},
+    "discovery_frontier_size": 2665,
+    "duplicate_player_observations": 716,
+    "duplikate": 18,
+    "duplikate_nach_typ": {
+      "ranked": 18
+    },
+    "fehler": {},
+    "frontier_before": 1371,
+    "frontier_size": 2665,
+    "future_test_eligible": true,
+    "historical_records_retained_raw_only": 94,
+    "holdout_evaluated": false,
+    "id_widersprueche": [],
+    "invalid_discovered_tags": 0,
+    "katalog": [],
+    "katalog_neu": [],
+    "katalog_verknuepft": [],
+    "konflikte": 0,
+    "neu": 105,
+    "neu_nach_typ": {
+      "friendly": 1,
+      "ranked": 104
+    },
+    "new_discovered_tags": 1294,
+    "new_eligible_solo_ranked_matches": 0,
+    "new_frontier_seeds": 0,
+    "partien_gelesen": 123,
+    "protected_historical_duplicates_raw_only": 0,
+    "protocol_sha256": "70e55f3dde205e15b232814f98b4e00c34fac8238f2fe5bc8b190608891adac8",
+    "purpose": "prospective_test",
+    "query_eligible_tags_available": 1371,
+    "query_eligible_tags_due": 1371,
+    "rangliste_gesehen": 0,
+    "rangliste_neu": 0,
+    "ranked_evidence_frontier_size": 56,
+    "ranked_evidence_matches": 33,
+    "ranking_attempts": 0,
+    "ranking_cooldown_skipped": false,
+    "ranking_duplicate_tags": 0,
+    "ranking_entries": 0,
+    "ranking_invalid_tags": 0,
+    "ranking_seeds_admitted": 0,
+    "ranking_seeds_due": 0,
+    "ranking_valid_unique_tags": 0,
+    "raw_battle_types": {
+      "UNKNOWN": 16,
+      "friendly": 1,
+      "ranked": 233
+    },
+    "report_version": "prospective_discovery_v1",
+    "run_id": 8,
+    "skill_labels": "UNKNOWN",
+    "spieler_abgefragt": 10,
+    "spieler_entdeckt": 1294,
+    "uebersprungen": 33,
+    "unbekannte_brawler": [],
+    "ungueltig": 0,
+    "unique_response_player_tags": 1376,
+    "unique_response_tags_not_in_bootstrap": 1376
+  },
+  "currently_admissible_not_sealed": 0,
+  "duplicate_admissible_fingerprints": {
+    "fingerprint": 0,
+    "reconstructed_fingerprint": 0
+  },
+  "exclusions": {
+    "not_official_soloRanked": 105
+  },
+  "finished_at": "2026-09-25T14:16:42.334100+00:00",
+  "frontier_evidence_count_note": "Collector ranked frontier totals include prior pilot provenance; only currently_admissible_not_sealed counts prospective candidates.",
+  "frozen_files_and_catalog": "VERIFIED",
+  "independent_raw_type_counts": {
+    "UNKNOWN": 16,
+    "friendly": 1,
+    "ranked": 233
+  },
+  "latest_run_linked_admissible": 0,
+  "model_predictions_or_performance_metrics_computed": false,
+  "next_run_not_before": "2026-09-25T20:12:18.440952+00:00",
+  "parameters": {
+    "abruf_abstand_stunden": 6,
+    "after_exclusive": "2026-09-25T00:00:00+00:00",
+    "battlelog_http_budget": 10,
+    "catalog_requests": 0,
+    "code_revision": "e9e6e7714409b566e86197abf01ddbe0957eaa9f",
+    "depth_semantics": "new_request_hops_per_run",
+    "future_test_eligible": true,
+    "max_tiefe": 1,
+    "protocol_sha256": "70e55f3dde205e15b232814f98b4e00c34fac8238f2fe5bc8b190608891adac8",
+    "purpose": "prospective_test",
+    "ranking_http_budget": 0,
+    "ranking_seeds": 0,
+    "strategie": "prospective_discovery_v1"
+  },
+  "pilot_origin_rows_in_window": 0,
+  "preflight": {
+    "checked_at": "2026-09-25T14:11:00.761736+00:00",
+    "files_and_catalog": "VERIFIED",
+    "previous_runs": [],
+    "protocol_sha256": "70e55f3dde205e15b232814f98b4e00c34fac8238f2fe5bc8b190608891adac8",
+    "query_eligible_due": 1371
+  },
+  "protocol_sha256": "70e55f3dde205e15b232814f98b4e00c34fac8238f2fe5bc8b190608891adac8",
+  "raw_content_integrity": "VERIFIED",
+  "raw_payloads": [
+    {
+      "content_hash": "a6ee03d5c48e379cf01a6d6e6127f412e7d2761bdf1f256e940450d6e2ebdbb1",
+      "fetched_at": "2026-09-25T14:12:20.519001+00:00",
+      "id": 942,
+      "parse_status": "parsed",
+      "sampling": "prospective_discovery_v1"
+    },
+    {
+      "content_hash": "4629fa1bd87ffecd0d878445af3069e6f912aa7808dcb4fe4ef5c8f3725944e5",
+      "fetched_at": "2026-09-25T14:12:34.179737+00:00",
+      "id": 943,
+      "parse_status": "parsed",
+      "sampling": "prospective_discovery_v1"
+    },
+    {
+      "content_hash": "fbfbc685ff7dc0dd44c9922d75fbfa52fac1525e6b6d787fba6931c49876d815",
+      "fetched_at": "2026-09-25T14:12:45.042332+00:00",
+      "id": 944,
+      "parse_status": "parsed",
+      "sampling": "prospective_discovery_v1"
+    },
+    {
+      "content_hash": "bbfd47aa2976b274eeed9dafc6f85cc14ca94079a396b6a4697205f72d7bddc2",
+      "fetched_at": "2026-09-25T14:12:54.580644+00:00",
+      "id": 945,
+      "parse_status": "parsed",
+      "sampling": "prospective_discovery_v1"
+    },
+    {
+      "content_hash": "4c20e4ab55f8bfa366f87e567b6891d860ee00404536602efaef5b9edd0aed59",
+      "fetched_at": "2026-09-25T14:13:07.750247+00:00",
+      "id": 946,
+      "parse_status": "parsed",
+      "sampling": "prospective_discovery_v1"
+    },
+    {
+      "content_hash": "726034531c98ff34d870a5619909af4619602ff975c7c5a6c687512264b0e741",
+      "fetched_at": "2026-09-25T14:13:30.570946+00:00",
+      "id": 947,
+      "parse_status": "parsed",
+      "sampling": "prospective_discovery_v1"
+    },
+    {
+      "content_hash": "38ef5ed5d55fee9c09c62bda706efa772c134a975ac51d12bd30779ce61e9aa5",
+      "fetched_at": "2026-09-25T14:14:10.888981+00:00",
+      "id": 948,
+      "parse_status": "parsed",
+      "sampling": "prospective_discovery_v1"
+    },
+    {
+      "content_hash": "c3e3ca02c1c4ee1fab2514e7a74f3f388d4908260234adf809f8f9c8aac64c49",
+      "fetched_at": "2026-09-25T14:14:43.538232+00:00",
+      "id": 949,
+      "parse_status": "parsed",
+      "sampling": "prospective_discovery_v1"
+    },
+    {
+      "content_hash": "835e6a2306cb6dd7df56d15a005432535b2242c41bec65b845bf9fc11897d5e7",
+      "fetched_at": "2026-09-25T14:15:17.173721+00:00",
+      "id": 950,
+      "parse_status": "parsed",
+      "sampling": "prospective_discovery_v1"
+    },
+    {
+      "content_hash": "a4de2a6cc0d0a0a3f1de2c850d0d7fdec38a66c7c76f4f235b91e308af8ad191",
+      "fetched_at": "2026-09-25T14:16:28.227788+00:00",
+      "id": 951,
+      "parse_status": "parsed",
+      "sampling": "prospective_discovery_v1"
+    }
+  ],
+  "recurring_collector": false,
+  "run_id": 8,
+  "schema": "prospective-acquisition-audit-1",
+  "sealed": false,
+  "started_at": "2026-09-25T14:12:18.440952+00:00",
+  "validation": {
+    "focused_tests": 14,
+    "status": "PASSED",
+    "test_data": "synthetic_disposable_database_only",
+    "test_seconds": 3.759
+  },
+  "window_http_attempts_used": 10,
+  "window_inventory_count": 105,
+  "window_runs_used": 1,
+  "window_types": {
+    "friendly": 1,
+    "ranked": 104
+  }
+}
