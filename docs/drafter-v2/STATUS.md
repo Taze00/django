@@ -1,3 +1,5 @@
+D-028 executable forward check complete: rejects scoring before fixed close, verifies frozen candidate/control hashes, preserves exact as-of membership and fails DATA_UNAVAILABLE below 1,000. Fifteen collector/experiment/forward regressions passed (4.081 s). No actual forward evaluation performed. Batch 03 remains active (runs 17/18 complete, 19 running at checkpoint); continue acquisition safely.
+
 RESUME FROM: 5k milestone and D-027 first chronological experiment complete. Batch 03 RUNNING (four bounded 50-attempt cycles), /tmp/development-batch-03.log; do not restart. Continue safe acquisition toward 10k/25k/50k. Do not repeat fitting on the September-25 slice. Fixed DEVELOPMENT forward confirmation is preregistered for September 26–27 UTC, only after close, at least 1,000 eligible; no final test.
 
 Immutable 5k snapshot: 5,212 eligible new soloRanked, plus verified 6,094 original Train; 840 older new / 4,372 latest-day observations. Completed runs 9–16: 400 HTTP 200, 4,880 strict new, zero retries/429/conflicts; raw hashes verified. Active run 17 contributes only to separately timestamped current coverage. See DEVELOPMENT_5K_DATASET.json / AUDIT.json.

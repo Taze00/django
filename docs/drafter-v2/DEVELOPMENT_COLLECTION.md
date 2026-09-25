@@ -99,3 +99,22 @@ dataset safety tests passed (3.641 s), final eight development/recovery tests
 passed (2.056 s). Recovery also restores eligible Ranked-evidence edges without
 changing raw fetch or player clocks. `--recover-only` performs this local replay
 without HTTP and is available during an API pause.
+
+## Frozen forward development confirmation (D-028)
+
+D-027 selected opponent_l2_10 on the first qualifying chronological snapshot.
+Do not repeat the grid against September-25 outcomes. The working artifact is
+unchanged. DEVELOPMENT_FORWARD_001_PROTOCOL.json pins the private candidate
+archive, controls, fixed September 26–27 UTC played-at slice and 1,000-example
+minimum. This remains DEVELOPMENT, never an independent final test.
+
+After 2026-09-28T00:00:00Z only, run `drafter_development_forward` with
+`--protocol`, its committed byte `--protocol-sha256`, `--output` (new private
+path), and `--revision`. The command rejects early scoring before opening the
+archive or querying examples, verifies artifact hashes, and uses only eligible
+observations actually fetched by the fixed end. It preserves a membership hash
+and private members with the result. Insufficient data yields DATA_UNAVAILABLE
+without metrics, extension or threshold changes. Confirmation requires lower
+LogLoss and no higher Brier than both frozen V2 and frozen retrained team.
+No fitting, Legacy scoring, final-test registration or artifact replacement is
+performed. Collection may continue in bounded development cycles meanwhile.

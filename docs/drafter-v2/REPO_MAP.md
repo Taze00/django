@@ -156,3 +156,5 @@ D-026: sustainable development collector/dataset implementation complete, valida
 D-027: development_experiment.py and drafter_development_experiment load only pinned development memberships, reverify content/lineage, and run the fixed grid. No Legacy evaluation and no artifact replacement.
 
 Development experiment artifacts: DEVELOPMENT_EXPERIMENT_001_RESULT.json and ARTIFACTS.json record public metrics/private immutable hashes; DEVELOPMENT_FORWARD_001_PROTOCOL.json pins the next development slice. DEVELOPMENT_5K_DATASET.json and AUDIT.json record coverage, membership hash, completed raw verification and active-run scope.
+
+`development_forward.py` / `drafter_development_forward`: immutable candidate/hash and fixed-time gates for D-028 forward DEVELOPMENT confirmation; never a final test or promotion command.
