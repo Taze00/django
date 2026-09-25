@@ -1,0 +1,73 @@
+{
+  "actual_game_patch": "UNKNOWN",
+  "after_exclusive": "2026-09-18T15:04:42+00:00",
+  "chronological_plan": {
+    "final_test": false,
+    "new_train_n": 7002,
+    "new_validation_n": 15319,
+    "status": "READY_FOR_PREREGISTERED_DEVELOPMENT_VALIDATION",
+    "validation_utc_day": "2026-09-25"
+  },
+  "coverage": {
+    "date": {
+      "2026-09-18": 10,
+      "2026-09-19": 11,
+      "2026-09-20": 17,
+      "2026-09-21": 81,
+      "2026-09-22": 130,
+      "2026-09-23": 686,
+      "2026-09-24": 6067,
+      "2026-09-25": 15319
+    },
+    "import_patch": {
+      "1": 22311,
+      "2": 10
+    },
+    "map": {
+      "Belle's Rock": 837,
+      "Bridge Too Far": 784,
+      "Center Stage": 887,
+      "Double Swoosh": 873,
+      "Dry Season": 829,
+      "Dueling Beetles": 870,
+      "Flaring Phoenix": 892,
+      "Gem Fort": 803,
+      "Hard Rock Mine": 898,
+      "Hideout": 924,
+      "Hot Potato": 845,
+      "In the Liminal": 819,
+      "Kaboom Canyon": 816,
+      "Layer Cake": 834,
+      "New Horizons": 882,
+      "Open Business": 892,
+      "Out in the Open": 873,
+      "Parallel Plays": 863,
+      "Pinball Dreams": 844,
+      "Quick Travel": 803,
+      "Ring of Fire": 889,
+      "Safe Zone": 790,
+      "Shooting Star": 878,
+      "Sneaky Fields": 833,
+      "Triple Dribble": 902,
+      "Undermine": 961
+    },
+    "mode": {
+      "bounty": 3465,
+      "brawlBall": 3466,
+      "gemGrab": 3535,
+      "heist": 3235,
+      "hotZone": 5136,
+      "knockout": 3484
+    }
+  },
+  "dataset_sha256": "6b98a56d67d78e5b7ac92e56abee7e279b4f949a3f48e03c38ea869b051622f8",
+  "eligible_new_current_soloRanked": 22321,
+  "excluded": {
+    "incomplete_conflicting_unknown_context_or_duplicate_brawlers": 1481
+  },
+  "final_test_eligible": false,
+  "new_membership_sha256": "e987668e905549e20788c5cc8c341894f827a0f0d6ae4e3cfe0259d40487372e",
+  "original_train_n": 6094,
+  "private_manifest": "data/brawl_reports/development-20260925-007-session-checkpoint.json",
+  "selection_bias": "Ranked-activity-prioritized graph, repeated players; no independence or sampling weights"
+}

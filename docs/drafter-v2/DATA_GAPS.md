@@ -172,3 +172,5 @@ D-026 1k milestone independently inventoried: 1,447 strict new eligible soloRank
 5k development snapshot: 5,212 strict eligible, 26 maps/six modes, graph-discovered repeated players; actual game patch remains UNKNOWN. Volume improved but temporal and population independence remain unproven. D-027 gain requires frozen forward confirmation; current-day data must not become a repeatedly tuned validation slice.
 
 D-026 10k checkpoint: immutable snapshot 006 verifies 10,180 new eligible soloRanked, 26 maps/six modes/five days. 8,377 are September-25; temporal breadth remains limited and actual patch UNKNOWN. Raw integrity verified for 800 completed responses. Continue toward 25k/50k without refitting the current Validation slice.
+
+Checkpoint 007: 22,321 strict eligible, 26 maps/six modes/eight dates; actual patch UNKNOWN despite imported contexts 1 (22,311) and 2 (10). 1,481 strict exclusions are not training evidence. Additional exclusion-reason decomposition is pending because Docker stopped; do not invent the breakdown. Repeated-player graph bias remains (41,964 observed tags; maximum 52 matches/tag).

@@ -232,3 +232,5 @@ D-026 1k milestone independently inventoried: 1,447 strict new eligible soloRank
 D-026 5k development milestone verified. D-027 fixed chronological experiment complete; small opponent-interaction gain retained privately, no working-artifact promotion. Next: continue acquisition at 10k/25k/50k checkpoints and execute D-028 forward DEVELOPMENT confirmation after its fixed close. No final test registration.
 
 D-026 10k checkpoint: immutable snapshot 006 verifies 10,180 new eligible soloRanked, 26 maps/six modes/five days. 8,377 are September-25; temporal breadth remains limited and actual patch UNKNOWN. Raw integrity verified for 800 completed responses. Continue toward 25k/50k without refitting the current Validation slice.
+
+D-026 session checkpoint 007 verifies 22,321 new eligible Ranked matches. Next: resume bounded collection toward 25k/50k when the isolated Docker runtime is restored; global Docker was inactive at 2026-09-25T19:06:10Z. No collector remains active. D-027 selection is frozen, D-028 stays time-gated; no new final test.

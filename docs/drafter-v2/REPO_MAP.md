@@ -158,3 +158,5 @@ D-027: development_experiment.py and drafter_development_experiment load only pi
 Development experiment artifacts: DEVELOPMENT_EXPERIMENT_001_RESULT.json and ARTIFACTS.json record public metrics/private immutable hashes; DEVELOPMENT_FORWARD_001_PROTOCOL.json pins the next development slice. DEVELOPMENT_5K_DATASET.json and AUDIT.json record coverage, membership hash, completed raw verification and active-run scope.
 
 `development_forward.py` / `drafter_development_forward`: immutable candidate/hash and fixed-time gates for D-028 forward DEVELOPMENT confirmation; never a final test or promotion command.
+
+DEVELOPMENT_SESSION_CHECKPOINT_DATASET.json / AUDIT.json preserve checkpoint 007 and complete successful-raw verification for runs 9–48. DEVELOPMENT_BATCH_05_COUNTS.json records the final 20 bounded cycles. Private membership remains data/brawl_reports/development-20260925-007-session-checkpoint.json.
