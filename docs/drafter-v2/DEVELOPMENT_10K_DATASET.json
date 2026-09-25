@@ -1,0 +1,69 @@
+{
+  "actual_game_patch": "UNKNOWN",
+  "after_exclusive": "2026-09-18T15:04:42+00:00",
+  "chronological_plan": {
+    "final_test": false,
+    "new_train_n": 1803,
+    "new_validation_n": 8377,
+    "status": "READY_FOR_PREREGISTERED_DEVELOPMENT_VALIDATION",
+    "validation_utc_day": "2026-09-25"
+  },
+  "coverage": {
+    "date": {
+      "2026-09-21": 4,
+      "2026-09-22": 12,
+      "2026-09-23": 114,
+      "2026-09-24": 1673,
+      "2026-09-25": 8377
+    },
+    "import_patch": {
+      "1": 10180
+    },
+    "map": {
+      "Belle's Rock": 412,
+      "Bridge Too Far": 329,
+      "Center Stage": 412,
+      "Double Swoosh": 432,
+      "Dry Season": 376,
+      "Dueling Beetles": 410,
+      "Flaring Phoenix": 389,
+      "Gem Fort": 328,
+      "Hard Rock Mine": 396,
+      "Hideout": 438,
+      "Hot Potato": 417,
+      "In the Liminal": 371,
+      "Kaboom Canyon": 367,
+      "Layer Cake": 399,
+      "New Horizons": 392,
+      "Open Business": 408,
+      "Out in the Open": 426,
+      "Parallel Plays": 385,
+      "Pinball Dreams": 364,
+      "Quick Travel": 358,
+      "Ring of Fire": 414,
+      "Safe Zone": 362,
+      "Shooting Star": 416,
+      "Sneaky Fields": 361,
+      "Triple Dribble": 375,
+      "Undermine": 443
+    },
+    "mode": {
+      "bounty": 1629,
+      "brawlBall": 1512,
+      "gemGrab": 1599,
+      "heist": 1475,
+      "hotZone": 2346,
+      "knockout": 1619
+    }
+  },
+  "dataset_sha256": "6487f562543ffc35569853f808af75c48e7805739e4d2b4688cc6cfe7b0dbdc3",
+  "eligible_new_current_soloRanked": 10180,
+  "excluded": {
+    "incomplete_conflicting_unknown_context_or_duplicate_brawlers": 130
+  },
+  "final_test_eligible": false,
+  "new_membership_sha256": "8e439aecee5c18c67cd98b158183d59a67bdffb0a9de7b3d9489c36effd9b82f",
+  "original_train_n": 6094,
+  "private_manifest": "data/brawl_reports/development-20260925-006-10k.json",
+  "selection_bias": "Ranked-activity-prioritized graph, repeated players; no independence or sampling weights"
+}
