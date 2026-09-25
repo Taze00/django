@@ -1,3 +1,5 @@
+D-027 pre-fit reporting completed: active unknown-feature occurrence fraction and explicit Brawler main-effect coverage, in addition to row coverage and measured latency. Four synthetic experiment tests passed. No fit/quality results yet; grid, data gates and selection unchanged. Batch 02 remains active; do not restart it.
+
 RESUME FROM: D-026 batch 01 complete (runs 9–12). Batch 02 is RUNNING, four bounded 50-attempt cycles, /tmp/development-batch-02.log. Do not restart active collection. Snapshot 003 has 2,485 new eligible matches but only 489 older-day Train examples: D-027 gate remains unmet, no fitting. At batch 02 completion create an immutable snapshot and apply the unchanged gates.
 
 Product and development regression suite: 50 passed (7.888 s), including Challenger, planning, exact Legacy comparison, explanations, shadow, collector and experiment selection.

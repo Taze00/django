@@ -22,3 +22,19 @@ class DevelopmentExperimentTests(SimpleTestCase):
         manifest['dataset_sha256']=digest(manifest)
         with self.assertRaisesRegex(ValueError,'Insufficient'):
             run_experiment(manifest,{'schema':'chronological-development-experiment-1'},'synthetic')
+
+    def test_coverage_separates_unknown_composition_terms_from_known_brawlers(self):
+        from datetime import datetime, timezone
+        from drafter.services.evaluation import EvaluationExample
+        from drafter.services.v2_model import CompositionLogitModel, FEATURE_VERSION
+        from drafter.services.development_experiment import feature_coverage
+        row=EvaluationExample('synthetic',datetime(2026,1,1,tzinfo=timezone.utc),
+            'bounty','Hideout',(1,2,3),(4,5,6),1)
+        model=CompositionLogitModel(FEATURE_VERSION,{f'brawler:{b}':b-1 for b in range(1,7)},(0,)*6,1,1)
+        coverage=feature_coverage(model,[row])
+        self.assertEqual(coverage['active_feature_occurrences'],24)
+        self.assertEqual(coverage['unknown_feature_occurrences'],18)
+        self.assertEqual(coverage['unknown_feature_fraction'],.75)
+        self.assertEqual(coverage['brawlers_without_train_main_effect'],[])
+        self.assertEqual(coverage['rows_with_unknown_feature_terms'],1)
+        self.assertIsNone(feature_coverage(model,[])['unknown_feature_fraction'])

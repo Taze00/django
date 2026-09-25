@@ -27,6 +27,22 @@ def select_candidate(results):
     return selected
 
 
+def feature_coverage(model, examples):
+    """Count active feature occurrences; unknown terms are absent evidence, not zeros."""
+    total=unknown=unknown_rows=0
+    brawlers=set()
+    for row in examples:
+        terms=[key for key,value in _feature_counts(row,model.feature_version).items() if value]
+        missing=sum(key not in model.manifest for key in terms)
+        total+=len(terms);unknown+=missing;unknown_rows+=bool(missing)
+        brawlers.update(row.team_a);brawlers.update(row.team_b)
+    return {'rows_with_unknown_feature_terms':unknown_rows,
+        'active_feature_occurrences':total,'unknown_feature_occurrences':unknown,
+        'unknown_feature_fraction':unknown/total if total else None,
+        'distinct_validation_brawlers':len(brawlers),
+        'brawlers_without_train_main_effect':sorted(b for b in brawlers if f'brawler:{b}' not in model.manifest)}
+
+
 def run_experiment(manifest,protocol,revision):
     if protocol['schema']!='chronological-development-experiment-1':
         raise ValueError('Unsupported development experiment')
@@ -63,10 +79,9 @@ def run_experiment(manifest,protocol,revision):
         inference_started=perf_counter()
         for row in validation:model.predict(row)
         inference_seconds=perf_counter()-inference_started
-        unknown=sum(any(k not in model.manifest for k in _feature_counts(row,model.feature_version)) for row in validation)
         return {'validation':result,'validation_seconds':elapsed,
             'mean_prediction_ms_per_row':1000*inference_seconds/len(validation),
-            'rows_with_unknown_feature_terms':unknown,'rows_scored':len(validation)}
+            **feature_coverage(model,validation),'rows_scored':len(validation)}
     results={'frozen_V2':evaluate(frozen),'B0':{'validation':metrics(lambda row:0.5,validation)}}
     models={}
     for candidate in protocol['grid']:
