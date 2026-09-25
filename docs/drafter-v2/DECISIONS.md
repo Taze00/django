@@ -612,3 +612,6 @@ Pilot and aborted-window observations are development-only forever. Block use
 of the aborted registration for collection/sealing/evaluation; exclude these
 origins from a future final test. Resume controlled development cycles and
 chronological validation once sufficient data exists. No final test yet.
+
+
+D-026: sustainable development collector/dataset implementation complete, validation pending. Ranked activity priority with one broader exploration query per five, 50-attempt cycles, unchanged per-player cooldown/client safeguards, global pause on quota signals, durable raw/checkpoints and replay without HTTP. New trophy entries remain raw/discovery-only. Versioned dataset includes verified original Train plus eligible recent development data; no old holdout or protected future final origins. Model development waits for preregistered chronological volume gates. See DEVELOPMENT_COLLECTION.md.

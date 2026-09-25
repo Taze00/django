@@ -73,6 +73,9 @@ class TaggedFrontierCollector:
     def _prepare_frontier(self):
         pass
 
+    def _importable_records(self, records):
+        return records
+
     def _extra_report(self):
         return {}
 
@@ -340,6 +343,7 @@ class TaggedFrontierCollector:
             return
         recent = [r for r in parsed.matches if r.played_at > self.after]
         self.metrics["historical_records_retained_raw_only"] += len(parsed.matches) - len(recent)
+        recent = self._importable_records(recent)
         delivery = Lieferung(
             referenz=player.tag, format=FORMAT_OFFIZIELLER_BATTLELOG,
             rohdaten=payload.payload, source=Datenquelle.API, matches=recent,

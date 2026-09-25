@@ -90,3 +90,6 @@ D-023 preserves model weights and Legacy default. Discovery/query frontier expan
 
 
 D-024: future baseline uses unchanged verified D-022 scoring clock/configuration and algorithmic patch ID 1. Actual prospective game patch remains UNKNOWN. 33 pilot matches demonstrate acquisition only; no quality/promotional claim or model change.
+
+
+D-026: sustainable development collector/dataset implementation complete, validation pending. Ranked activity priority with one broader exploration query per five, 50-attempt cycles, unchanged per-player cooldown/client safeguards, global pause on quota signals, durable raw/checkpoints and replay without HTTP. New trophy entries remain raw/discovery-only. Versioned dataset includes verified original Train plus eligible recent development data; no old holdout or protected future final origins. Model development waits for preregistered chronological volume gates. See DEVELOPMENT_COLLECTION.md.
