@@ -93,3 +93,5 @@ D-024: future baseline uses unchanged verified D-022 scoring clock/configuration
 
 
 D-026: sustainable development collector/dataset implementation complete, validation pending. Ranked activity priority with one broader exploration query per five, 50-attempt cycles, unchanged per-player cooldown/client safeguards, global pause on quota signals, durable raw/checkpoints and replay without HTTP. New trophy entries remain raw/discovery-only. Versioned dataset includes verified original Train plus eligible recent development data; no old holdout or protected future final origins. Model development waits for preregistered chronological volume gates. See DEVELOPMENT_COLLECTION.md.
+
+D-027 development-only opponent candidate selected with a small chronological gain. Current working artifact remains unchanged; complete-team mean prediction latency was 0.0431 ms/row on this machine, not an end-to-end draft search benchmark. All Validation Brawler identities have a Train main effect, but 1.85% of active feature occurrences lack Train support. See result JSON for exact distinct Brawler count and calibration bins. No role/mechanics claims follow from these coefficients.

@@ -1,0 +1,203 @@
+{
+  "Legacy_evaluated": false,
+  "code_revision": "df44be93047104fd27df48804395c4322fdf5c62",
+  "dataset_sha256": "8b9bab80560e9948340ccd692dab8046f09a0fd117bbf032e553c493a6bbcc68",
+  "final_test": false,
+  "interpretation": "development selection only; repeated-player/time dependence; forward confirmation required",
+  "protocol_sha256": "7899002f3f0f6b172e1f16d513ee5241184ca4b9324f77cc39128b6c8258e618",
+  "results": {
+    "B0": {
+      "validation": {
+        "brier": 0.25,
+        "calibration": [
+          {
+            "lower": 0.4,
+            "mean_predicted": 0.5,
+            "n": 4116,
+            "observed_rate": 0.5034013605442177
+          }
+        ],
+        "log_loss": 0.6931471805599647,
+        "n": 4116,
+        "status": "ok"
+      }
+    },
+    "frozen_V2": {
+      "active_feature_occurrences": 98784,
+      "brawlers_without_train_main_effect": [],
+      "distinct_validation_brawlers": 106,
+      "mean_prediction_ms_per_row": 0.02181477041262726,
+      "rows_scored": 4116,
+      "rows_with_unknown_feature_terms": 1279,
+      "unknown_feature_fraction": 0.020114593456430192,
+      "unknown_feature_occurrences": 1987,
+      "validation": {
+        "brier": 0.2486485655399419,
+        "calibration": [
+          {
+            "lower": 0.2,
+            "mean_predicted": 0.38044107405404626,
+            "n": 12,
+            "observed_rate": 0.3333333333333333
+          },
+          {
+            "lower": 0.4,
+            "mean_predicted": 0.5058293681191658,
+            "n": 4052,
+            "observed_rate": 0.5029615004935835
+          },
+          {
+            "lower": 0.6,
+            "mean_predicted": 0.613324320315175,
+            "n": 52,
+            "observed_rate": 0.5769230769230769
+          }
+        ],
+        "log_loss": 0.6904378739953365,
+        "n": 4116,
+        "status": "ok"
+      },
+      "validation_seconds": 0.11331241502193734
+    },
+    "opponent_l2_10": {
+      "active_feature_occurrences": 135828,
+      "brawlers_without_train_main_effect": [],
+      "configuration": {
+        "feature_version": "v2-composition-opponent-2",
+        "id": "opponent_l2_10",
+        "l2": 10.0
+      },
+      "distinct_validation_brawlers": 106,
+      "eligible_development_candidate": true,
+      "mean_prediction_ms_per_row": 0.043124439506144405,
+      "rows_scored": 4116,
+      "rows_with_unknown_feature_terms": 1380,
+      "training_seconds": 19.580210753018036,
+      "unknown_feature_fraction": 0.018486615425390936,
+      "unknown_feature_occurrences": 2511,
+      "validation": {
+        "brier": 0.2480438693381472,
+        "calibration": [
+          {
+            "lower": 0.2,
+            "mean_predicted": 0.3765218936293979,
+            "n": 19,
+            "observed_rate": 0.2631578947368421
+          },
+          {
+            "lower": 0.4,
+            "mean_predicted": 0.5057883938969675,
+            "n": 4022,
+            "observed_rate": 0.5012431626056688
+          },
+          {
+            "lower": 0.6,
+            "mean_predicted": 0.6144725954744987,
+            "n": 75,
+            "observed_rate": 0.68
+          }
+        ],
+        "log_loss": 0.6892220282695105,
+        "n": 4116,
+        "status": "ok"
+      },
+      "validation_seconds": 0.1646619550010655
+    },
+    "retrained_team_l2_1": {
+      "active_feature_occurrences": 98784,
+      "brawlers_without_train_main_effect": [],
+      "configuration": {
+        "feature_version": "v2-composition-logit-1",
+        "id": "retrained_team_l2_1",
+        "l2": 1.0
+      },
+      "distinct_validation_brawlers": 106,
+      "eligible_development_candidate": true,
+      "mean_prediction_ms_per_row": 0.023048021378080687,
+      "rows_scored": 4116,
+      "rows_with_unknown_feature_terms": 1075,
+      "training_seconds": 13.045880543999374,
+      "unknown_feature_fraction": 0.015508584386135407,
+      "unknown_feature_occurrences": 1532,
+      "validation": {
+        "brier": 0.2482093192613859,
+        "calibration": [
+          {
+            "lower": 0.2,
+            "mean_predicted": 0.3803053380365948,
+            "n": 12,
+            "observed_rate": 0.3333333333333333
+          },
+          {
+            "lower": 0.4,
+            "mean_predicted": 0.505779978497576,
+            "n": 4063,
+            "observed_rate": 0.5025842973172533
+          },
+          {
+            "lower": 0.6,
+            "mean_predicted": 0.6077630681381053,
+            "n": 41,
+            "observed_rate": 0.6341463414634146
+          }
+        ],
+        "log_loss": 0.6895533821458294,
+        "n": 4116,
+        "status": "ok"
+      },
+      "validation_seconds": 0.09768749002250843
+    },
+    "retrained_team_l2_10": {
+      "active_feature_occurrences": 98784,
+      "brawlers_without_train_main_effect": [],
+      "configuration": {
+        "feature_version": "v2-composition-logit-1",
+        "id": "retrained_team_l2_10",
+        "l2": 10.0
+      },
+      "distinct_validation_brawlers": 106,
+      "eligible_development_candidate": false,
+      "mean_prediction_ms_per_row": 0.03582374150066051,
+      "rows_scored": 4116,
+      "rows_with_unknown_feature_terms": 1075,
+      "training_seconds": 13.779477260017302,
+      "unknown_feature_fraction": 0.015508584386135407,
+      "unknown_feature_occurrences": 1532,
+      "validation": {
+        "brier": 0.24821226600930305,
+        "calibration": [
+          {
+            "lower": 0.2,
+            "mean_predicted": 0.3812879465899444,
+            "n": 12,
+            "observed_rate": 0.3333333333333333
+          },
+          {
+            "lower": 0.4,
+            "mean_predicted": 0.5057324217903212,
+            "n": 4063,
+            "observed_rate": 0.5025842973172533
+          },
+          {
+            "lower": 0.6,
+            "mean_predicted": 0.6068719115165601,
+            "n": 41,
+            "observed_rate": 0.6341463414634146
+          }
+        ],
+        "log_loss": 0.6895593610763711,
+        "n": 4116,
+        "status": "ok"
+      },
+      "validation_seconds": 0.13204249500995502
+    }
+  },
+  "schema": "chronological-development-result-1",
+  "selected_development_candidate": "opponent_l2_10",
+  "train_content_sha256": "6d8e37681be3dee84ee0ce5adae9b255134b5de08d2050cf37848941d9f3299b",
+  "train_n": 6891,
+  "validation_content_sha256": "75fe94cd1bc440a70eb73b363986b6ad5136ecf009085fe6ed57d64ba51695a6",
+  "validation_n": 4116,
+  "validation_utc_day": "2026-09-25",
+  "working_artifact_changed": false
+}

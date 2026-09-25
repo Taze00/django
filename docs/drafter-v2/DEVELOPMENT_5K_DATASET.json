@@ -1,0 +1,69 @@
+{
+  "actual_game_patch": "UNKNOWN",
+  "after_exclusive": "2026-09-18T15:04:42+00:00",
+  "chronological_plan": {
+    "final_test": false,
+    "new_train_n": 840,
+    "new_validation_n": 4372,
+    "status": "READY_FOR_PREREGISTERED_DEVELOPMENT_VALIDATION",
+    "validation_utc_day": "2026-09-25"
+  },
+  "coverage": {
+    "date": {
+      "2026-09-21": 2,
+      "2026-09-22": 8,
+      "2026-09-23": 49,
+      "2026-09-24": 781,
+      "2026-09-25": 4372
+    },
+    "import_patch": {
+      "1": 5212
+    },
+    "map": {
+      "Belle's Rock": 230,
+      "Bridge Too Far": 178,
+      "Center Stage": 221,
+      "Double Swoosh": 203,
+      "Dry Season": 186,
+      "Dueling Beetles": 175,
+      "Flaring Phoenix": 206,
+      "Gem Fort": 202,
+      "Hard Rock Mine": 189,
+      "Hideout": 220,
+      "Hot Potato": 216,
+      "In the Liminal": 180,
+      "Kaboom Canyon": 212,
+      "Layer Cake": 208,
+      "New Horizons": 201,
+      "Open Business": 203,
+      "Out in the Open": 199,
+      "Parallel Plays": 204,
+      "Pinball Dreams": 202,
+      "Quick Travel": 162,
+      "Ring of Fire": 204,
+      "Safe Zone": 182,
+      "Shooting Star": 216,
+      "Sneaky Fields": 187,
+      "Triple Dribble": 173,
+      "Undermine": 253
+    },
+    "mode": {
+      "bounty": 830,
+      "brawlBall": 783,
+      "gemGrab": 847,
+      "heist": 788,
+      "hotZone": 1128,
+      "knockout": 836
+    }
+  },
+  "dataset_sha256": "24a239ab4e68c33891fbc3991127d0222b799fa145405d059c39ea641afc4f1b",
+  "eligible_new_current_soloRanked": 5212,
+  "excluded": {
+    "incomplete_conflicting_unknown_context_or_duplicate_brawlers": 67
+  },
+  "final_test_eligible": false,
+  "new_membership_sha256": "302a4420fb5d9c8a6fdac5851d7dd8f556a9eb5a6c75ab3e06200cbc1191add1",
+  "original_train_n": 6094,
+  "private_manifest": "data/brawl_reports/development-20260925-005-5k.json",
+  "selection_bias": "Ranked-activity-prioritized graph, repeated players; no independence or sampling weights"
+}

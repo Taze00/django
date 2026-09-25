@@ -1,0 +1,37 @@
+{
+  "candidate": "opponent_l2_10",
+  "candidate_archive": "data/brawl_reports/development-experiment-001-result.json",
+  "candidate_archive_sha256": "7468806d5cbeaab580ddd43d0b2ac2932ff64e0ad7fe97b563284ae4633b7c76",
+  "collector": "Unchanged ranked_development_v1; explicit bounded invocations only, no schedule/daemon",
+  "controls": [
+    "frozen_V2",
+    "retrained_team_l2_1 from same frozen archive",
+    "B0_0.5"
+  ],
+  "end_exclusive": "2026-09-28T00:00:00Z",
+  "forbidden": [
+    "Legacy-vs-V2 evaluation on aborted observations",
+    "historical holdout",
+    "future final test",
+    "training on confirmation slice before confirmation",
+    "automatic working artifact replacement"
+  ],
+  "insufficient_data": "DATA_UNAVAILABLE; do not extend interval or lower threshold",
+  "interpretation": "Biased graph-discovered forward DEVELOPMENT confirmation, not independent final test. No sampling weights or independent-match significance claim.",
+  "membership": "All strict D-026 eligible development matches in this fixed played-at interval observed by end_exclusive; freeze membership once after close. No selection by outcome, predictions or map.",
+  "metrics": [
+    "LogLoss",
+    "Brier",
+    "five equal-width calibration bins",
+    "feature coverage",
+    "complete-team inference latency"
+  ],
+  "minimum_eligible": 1000,
+  "purpose": "DEVELOPMENT_ONLY_NOT_FINAL_TEST",
+  "registered_at": "2026-09-25T15:14:16.161010+00:00",
+  "schema": "development-forward-confirmation-1",
+  "selection": "Candidate must have lower LogLoss and no higher Brier than both frozen V2 and frozen retrained_team_l2_1 on the full forward slice. No grid expansion or weight fitting on slice.",
+  "start_inclusive": "2026-09-26T00:00:00Z",
+  "status": "PREREGISTERED_NOT_STARTED",
+  "working_artifact": "unchanged; any later integration requires product checks and documented experimental version pin"
+}
