@@ -1,3 +1,5 @@
+CURRENT LIFECYCLE: ABORTED_FOR_DEVELOPMENT_BEFORE_EVALUATION (D-025, explicit user decision). The original registration, dates, reports and instructions below are historical and preserved. Do not execute prospective collection, sealing or Legacy-vs-V2 evaluation for this registration. Pilot/aborted observations are permanently DEVELOPMENT. Current work follows DEVELOPMENT_COLLECTION.md; no new final window is registered. Authority: PROSPECTIVE_ABORT_FOR_DEVELOPMENT.json.
+
 # Next independent window — REGISTERED, not started
 
 Current D-024 registration is PROSPECTIVE_WINDOW.json; the fixed interval is

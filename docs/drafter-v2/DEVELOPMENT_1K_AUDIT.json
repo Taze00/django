@@ -1,0 +1,932 @@
+{
+  "audited_at": "2026-09-25T14:48:13.493490+00:00",
+  "closed_run_ids": [
+    9,
+    10
+  ],
+  "closed_run_totals": {
+    "battlelog_attempts": 100,
+    "duplikate": 211,
+    "konflikte": 0,
+    "new_discovered_tags": 6435,
+    "new_eligible_solo_ranked_matches": 1130,
+    "retries": 0,
+    "spieler_abgefragt": 100
+  },
+  "current_dataset": {
+    "actual_game_patch": "UNKNOWN",
+    "after_exclusive": "2026-09-18T15:04:42+00:00",
+    "coverage": {
+      "date": {
+        "2026-09-21": 2,
+        "2026-09-22": 8,
+        "2026-09-23": 17,
+        "2026-09-24": 419,
+        "2026-09-25": 1001
+      },
+      "import_patch": {
+        "1": 1447
+      },
+      "map": {
+        "Belle's Rock": 75,
+        "Bridge Too Far": 50,
+        "Center Stage": 66,
+        "Double Swoosh": 48,
+        "Dry Season": 54,
+        "Dueling Beetles": 56,
+        "Flaring Phoenix": 89,
+        "Gem Fort": 58,
+        "Hard Rock Mine": 37,
+        "Hideout": 60,
+        "Hot Potato": 62,
+        "In the Liminal": 42,
+        "Kaboom Canyon": 52,
+        "Layer Cake": 30,
+        "New Horizons": 51,
+        "Open Business": 54,
+        "Out in the Open": 62,
+        "Parallel Plays": 59,
+        "Pinball Dreams": 68,
+        "Quick Travel": 43,
+        "Ring of Fire": 59,
+        "Safe Zone": 38,
+        "Shooting Star": 57,
+        "Sneaky Fields": 59,
+        "Triple Dribble": 40,
+        "Undermine": 78
+      },
+      "mode": {
+        "bounty": 201,
+        "brawlBall": 233,
+        "gemGrab": 221,
+        "heist": 202,
+        "hotZone": 313,
+        "knockout": 277
+      }
+    },
+    "eligible_new_current_soloRanked": 1447,
+    "excluded": {
+      "incomplete_conflicting_unknown_context_or_duplicate_brawlers": 46
+    },
+    "final_test_eligible": false,
+    "new_membership_sha256": "03e3ec47251c889c000a076083ff5a69968bf169b02836ca29a10edabc42bbac",
+    "selection_bias": "Ranked-activity-prioritized graph, repeated players; no independence or sampling weights"
+  },
+  "discovery_frontier_size": 10243,
+  "final_test_registered": false,
+  "http_status_counts": {
+    "200": 100
+  },
+  "old_holdout_read": false,
+  "performance_metrics_computed": false,
+  "raw_integrity": "VERIFIED",
+  "raw_integrity_scope": "All completed development runs (9,10); running run 11 remains in progress. Dataset counts include its committed observations at snapshot time.",
+  "raw_type_counts": {
+    "UNKNOWN": 184,
+    "friendly": 1,
+    "ranked": 884,
+    "soloRanked": 1387
+  },
+  "running_run_ids": [
+    11
+  ],
+  "runs": [
+    {
+      "finished_at": "2026-09-25T14:43:57.512524+00:00",
+      "id": 9,
+      "parameters": {
+        "abruf_abstand_stunden": 6,
+        "after_exclusive": "2026-09-18T15:04:42+00:00",
+        "battlelog_http_budget": 50,
+        "catalog_requests": 0,
+        "code_revision": "b317605122bd588d9b725ce3973e0e21d9537a9b",
+        "depth_semantics": "new_request_hops_per_run",
+        "future_test_eligible": false,
+        "max_tiefe": 1,
+        "policy": {
+          "cooldown_hours": 6,
+          "current_age_days": 30,
+          "cycle_http_cap": 50,
+          "exploration_every_queries": 5,
+          "future_final_test_eligible": false,
+          "max_depth": 1,
+          "priority": "direct_observed_soloRanked_activity",
+          "quota": "UNKNOWN",
+          "rankings": 0,
+          "version": "ranked_development_v1"
+        },
+        "purpose": "development",
+        "ranking_http_budget": 0,
+        "ranking_seeds": 0,
+        "strategie": "ranked_development_v1"
+      },
+      "report": {
+        "abbruch": "",
+        "api": {
+          "anfragen": 50,
+          "ratenlimit_header": [],
+          "retry_after": [],
+          "status": {
+            "200": 50
+          },
+          "wartezeit_sekunden": 0.0,
+          "wiederholungen": 0
+        },
+        "api_backoff_required": false,
+        "api_backoff_until": null,
+        "battlelog_attempts": 50,
+        "battlelog_eintraege": 1226,
+        "battlelogs_ok": 50,
+        "bootstrap_raw_battle_types": {},
+        "data_status": "OBSERVATIONS_AVAILABLE",
+        "datenlage": {},
+        "discovery_frontier_size": 5806,
+        "duplicate_player_observations": 7905,
+        "duplikate": 110,
+        "duplikate_nach_typ": {
+          "soloRanked": 110
+        },
+        "fehler": {},
+        "frontier_before": 2665,
+        "frontier_size": 5806,
+        "future_test_eligible": false,
+        "historical_records_retained_raw_only": 13,
+        "holdout_evaluated": false,
+        "id_widersprueche": [],
+        "invalid_discovered_tags": 0,
+        "katalog": [],
+        "katalog_neu": [],
+        "katalog_verknuepft": [],
+        "konflikte": 0,
+        "model_fitting_performed": false,
+        "neu": 563,
+        "neu_nach_typ": {
+          "soloRanked": 563
+        },
+        "new_discovered_tags": 3141,
+        "new_eligible_solo_ranked_matches": 542,
+        "new_frontier_seeds": 0,
+        "next_cycle_allowed": true,
+        "partien_gelesen": 673,
+        "protected_historical_duplicates_raw_only": 0,
+        "purpose": "development",
+        "query_eligible_tags_available": 2665,
+        "query_eligible_tags_due": 2655,
+        "quota": "UNKNOWN",
+        "rangliste_gesehen": 0,
+        "rangliste_neu": 0,
+        "ranked_evidence_frontier_size": 1344,
+        "ranked_evidence_matches": 595,
+        "ranking_attempts": 0,
+        "ranking_cooldown_skipped": false,
+        "ranking_duplicate_tags": 0,
+        "ranking_entries": 0,
+        "ranking_invalid_tags": 0,
+        "ranking_seeds_admitted": 0,
+        "ranking_seeds_due": 0,
+        "ranking_valid_unique_tags": 0,
+        "raw_battle_types": {
+          "UNKNOWN": 120,
+          "friendly": 1,
+          "ranked": 432,
+          "soloRanked": 673
+        },
+        "recovered_raw": {},
+        "report_version": "ranked_development_v1",
+        "run_id": 9,
+        "skill_labels": "UNKNOWN",
+        "soloRanked_yield_per_http_attempt": 10.84,
+        "spieler_abgefragt": 50,
+        "spieler_entdeckt": 3141,
+        "uebersprungen": 183,
+        "unbekannte_brawler": [],
+        "ungueltig": 0,
+        "unique_response_player_tags": 3306,
+        "unique_response_tags_not_in_bootstrap": 3306
+      },
+      "started_at": "2026-09-25T14:40:53.111833+00:00",
+      "status": "finished"
+    },
+    {
+      "finished_at": "2026-09-25T14:46:47.430557+00:00",
+      "id": 10,
+      "parameters": {
+        "abruf_abstand_stunden": 6,
+        "after_exclusive": "2026-09-18T15:04:42+00:00",
+        "battlelog_http_budget": 50,
+        "catalog_requests": 0,
+        "code_revision": "b317605122bd588d9b725ce3973e0e21d9537a9b",
+        "depth_semantics": "new_request_hops_per_run",
+        "future_test_eligible": false,
+        "max_tiefe": 1,
+        "policy": {
+          "cooldown_hours": 6,
+          "current_age_days": 30,
+          "cycle_http_cap": 50,
+          "exploration_every_queries": 5,
+          "future_final_test_eligible": false,
+          "max_depth": 1,
+          "priority": "direct_observed_soloRanked_activity",
+          "quota": "UNKNOWN",
+          "rankings": 0,
+          "version": "ranked_development_v1"
+        },
+        "purpose": "development",
+        "ranking_http_budget": 0,
+        "ranking_seeds": 0,
+        "strategie": "ranked_development_v1"
+      },
+      "report": {
+        "abbruch": "",
+        "api": {
+          "anfragen": 50,
+          "ratenlimit_header": [],
+          "retry_after": [],
+          "status": {
+            "200": 50
+          },
+          "wartezeit_sekunden": 0.0,
+          "wiederholungen": 0
+        },
+        "api_backoff_required": false,
+        "api_backoff_until": null,
+        "battlelog_attempts": 50,
+        "battlelog_eintraege": 1230,
+        "battlelogs_ok": 50,
+        "bootstrap_raw_battle_types": {},
+        "data_status": "OBSERVATIONS_AVAILABLE",
+        "datenlage": {},
+        "discovery_frontier_size": 9100,
+        "duplicate_player_observations": 8252,
+        "duplikate": 101,
+        "duplikate_nach_typ": {
+          "soloRanked": 101
+        },
+        "fehler": {},
+        "frontier_before": 5806,
+        "frontier_size": 9100,
+        "future_test_eligible": false,
+        "historical_records_retained_raw_only": 15,
+        "holdout_evaluated": false,
+        "id_widersprueche": [],
+        "invalid_discovered_tags": 0,
+        "katalog": [],
+        "katalog_neu": [],
+        "katalog_verknuepft": [],
+        "konflikte": 0,
+        "model_fitting_performed": false,
+        "neu": 613,
+        "neu_nach_typ": {
+          "soloRanked": 613
+        },
+        "new_discovered_tags": 3294,
+        "new_eligible_solo_ranked_matches": 588,
+        "new_frontier_seeds": 0,
+        "next_cycle_allowed": true,
+        "partien_gelesen": 714,
+        "protected_historical_duplicates_raw_only": 0,
+        "purpose": "development",
+        "query_eligible_tags_available": 5806,
+        "query_eligible_tags_due": 5746,
+        "quota": "UNKNOWN",
+        "rangliste_gesehen": 0,
+        "rangliste_neu": 0,
+        "ranked_evidence_frontier_size": 2692,
+        "ranked_evidence_matches": 1206,
+        "ranking_attempts": 0,
+        "ranking_cooldown_skipped": false,
+        "ranking_duplicate_tags": 0,
+        "ranking_entries": 0,
+        "ranking_invalid_tags": 0,
+        "ranking_seeds_admitted": 0,
+        "ranking_seeds_due": 0,
+        "ranking_valid_unique_tags": 0,
+        "raw_battle_types": {
+          "UNKNOWN": 64,
+          "ranked": 452,
+          "soloRanked": 714
+        },
+        "recovered_raw": {},
+        "report_version": "ranked_development_v1",
+        "run_id": 10,
+        "skill_labels": "UNKNOWN",
+        "soloRanked_yield_per_http_attempt": 11.76,
+        "spieler_abgefragt": 50,
+        "spieler_entdeckt": 3294,
+        "uebersprungen": 194,
+        "unbekannte_brawler": [],
+        "ungueltig": 0,
+        "unique_response_player_tags": 3608,
+        "unique_response_tags_not_in_bootstrap": 3608
+      },
+      "started_at": "2026-09-25T14:43:57.582383+00:00",
+      "status": "finished"
+    },
+    {
+      "finished_at": null,
+      "id": 11,
+      "parameters": {
+        "abruf_abstand_stunden": 6,
+        "after_exclusive": "2026-09-18T15:04:42+00:00",
+        "battlelog_http_budget": 50,
+        "catalog_requests": 0,
+        "code_revision": "b317605122bd588d9b725ce3973e0e21d9537a9b",
+        "depth_semantics": "new_request_hops_per_run",
+        "future_test_eligible": false,
+        "max_tiefe": 1,
+        "policy": {
+          "cooldown_hours": 6,
+          "current_age_days": 30,
+          "cycle_http_cap": 50,
+          "exploration_every_queries": 5,
+          "future_final_test_eligible": false,
+          "max_depth": 1,
+          "priority": "direct_observed_soloRanked_activity",
+          "quota": "UNKNOWN",
+          "rankings": 0,
+          "version": "ranked_development_v1"
+        },
+        "purpose": "development",
+        "ranking_http_budget": 0,
+        "ranking_seeds": 0,
+        "strategie": "ranked_development_v1"
+      },
+      "report": {
+        "abbruch": "",
+        "api": {
+          "anfragen": 20,
+          "ratenlimit_header": [],
+          "retry_after": [],
+          "status": {
+            "200": 20
+          },
+          "wartezeit_sekunden": 0.0,
+          "wiederholungen": 0
+        },
+        "api_backoff_required": false,
+        "api_backoff_until": null,
+        "battlelog_attempts": 20,
+        "battlelog_eintraege": 464,
+        "battlelogs_ok": 19,
+        "checkpoint": "response_processed",
+        "datenlage": {},
+        "duplicate_player_observations": 3720,
+        "duplikate": 42,
+        "duplikate_nach_typ": {
+          "soloRanked": 42
+        },
+        "fehler": {},
+        "frontier_before": 9100,
+        "historical_records_retained_raw_only": 0,
+        "holdout_evaluated": false,
+        "id_widersprueche": [],
+        "invalid_discovered_tags": 0,
+        "katalog": [],
+        "katalog_neu": [],
+        "katalog_verknuepft": [],
+        "konflikte": 0,
+        "neu": 284,
+        "neu_nach_typ": {
+          "soloRanked": 284
+        },
+        "new_discovered_tags": 1143,
+        "new_eligible_solo_ranked_matches": 284,
+        "new_frontier_seeds": 0,
+        "partien_gelesen": 326,
+        "protected_historical_duplicates_raw_only": 0,
+        "query_eligible_tags_available": 9100,
+        "query_eligible_tags_due": 8990,
+        "rangliste_gesehen": 0,
+        "rangliste_neu": 0,
+        "ranking_attempts": 0,
+        "ranking_cooldown_skipped": false,
+        "ranking_duplicate_tags": 0,
+        "ranking_entries": 0,
+        "ranking_invalid_tags": 0,
+        "ranking_seeds_admitted": 0,
+        "ranking_seeds_due": 0,
+        "ranking_valid_unique_tags": 0,
+        "raw_payloads_persisted": 19,
+        "report_version": "ranked_development_v1",
+        "skill_labels": "UNKNOWN",
+        "spieler_abgefragt": 19,
+        "spieler_entdeckt": 1143,
+        "uebersprungen": 29,
+        "unbekannte_brawler": [],
+        "ungueltig": 0
+      },
+      "started_at": "2026-09-25T14:46:47.449361+00:00",
+      "status": "running"
+    }
+  ],
+  "sampling_diagnostics": {
+    "interpretation": "repeated-player graph sample; matches are not independent; no weights inferred",
+    "max_matches_for_one_observed_player": 33,
+    "missing_player_tag_occurrences": 0,
+    "observed_player_occurrences": 8682,
+    "unique_observed_player_tags_in_eligible_matches": 3026
+  },
+  "schema": "ranked-development-acquisition-audit-1",
+  "verified_raw_payloads": [
+    {
+      "id": 952,
+      "run_id": 9,
+      "sha256": "66899adcf62cbbe03e5ac030fe387821161e172102a3073a01ccd03ca6de104f"
+    },
+    {
+      "id": 953,
+      "run_id": 9,
+      "sha256": "b76aaf5257c90471d482e913c8228b23b324a28436078d09faae17f32c6ec118"
+    },
+    {
+      "id": 954,
+      "run_id": 9,
+      "sha256": "4786de5abe05631c81f1e944e1337547d4e89b04ebdb72ce878bd48bec982385"
+    },
+    {
+      "id": 955,
+      "run_id": 9,
+      "sha256": "eb79776ae1c91fa911408dc32c2967d8dcdcc3f669dacc313366a6aad88ac9c5"
+    },
+    {
+      "id": 956,
+      "run_id": 9,
+      "sha256": "1b23c1437511b2ca8333e8575e2a6332eb5d37d8a81f84c0d2aa4de375dcbc6a"
+    },
+    {
+      "id": 957,
+      "run_id": 9,
+      "sha256": "860a97e0321cbc3be00ff55a6b603e5bbc11436a7c6af4e329679e4b4b8749d2"
+    },
+    {
+      "id": 958,
+      "run_id": 9,
+      "sha256": "edd7e3d6a566e3ea3ed641213bc51f94d7d6c7103d4ab8442ecea930f0b38102"
+    },
+    {
+      "id": 959,
+      "run_id": 9,
+      "sha256": "cc73680909d62ba1e1ffe0e7996e0c8238727b9cf6a36264e5bcdb286f93f7d9"
+    },
+    {
+      "id": 960,
+      "run_id": 9,
+      "sha256": "837a43a6cbc385227977eb47e2850e57c7753cb9459f79c36675627ecbd1ef27"
+    },
+    {
+      "id": 961,
+      "run_id": 9,
+      "sha256": "897893ae648a1c02f5def0539f8ebaec01d83bb0b6b8e724cd885b73c6ec8d88"
+    },
+    {
+      "id": 962,
+      "run_id": 9,
+      "sha256": "3ab1ba8b7618771aeb40dbbc65eff51362aafe3db0149a702583fa1638e397d2"
+    },
+    {
+      "id": 963,
+      "run_id": 9,
+      "sha256": "115e97dae562b22cbf62a65ea71f42f1afc6e6fd1fab4438a52c2772b6beaa35"
+    },
+    {
+      "id": 964,
+      "run_id": 9,
+      "sha256": "6ef569139c5016282cc062472952e91a6a9d15e0a3d78cdac4cc308820bb6d24"
+    },
+    {
+      "id": 965,
+      "run_id": 9,
+      "sha256": "e69a9c7746be507db572c32030045d7de2545c41df8b8d51cbba495b54284ba7"
+    },
+    {
+      "id": 966,
+      "run_id": 9,
+      "sha256": "b954a9e003f9e885192e62d12472dc4c44326d3e8f6a74cc19ecbe9cd7c69406"
+    },
+    {
+      "id": 967,
+      "run_id": 9,
+      "sha256": "16354a453079a761cda9fbef0f625aafb874bdb51ded95ebafa008720598bb5c"
+    },
+    {
+      "id": 968,
+      "run_id": 9,
+      "sha256": "423107d253b5b15ddcdab240f921cbc5e896188a496ec2eb484f353555e42830"
+    },
+    {
+      "id": 969,
+      "run_id": 9,
+      "sha256": "8b4fd6671f7a48ebc64edcf8237260c6890d157577788924e2e2261658bb4362"
+    },
+    {
+      "id": 970,
+      "run_id": 9,
+      "sha256": "caad1565e6a0d2708c4a2ae9878912216bac4b8a0685c4644ed84165280147ff"
+    },
+    {
+      "id": 971,
+      "run_id": 9,
+      "sha256": "7c24a7258353639c108aaef080bdad3b16fcd88e4f85ef10749e0fe6084c5bc8"
+    },
+    {
+      "id": 972,
+      "run_id": 9,
+      "sha256": "d8def4c0f5eb1a71f0ab6d97a280fe84ad5d2cf33e5f428103ee07c7853820f0"
+    },
+    {
+      "id": 973,
+      "run_id": 9,
+      "sha256": "6203dee1756224e335b2df2b0dbedbc48e22c9da61036862fd439d809f877dd0"
+    },
+    {
+      "id": 974,
+      "run_id": 9,
+      "sha256": "f5f83a5c36882a9c7b1a2a733355b42f92f94532ae3b25886f248ab790b126e6"
+    },
+    {
+      "id": 975,
+      "run_id": 9,
+      "sha256": "7fcdb7911b7cebdf73e74d2828f8a3f5e3f0f1f7e6695e6f24d3d5ffe8a27c5a"
+    },
+    {
+      "id": 976,
+      "run_id": 9,
+      "sha256": "113fb619f270d162277b927c67b0652761c0ca4dbf279d9b492c0cfaaf307837"
+    },
+    {
+      "id": 977,
+      "run_id": 9,
+      "sha256": "ae7466c934b2e3c7f8bd3ad6730392eb5c29347767feee740b199befb0446d5a"
+    },
+    {
+      "id": 978,
+      "run_id": 9,
+      "sha256": "0956d65387cc278a44851e1c23a517e68c46797a6f67c963993aba9675d7d395"
+    },
+    {
+      "id": 979,
+      "run_id": 9,
+      "sha256": "bea1ce6980bf1a282952978d0bb6ac91d8c0b6c3ba54e695a55ac649116e3072"
+    },
+    {
+      "id": 980,
+      "run_id": 9,
+      "sha256": "852eeb3c807a7bd07ffec0d39205b64bac34614e609daadcced365cbcdb74410"
+    },
+    {
+      "id": 981,
+      "run_id": 9,
+      "sha256": "7bd0caf60e7ff274d6989eddea9b542fdbcb13dfdd1e5d7607001251aa845f50"
+    },
+    {
+      "id": 982,
+      "run_id": 9,
+      "sha256": "cf927c81219041dd2c227454d1c65aca788aa1cb240a209ab14810b5e3d78fa0"
+    },
+    {
+      "id": 983,
+      "run_id": 9,
+      "sha256": "9ac9c78d1d1398b1e5339fff7ee710dd2fc221350d9087847248bfb8dffdea51"
+    },
+    {
+      "id": 984,
+      "run_id": 9,
+      "sha256": "e6604d9edf6c88a80615d6a783bec1bd3ee037c21ffcd2b30ba8b1337f57c222"
+    },
+    {
+      "id": 985,
+      "run_id": 9,
+      "sha256": "f55c9cdad1f25be7a6f3fbfe739c158bf1c99e8b44e9bf774946b38cad651735"
+    },
+    {
+      "id": 986,
+      "run_id": 9,
+      "sha256": "6e1e47ff673124f00cecd405b141a64b874507664fbcdc133e06f0aa560b46d3"
+    },
+    {
+      "id": 987,
+      "run_id": 9,
+      "sha256": "509ff803d123735def961283234a70ed2c854968c54555be2686b6e90efdc25c"
+    },
+    {
+      "id": 988,
+      "run_id": 9,
+      "sha256": "9a4f2119271ee4394d8cad72a4c5123f7afb7206504da02bf82ae73aad3e057c"
+    },
+    {
+      "id": 989,
+      "run_id": 9,
+      "sha256": "ba06c75681401197abf6f2d346f771e3db00695cabd450019d78a3bad1709f14"
+    },
+    {
+      "id": 990,
+      "run_id": 9,
+      "sha256": "ce7599ee4c79290c73b5bb32337cb98850a93eef32ce84975a33d12d65becab2"
+    },
+    {
+      "id": 991,
+      "run_id": 9,
+      "sha256": "664fa0a42366d3d088206f292e07393d94b9a591526181c352f5e0fa26d39bcb"
+    },
+    {
+      "id": 992,
+      "run_id": 9,
+      "sha256": "b1f6dca92a0a290d2949ee4401cea14ae14815e0799089e5c32390cf08abea5e"
+    },
+    {
+      "id": 993,
+      "run_id": 9,
+      "sha256": "26c44fe75ba3698450db458a96eb3315ef9d63d5cbb72359ae814d0c593bce57"
+    },
+    {
+      "id": 994,
+      "run_id": 9,
+      "sha256": "0ced4f8f26ac0498e867fab680d7bcd4fe1b5381abf6e66cad802bb73848376d"
+    },
+    {
+      "id": 995,
+      "run_id": 9,
+      "sha256": "ca355215f71eaec536596b735adee48dbb6614c3607ec35249462f0b90fea551"
+    },
+    {
+      "id": 996,
+      "run_id": 9,
+      "sha256": "f39745d64188b0096533a6104cac7e0576ad3aca2dd733ef89cac6058bc32427"
+    },
+    {
+      "id": 997,
+      "run_id": 9,
+      "sha256": "b19a014ec9af03ddd7192f8c09511cc39ce439aed12c76047efe29b10f879f70"
+    },
+    {
+      "id": 998,
+      "run_id": 9,
+      "sha256": "d001b70bcfedf666302755347558d360f8c9f9b5038881086adac63997d9abd3"
+    },
+    {
+      "id": 999,
+      "run_id": 9,
+      "sha256": "40f8603de91bdbaf388d7f19f038311a8dd8e9cecfd648519cbfe1e719e365ad"
+    },
+    {
+      "id": 1000,
+      "run_id": 9,
+      "sha256": "e9f53163cefdba31b3e771951f945f56d0e374447db39a6cd825d718ee0b0b95"
+    },
+    {
+      "id": 1001,
+      "run_id": 9,
+      "sha256": "d5f6c1243be2885bbe5bd96db534ad93a036443fda09cb8f4763ad46d011c711"
+    },
+    {
+      "id": 1002,
+      "run_id": 10,
+      "sha256": "1257a541507aa1e0cb1a3aac3bcb8894cd3e2b1139295bb770c0dd353fd1ad98"
+    },
+    {
+      "id": 1003,
+      "run_id": 10,
+      "sha256": "10000d920ebd7b14191dcb683f433ea4fc710788f24b142f01d485db8c08452e"
+    },
+    {
+      "id": 1004,
+      "run_id": 10,
+      "sha256": "3005f64d2dfffbc3526617c4efb2066de17fa46fd55c03609d0c0b4d3b84ffad"
+    },
+    {
+      "id": 1005,
+      "run_id": 10,
+      "sha256": "e972bcafc9300178767ca2a1c6d467ae7f983395efeaf28163fff4beae06c208"
+    },
+    {
+      "id": 1006,
+      "run_id": 10,
+      "sha256": "49a773179fbc58e146999eef768bf4e5faa6650a13178bc8abd167b854a43009"
+    },
+    {
+      "id": 1007,
+      "run_id": 10,
+      "sha256": "e0a339468ca8dc262aada7857ea09d4597d2b00629db83bf59abce8b42c24280"
+    },
+    {
+      "id": 1008,
+      "run_id": 10,
+      "sha256": "46dc40337ea08e0da91c5a5d7cc40ad722ca0a93bef0eaed4292947c47878f4e"
+    },
+    {
+      "id": 1009,
+      "run_id": 10,
+      "sha256": "37353239c348a25a12e6bb6ca95bb229218c0c29befb228537a54960caa6794b"
+    },
+    {
+      "id": 1010,
+      "run_id": 10,
+      "sha256": "920c2ebe76bf2cb0d7b02e6b080b41a44bd59e82a2985801d7d9c60810f4a5ea"
+    },
+    {
+      "id": 1011,
+      "run_id": 10,
+      "sha256": "52d270dc6a158699dbb39ec83a2f43c8f2e970f7b84ccdb9e37385360baece38"
+    },
+    {
+      "id": 1012,
+      "run_id": 10,
+      "sha256": "70373082ef31df078cf8f6455d02eb05d3d022ae1819e7489a8ac1b540bf7a12"
+    },
+    {
+      "id": 1013,
+      "run_id": 10,
+      "sha256": "6ef7ae717ffa624d03024f36349f62b2ca401bcad2f2ec12997389c17e9aed1f"
+    },
+    {
+      "id": 1014,
+      "run_id": 10,
+      "sha256": "3fcc7945d6cc8b89cb62b3e7c2e7ceb490ca90ea865e89536f8c2855fb574921"
+    },
+    {
+      "id": 1015,
+      "run_id": 10,
+      "sha256": "7881126cc69e412fa84d979010f1cd7de5eb09bb4abab7b7e1b0b7ccdb5d5098"
+    },
+    {
+      "id": 1016,
+      "run_id": 10,
+      "sha256": "0df18ccc45a932d166bf6cc82e48fbc1d197251dd718a12a8a93a9804a877295"
+    },
+    {
+      "id": 1017,
+      "run_id": 10,
+      "sha256": "4de09a4fa4190a35790e920f8881ae5558c4e7a33fb980b5d8ec0de60ff8f345"
+    },
+    {
+      "id": 1018,
+      "run_id": 10,
+      "sha256": "d0a71d1f848c16507ed868c90d5491018356e78d4af491b61f191130e5839840"
+    },
+    {
+      "id": 1019,
+      "run_id": 10,
+      "sha256": "d514c017c17d69da8a92c4dda4d72d76b92811f1c4ba1b9556cca2a47db479d3"
+    },
+    {
+      "id": 1020,
+      "run_id": 10,
+      "sha256": "23d4fa3c03f844081f06741d301a468562e9d9f90e6003463117dc0bde58ef23"
+    },
+    {
+      "id": 1021,
+      "run_id": 10,
+      "sha256": "71fa25cc4c44712f6126f65cb151897377848f2800c1cc136e6690db8a1ca991"
+    },
+    {
+      "id": 1022,
+      "run_id": 10,
+      "sha256": "93d937f902484cfd33ac1e3ebfa697a85f264ee0bfa28e21e862c8f227757fef"
+    },
+    {
+      "id": 1023,
+      "run_id": 10,
+      "sha256": "70925da6b5435b1c1f589dc162a397f5735f5d923b960c3f9b2ef59f72348fb5"
+    },
+    {
+      "id": 1024,
+      "run_id": 10,
+      "sha256": "9bfbef49dea256c814d1c033cb5a293e858dc7566b805be1372e5c0f7ece38e5"
+    },
+    {
+      "id": 1025,
+      "run_id": 10,
+      "sha256": "7ee74da5b567a90927174f777b078a7c8fe263b7651236748046912931cb3ed3"
+    },
+    {
+      "id": 1026,
+      "run_id": 10,
+      "sha256": "a8b74b458a7813e2bf85f0bd5359652ebb270f5135d0716bcd0c94c31441e079"
+    },
+    {
+      "id": 1027,
+      "run_id": 10,
+      "sha256": "cc078b9a6993ee7c3d5ba3e453f881c122b669d32811614bcfe8fffe4e9c19e6"
+    },
+    {
+      "id": 1028,
+      "run_id": 10,
+      "sha256": "ec8a1a5400a8e2beb75e19ee2b69af3c98b1cab2232c2237b2c62487a50d3be9"
+    },
+    {
+      "id": 1029,
+      "run_id": 10,
+      "sha256": "870ff931e264fe6d417505e861dfa1d159b7a67bd8f636766d9939d3085cf6fd"
+    },
+    {
+      "id": 1030,
+      "run_id": 10,
+      "sha256": "cc0cb5fb7e2a17976cab508a358307db77cf04a093d81b044230ae6cb3c44f27"
+    },
+    {
+      "id": 1031,
+      "run_id": 10,
+      "sha256": "8f3e549f9a5cef5f7cdd6fced37ea7b6168120eaad63dcd4c8d35f868dac04b8"
+    },
+    {
+      "id": 1032,
+      "run_id": 10,
+      "sha256": "4bc64717100acf1241396986cd84c4f2a83eae6e1e0623e9197b303f190fdf9b"
+    },
+    {
+      "id": 1033,
+      "run_id": 10,
+      "sha256": "89a0e4bfcd2686c442cc2cd364334feb021eb0df188377f5c27e34ad4d0fcf60"
+    },
+    {
+      "id": 1034,
+      "run_id": 10,
+      "sha256": "6972e0b955c65d751cd6fa796e04d822c3221334c6fc4a84fced4d4db8cb5e80"
+    },
+    {
+      "id": 1035,
+      "run_id": 10,
+      "sha256": "e9f91b6f41c5ed8aac7d199d1c9921660c6b38ba792bda20a9f2d021c1e3d0bd"
+    },
+    {
+      "id": 1036,
+      "run_id": 10,
+      "sha256": "90b45fb0b12a5b3e204d07e8b27f0eb4b05cf3a6438e8278c9bb700b7a2e105e"
+    },
+    {
+      "id": 1037,
+      "run_id": 10,
+      "sha256": "67de27d51476a2cb2b2f82bba41005c70bb4b2a556a100d033d2e13f2bd87833"
+    },
+    {
+      "id": 1038,
+      "run_id": 10,
+      "sha256": "d40ef6a610fb60bc72ba8fee87340d563cbe8478330e55716be7ab2b9be8704f"
+    },
+    {
+      "id": 1039,
+      "run_id": 10,
+      "sha256": "8ff4619252aa4fc37c18f6d66152ab94d9d81721d60158804d5689ea52912d15"
+    },
+    {
+      "id": 1040,
+      "run_id": 10,
+      "sha256": "f5050a4fc3a80755af193fb6d11fbad9ef422553b9d64fc2ab0cd77b1a518bfa"
+    },
+    {
+      "id": 1041,
+      "run_id": 10,
+      "sha256": "c87452988c135c5bec5f55adef57e1419ab0ae1d993d9603498a52dae36d67a0"
+    },
+    {
+      "id": 1042,
+      "run_id": 10,
+      "sha256": "b69599c773278e4dae807cf7b9ee730af13020086fa5674e971ed0d3e7160f54"
+    },
+    {
+      "id": 1043,
+      "run_id": 10,
+      "sha256": "e3a964532fd4785af72ab08ac8450ae441d59c4d3823096588096468de6b68fc"
+    },
+    {
+      "id": 1044,
+      "run_id": 10,
+      "sha256": "c55cc793b049fa62a198cc1867bbb63543116fe4c3ee1df49c954a2911f01e37"
+    },
+    {
+      "id": 1045,
+      "run_id": 10,
+      "sha256": "a915f43bdd399be4d1c4dd3586c30d8ef12ef4abc37fe4df1ae5608f1e3b2034"
+    },
+    {
+      "id": 1046,
+      "run_id": 10,
+      "sha256": "aebb384f8f91c4f06f3f3d8472481b1065d24723a22163a925e22725e61f3462"
+    },
+    {
+      "id": 1047,
+      "run_id": 10,
+      "sha256": "a3650b7044505642782438d65c77a7ecdacc14d56a4090c78202bb53525be8d8"
+    },
+    {
+      "id": 1048,
+      "run_id": 10,
+      "sha256": "0cd668129a18a410bc596e3e0593bffa3db276a2c929f9eab8ba7e0421775156"
+    },
+    {
+      "id": 1049,
+      "run_id": 10,
+      "sha256": "815e6a2813e7912587a0408c0fcc7cd5dce19df9f2eeda1c44ffcfeee47d58cd"
+    },
+    {
+      "id": 1050,
+      "run_id": 10,
+      "sha256": "0619f9ba9b491e5893fffa84ebd0a9afa9309912aebd83486cc63c2e6dd92b85"
+    },
+    {
+      "id": 1051,
+      "run_id": 10,
+      "sha256": "f3737fd53318af82e24972ce26f8e8c6107aa5f01add2dc006bc64dc1422d091"
+    }
+  ]
+}

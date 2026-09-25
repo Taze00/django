@@ -1,3 +1,5 @@
+CURRENT LIFECYCLE: ABORTED_FOR_DEVELOPMENT_BEFORE_EVALUATION (D-025, explicit user decision). The original registration, dates, reports and instructions below are historical and preserved. Do not execute prospective collection, sealing or Legacy-vs-V2 evaluation for this registration. Pilot/aborted observations are permanently DEVELOPMENT. Current work follows DEVELOPMENT_COLLECTION.md; no new final window is registered. Authority: PROSPECTIVE_ABORT_FOR_DEVELOPMENT.json.
+
 # D-024 — frozen prospective comparison
 
 Acquisition feasibility passed D-023: 33 new eligible soloRanked observations from
