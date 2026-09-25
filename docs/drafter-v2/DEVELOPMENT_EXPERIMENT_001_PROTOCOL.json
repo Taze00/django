@@ -1,0 +1,48 @@
+{
+  "calibration": "existing five equal-width bins; no calibration fitting on Validation",
+  "controls": [
+    "B0_0.5",
+    "unchanged_frozen_V2"
+  ],
+  "coverage": "known Brawlers and fraction of feature terms unsupported by each Train-only manifest",
+  "dataset_selection": "First completed bounded collection invocation whose immutable snapshot passes all gates; never select by outcomes or predictions.",
+  "epochs": 300,
+  "forbidden": [
+    "old historical holdout",
+    "Legacy-vs-V2 metrics on aborted window",
+    "future final test examples",
+    "mechanics fabrication",
+    "post-result grid expansion"
+  ],
+  "grid": [
+    {
+      "feature_version": "v2-composition-logit-1",
+      "id": "retrained_team_l2_1",
+      "l2": 1.0
+    },
+    {
+      "feature_version": "v2-composition-logit-1",
+      "id": "retrained_team_l2_10",
+      "l2": 10.0
+    },
+    {
+      "feature_version": "v2-composition-opponent-2",
+      "id": "opponent_l2_10",
+      "l2": 10.0
+    }
+  ],
+  "latency": "measured complete-team inference time per validation row",
+  "learning_rate": 0.05,
+  "minimum_latest_utc_day_validation": 200,
+  "minimum_new_eligible": 1000,
+  "minimum_older_new_train": 500,
+  "prior_negative_opponent_result": "preserved; new data is the sole reason for this small fresh check",
+  "production_legacy": "unchanged_default",
+  "purpose": "DEVELOPMENT_ONLY_NOT_FINAL_TEST",
+  "registered_at": "2026-09-25T14:44:12.062466+00:00",
+  "schema": "chronological-development-experiment-1",
+  "selection": "lowest chronological Validation LogLoss with Brier no worse than frozen V2; extra interaction challenger also must beat retrained team l2=1 on LogLoss with no Brier regression",
+  "split": "original pinned Train plus new earlier UTC days -> Train; latest UTC day group present in the immutable snapshot -> Validation (possibly a partial calendar day); no random mixing",
+  "status": "PREREGISTERED_NOT_RUN",
+  "working_v2_artifact": "unchanged; save development candidates separately pending forward confirmation"
+}
