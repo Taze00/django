@@ -1,0 +1,17 @@
+{
+  "authority": "explicit user priority change after 553c2b5",
+  "decided_at": "2026-09-25T14:28:31.518891+00:00",
+  "historical_holdout": "permanently_closed",
+  "performance_evaluated": false,
+  "pilot_and_aborted_observations": "DEVELOPMENT_PERMANENTLY_EXCLUDED_FROM_FUTURE_FINAL_TEST",
+  "preserved_run_ids": [
+    7,
+    8
+  ],
+  "protocol_sha256": "70e55f3dde205e15b232814f98b4e00c34fac8238f2fe5bc8b190608891adac8",
+  "reason": "Deliberately grow a substantially larger development Ranked dataset before a final independent Legacy-vs-V2 test.",
+  "registration_file_sha256": "5feb955376905206ba4adc3d5e565bbd2389cbf372706272572dd329c316752c",
+  "replacement_window_registered": false,
+  "schema": "evaluation-lifecycle-decision-1",
+  "status": "ABORTED_FOR_DEVELOPMENT_BEFORE_EVALUATION"
+}

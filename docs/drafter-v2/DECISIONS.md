@@ -602,3 +602,13 @@ only after checks pass; see PROSPECTIVE_RUNBOOK.md.
 
 
 D-024 REGISTERED_NOT_STARTED. Fixed interval: (2026-09-25T00:00:00Z, 2026-10-09T00:00:00Z]. Registration: 2026-09-24T16:37:53.358317Z. Protocol digest 70e55f3dde205e15b232814f98b4e00c34fac8238f2fe5bc8b190608891adac8; implementation revision e9e6e7714409b566e86197abf01ddbe0957eaa9f. D-022 bundle and V2 artifact remain byte-identical. Fifty-nine combined tests passed (8.696 s). Real read-only pre-start collector check rejected before HTTP/run creation; inventory is zero. No predictions, metrics, training, promotion or recurring collector.
+
+
+D-025: explicit user request after 553c2b5 aborts the registered evaluation BEFORE
+performance evaluation to prioritize 50k–100k genuine current Ranked development
+observations if safely achievable. Preserve original registration and run/raw
+history; append PROSPECTIVE_ABORT_FOR_DEVELOPMENT.json as lifecycle authority.
+Pilot and aborted-window observations are development-only forever. Block use
+of the aborted registration for collection/sealing/evaluation; exclude these
+origins from a future final test. Resume controlled development cycles and
+chronological validation once sufficient data exists. No final test yet.

@@ -9,6 +9,7 @@ import os
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
+from drafter.services.evaluation_lifecycle import development_origin
 
 SCHEMA = 'drafter-future-window-3'
 OLD_END = datetime(2026, 9, 18, 15, 4, 42, tzinfo=timezone.utc)
@@ -52,6 +53,8 @@ def _sha(value):
 
 
 def validate(protocol):
+    from drafter.services.evaluation_lifecycle import ensure_evaluation_active
+    ensure_evaluation_active(protocol)
     if protocol.get('schema') != SCHEMA or protocol.get('policy') != POLICY:
         raise ValueError('Unsupported future protocol/policy')
     if not all(_sha(protocol.get(key)) for key in ('v2_artifact_sha256', 'legacy_bundle_sha256', 'development_membership_sha256')):
@@ -125,7 +128,7 @@ def seal(protocol, inventory, now):
                 or row.get('patch_id') not in common['allowed_import_patch_ids']):
             reject('outside_frozen_common_context'); continue
         origins = row.get('origins', [])
-        if any(o['sampling'] == 'observed_discovery_pilot_v1' for o in origins):
+        if any(development_origin(o) for o in origins):
             reject('pre_registration_acquisition_pilot'); continue
         if not any(o['sampling'] == POLICY['sampling'] and o['source'] == 'api'
                    and o['format'] == 'brawlstars.battlelog.raw' and o['run_id'] is not None
@@ -176,7 +179,7 @@ def verify_membership(protocol, membership, inventory):
         observed = current.get(row['fingerprint'])
         if observed is None or any(observed.get(k) != v for k,v in row.items() if k != 'origins'):
             raise ValueError('Sealed match content/eligibility changed')
-        if any(o['sampling'] == 'observed_discovery_pilot_v1' for o in observed['origins']):
+        if any(development_origin(o) for o in observed['origins']):
             raise ValueError('Acquisition pilot observation cannot enter prospective membership')
         if not all(origin in observed['origins'] for origin in row['origins']):
             raise ValueError('Sealed source provenance changed')
