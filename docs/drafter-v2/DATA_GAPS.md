@@ -176,3 +176,5 @@ D-026 10k checkpoint: immutable snapshot 006 verifies 10,180 new eligible soloRa
 Checkpoint 007: 22,321 strict eligible, 26 maps/six modes/eight dates; actual patch UNKNOWN despite imported contexts 1 (22,311) and 2 (10). 1,481 strict exclusions are not training evidence. Additional exclusion-reason decomposition is pending because Docker stopped; do not invent the breakdown. Repeated-player graph bias remains (41,964 observed tags; maximum 52 matches/tag).
 
 Migration audit confirms source state; target Mac restore, full regressions and credential/IP readiness remain unverified until handoff. No API request is authorized for migration acceptance.
+
+D-029 preparation verified; only new-Mac build/restore/full regressions/preview/credential-IP readiness and owner confirmation remain unknown. No source API probe or production data access was used to close these gaps.

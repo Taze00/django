@@ -1,0 +1,130 @@
+[
+  {
+    "bytes": 953102,
+    "included": true,
+    "path": "data/brawl_reports/development-20260925-001.json",
+    "purpose": "immutable development membership/provenance or candidate archive",
+    "required": true,
+    "sha256": "6007b8380c7c9e6387d3d8150c337c70db4c83fe5d7afdccc017ddc7ed4c389f"
+  },
+  {
+    "bytes": 1707674,
+    "included": true,
+    "path": "data/brawl_reports/development-20260925-002-1k.json",
+    "purpose": "immutable development membership/provenance or candidate archive",
+    "required": true,
+    "sha256": "79d6b2d3958bf7954d6c98e6057d626b768b96926b9fabd966d7ec151a04a710"
+  },
+  {
+    "bytes": 2294722,
+    "included": true,
+    "path": "data/brawl_reports/development-20260925-003-batch01.json",
+    "purpose": "immutable development membership/provenance or candidate archive",
+    "required": true,
+    "sha256": "ac83ec8e8f523bb7c7e5dcb93464ab45dbada8d184c9a0e1548cb51611e0a480"
+  },
+  {
+    "bytes": 3692446,
+    "included": true,
+    "path": "data/brawl_reports/development-20260925-004-batch02.json",
+    "purpose": "immutable development membership/provenance or candidate archive",
+    "required": true,
+    "sha256": "db7b269b0f55a4121e1f4ee9c53422b3d1139e474cbc949444055c14b8b920af"
+  },
+  {
+    "bytes": 3853630,
+    "included": true,
+    "path": "data/brawl_reports/development-20260925-005-5k.json",
+    "purpose": "immutable development membership/provenance or candidate archive",
+    "required": true,
+    "sha256": "f0ffcd888771b3598ee0e7ce2830e71b2bb183d2708d9b6d2662b10f28cdad7d"
+  },
+  {
+    "bytes": 6681076,
+    "included": true,
+    "path": "data/brawl_reports/development-20260925-006-10k.json",
+    "purpose": "immutable development membership/provenance or candidate archive",
+    "required": true,
+    "sha256": "c0cb2d980c2f0a5458fed90ce7f8871ae70e39674c7788ce6cad9f0e36769858"
+  },
+  {
+    "bytes": 13387163,
+    "included": true,
+    "path": "data/brawl_reports/development-20260925-007-session-checkpoint.json",
+    "purpose": "immutable development membership/provenance or candidate archive",
+    "required": true,
+    "sha256": "2343247890c56f95bd1a95a4e0d681d932fa87c47988100095d6ac6d5d7c2049"
+  },
+  {
+    "bytes": 1469595,
+    "included": true,
+    "path": "data/brawl_reports/development-experiment-001-result.json",
+    "purpose": "immutable development membership/provenance or candidate archive",
+    "required": true,
+    "sha256": "7468806d5cbeaab580ddd43d0b2ac2932ff64e0ad7fe97b563284ae4633b7c76"
+  },
+  {
+    "bytes": 202,
+    "included": true,
+    "path": "data/brawl_reports/legacy-bundle-replay.json.gz",
+    "purpose": "frozen Legacy input/bundle/verification receipt",
+    "required": true,
+    "sha256": "d9a71ebb313a50ab80e40d6bc28f46000027b2243a3d97afc1bd03f71bec25be"
+  },
+  {
+    "bytes": 4728874,
+    "included": false,
+    "path": "data/brawl_reports/legacy-bundle-verified-a.json.gz",
+    "purpose": "redundant independent D-022 build; identical primary bundle retained",
+    "required": false,
+    "sha256": "879c8e73449280deeeb364ebcb2ed4f8997c091237175c6c006358f2eb89dede"
+  },
+  {
+    "bytes": 4728874,
+    "included": false,
+    "path": "data/brawl_reports/legacy-bundle-verified-b.json.gz",
+    "purpose": "redundant independent D-022 build; identical primary bundle retained",
+    "required": false,
+    "sha256": "879c8e73449280deeeb364ebcb2ed4f8997c091237175c6c006358f2eb89dede"
+  },
+  {
+    "bytes": 4728874,
+    "included": true,
+    "path": "data/brawl_reports/legacy-evaluation-23069ec9ec9cbbc8b7475e590c18e9548c4666395834886e12c0cd8436830527.json.gz",
+    "purpose": "frozen Legacy input/bundle/verification receipt",
+    "required": true,
+    "sha256": "879c8e73449280deeeb364ebcb2ed4f8997c091237175c6c006358f2eb89dede"
+  },
+  {
+    "bytes": 1226123,
+    "included": true,
+    "path": "data/brawl_reports/legacy-input-final.json.gz",
+    "purpose": "frozen Legacy input/bundle/verification receipt",
+    "required": true,
+    "sha256": "a2d99d0167578c1e62c9b7f90c42aa9aa396645592d8ac065cc311d19f6b5734"
+  },
+  {
+    "bytes": 1226121,
+    "included": true,
+    "path": "data/brawl_reports/legacy-input-v1.json.gz",
+    "purpose": "historical pre-verification Legacy input",
+    "required": false,
+    "sha256": "5965905f424c604bd23d925cc6a8117ff6dfb917a9db120eb9a1613a7ac99f4c"
+  },
+  {
+    "bytes": 1157575,
+    "included": true,
+    "path": "data/brawl_reports/v2_challenger.json",
+    "purpose": "working V2 / preserved negative opponent experiment",
+    "required": true,
+    "sha256": "92e0b427bf9abce62e047419ea1008f740c9ee7b39b1458ae15692402b7cf52d"
+  },
+  {
+    "bytes": 1161838,
+    "included": true,
+    "path": "data/brawl_reports/v2_opponent_experiment.json",
+    "purpose": "working V2 / preserved negative opponent experiment",
+    "required": true,
+    "sha256": "545c9413279c00ea79dfcafaabbf155943baef1fba2b19b4c28635e893e94884"
+  }
+]

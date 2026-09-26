@@ -162,3 +162,5 @@ Development experiment artifacts: DEVELOPMENT_EXPERIMENT_001_RESULT.json and ART
 DEVELOPMENT_SESSION_CHECKPOINT_DATASET.json / AUDIT.json preserve checkpoint 007 and complete successful-raw verification for runs 9–48. DEVELOPMENT_BATCH_05_COUNTS.json records the final 20 bounded cycles. Private membership remains data/brawl_reports/development-20260925-007-session-checkpoint.json.
 
 Migration tooling: tools/drafter_migration/{audit,build_package,verify_package,test_package}.py; compose.drafter-v2-migration.yml is standalone, no production Compose inheritance. docker/Dockerfile.drafter-v2 uses a docker-only build context and captured dependency lock. Private package under ignored backups/.
+
+Final public migration records: MIGRATION_HANDOFF.md, MIGRATION_ARTIFACT_INVENTORY.json, MIGRATION_PACKAGE_RECEIPT.json. Private archive/checksum/staging remain under ignored backups/. CODE_REVISION inside package pins restore tools db6c2b7.

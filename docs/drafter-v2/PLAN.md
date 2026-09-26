@@ -236,3 +236,5 @@ D-026 10k checkpoint: immutable snapshot 006 verifies 10,180 new eligible soloRa
 D-026 session checkpoint 007 verifies 22,321 new eligible Ranked matches. Next: resume bounded collection toward 25k/50k when the isolated Docker runtime is restored; global Docker was inactive at 2026-09-25T19:06:10Z. No collector remains active. D-027 selection is frozen, D-028 stays time-gated; no new final test.
 
 Migration priority: freeze all acquisition/model work. Preserve source; prepare selective logical PostgreSQL dump and private integrity package. New Mac acceptance must pass before any cleanup or collection. See MIGRATION_RUNBOOK.md.
+
+D-029 package preparation complete; migration transfer/new-Mac acceptance is now the next gate. See MIGRATION_HANDOFF.md. Stop acquisition/model work until migration verification completes; source cleanup requires explicit owner confirmation.
