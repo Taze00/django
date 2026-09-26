@@ -1,0 +1,50 @@
+# Standalone file: NEVER combine with the production docker-compose.yml.
+services:
+  db:
+    image: postgres:16.0
+    restart: "no"
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: local-drafter-only
+    volumes:
+      - drafter_pgdata:/var/lib/postgresql/data
+    networks: [isolated]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  app:
+    build:
+      context: ./docker
+      dockerfile: Dockerfile.drafter-v2
+    restart: "no"
+    working_dir: /code
+    command: python manage.py runserver 0.0.0.0:8000 --noreload
+    environment:
+      POSTGRES_NAME: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: local-drafter-only
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-local-drafter-preview-not-production}
+      DJANGO_REGISTRATION_KEY: disabled
+      DJANGO_SETTINGS_MODULE: tools.drafter_migration.settings
+      DJANGO_DEBUG: "True"
+      DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1,testserver
+      BRAWL_STARS_API_KEY: ${BRAWL_STARS_API_KEY:-}
+      TMDB_API_KEY: ""
+      PYTHONDONTWRITEBYTECODE: "1"
+    volumes:
+      - .:/code:ro
+      - ./data/brawl_reports:/code/data/brawl_reports
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks: [isolated]
+volumes:
+  drafter_pgdata:
+networks:
+  isolated:
+    driver: bridge

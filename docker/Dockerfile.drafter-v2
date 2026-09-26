@@ -1,0 +1,6 @@
+FROM python:3.11.14-slim
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+WORKDIR /code
+COPY drafter-v2-requirements.lock /requirements.lock
+RUN pip install --no-cache-dir -r /requirements.lock
+# Source/private data are runtime mounts, never image layers or build context.

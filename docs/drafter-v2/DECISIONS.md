@@ -625,3 +625,5 @@ remains intact. Selection cannot enlarge the grid after seeing results. Keep
 working V2 artifact unchanged pending a later forward-validation confirmation.
 
 D-028: preserve D-027 fixed-grid development result and preregister a frozen forward DEVELOPMENT confirmation for [2026-09-26, 2026-09-28) UTC, minimum 1,000 strict eligible. No fitting/reselection until this new slice is frozen and assessed after close. Do not extend or lower the gate. Current working V2 and Legacy stay unchanged; collection continues under D-026.
+
+D-029: user-authorized development-only migration. Preserve complete repository structure and all Drafter DB/artifact state; exclude unrelated row data and all secrets. Logical pg_dump/pg_restore, no raw PGDATA transfer. Source remains read-only except new package/docs/tools; target loopback-only and must reproduce pinned counts/hashes/smoke outputs. No collection/fitting or destructive source cleanup.
